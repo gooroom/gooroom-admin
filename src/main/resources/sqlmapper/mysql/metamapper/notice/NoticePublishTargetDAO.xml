@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NoticePublishTargetDAO">
+
+	<resultMap type="noticePublishTargetVO" id="noticePublishTarget">
+
+		<result property="noticePublishId" column="NOTICE_PUBLISH_ID"/>
+		<result property="targetType" column="TARGET_TYPE"/>
+		<result property="targetId" column="TARGET_ID"/>
+		<result property="targetName" column="TARGET_NAME"/>
+		<result property="isChildCheck" column="IS_CHILD_CHECK"/>
+		<result property="isShow" column="IS_SHOW"/>
+
+	</resultMap>
+	
+	<insert id="insertNoticePublishTargets" parameterType="java.util.List">
+	    INSERT INTO NOTICE_PUBLISH_TARGET
+	        (NOTICE_PUBLISH_ID, TARGET_TYPE, TARGET_ID, IS_CHILD_CHECK, IS_SHOW)
+        VALUES
+        <foreach collection="list" item="item" separator=" , ">
+            (#{item.noticePublishId}, #{item.targetType}, #{item.targetId}, #{item.isChildCheck}, #{item.isShow})
+        </foreach>
+	</insert>
+	
+	<select id="selectNoticePublishTargetList" parameterType="hashMap" resultMap="noticePublishTarget">
+        SELECT * FROM (        
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, UM.USER_NM AS TARGET_NAME, NPT.IS_CHILD_CHECK
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN USER_MSTR UM ON UM.USER_ID = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '0' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+    
+            UNION
+    
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, DM.DEPT_NM AS TARGET_NAME, NPT.IS_CHILD_CHECK
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN DEPT_MSTR DM ON DM.DEPT_CD = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '1' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+            
+            UNION
+            
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, CM.CLIENT_NM AS TARGET_NAME, NPT.IS_CHILD_CHECK
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN CLIENT_MSTR CM ON CM.CLIENT_ID = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '2' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+            
+            UNION
+            
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, CGM.GRP_NM AS TARGET_NAME, NPT.IS_CHILD_CHECK
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN CLIENT_GRP_MSTR CGM ON CGM.GRP_ID = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '3' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+        ) NTP_UNION
+	</select>
+	
+	<select id="selectNoticePublishTargetListPaged" parameterType="hashMap" resultMap="noticePublishTarget">
+        SELECT * FROM (	       
+			SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, UM.USER_NM AS TARGET_NAME, NPT.IS_CHILD_CHECK
+			FROM NOTICE_PUBLISH_TARGET NPT
+				LEFT JOIN USER_MSTR UM ON UM.USER_ID = NPT.TARGET_ID
+			WHERE NPT.TARGET_TYPE = '0' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+	
+			UNION
+	
+			SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, DM.DEPT_NM AS TARGET_NAME, NPT.IS_CHILD_CHECK
+			FROM NOTICE_PUBLISH_TARGET NPT
+				LEFT JOIN DEPT_MSTR DM ON DM.DEPT_CD = NPT.TARGET_ID
+			WHERE NPT.TARGET_TYPE = '1' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+			
+			UNION
+			
+			SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, CM.CLIENT_NM AS TARGET_NAME, NPT.IS_CHILD_CHECK
+			FROM NOTICE_PUBLISH_TARGET NPT
+				LEFT JOIN CLIENT_MSTR CM ON CM.CLIENT_ID = NPT.TARGET_ID
+			WHERE NPT.TARGET_TYPE = '2' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+			
+			UNION
+			
+			SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, CGM.GRP_NM AS TARGET_NAME, NPT.IS_CHILD_CHECK
+			FROM NOTICE_PUBLISH_TARGET NPT
+				LEFT JOIN CLIENT_GRP_MSTR CGM ON CGM.GRP_ID = NPT.TARGET_ID
+			WHERE NPT.TARGET_TYPE = '3' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+		) NTP_UNION
+        ORDER BY ${paramOrderColumn} ${paramOrderDir}
+        LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectNoticePublishTargetListTotalCount" parameterType="hashMap" resultType="long">
+	    SELECT COUNT(NOTICE_PUBLISH_ID) FROM (
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, UM.USER_NM AS TARGET_NAME
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN USER_MSTR UM ON UM.USER_ID = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '0' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+    
+            UNION
+    
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, DM.DEPT_NM AS TARGET_NAME
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN DEPT_MSTR DM ON DM.DEPT_CD = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '1' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+            
+            UNION
+            
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, CM.CLIENT_NM AS TARGET_NAME
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN CLIENT_MSTR CM ON CM.CLIENT_ID = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '2' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+            
+            UNION
+            
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, CGM.GRP_NM AS TARGET_NAME
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN CLIENT_GRP_MSTR CGM ON CGM.GRP_ID = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '3' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+        ) NTP_UNION
+    </select>
+    
+    <select id="selectNoticePublishTargetListFilteredCount" parameterType="hashMap" resultType="long">
+        SELECT COUNT(NOTICE_PUBLISH_ID) FROM (
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, UM.USER_NM AS TARGET_NAME
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN USER_MSTR UM ON UM.USER_ID = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '0' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+    
+            UNION
+    
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, DM.DEPT_NM AS TARGET_NAME
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN DEPT_MSTR DM ON DM.DEPT_CD = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '1' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+            
+            UNION
+            
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, CM.CLIENT_NM AS TARGET_NAME
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN CLIENT_MSTR CM ON CM.CLIENT_ID = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '2' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+            
+            UNION
+            
+            SELECT NPT.NOTICE_PUBLISH_ID, NPT.TARGET_TYPE, NPT.TARGET_ID, CGM.GRP_NM AS TARGET_NAME
+            FROM NOTICE_PUBLISH_TARGET NPT
+                LEFT JOIN CLIENT_GRP_MSTR CGM ON CGM.GRP_ID = NPT.TARGET_ID
+            WHERE NPT.TARGET_TYPE = '3' AND NPT.IS_SHOW = '1' AND NPT.NOTICE_PUBLISH_ID = #{noticePublishId}
+        ) NTP_UNION
+    </select>
+
+</mapper>

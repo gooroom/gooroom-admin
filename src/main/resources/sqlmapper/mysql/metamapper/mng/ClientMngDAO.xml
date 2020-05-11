@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ClientMngDAO">
+
+	<resultMap type="clientRegKeyVO" id="clientRegKeyInfo">
+		<result property="regKeyNo" column="REGKEY_NO" />
+		<result property="validDate" column="VALID_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="expireDate" column="EXPIRE_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+
+		<result property="ipRange" column="IP_RANGE"/>
+	
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+	</resultMap>
+	
+	<resultMap type="clientProfileSetVO" id="clientProfileSetInfo">
+		<result property="clientId" column="CLIENT_ID" />
+		<result property="clientNm" column="CLIENT_NM" />
+		
+		<result property="profileNo" column="PROFILE_NO"/>
+		<result property="profileNm" column="PROFILE_NM"/>
+		<result property="profileCmt" column="PROFILE_COMMENT"/>
+
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+	</resultMap>
+
+	<resultMap type="clientPackageVO" id="clientProfilePackageInfo">
+	
+		<result property="clientId" column="CLIENT_ID" />
+		
+		<result property="packageId" column="PACKAGE_ID" />
+		<result property="packageArch" column="PACKAGE_ARCH" />
+		
+		<result property="installVer" column="INSTALL_VER" />
+		<result property="packageLastVer" column="PACKAGE_LAST_VER" />
+
+		<result property="totalCnt" column="TOTAL_CNT" />
+		<result property="updateTargetCnt" column="UPDATE_TARGET_CNT" />
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+		
+	</resultMap>
+
+	<!-- 등록키 관련 정보 조회 -->
+	<select id="selectRegKeyList" parameterType="hashMap" resultMap="clientRegKeyInfo">
+		SELECT REGKEY_NO, VALID_DT, EXPIRE_DT, IP_RANGE, COMMENT, MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID 
+		FROM CLIENT_REGKEY
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				REGKEY_NO LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectRegKeyListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(REGKEY_NO) AS CNT 
+		FROM CLIENT_REGKEY
+	</select>
+
+	<select id="selectRegKeyListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(REGKEY_NO) AS CNT 
+		FROM CLIENT_REGKEY
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				REGKEY_NO LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>
+	</select>
+	
+	<!-- 등록키 관련 정보 등록 -->
+	<insert id="insertRegKeyData" parameterType="clientRegKeyVO">
+		INSERT INTO CLIENT_REGKEY
+			(REGKEY_NO, VALID_DT, EXPIRE_DT, IP_RANGE, COMMENT, MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID)
+		VALUES
+			(#{regKeyNo}, #{validDate}, #{expireDate}, #{ipRange}, #{comment}, now(), #{modUserId}, now(), #{regUserId})
+	</insert>
+	
+	<!-- 등록키 관련 정보 삭제 -->
+	<delete id="deleteRegKeyData" parameterType="string">
+		DELETE FROM CLIENT_REGKEY
+		WHERE
+			REGKEY_NO = #{regKeyNo}
+	</delete>
+	
+	<!-- 등록키 관련 정보 수정 -->
+	<update id="updateRegKeyData" parameterType="clientRegKeyVO">
+		UPDATE CLIENT_REGKEY SET
+			VALID_DT = #{validDate}, 
+			EXPIRE_DT = #{expireDate},
+			IP_RANGE = #{ipRange},
+			COMMENT = #{comment},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now()
+		WHERE
+			REGKEY_NO = #{regKeyNo}
+	</update>
+	
+
+
+	<!-- 프로파일 마스터 정보 등록 -->
+	<insert id="insertProfileSet" parameterType="clientProfileSetVO">
+		<selectKey keyProperty="profileNo" resultType="string" order="BEFORE">
+			SELECT GRNEXTVAL('CLIENTPROF_SEQ')
+		</selectKey>
+		INSERT INTO CLIENT_PROFILE_MSTR (
+			PROFILE_NO, PROFILE_NM, PROFILE_COMMENT, CLIENT_ID, 
+			MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT
+		) 
+		VALUES (#{profileNo}, #{profileNm}, #{profileCmt}, #{clientId}, #{modUserId}, now(), #{regUserId}, now());
+	</insert>
+
+	<!-- 프로파일 정보 조회 - 페이징 -->
+	<select id="selectProfileSetListPaged" parameterType="hashMap" resultMap="clientProfileSetInfo">
+		SELECT 
+			CPM.PROFILE_NO, 
+			CPM.PROFILE_NM, 
+			CPM.PROFILE_COMMENT, 
+			CPM.CLIENT_ID,
+			CM.CLIENT_NM,
+			CPM.MOD_USER_ID, 
+			CPM.MOD_DT, 
+			CPM.REG_USER_ID, 
+			CPM.REG_DT 
+		FROM CLIENT_PROFILE_MSTR CPM LEFT JOIN CLIENT_MSTR CM ON CPM.CLIENT_ID = CM.CLIENT_ID
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				CPM.PROFILE_NM LIKE CONCAT('%', #{searchKey}, '%') 
+				OR CPM.PROFILE_COMMENT LIKE CONCAT('%', #{searchKey}, '%')
+				OR CPM.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectProfileSetListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(PROFILE_NO) AS CNT 
+		FROM CLIENT_PROFILE_MSTR
+	</select>
+
+	<select id="selectProfileSetListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(PROFILE_NO) AS CNT 
+		FROM CLIENT_PROFILE_MSTR
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				PROFILE_NM LIKE CONCAT('%', #{searchKey}, '%') OR PROFILE_COMMENT LIKE CONCAT('%', #{searchKey}, '%') 
+			</if>
+		</where>
+	</select>
+
+	<!-- 프로파일 정보 삭제 -->
+	<delete id="deleteProfileSetMaster" parameterType="string">
+		DELETE FROM CLIENT_PROFILE_MSTR
+		WHERE
+			PROFILE_NO = #{profileNo}
+	</delete>
+
+	<delete id="deleteProfileSetData" parameterType="string">
+		DELETE FROM CLIENT_PROFILE_DATA
+		WHERE
+			PROFILE_NO = #{profileNo}
+	</delete>
+	
+	<!-- 프로파일 정보 수정 -->
+	<update id="updateProfileSetData" parameterType="clientProfileSetVO">
+		UPDATE CLIENT_PROFILE_MSTR
+		<set>
+      		<if test="profileNm != null">PROFILE_NM=#{profileNm},</if>
+      		<if test="profileCmt != null">PROFILE_COMMENT=#{profileCmt},</if>
+      		<if test="clientId != null">CLIENT_ID=#{clientId},</if>
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now()
+    	</set>
+		WHERE
+			PROFILE_NO = #{profileNo}
+	</update>
+
+
+	<select id="selectProfilePackageListPaged" parameterType="hashmap" resultMap="clientProfilePackageInfo">
+		SELECT #{clientId} AS CLIENT_ID, CPD.PROFILE_NO, CPD.PACKAGE_ID, CPD.PACKAGE_ARCH, CPD.INSTALL_VER, CPD.PACKAGE_LAST_VER, CPD.MOD_DT 
+		FROM CLIENT_PROFILE_DATA CPD
+		WHERE CPD.PROFILE_NO=#{profileNo}
+		<if test='searchKey != null and searchKey != ""'>
+			AND CPD.PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+		</if>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectProfilePackageListTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(CPD.PACKAGE_ID) AS CNT 
+		FROM CLIENT_PROFILE_DATA CPD
+		WHERE CPD.PROFILE_NO=#{profileNo}
+	</select>
+
+	<select id="selectProfilePackageListFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(CPD.PACKAGE_ID) AS CNT 
+		FROM CLIENT_PROFILE_DATA CPD
+		WHERE CPD.PROFILE_NO=#{profileNo}
+		<if test="searchKey != null and searchKey != ''">
+			AND CPD.PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+		</if>
+	</select>
+	
+</mapper>
+
+
+

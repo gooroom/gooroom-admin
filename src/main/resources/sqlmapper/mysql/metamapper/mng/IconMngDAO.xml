@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="IconMngDAO">
+
+	<resultMap type="iconVO" id="iconInfo">
+		<result property="iconId" column="ICON_ID" />
+		<result property="iconNm" column="ICON_NM"/>
+		<result property="iconCmt" column="ICON_CMT"/>
+
+		<result property="grpId" column="GRP_ID" />
+		<result property="grpNm" column="GRP_NM" />
+		
+		<result property="fileNo" column="FILE_NO"/>
+		<result property="fileNm" column="FILE_NM"/>
+		<result property="filePath" column="FILE_PATH"/>
+
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+	</resultMap>
+
+	<resultMap type="iconGroupVO" id="iconGroupInfo">
+		<result property="grpId" column="GRP_ID" />
+		<result property="grpNm" column="GRP_NM" />
+		
+		<result property="grpCmt" column="GRP_CMT" />
+		<result property="iconCnt" column="ICON_COUNT" />
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+	</resultMap>
+	
+	<select id="selectIconList" parameterType="hashmap" resultMap="iconInfo">
+		SELECT IM.ICON_ID, IM.ICON_NM, IM.ICON_CMT, IGM.GRP_ID, IGM.GRP_NM, 
+      		IM.FILE_NO, FM.FILE_NM, FM.FILE_PATH, 
+			IM.REG_USER_ID, IM.REG_DT, IM.MOD_USER_ID, IM.MOd_DT
+		FROM ICON_MSTR IM 
+			LEFT JOIN FILE_MSTR FM ON IM.FILE_NO=FM.FILE_NO
+			LEFT JOIN ICON_GRP IG ON IM.ICON_ID=IG.ICON_ID
+			LEFT JOIN ICON_GRP_MSTR IGM ON IG.GRP_ID=IGM.GRP_ID
+		<where>
+			<if test="grpId != null and grpId != ''">
+				IG.GRP_ID=#{grpId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectNoGroupIconList" resultMap="iconInfo">
+		SELECT IM.ICON_ID, IM.ICON_NM, IM.ICON_CMT, 
+			IM.FILE_NO, FM.FILE_NM, FM.FILE_PATH, 
+			IM.REG_USER_ID, IM.REG_DT, IM.MOD_USER_ID, IM.MOd_DT   
+		FROM ICON_MSTR IM 
+			LEFT JOIN FILE_MSTR FM ON IM.FILE_NO=FM.FILE_NO
+			LEFT JOIN ICON_GRP IG ON IM.ICON_ID=IG.ICON_ID
+		WHERE IG.ICON_ID IS NULL
+	</select>
+
+	<select id="selectIconData" parameterType="string" resultMap="iconInfo">
+		SELECT IM.ICON_ID, IM.ICON_NM, IM.ICON_CMT, IM.FILE_NO, FM.FILE_NM, IM.REG_USER_ID, IM.REG_DT, IM.MOD_USER_ID, IM.MOd_DT
+		FROM ICON_MSTR IM 
+			LEFT JOIN FILE_MSTR FM ON IM.FILE_NO=FM.FILE_NO
+			LEFT JOIN ICON_GRP IG ON IM.ICON_ID=IG.ICON_ID
+		WHERE IM.ICON_ID=#{iconId}
+	</select>
+
+	<insert id="insertIconData" parameterType="iconVO">
+	
+		INSERT INTO ICON_MSTR
+			(ICON_NM, ICON_CMT, FILE_NO, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT) 
+		VALUES (#{iconNm}, #{iconCmt}, #{fileNo}, #{modUserId}, now(), #{regUserId}, now())
+		<selectKey resultType="String" keyProperty="iconId" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="updateIconData" parameterType="iconVO">
+		UPDATE ICON_MSTR SET
+			ICON_NM = #{iconNm},
+			ICON_CMT = #{iconCmt},
+			FILE_NO = #{fileNo},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now()
+		WHERE
+			ICON_ID = #{iconId}
+	</update>
+
+	<update id="deleteIconData" parameterType="string">
+		DELETE FROM ICON_MSTR 
+		WHERE ICON_ID = #{iconId}
+	</update>
+
+
+	<insert id="insertIconGroupData" parameterType="iconGroupVO">
+
+		INSERT INTO ICON_GRP_MSTR
+			(GRP_NM, GRP_CMT, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT)
+		VALUES (
+			#{grpNm},
+			#{grpCmt},
+			#{modUserId},
+			now(),
+			#{regUserId},
+			now()
+		)
+
+	</insert>
+	
+	<select id="selectIconGroupData" parameterType="String" resultMap="iconGroupInfo">
+	
+		SELECT 
+  			GRP_ID, GRP_NM, GRP_CMT, 
+  			(SELECT COUNT(ICON_ID) FROM ICON_GRP WHERE GRP_ID = GM.GRP_ID) ICON_COUNT,
+  			MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT 
+		FROM ICON_GRP_MSTR
+		WHERE GRP_ID=#{groupId}
+
+	</select>
+
+	<select id="selectIconGroupList" resultMap="iconGroupInfo">
+	
+		SELECT 
+  			IGM.GRP_ID, IGM.GRP_NM, IGM.GRP_CMT, 
+  			(SELECT COUNT(ICON_ID) FROM ICON_GRP IG WHERE IG.GRP_ID = IGM.GRP_ID) ICON_COUNT,
+  			IGM.MOD_USER_ID, IGM.MOD_DT, IGM.REG_USER_ID, IGM.REG_DT 
+		FROM ICON_GRP_MSTR IGM
+	</select>
+
+	<delete id="deleteIconGroup" parameterType="String">
+		DELETE FROM ICON_GRP_MSTR WHERE GRP_ID = #{groupId};
+	</delete>
+
+	<delete id="deleteIconGroupLink" parameterType="String">
+		DELETE FROM ICON_GRP WHERE GRP_ID = #{groupId};
+	</delete>
+
+	<update id="updateIconGroup" parameterType="iconGroupVO">
+
+		UPDATE ICON_GRP_MSTR SET GRP_NM = #{grpNm}, GRP_CMT = #{grpCmt} 
+		WHERE GRP_ID = #{grpId};
+
+	</update>
+	
+	<insert id="insertIconInGroup" parameterType="hashmap">
+	
+		INSERT INTO ICON_GRP (GRP_ID, ICON_ID, REG_DT, REG_USER_ID) 
+		VALUES (#{grpId}, #{iconId}, now(), #{regUserId})
+		ON DUPLICATE KEY UPDATE GRP_ID=#{grpId}, ICON_ID=#{iconId}
+
+	</insert>
+	
+	<delete id="deleteIconInGroup" parameterType="hashmap">
+		DELETE FROM ICON_GRP WHERE GRP_ID = #{grpId} AND ICON_ID = #{iconId};
+	</delete>
+
+	<delete id="deleteAllIconInGroup" parameterType="hashmap">
+		DELETE FROM ICON_GRP WHERE GRP_ID = #{grpId}
+	</delete>
+	
+	<delete id="deleteIconInGroupMapper" parameterType="hashmap">
+		DELETE FROM ICON_GRP WHERE ICON_ID = #{iconId}
+	</delete>
+	
+</mapper>
+
+
+

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration	PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<properties>
+
+	</properties>
+	
+	<typeAliases>
+	
+		<typeAlias type="kr.gooroom.gpms.client.service.ClientVO" alias="clientVO"/>
+		<typeAlias type="kr.gooroom.gpms.client.service.ClientStatsVO" alias="clientStatsVO"/>
+		<typeAlias type="kr.gooroom.gpms.client.service.ClientGroupVO" alias="clientGroupVO"/>
+		<typeAlias type="kr.gooroom.gpms.client.service.ClientPackageVO" alias="clientPackageVO"/>
+		<typeAlias type="kr.gooroom.gpms.client.service.ClientSummaryVO" alias="clientSummaryVO"/>
+		<typeAlias type="kr.gooroom.gpms.client.service.UpdatePackageClientVO" alias="updatePackageClientVO"/>
+				
+		<typeAlias type="kr.gooroom.gpms.common.service.CertForClientVO" alias="certificateVO"/>
+		<typeAlias type="kr.gooroom.gpms.common.service.NameAndValueVO" alias="nameAndValueVO"/>
+		
+		<typeAlias type="kr.gooroom.gpms.account.service.AccountVO" alias="accountVO" />
+		<typeAlias type="kr.gooroom.gpms.account.service.ActHistoryVO" alias="actHistoryVO" />
+
+		<typeAlias type="kr.gooroom.gpms.job.service.JobVO" alias="jobVO" />
+		<typeAlias type="kr.gooroom.gpms.job.service.JobResultVO" alias="jobResultVO" />
+		<typeAlias type="kr.gooroom.gpms.job.service.ClientInJobVO" alias="clientInJobVO" />
+
+		<typeAlias type="kr.gooroom.gpms.config.service.CtrlItemVO" alias="ctrlItemVO" />
+		<typeAlias type="kr.gooroom.gpms.config.service.CtrlPropVO" alias="ctrlPropVO" />
+		
+		<typeAlias type="kr.gooroom.gpms.user.service.AdminUserVO" alias="adminUserVO" />
+		<typeAlias type="kr.gooroom.gpms.user.service.UserRoleVO" alias="userRoleVO" />
+		<typeAlias type="kr.gooroom.gpms.user.service.UserVO" alias="userVO" />
+		<typeAlias type="kr.gooroom.gpms.user.service.UserAndRoleVO" alias="userAndRoleVO" />
+		<typeAlias type="kr.gooroom.gpms.user.service.UserAndClientVO" alias="userAndClientVO" />
+		<typeAlias type="kr.gooroom.gpms.user.service.UserTokenVO" alias="userTokenVO"/>
+		
+		<typeAlias type="kr.gooroom.gpms.config.service.DesktopConfVO" alias="desktopConfVO" />
+
+		<typeAlias type="kr.gooroom.gpms.config.service.DesktopInfoVO" alias="desktopInfoVO" />
+		<typeAlias type="kr.gooroom.gpms.config.service.DesktopItemVO" alias="desktopItemVO" />
+		<typeAlias type="kr.gooroom.gpms.config.service.DesktopApplicationInfoVO" alias="desktopApplicationInfoVO" />
+		<typeAlias type="kr.gooroom.gpms.config.service.DesktopMountInfoVO" alias="desktopMountInfoVO" />
+				
+		<typeAlias type="kr.gooroom.gpms.config.service.ClientConfDataVO" alias="clientConfDataVO" />
+		<typeAlias type="kr.gooroom.gpms.config.service.MgServerConfVO" alias="mgServerConfVO" />
+		<typeAlias type="kr.gooroom.gpms.config.service.SiteConfVO" alias="siteConfVO" />
+		<typeAlias type="kr.gooroom.gpms.common.service.ServerAddrInfoVO" alias="serverAddrInfoVO" />
+		
+		<typeAlias type="kr.gooroom.gpms.csp.service.CspVO" alias="cspVO" />
+		
+		<typeAlias type="kr.gooroom.gpms.stats.service.LoginCountVO" alias="loginCountVO"/>
+		<typeAlias type="kr.gooroom.gpms.stats.service.LoginDataVO" alias="loginDataVO"/>
+		<typeAlias type="kr.gooroom.gpms.stats.service.ClientMngCountVO" alias="clientMngCountVO"/>
+		<typeAlias type="kr.gooroom.gpms.stats.service.ViolatedCountVO" alias="violatedCountVO"/>
+		<typeAlias type="kr.gooroom.gpms.stats.service.ViolatedLogVO" alias="violatedLogVO"/>
+		
+		<typeAlias type="kr.gooroom.gpms.log.service.ClientLogVO" alias="clientLogVO"/>
+
+		<typeAlias type="kr.gooroom.gpms.mng.service.DesktopAppVO" alias="desktopAppVO" />
+		
+		<typeAlias type="kr.gooroom.gpms.dept.service.DeptVO" alias="deptVO" />
+		<typeAlias type="kr.gooroom.gpms.common.service.FileVO" alias="fileVO" />
+		
+		<typeAlias type="kr.gooroom.gpms.mng.service.ClientRegKeyVO" alias="clientRegKeyVO" />
+		<typeAlias type="kr.gooroom.gpms.mng.service.ClientProfileSetVO" alias="clientProfileSetVO" />
+		
+		<typeAlias type="kr.gooroom.gpms.mng.service.ThemeVO" alias="themeVO" />
+		<typeAlias type="kr.gooroom.gpms.mng.service.WallpaperVO" alias="wallpaperVO" />
+		<typeAlias type="kr.gooroom.gpms.mng.service.IconVO" alias="iconVO" />
+		<typeAlias type="kr.gooroom.gpms.mng.service.IconGroupVO" alias="iconGroupVO" />
+		
+		<typeAlias type="kr.gooroom.gpms.job.custom.OnlineClientAndUserVO" alias="onlineClientAndUserVO" />
+		<typeAlias type="kr.gooroom.gpms.config.service.RuleIdsVO" alias="ruleIdsVO" />
+
+		<typeAlias type="kr.gooroom.gpms.site.service.SiteMngVO" alias="siteMngVO"/>
+		
+		<typeAlias type="kr.gooroom.gpms.notice.service.NoticeVO" alias="noticeVO" />
+		<typeAlias type="kr.gooroom.gpms.notice.service.NoticePublishVO" alias="noticePublishVO" />
+		<typeAlias type="kr.gooroom.gpms.notice.service.NoticeInstantNoticeVO" alias="noticeInstantNoticeVO" />
+		<typeAlias type="kr.gooroom.gpms.notice.service.UserOpenedNoticeVO" alias="userOpenedNoticeVO" />
+		<typeAlias type="kr.gooroom.gpms.notice.service.NoticePublishTargetVO" alias="noticePublishTargetVO" />
+		<typeAlias type="kr.gooroom.gpms.notice.service.TargetNoticeVO" alias="targetNoticeVO" />
+		
+	</typeAliases>
+	
+</configuration>

@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="JobDAO">
+
+	<resultMap type="jobVO" id="jobInfo">
+	
+		<result property="jobNo" column="JOB_NO" />
+		<result property="jobName" column="JOB_NM" />
+
+		<result property="jobStatus" column="JOB_STATUS" />
+		<result property="jobData" column="JOB_DATA" />
+
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID" />
+		<result property="endDate" column="END_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		
+		<result property="runAmount" column="RUN_AMOUNT" />
+		
+		<result property="clientId" column="CLIENT_ID" />
+	
+		<result property="clientCount" column="CLIENT_COUNT" />
+		<result property="compCount" column="COMP_COUNT" />
+		<result property="errorCount" column="ERROR_COUNT" />
+		<result property="runCount" column="RUN_COUNT" />
+		<result property="runCount" column="RUN_COUNT" />
+		<result property="cancelCount" column="CANCEL_COUNT" />
+
+	</resultMap>
+
+	<resultMap type="jobResultVO" id="jobResultInfo">
+	
+		<result property="jobNo" column="JOB_NO" />
+		<result property="jobName" column="JOB_NM" />
+		
+		<result property="jobData" column="JOB_DATA" />
+		
+		<result property="clientId" column="CLIENT_ID" />
+		<result property="resultData" column="RESULT_DATA" />
+	
+	</resultMap>
+	
+	<resultMap type="clientInJobVO" id="clientInJobInfo">
+	
+		<result property="jobNo" column="JOB_NO" />
+		<result property="clientId" column="CLIENT_ID" />
+		
+		<result property="jobStat" column="JOB_STAT"/>
+		<result property="grpNm" column="GRP_NM" />
+		<result property="resultData" column="RESULT_DATA" />
+		
+		<result property="isOn" column="ISON"/>
+		
+	</resultMap>
+	
+
+	<!-- 작업리스트조회 -->
+	<select id="selectJobList" parameterType="hashMap" resultMap="jobInfo">
+	
+		SELECT 
+		  JM.JOB_NO, JM.JOB_NM, JM.JOB_TP, 
+		  JT.CLIENT_COUNT,
+		  JT.COMP_COUNT,
+		  JT.ERROR_COUNT,
+		  JT.RUN_COUNT,
+		  JT.READY_COUNT,
+		  JT.CANCEL_COUNT,
+		  JM.JOB_DATA, JM.REG_USER_ID, JM.REG_DT, JT.END_DT,
+		  (UNIX_TIMESTAMP(JT.END_DT)) - (UNIX_TIMESTAMP(JM.REG_DT)) AS RUN_AMOUNT
+		FROM JOB_MSTR JM
+		  JOIN (
+		SELECT JOB_NO AS JOB_NO, COUNT(CLIENT_ID) AS CLIENT_COUNT, 
+		  COUNT(IF(JOB_STAT='C' OR JOB_STAT='CK' OR JOB_STAT='DK' OR JOB_STAT='RK' OR JOB_STAT='QK', JOB_STAT, NULL)) AS COMP_COUNT, 
+		  COUNT(IF(JOB_STAT='E' OR JOB_STAT='EK', JOB_STAT, NULL)) AS ERROR_COUNT, 
+		  COUNT(IF(JOB_STAT='D', JOB_STAT, NULL)) AS RUN_COUNT, 
+		  COUNT(IF(JOB_STAT='R', JOB_STAT, NULL)) AS READY_COUNT,
+		  COUNT(IF(JOB_STAT='Q', JOB_STAT, NULL)) AS CANCEL_COUNT,
+		  MAX(MOD_DT) AS END_DT
+		FROM JOB_TRGT
+		GROUP BY JOB_NO
+		  ) JT ON JM.JOB_NO = JT.JOB_NO
+		<choose>
+		    <when test='"C".equals(jobStatus)'>
+				WHERE JT.CLIENT_COUNT = JT.COMP_COUNT
+		    </when>
+		    <when test='"D".equals(jobStatus)'>
+				WHERE JT.RUN_COUNT > 0
+		    </when>
+		    <when test='"R".equals(jobStatus)'>
+				WHERE JT.CLIENT_COUNT > (JT.COMP_COUNT + JT.ERROR_COUNT)
+		    </when>
+		    <otherwise>
+		    </otherwise>
+		</choose>
+
+	</select>
+
+	<!-- 작업상세조회 -->
+	<select id="selectJobInfo" parameterType="String" resultMap="jobInfo">
+		SELECT 
+			JOB_NO, JOB_NM, JOB_DATA 
+			REG_DT, REG_USER_ID 
+		FROM JOB_MSTR
+		WHERE JOB_NO=#{jobNo}
+	</select>
+
+	<!-- 작업취소 -->
+	<update id="updateJobClientToCancel" parameterType="jobVO">
+		UPDATE JOB_TRGT SET JOB_STAT = 'Q', MOD_DT = NOW() WHERE JOB_NO = #{jobNo} AND JOB_STAT='R'
+	</update>
+
+	<!-- 작업에 포함된 단말기 리스트 조회 -->
+	<select id="selectClientListInJob" parameterType="String" resultMap="clientInJobInfo">
+		SELECT JT.JOB_NO, JT.CLIENT_ID, JT.JOB_STAT, JT.RESULT_DATA,
+		       	CGM.GRP_NM,
+		       	CASE 
+					WHEN ISNULL(CA.ON_USER_ID) THEN '0' 
+					WHEN CA.ON_USER_ID = '-' THEN '0' 
+					ELSE '1' 
+				END AS ISON
+		FROM JOB_TRGT JT
+      		LEFT JOIN CLIENT_MSTR T ON JT.CLIENT_ID = T.CLIENT_ID
+      		LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+			LEFT JOIN CLIENT_ACCESS CA ON JT.CLIENT_ID = CA.CLIENT_ID
+		WHERE JT.JOB_NO = #{jobNo}
+	</select>
+	
+	
+	
+	<select id="selectClientListInJobPaged" parameterType="hashMap" resultMap="clientInJobInfo">
+		SELECT AA.JOB_NO, AA.CLIENT_ID, AA.JOB_STAT, AA.RESULT_DATA, AA.GRP_NM, AA.ISON 
+		FROM (
+			SELECT JT.JOB_NO, JT.CLIENT_ID, JT.JOB_STAT, JT.RESULT_DATA,
+					CGM.GRP_NM,
+					CASE 
+						WHEN ISNULL(CA.ON_USER_ID) THEN '0' 
+						WHEN CA.ON_USER_ID = '-' THEN '0' 
+						ELSE '1' 
+					END AS ISON
+			FROM JOB_TRGT JT
+	      		LEFT JOIN CLIENT_MSTR T ON JT.CLIENT_ID = T.CLIENT_ID
+	      		LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+				LEFT JOIN CLIENT_ACCESS CA ON JT.CLIENT_ID = CA.CLIENT_ID
+			<where>
+				<if test="jobNo != null and jobNo != ''">
+					JT.JOB_NO = #{jobNo}
+				</if>
+				<if test="searchKey != null and searchKey != ''">
+					AND (JT.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR CGM.GRP_NM LIKE CONCAT('%', #{searchKey}, '%')) 
+				</if>
+			</where>
+			UNION
+			SELECT JT.JOB_NO, JT.CLIENT_ID, JT.JOB_STAT, JT.RESULT_DATA,
+					CGM.GRP_NM,
+					CASE 
+						WHEN ISNULL(CA.ON_USER_ID) THEN '0' 
+						WHEN CA.ON_USER_ID = '-' THEN '0' 
+						ELSE '1' 
+					END AS ISON
+			FROM JOB_TRGT_BK JT
+	      		LEFT JOIN CLIENT_MSTR T ON JT.CLIENT_ID = T.CLIENT_ID
+	      		LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+				LEFT JOIN CLIENT_ACCESS CA ON JT.CLIENT_ID = CA.CLIENT_ID
+			<where>
+				<if test="jobNo != null and jobNo != ''">
+					JT.JOB_NO = #{jobNo}
+				</if>
+				<if test="searchKey != null and searchKey != ''">
+					AND (JT.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR CGM.GRP_NM LIKE CONCAT('%', #{searchKey}, '%')) 
+				</if>
+			</where>
+		) AA
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectClientListInJobFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(AA.CLIENT_ID) AS CNT
+		FROM (
+			SELECT JT.CLIENT_ID
+			FROM JOB_TRGT JT
+	      		LEFT JOIN CLIENT_MSTR T ON JT.CLIENT_ID = T.CLIENT_ID
+	      		LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+			<where>
+				<if test="jobNo != null and jobNo != ''">
+					JT.JOB_NO = #{jobNo}
+				</if>
+				<if test="searchKey != null and searchKey != ''">
+					AND (JT.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR CGM.GRP_NM LIKE CONCAT('%', #{searchKey}, '%')) 
+				</if>
+			</where>
+			UNION
+			SELECT JT.CLIENT_ID
+			FROM JOB_TRGT_BK JT
+	      		LEFT JOIN CLIENT_MSTR T ON JT.CLIENT_ID = T.CLIENT_ID
+	      		LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+			<where>
+				<if test="jobNo != null and jobNo != ''">
+					JT.JOB_NO = #{jobNo}
+				</if>
+				<if test="searchKey != null and searchKey != ''">
+					AND (JT.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR CGM.GRP_NM LIKE CONCAT('%', #{searchKey}, '%')) 
+				</if>
+			</where>
+		) AA
+	</select>
+
+	<select id="selectClientListInJobTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(AA.CLIENT_ID) AS CNT
+		FROM (
+			SELECT JT.CLIENT_ID
+			FROM JOB_TRGT JT
+	      		LEFT JOIN CLIENT_MSTR T ON JT.CLIENT_ID = T.CLIENT_ID
+	      		LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+			<where>
+				<if test="jobNo != null and jobNo != ''">
+					JT.JOB_NO = #{jobNo}
+				</if>
+			</where>
+			UNION
+			SELECT JT.CLIENT_ID
+			FROM JOB_TRGT_BK JT
+	      		LEFT JOIN CLIENT_MSTR T ON JT.CLIENT_ID = T.CLIENT_ID
+	      		LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+			<where>
+				<if test="jobNo != null and jobNo != ''">
+					JT.JOB_NO = #{jobNo}
+				</if>
+			</where>
+		) AA
+	</select>
+
+	<!-- 작업 마스터 등록 -->
+	<insert id="insertJobMaster" parameterType="jobVO">
+		<selectKey keyProperty="jobNo" resultType="string" order="BEFORE">
+			SELECT GRNEXTVAL('JOBNO_SEQ')
+		</selectKey>
+		INSERT INTO JOB_MSTR
+			(JOB_NO, JOB_NM, JOB_TP, JOB_DATA, REG_USER_ID, REG_DT)
+		VALUES (
+			#{jobNo},
+			#{jobName},
+			'',
+			#{jobData},
+			#{regUserId},
+			now(6)
+		);
+	</insert>
+	
+	<!-- 작업 타겟 등록 -->
+	<insert id="insertJobTarget" parameterType="jobVO">
+		INSERT INTO JOB_TRGT
+			(JOB_NO, CLIENT_ID, JOB_STAT, MOD_USER_ID, MOD_DT)
+		VALUES (
+			#{jobNo},
+			#{clientId},
+			'R',
+			#{regUserId},
+			now(6)
+		);
+	</insert>
+
+	<update id="updateJobTargetForPolling" parameterType="jobVO">
+		UPDATE client_access 
+		SET is_job = 1
+	</update>
+
+<!-- 
+타겟과 히스트 테이블 동시 바라보는 SQL - 리스트
+
+    SELECT JOB_TRGT_LIST.GUBUN,
+		  JM.JOB_NO, JM.JOB_NM, JM.JOB_TP, 
+		  JOB_TRGT_LIST.CLIENT_COUNT,
+		  JOB_TRGT_LIST.COMP_COUNT,
+		  JOB_TRGT_LIST.ERROR_COUNT,
+		  JOB_TRGT_LIST.RUN_COUNT,
+		  JOB_TRGT_LIST.READY_COUNT,
+		  JM.JOB_DATA, JM.REG_USER_ID, JM.REG_DT 
+		FROM JOB_MSTR JM
+		  JOIN (
+            SELECT UT.GUBUN, UT.JOB_NO, UT.CLIENT_COUNT, UT.COMP_COUNT, UT.ERROR_COUNT, UT.RUN_COUNT, UT.READY_COUNT FROM (
+            		SELECT 'T' as gubun, JOB_NO AS JOB_NO, COUNT(CLIENT_ID) AS CLIENT_COUNT, 
+            		  COUNT(IF(JOB_STAT='C' OR JOB_STAT='CK', JOB_STAT, NULL)) AS COMP_COUNT, 
+            		  COUNT(IF(JOB_STAT='E' OR JOB_STAT='EK', JOB_STAT, NULL)) AS ERROR_COUNT, 
+            		  COUNT(IF(JOB_STAT='D', JOB_STAT, NULL)) AS RUN_COUNT, 
+            		  COUNT(IF(JOB_STAT='R', JOB_STAT, NULL)) AS READY_COUNT
+            		FROM JOB_TRGT GROUP BY JOB_NO
+                UNION ALL
+            		SELECT 'H' as gubun, JOB_NO AS JOB_NO, COUNT(CLIENT_ID) AS CLIENT_COUNT, 
+            		  COUNT(IF(JOB_STAT='C' OR JOB_STAT='CK', JOB_STAT, NULL)) AS COMP_COUNT, 
+            		  COUNT(IF(JOB_STAT='E' OR JOB_STAT='EK', JOB_STAT, NULL)) AS ERROR_COUNT, 
+            		  COUNT(IF(JOB_STAT='D', JOB_STAT, NULL)) AS RUN_COUNT, 
+            		  COUNT(IF(JOB_STAT='R', JOB_STAT, NULL)) AS READY_COUNT
+            		FROM JOB_TRGT_HIST GROUP BY JOB_NO
+            ) AS UT
+		  ) AS JOB_TRGT_LIST ON JM.JOB_NO = JOB_TRGT_LIST.JOB_NO
+    ORDER BY JM.JOB_NO
+    LIMIT 0, 10
+
+ -->
+
+	<!-- 작업리스트조회 - 페이징 -->
+	<select id="selectJobListPaged" parameterType="hashMap" resultMap="jobInfo">
+		SELECT 
+		  AA.JOB_NO, AA.JOB_NM, AA.JOB_TP, 
+		  AA.CLIENT_COUNT,
+		  AA.COMP_COUNT,
+		  AA.ERROR_COUNT,
+		  AA.RUN_COUNT,
+		  AA.READY_COUNT,
+		  AA.JOB_STATUS,
+		  AA.JOB_DATA, AA.REG_USER_ID, AA.REG_DT
+		FROM (
+			SELECT 
+			  JM.JOB_NO, JM.JOB_NM, JM.JOB_TP, 
+			  JT.CLIENT_COUNT,
+			  JT.COMP_COUNT,
+			  JT.ERROR_COUNT,
+			  JT.RUN_COUNT,
+			  JT.READY_COUNT,
+			  CASE
+		        WHEN JT.CLIENT_COUNT = JT.READY_COUNT THEN "R"
+		        WHEN JT.CLIENT_COUNT &lt;= (JT.COMP_COUNT + JT.ERROR_COUNT + JT.CANCEL_COUNT) THEN "C"
+		        WHEN JT.RUN_COUNT &gt; 0 OR JT.READY_COUNT &gt; 0 THEN "D"
+		        WHEN JT.COMP_COUNT = 0 AND JT.ERROR_COUNT = 0 AND JT.RUN_COUNT = 0 AND JT.READY_COUNT = 0 AND JT.CANCEL_COUNT = 0 THEN "R"
+		        ELSE "-"
+		      END
+		      AS JOB_STATUS,
+			  JM.JOB_DATA, JM.REG_USER_ID, JM.REG_DT 
+			FROM JOB_MSTR JM
+			  JOIN (
+				SELECT JOB_NO AS JOB_NO, COUNT(CLIENT_ID) AS CLIENT_COUNT, 
+				  COUNT(IF(JOB_STAT='C' OR JOB_STAT='CK' OR JOB_STAT='DK' OR JOB_STAT='RK' OR JOB_STAT='QK', JOB_STAT, NULL)) AS COMP_COUNT, 
+				  COUNT(IF(JOB_STAT='E' OR JOB_STAT='EK', JOB_STAT, NULL)) AS ERROR_COUNT, 
+				  COUNT(IF(JOB_STAT='D', JOB_STAT, NULL)) AS RUN_COUNT, 
+				  COUNT(IF(JOB_STAT='R', JOB_STAT, NULL)) AS READY_COUNT,
+				  COUNT(IF(JOB_STAT='Q', JOB_STAT, NULL)) AS CANCEL_COUNT
+				FROM JOB_TRGT
+				GROUP BY JOB_NO
+			  ) JT ON JM.JOB_NO = JT.JOB_NO
+			<where>
+				<if test="searchKey != null and searchKey != ''">
+					JM.JOB_NO LIKE CONCAT('%', #{searchKey}, '%') OR JM.REG_USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
+				<if test="jobType != null and jobType != ''">
+					AND JM.JOB_NM = #{jobType}
+				</if>
+			</where>
+			union
+			SELECT 
+			  JM.JOB_NO, JM.JOB_NM, JM.JOB_TP, 
+			  JT.CLIENT_COUNT,
+			  JT.COMP_COUNT,
+			  JT.ERROR_COUNT,
+			  JT.RUN_COUNT,
+			  JT.READY_COUNT,
+			  CASE
+		        WHEN JT.CLIENT_COUNT = JT.READY_COUNT THEN "R"
+		        WHEN JT.CLIENT_COUNT &lt;= (JT.COMP_COUNT + JT.ERROR_COUNT + JT.CANCEL_COUNT) THEN "C"
+		        WHEN JT.RUN_COUNT &gt; 0 OR JT.READY_COUNT &gt; 0 THEN "D"
+		        WHEN JT.COMP_COUNT = 0 AND JT.ERROR_COUNT = 0 AND JT.RUN_COUNT = 0 AND JT.READY_COUNT = 0 AND JT.CANCEL_COUNT = 0 THEN "R"
+		        ELSE "-"
+		      END
+		      AS JOB_STATUS,
+			  JM.JOB_DATA, JM.REG_USER_ID, JM.REG_DT 
+			FROM JOB_MSTR_BK JM
+			  JOIN (
+				SELECT JOB_NO AS JOB_NO, COUNT(CLIENT_ID) AS CLIENT_COUNT, 
+				  COUNT(IF(JOB_STAT='C' OR JOB_STAT='CK' OR JOB_STAT='DK' OR JOB_STAT='RK' OR JOB_STAT='QK', JOB_STAT, NULL)) AS COMP_COUNT, 
+				  COUNT(IF(JOB_STAT='E' OR JOB_STAT='EK', JOB_STAT, NULL)) AS ERROR_COUNT, 
+				  COUNT(IF(JOB_STAT='D', JOB_STAT, NULL)) AS RUN_COUNT, 
+				  COUNT(IF(JOB_STAT='R', JOB_STAT, NULL)) AS READY_COUNT,
+				  COUNT(IF(JOB_STAT='Q', JOB_STAT, NULL)) AS CANCEL_COUNT
+				FROM JOB_TRGT_BK
+				GROUP BY JOB_NO
+			  ) JT ON JM.JOB_NO = JT.JOB_NO
+			<where>
+				<if test="searchKey != null and searchKey != ''">
+					JM.JOB_NO LIKE CONCAT('%', #{searchKey}, '%') OR JM.REG_USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
+				<if test="jobType != null and jobType != ''">
+					AND JM.JOB_NM = #{jobType}
+				</if>
+			</where>
+		) AA
+		<where>
+			<if test="jobStatus != null">
+				AA.JOB_STATUS IN 
+				<foreach item="item" index="index" collection="jobStatus" open="(" separator="," close=")">
+    				#{item}
+    			</foreach>
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectJobListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(AA.JOB_NO) AS CNT FROM (
+		SELECT JOB_NO FROM JOB_MSTR
+		UNION 
+		SELECT JOB_NO FROM JOB_MSTR_BK) AA
+	</select>
+
+	<select id="selectJobListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(AA.JOB_NO) AS CNT
+		FROM (
+			SELECT JM.JOB_NO, 
+			  CASE
+		        WHEN JT.CLIENT_COUNT = JT.READY_COUNT THEN "R"
+		        WHEN JT.CLIENT_COUNT &lt;= (JT.COMP_COUNT + JT.ERROR_COUNT + JT.CANCEL_COUNT) THEN "C"
+		        WHEN JT.RUN_COUNT &gt; 0 OR JT.READY_COUNT &gt; 0 THEN "D"
+		        WHEN JT.COMP_COUNT = 0 AND JT.ERROR_COUNT = 0 AND JT.RUN_COUNT = 0 AND JT.READY_COUNT = 0 AND JT.CANCEL_COUNT = 0 THEN "R"
+		        ELSE "-"
+		      END
+		      AS JOB_STATUS
+			FROM JOB_MSTR JM
+			  JOIN (
+				SELECT JOB_NO AS JOB_NO, COUNT(CLIENT_ID) AS CLIENT_COUNT, 
+				  COUNT(IF(JOB_STAT='C' OR JOB_STAT='CK' OR JOB_STAT='DK' OR JOB_STAT='RK' OR JOB_STAT='QK', JOB_STAT, NULL)) AS COMP_COUNT, 
+				  COUNT(IF(JOB_STAT='E' OR JOB_STAT='EK', JOB_STAT, NULL)) AS ERROR_COUNT, 
+				  COUNT(IF(JOB_STAT='D', JOB_STAT, NULL)) AS RUN_COUNT, 
+				  COUNT(IF(JOB_STAT='R', JOB_STAT, NULL)) AS READY_COUNT,
+				  COUNT(IF(JOB_STAT='Q', JOB_STAT, NULL)) AS CANCEL_COUNT
+				FROM JOB_TRGT
+				GROUP BY JOB_NO
+			  ) JT ON JM.JOB_NO = JT.JOB_NO
+			<where>
+				<if test="searchKey != null and searchKey != ''">
+					JM.JOB_NM LIKE CONCAT('%', #{searchKey}, '%') OR JM.JOB_NO LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
+			</where>
+			union
+			SELECT 
+			  JM.JOB_NO,
+			  CASE
+		        WHEN JT.CLIENT_COUNT = JT.READY_COUNT THEN "R"
+		        WHEN JT.CLIENT_COUNT &lt;= (JT.COMP_COUNT + JT.ERROR_COUNT + JT.CANCEL_COUNT) THEN "C"
+		        WHEN JT.RUN_COUNT &gt; 0 OR JT.READY_COUNT &gt; 0 THEN "D"
+		        WHEN JT.COMP_COUNT = 0 AND JT.ERROR_COUNT = 0 AND JT.RUN_COUNT = 0 AND JT.READY_COUNT = 0 AND JT.CANCEL_COUNT = 0 THEN "R"
+		        ELSE "-"
+		      END
+		      AS JOB_STATUS 
+			FROM JOB_MSTR_BK JM
+			  JOIN (
+				SELECT JOB_NO AS JOB_NO, COUNT(CLIENT_ID) AS CLIENT_COUNT, 
+				  COUNT(IF(JOB_STAT='C' OR JOB_STAT='CK' OR JOB_STAT='DK' OR JOB_STAT='RK' OR JOB_STAT='QK', JOB_STAT, NULL)) AS COMP_COUNT, 
+				  COUNT(IF(JOB_STAT='E' OR JOB_STAT='EK', JOB_STAT, NULL)) AS ERROR_COUNT, 
+				  COUNT(IF(JOB_STAT='D', JOB_STAT, NULL)) AS RUN_COUNT, 
+				  COUNT(IF(JOB_STAT='R', JOB_STAT, NULL)) AS READY_COUNT,
+				  COUNT(IF(JOB_STAT='Q', JOB_STAT, NULL)) AS CANCEL_COUNT
+				FROM JOB_TRGT_BK
+				GROUP BY JOB_NO
+			  ) JT ON JM.JOB_NO = JT.JOB_NO
+			<where>
+				<if test="searchKey != null and searchKey != ''">
+					JM.JOB_NM LIKE CONCAT('%', #{searchKey}, '%') OR JM.JOB_NO LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
+			</where>
+		) AA		  
+		<where>
+			<if test="jobStatus != null and jobStatus != ''">
+				JOB_STATUS IN 
+				<foreach item="item" index="index" collection="jobStatus" open="(" separator="," close=")">
+    				#{item}
+    			</foreach>
+			</if>
+		</where>
+	</select>
+	
+</mapper>

@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UseStatsDAO">
+
+	<resultMap type="loginCountVO" id="loginCountInfo">
+		<result property="userAll" column="USER_ALL" />
+		<result property="userSuccess" column="USER_SUCCESS" />
+		<result property="clientAll" column="CLIENT_ALL" />
+		<result property="clientSuccess" column="CLIENT_SUCCESS" />
+		
+		<result property="loginAll" column="LOGIN_ALL" />
+		<result property="loginSuccess" column="LOGIN_SUCCESS" />
+		<result property="loginFail" column="LOGIN_FAIL" />
+		<result property="logDate" column="LOGDATE" />
+	</resultMap>
+
+	<resultMap type="loginDataVO" id="loginDataInfo">
+		<result property="histSeq" column="HIST_SEQ" />
+		<result property="clientGroup" column="GRP_NM"/>
+		<result property="clientId" column="CLIENT_ID" />
+		<result property="deptName" column="DEPT_NM"/>
+		<result property="userId" column="USER_ID" />
+		<result property="status" column="STATUS" />
+		<result property="regDate" column="REG_DT" />
+	</resultMap>
+
+	<resultMap type="clientMngCountVO" id="clientMngCountInfo">
+		<result property="regCount" column="REG_COUNT" />
+		<result property="revokeCount" column="REVOKE_COUNT" />
+		<result property="logDate" column="LOGDATE" />
+	</resultMap>
+	
+	<resultMap type="clientStatsVO" id="clientStatsInfo">
+	
+		<result property="clientId" column="CLIENT_ID" />
+		<result property="clientName" column="CLIENT_NM"/>
+
+		<result property="clientStatus" column="STATUS_CD"/>
+		<result property="clientCnt" column="CLIENT_CNT"/>
+		
+		<result property="clientGroupId" column="GROUP_ID"/>
+		<result property="clientGroupName" column="GROUP_NAME"/>
+		
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		<result property="modUserId" column="MOD_USER_ID"/>
+	
+	</resultMap>	
+
+	<!-- 일별 로그인(사용량) 수 조회 -->
+	<select id="selectLoginDailyCount" parameterType="hashmap" resultMap="loginCountInfo">
+		SELECT IFNULL(VV.USER_ALL, 0) AS USER_ALL,
+		       IFNULL(VV.USER_SUCCESS, 0) AS USER_SUCCESS,
+		       IFNULL(VV.CLIENT_ALL, 0) AS CLIENT_ALL,
+		       IFNULL(VV.CLIENT_SUCCESS, 0) AS CLIENT_SUCCESS,
+		       IFNULL(VV.LOGIN_ALL, 0) AS LOGIN_ALL,
+		       IFNULL(VV.LOGIN_SUCCESS, 0) AS LOGIN_SUCCESS,
+		       IFNULL(VV.LOGIN_FAIL, 0) AS LOGIN_FAIL,
+		       DD.LOGDATE AS LOGDATE
+		FROM (SELECT A.DATELIST AS LOGDATE
+		      FROM (SELECT   STR_TO_DATE(#{fromDate}, '%Y-%m-%d')
+		                   + INTERVAL (A.A + (10 * B.A) + (100 * C.A)) DAY
+		                      AS DATELIST
+		            FROM (SELECT 0 AS A
+		                  UNION ALL
+		                  SELECT 1
+		                  UNION ALL
+		                  SELECT 2
+		                  UNION ALL
+		                  SELECT 3
+		                  UNION ALL
+		                  SELECT 4
+		                  UNION ALL
+		                  SELECT 5
+		                  UNION ALL
+		                  SELECT 6
+		                  UNION ALL
+		                  SELECT 7
+		                  UNION ALL
+		                  SELECT 8
+		                  UNION ALL
+		                  SELECT 9) AS A
+		                 CROSS JOIN (SELECT 0 AS A
+		                             UNION ALL
+		                             SELECT 1
+		                             UNION ALL
+		                             SELECT 2
+		                             UNION ALL
+		                             SELECT 3
+		                             UNION ALL
+		                             SELECT 4
+		                             UNION ALL
+		                             SELECT 5
+		                             UNION ALL
+		                             SELECT 6
+		                             UNION ALL
+		                             SELECT 7
+		                             UNION ALL
+		                             SELECT 8
+		                             UNION ALL
+		                             SELECT 9) AS B
+		                 CROSS JOIN (SELECT 0 AS A
+		                             UNION ALL
+		                             SELECT 1
+		                             UNION ALL
+		                             SELECT 2
+		                             UNION ALL
+		                             SELECT 3
+		                             UNION ALL
+		                             SELECT 4
+		                             UNION ALL
+		                             SELECT 5
+		                             UNION ALL
+		                             SELECT 6
+		                             UNION ALL
+		                             SELECT 7
+		                             UNION ALL
+		                             SELECT 8
+		                             UNION ALL
+		                             SELECT 9) AS C) A
+		      WHERE A.DATELIST &lt;= #{toDate}) DD
+		     LEFT JOIN
+		     (SELECT COUNT(DISTINCT ULH.USER_ID)
+		                AS USER_ALL,
+		             COUNT(
+		                DISTINCT (IF(ULH.RESPONSE_CD = 'SUCCESS', ULH.USER_ID, NULL)))
+		                AS USER_SUCCESS,
+		             COUNT(DISTINCT ULH.CLIENT_ID)
+		                AS CLIENT_ALL,
+		             COUNT(
+		                DISTINCT (IF(ULH.RESPONSE_CD = 'SUCCESS',
+		                             ULH.CLIENT_ID,
+		                             NULL)))
+		                AS CLIENT_SUCCESS,
+		             COUNT(*)
+		                AS LOGIN_ALL,
+		             COUNT(IF(ULH.RESPONSE_CD = 'SUCCESS', ULH.RESPONSE_CD, NULL))
+		                AS LOGIN_SUCCESS,
+		             COUNT(IF(ULH.RESPONSE_CD = 'FAIL', ULH.RESPONSE_CD, NULL))
+		                AS LOGIN_FAIL,
+		             DATE_FORMAT(ULH.REG_DT, '%Y-%m-%d')
+		                AS LOGDATE
+		      FROM USER_LOGIN_HIST ULH
+		      WHERE ULH.REG_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
+		            AND ACT_TP = 'PAM_LOGIN'
+    				<if test="adminId != null">
+    					AND ULH.USER_ID IN (
+							SELECT USER_ID FROM USER_MSTR WHERE DEPT_CD IN (
+							          SELECT 'DEPTDEFAULT' UNION
+									  SELECT DEPT_CD
+										FROM DEPT_MSTR DM WHERE DM.WHLE_DEPT_CD REGEXP
+											(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+												FROM (SELECT CONCAT('^', W.WHLE_DEPT_CD) GPATH
+														FROM DEPT_MSTR W
+												        WHERE W.DEPT_CD IN (SELECT DEPT_CD FROM ADMIN_DEPT WHERE ADMIN_ID = #{adminId} AND DEPT_CD != 'DEPTDEFAULT')
+													) TT1
+											)
+							)    					
+    					)
+    				</if>
+		      GROUP BY LOGDATE) VV
+		        ON DD.LOGDATE = VV.LOGDATE
+		ORDER BY DD.LOGDATE;	
+	</select>
+
+
+	<!-- 로그인 로그 조회 (날짜) -->
+	<select id="selectLoginList" parameterType="hashmap" resultMap="loginDataInfo">
+			SELECT REG_DT, CLIENT_ID, USER_ID, RESPONSE_CD AS STATUS
+			FROM USER_LOGIN_HIST
+			WHERE ACT_TP='PAM_LOGIN' AND DATE_FORMAT(REG_DT, '%Y-%m-%d') = #{searchDate}
+	</select>
+
+	<!-- 로그인 로그 조회 (날짜) -->
+	<select id="selectLoginListPaged" parameterType="hashmap" resultMap="loginDataInfo">
+		SELECT ULH.HIST_SEQ AS HIST_SEQ, ULH.REG_DT AS REG_DT, CGM.GRP_NM AS GRP_NM,
+			ULH.CLIENT_ID AS CLIENT_ID, DM.DEPT_NM AS DEPT_NM, ULH.USER_ID AS USER_ID, ULH.RESPONSE_CD AS STATUS
+		FROM USER_LOGIN_HIST ULH
+			LEFT OUTER JOIN CLIENT_GRP_MSTR CGM ON (SELECT CM.GRP_ID FROM CLIENT_MSTR CM WHERE ULH.CLIENT_ID = CM.CLIENT_ID) = CGM.GRP_ID
+			LEFT OUTER JOIN DEPT_MSTR DM ON (SELECT UM.DEPT_CD FROM USER_MSTR UM WHERE ULH.USER_ID = UM.USER_ID) = DM.DEPT_CD
+		WHERE ULH.ACT_TP='PAM_LOGIN' AND DATE_FORMAT(ULH.REG_DT, '%Y-%m-%d') = #{searchDate}
+		<if test="searchKey != null and searchKey != ''">
+			AND (ULH.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR ULH.USER_ID LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		<if test="adminId != null">
+			AND ULH.USER_ID IN (
+				SELECT USER_ID FROM USER_MSTR WHERE DEPT_CD IN (
+			          SELECT 'DEPTDEFAULT' UNION
+					  SELECT DEPT_CD
+						FROM DEPT_MSTR DM WHERE DM.WHLE_DEPT_CD REGEXP
+							(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+								FROM (SELECT CONCAT('^', W.WHLE_DEPT_CD) GPATH
+										FROM DEPT_MSTR W
+								        WHERE W.DEPT_CD IN (SELECT DEPT_CD FROM ADMIN_DEPT WHERE ADMIN_ID = #{adminId} AND DEPT_CD != 'DEPTDEFAULT')
+									) TT1
+							)
+				)    					
+			)
+		</if>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectLoginTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(HIST_SEQ) AS CNT
+		FROM USER_LOGIN_HIST
+		WHERE ACT_TP='PAM_LOGIN' AND DATE_FORMAT(REG_DT, '%Y-%m-%d') = #{searchDate}
+		<if test="adminId != null">
+			AND USER_ID IN (
+				SELECT USER_ID FROM USER_MSTR WHERE DEPT_CD IN (
+			          SELECT 'DEPTDEFAULT' UNION
+					  SELECT DEPT_CD
+						FROM DEPT_MSTR DM WHERE DM.WHLE_DEPT_CD REGEXP
+							(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+								FROM (SELECT CONCAT('^', W.WHLE_DEPT_CD) GPATH
+										FROM DEPT_MSTR W
+								        WHERE W.DEPT_CD IN (SELECT DEPT_CD FROM ADMIN_DEPT WHERE ADMIN_ID = #{adminId} AND DEPT_CD != 'DEPTDEFAULT')
+									) TT1
+							)
+				)    					
+			)
+		</if>
+	</select>
+
+	<select id="selectLoginFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(HIST_SEQ) AS CNT
+		FROM USER_LOGIN_HIST
+		WHERE ACT_TP='PAM_LOGIN' AND DATE_FORMAT(REG_DT, '%Y-%m-%d') = #{searchDate}
+		<if test="searchKey != null and searchKey != ''">
+			AND (CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR USER_ID LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		<if test="adminId != null">
+			AND USER_ID IN (
+				SELECT USER_ID FROM USER_MSTR WHERE DEPT_CD IN (
+			          SELECT 'DEPTDEFAULT' UNION
+					  SELECT DEPT_CD
+						FROM DEPT_MSTR DM WHERE DM.WHLE_DEPT_CD REGEXP
+							(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+								FROM (SELECT CONCAT('^', W.WHLE_DEPT_CD) GPATH
+										FROM DEPT_MSTR W
+								        WHERE W.DEPT_CD IN (SELECT DEPT_CD FROM ADMIN_DEPT WHERE ADMIN_ID = #{adminId} AND DEPT_CD != 'DEPTDEFAULT')
+									) TT1
+							)
+				)    					
+			)
+		</if>
+	</select>
+	
+	<!-- 일별 단말등록, 삭제 수 조회 -->
+	<select id="selectClientMngCount" parameterType="hashmap" resultMap="clientMngCountInfo">
+	
+		SELECT DD.LOGDATE AS LOGDATE, IFNULL(VV.REG_COUNT, 0) AS REG_COUNT, IFNULL(VV.REVOKE_COUNT, 0) AS REVOKE_COUNT
+		  FROM (SELECT A.DATELIST AS LOGDATE
+		          FROM (SELECT   STR_TO_DATE(#{fromDate}, '%Y-%m-%d')
+		                       + INTERVAL (A.A + (10 * B.A) + (100 * C.A)) DAY
+		                          AS DATELIST
+		                  FROM (SELECT 0 AS A UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS A
+		                       CROSS JOIN (SELECT 0 AS A UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS B
+		                       CROSS JOIN (SELECT 0 AS A UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) AS C) A
+		         WHERE A.DATELIST &lt;= #{toDate}) DD
+		       LEFT JOIN
+		       
+		       (
+		       	SELECT COUNT(IF(CMH.CHG_TP = 'CREATE', CMH.CLIENT_ID, NULL)) AS REG_COUNT,
+		                 COUNT(IF(CMH.CHG_TP = 'REVOKE', CMH.CLIENT_ID, NULL)) AS REVOKE_COUNT,
+		                 DATE_FORMAT(CMH.MOD_DT, "%Y-%m-%d") AS LOGDATE
+		            FROM CLIENT_MSTR_HIST CMH
+		            WHERE DATE_FORMAT(CMH.MOD_DT, "%Y-%m-%d") &gt;= #{fromDate} AND DATE_FORMAT(CMH.MOD_DT, "%Y-%m-%d") &lt;= #{toDate}
+		  			<if test="adminId != null">
+		            	AND CMH.CLIENT_ID IN (
+		                	SELECT CLIENT_ID FROM CLIENT_MSTR
+		                	WHERE GRP_ID IN (
+										SELECT 'CGRPDEFAULT' UNION
+										SELECT GRP_ID
+										FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+											(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+											FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+													FROM CLIENT_GRP_MSTR W
+													WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+												) TT1
+											)
+		                				)
+							)	  			
+		  			</if>
+		        GROUP BY DATE_FORMAT(CMH.MOD_DT, "%Y-%m-%d")) VV
+		          ON DD.LOGDATE = VV.LOGDATE
+		        ORDER BY DD.LOGDATE
+	</select>
+
+	<!-- 단말기 리스트 조회 - 통계 -->
+	<select id="selectClientMngListPaged" parameterType="hashmap" resultMap="clientStatsInfo">
+		SELECT 
+			CMH.CLIENT_ID, CMH.CLIENT_CNT,
+			T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT,
+			T.REG_USER_ID, T.MOD_USER_ID,
+			CGM.GRP_NM AS GROUP_NAME,
+			CGM.GRP_ID AS GROUP_ID
+		FROM CLIENT_MSTR T 
+			RIGHT JOIN (
+				SELECT NN.CLIENT_ID, COUNT(NN.CLIENT_ID) AS CLIENT_CNT FROM CLIENT_MSTR_HIST NN
+ 				WHERE DATE_FORMAT(NN.MOD_DT, '%Y-%m-%d') =  #{searchDate} AND NN.CHG_TP = #{searchType}
+      			GROUP BY NN.CLIENT_ID
+			) CMH ON T.CLIENT_ID = CMH.CLIENT_ID
+			LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+		<where> 
+		<if test="searchKey != null and searchKey != ''">
+			(T.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR T.CLIENT_NM LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		<if test="adminId != null">
+			AND (T.GRP_ID IN (
+				SELECT 'CGRPDEFAULT' UNION
+				SELECT GRP_ID
+				FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+					(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						          FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+						                FROM CLIENT_GRP_MSTR W
+						                WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+										) TT1
+					)
+			))
+		</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectClientMngTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(T.CLIENT_ID) AS CNT
+		FROM CLIENT_MSTR T 
+			RIGHT JOIN (
+				SELECT NN.CLIENT_ID, COUNT(NN.CLIENT_ID) AS CLIENT_CNT FROM CLIENT_MSTR_HIST NN
+ 				WHERE DATE_FORMAT(NN.MOD_DT, '%Y-%m-%d') =  #{searchDate} AND NN.CHG_TP = #{searchType}
+      			GROUP BY NN.CLIENT_ID
+			) CMH ON T.CLIENT_ID = CMH.CLIENT_ID
+		<where>
+		<if test="adminId != null">
+			(T.GRP_ID IN (
+				SELECT 'CGRPDEFAULT' UNION
+				SELECT GRP_ID
+				FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+					(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						          FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+						                FROM CLIENT_GRP_MSTR W
+						                WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+										) TT1
+					)
+			))
+		</if>
+		</where>
+	</select>
+
+	<select id="selectClientMngFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(T.CLIENT_ID) AS CNT
+		FROM CLIENT_MSTR T 
+			RIGHT JOIN (
+				SELECT NN.CLIENT_ID, COUNT(NN.CLIENT_ID) AS CLIENT_CNT FROM CLIENT_MSTR_HIST NN
+ 				WHERE DATE_FORMAT(NN.MOD_DT, '%Y-%m-%d') =  #{searchDate} AND NN.CHG_TP = #{searchType}
+      			GROUP BY NN.CLIENT_ID
+			) CMH ON T.CLIENT_ID = CMH.CLIENT_ID
+		<where>
+		<if test="searchKey != null and searchKey != ''">
+			(T.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR T.CLIENT_NM LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		<if test="adminId != null">
+			AND (T.GRP_ID IN (
+				SELECT 'CGRPDEFAULT' UNION
+				SELECT GRP_ID
+				FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+					(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						          FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+						                FROM CLIENT_GRP_MSTR W
+						                WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+										) TT1
+					)
+			))
+		</if>
+		</where>
+	</select>
+	
+</mapper>

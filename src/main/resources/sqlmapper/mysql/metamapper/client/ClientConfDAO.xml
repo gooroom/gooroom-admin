@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ClientConfDAO">
+
+	<resultMap type="clientConfDataVO" id="clientConfData">
+	
+		<result property="pmId" column="PM_ID"/>
+
+		<result property="mainLabel" column="MAINOS_LABEL"/>
+		<result property="mainOsData" column="MAINOS_DATA"/>
+		<result property="extOsData" column="EXTOS_DATA"/>
+		<result property="priorityData" column="PRIORITY_DATA"/>
+		<result property="hostsData" column="HOSTS_DATA"/>
+		<result property="comment" column="COMMENT"/>
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+	
+	</resultMap>
+	
+	<resultMap type="mgServerConfVO" id="mgServerConf">
+		<result property="kmIp" column="KM_IP"/>
+		<result property="kmUrl" column="KM_URL"/>
+		<result property="lmIp" column="LM_IP"/>
+		<result property="lmUrl" column="LM_URL"/>
+		<result property="rmIp" column="RM_IP"/>
+		<result property="rmUrl" column="RM_URL"/>
+		<result property="pmIp" column="PM_IP"/>
+		<result property="pmUrl" column="PM_URL"/>
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+	</resultMap>
+
+	<resultMap type="siteConfVO" id="siteConf">
+		<result property="kmIp" column="KM_IP"/>
+		<result property="kmUrl" column="KM_URL"/>
+		<result property="lmIp" column="LM_IP"/>
+		<result property="lmUrl" column="LM_URL"/>
+		<result property="rmIp" column="RM_IP"/>
+		<result property="rmUrl" column="RM_URL"/>
+		<result property="pmIp" column="PM_IP"/>
+		<result property="pmUrl" column="PM_URL"/>
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+	</resultMap>
+
+	<!-- ########################################################################################### -->
+	<!-- ########################################################################################### -->
+	<!-- ########################################################################################### -->
+	<!-- ########################################################################################### -->
+	
+	<!-- 데이타 존재 여부 확인 -->
+	<select id="isExistMgServerConf" resultType="boolean">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END ISEXIST FROM MG_SERVER
+	</select>
+	
+	<!-- 생성 -->
+	<insert id="insertMgServerConf" parameterType="mgServerConfVO">
+		INSERT INTO MG_SERVER
+			(KM_IP, KM_URL, LM_IP, LM_URL, RM_IP, RM_URL, PM_IP, PM_URL, MOD_USER_ID, MOD_DT) 
+		VALUES (#{kmIp}, #{kmUrl}, #{lmIp}, #{lmUrl}, #{rmIp}, #{rmUrl}, #{pmIp}, #{pmUrl}, #{modUserId}, now())
+	</insert>
+
+	<!-- 이력생성  -->
+	<insert id="insertMgServerConfHistory" parameterType="mgServerConfVO">
+		INSERT INTO MG_SERVER_HIST
+			(KM_IP, KM_URL, LM_IP, LM_URL, RM_IP, RM_URL, PM_IP, PM_URL, MOD_USER_ID, MOD_DT) 
+		VALUES 
+			(#{kmIp}, #{kmUrl}, #{lmIp}, #{lmUrl}, #{rmIp}, #{rmUrl}, #{pmIp}, #{pmUrl}, #{modUserId}, now())
+	</insert>
+
+	<!-- 상세조회 -->
+	<select id="selectMgServerConf" resultMap="mgServerConf">
+		SELECT 
+			'' AS KM_IP, KM_URL, '' AS LM_IP, LM_URL, '' AS RM_IP, RM_URL, '' AS PM_IP, PM_URL, 
+			MOD_USER_ID, MOD_DT 
+		FROM MG_SERVER
+	</select>
+	
+	<!-- 수정 -->
+	<update id="editMgServerConf" parameterType="mgServerConfVO">
+		UPDATE MG_SERVER SET
+			KM_IP = #{kmIp},
+			KM_URL = #{kmUrl},
+			LM_IP = #{lmIp},
+			LM_URL = #{lmUrl},
+			RM_IP = #{rmIp},
+			RM_URL = #{rmUrl},
+			PM_IP = #{pmIp},
+			PM_URL = #{pmUrl},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now()
+	</update>
+
+	<!-- 이력리스트 -->
+	<select id="selectMgServerConfList" resultMap="mgServerConf">
+		SELECT  
+			KM_IP, KM_URL, LM_IP, LM_URL, RM_IP, RM_URL, PM_IP, PM_URL, 
+			MOD_USER_ID, MOD_DT 
+		FROM 
+			MG_SERVER_HIST
+		ORDER BY MOD_DT DESC 
+	</select>
+	
+	
+	<select id="selectSitePollingTime" parameterType="hashMap" resultType="long">
+		SELECT IFNULL(POLLING_CYCLE, 30) FROM SITE_MSTR
+	</select>
+	
+	<select id="selectSiteLoginTrialCount" parameterType="hashMap" resultType="long">
+		SELECT IFNULL(TRIAL_COUNT, 5) FROM SITE_MSTR
+	</select>
+	
+	<select id="selectSiteLoginLockTime" parameterType="hashMap" resultType="long">
+		SELECT IFNULL(LOCK_TIME, 0) FROM SITE_MSTR
+	</select>
+	
+	<select id="selectSitePasswordRule" parameterType="hashMap" resultType="string">
+		SELECT PASSWORD_RULE FROM SITE_MSTR
+	</select>
+
+	<select id="selectSiteLoginDuplicateEnable" parameterType="hashMap" resultType="long">
+		SELECT IFNULL(ENABLE_DUPLOGIN, 0) FROM SITE_MSTR
+	</select>
+	
+	<!-- 이력생성  -->
+	<insert id="insertSiteConfHistory" parameterType="siteConfVO">
+		INSERT INTO SITE_MSTR_HIST
+			(SITE_ID, SITE_NAME, COMMENT, POLLING_CYCLE, SERVER_VERSION, ROOTDEPT_CD, STATUS, ROOTGRP_ID, MOD_USER, MOD_DT, TRIAL_COUNT, LOCK_TIME, PASSWORD_RULE, ENABLE_DUPLOGIN)
+		SELECT SITE_ID, SITE_NAME, COMMENT, POLLING_CYCLE, SERVER_VERSION, ROOTDEPT_CD, STATUS, ROOTGRP_ID, MOD_USER, MOD_DT, TRIAL_COUNT, LOCK_TIME, PASSWORD_RULE, ENABLE_DUPLOGIN FROM SITE_MSTR LIMIT 1
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="updateSiteConf" parameterType="siteConfVO">
+		UPDATE SITE_MSTR SET
+			POLLING_CYCLE = #{pollingCycle},
+			TRIAL_COUNT = #{trialCount},
+			LOCK_TIME = #{lockTime},
+			PASSWORD_RULE = #{passwordRule},
+			ENABLE_DUPLOGIN = #{enableDuplicateLogin},
+			MOD_USER = #{modUserId},
+			MOD_DT = now()
+	</update>
+	
+	<update id="updateLoginTrialInUser" parameterType="hashMap">
+		UPDATE USER_MSTR SET
+			LOGIN_TRIAL = #{trialCount}
+	</update>
+	
+	<update id="__updateSiteConf" parameterType="siteConfVO">
+		UPDATE SITE_MSTR SET
+			SITE_ID = #{siteId},
+			SITE_NAME = #{siteName},
+			POLLING_CYCLE = #{pollingCycle},
+			SERVER_VERSION = #{serverVersion},
+			MOD_USER = #{modUserId},
+			MOD_DT = now()
+	</update>
+
+</mapper>

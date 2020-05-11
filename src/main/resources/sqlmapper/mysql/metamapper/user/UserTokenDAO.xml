@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="userTokenDAO">
+
+    <resultMap id="userToken" type="userTokenVO" >
+        <result property="token" column="token"/>
+        <result property="userId" column="user_id"/>
+        <result property="expirationDt" column="expiration_dt"/>
+        <result property="statusCd" column="status_cd"/>
+        <result property="authAllowCnt" column="auth_allow_cnt"/>
+        <result property="authCnt" column="auth_cnt"/>
+        <result property="clientId" column="client_id"/>
+        <result property="modDt" column="mod_dt"/>
+        <result property="nfcSecretData" column="nfc_secret_data"/>
+    </resultMap>
+
+    <sql id="include_SelectTokenListResult">
+        ut.token, ut.user_id, ut.expiration_dt, ut.status_cd, ut.auth_allow_cnt, ut.auth_cnt, ut.client_id, ut.mod_dt
+    </sql>
+    
+    <select id="selectTokenInfo" parameterType="map" resultMap="userToken">
+        SELECT <include refid="include_SelectTokenListResult"/>, um.nfc_secret_data
+        FROM user_token ut, user_mstr um
+        WHERE ut.client_id = #{clientId} 
+                AND ut.token = #{token}
+                AND um.user_id = ut.user_id
+            <if test="statusCd != null">
+                AND ut.status_cd = #{statusCd}
+            </if>
+    </select>
+    
+    
+</mapper>

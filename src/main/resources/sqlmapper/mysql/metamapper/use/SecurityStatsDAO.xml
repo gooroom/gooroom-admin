@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SecuritytatsDAO">
+
+	<resultMap type="ViolatedCountVO" id="violatedCountInfo">
+		<result property="protectorCount" column="PROTECTOR_COUNT" />
+		<result property="bootProtectorCount" column="BOOTPROTECTOR_COUNT" />
+		<result property="exeProtectorCount" column="EXEPROTECTOR_COUNT" />
+		<result property="osProtectorCount" column="OSPROTECTOR_COUNT" />
+		<result property="mediaProtectorCount" column="MEDIAPROTECTOR_COUNT" />
+		<result property="logDateStr" column="LOGDATE_STR" />
+		<result property="logDate" column="LOGDATE" />
+	</resultMap>
+	
+	<resultMap type="violatedLogVO" id="violatedLogInfo">
+		<result property="logSeq" column="LOG_SEQ" />
+		<result property="logItem" column="LOG_ITEM" />
+		<result property="logTp" column="LOG_TP" />
+		<result property="clientId" column="CLIENT_ID" />
+		<result property="userId" column="USER_ID" />
+		<result property="logValue" column="LOG_VALUE" />
+		<result property="logDate" column="LOG_DT" />
+		<result property="regDate" column="REG_DT" />
+	</resultMap>
+
+	<!-- 일별 침해 이력 수 조회 -->
+	<select id="selectViolatedDailyCount" parameterType="hashMap" resultMap="violatedCountInfo">
+		SELECT DD.SELECTED_DATE LOGDATE, 
+			DATE_FORMAT(DD.SELECTED_DATE, '%m/%d') LOGDATE_STR,
+		  IFNULL(CC.BOOT_LOG, 0) BOOTPROTECTOR_COUNT, 
+		  IFNULL(CC.EXE_LOG, 0) EXEPROTECTOR_COUNT, 
+		  IFNULL(CC.OS_LOG, 0) OSPROTECTOR_COUNT, 
+		  IFNULL(CC.MEDIA_LOG, 0) MEDIAPROTECTOR_COUNT 
+		FROM (
+		  SELECT SELECTED_DATE FROM 
+		  	(SELECT ADDDATE('1970-01-01',T4.I*10000 + T3.I*1000 + T2.I*100 + T1.I*10 + T0.I) SELECTED_DATE FROM
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T0,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T1,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T2,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T3,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T4) V
+		  WHERE SELECTED_DATE BETWEEN #{fromDate} AND #{toDate}
+		  ) DD LEFT JOIN (
+		  SELECT
+		      TT.LOGDATE,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "media_log" THEN TT.CNT END), 0) AS MEDIA_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "boot_log" THEN TT.CNT END), 0) AS BOOT_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "os_log" THEN TT.CNT END), 0) AS OS_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "exe_log" THEN TT.CNT END), 0) AS EXE_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "agent_log" THEN TT.CNT END), 0) AS AGENT_LOG
+		  FROM (
+	  			SELECT DATE_FORMAT(LS.LOG_DT, '%Y-%m-%d') AS LOGDATE, LS.LOG_ITEM, COUNT(LS.LOG_ITEM) AS CNT
+	  			FROM LOG_SECURITY LS
+	  			WHERE LS.LOG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59') AND LS.LOG_TP=#{defaultViolatedLogType}
+	  			<if test="adminId != null">
+            	AND LS.CLIENT_ID IN (
+                	SELECT CLIENT_ID FROM CLIENT_MSTR
+                	WHERE GRP_ID IN (
+								SELECT 'CGRPDEFAULT' UNION
+								SELECT GRP_ID
+								FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+									(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+									FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+											FROM CLIENT_GRP_MSTR W
+											WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+										) TT1
+									)
+                				)
+					)	  			
+	  			</if>
+	        	GROUP BY LS.LOG_ITEM, DATE_FORMAT(LS.LOG_DT, '%Y-%m-%d')
+		  ) TT
+		  GROUP BY TT.LOGDATE
+		) CC ON DD.SELECTED_DATE = CC.LOGDATE;
+	</select>
+
+	<select id="selectViolatedWeeklyCount" parameterType="hashMap" resultMap="violatedCountInfo">
+		SELECT DD.SELECTED_DATE AS LOGDATE_STR, 
+		  IFNULL(CC.BOOT_LOG, 0) BOOTPROTECTOR_COUNT, 
+		  IFNULL(CC.EXE_LOG, 0) EXEPROTECTOR_COUNT, 
+		  IFNULL(CC.OS_LOG, 0) OSPROTECTOR_COUNT, 
+		  IFNULL(CC.MEDIA_LOG, 0) MEDIAPROTECTOR_COUNT 
+		FROM (
+		  SELECT DATE_FORMAT(SELECTED_DATE, '%y/%U') AS SELECTED_DATE FROM 
+		  	(SELECT ADDDATE('1970-01-01',T4.I*10000 + T3.I*1000 + T2.I*100 + T1.I*10 + T0.I) SELECTED_DATE FROM
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T0,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T1,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T2,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T3,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T4) V
+		  WHERE SELECTED_DATE BETWEEN #{fromDate} AND #{toDate}
+		  GROUP BY DATE_FORMAT(SELECTED_DATE, '%y/%U')
+		  ) DD LEFT JOIN (
+		  SELECT
+		      TT.LOGDATE,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "media_log" THEN TT.CNT END), 0) AS MEDIA_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "boot_log" THEN TT.CNT END), 0) AS BOOT_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "os_log" THEN TT.CNT END), 0) AS OS_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "exe_log" THEN TT.CNT END), 0) AS EXE_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "agent_log" THEN TT.CNT END), 0) AS AGENT_LOG
+		  FROM (
+				SELECT DATE_FORMAT(LS.LOG_DT, '%y/%U') AS LOGDATE, LS.LOG_ITEM, COUNT(LS.LOG_ITEM) AS CNT
+				FROM LOG_SECURITY LS
+				WHERE LS.LOG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59') AND LS.LOG_TP=#{defaultViolatedLogType}
+	  			<if test="adminId != null">
+            	AND LS.CLIENT_ID IN (
+                	SELECT CLIENT_ID FROM CLIENT_MSTR
+                	WHERE GRP_ID IN (
+								SELECT 'CGRPDEFAULT' UNION
+								SELECT GRP_ID
+								FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+									(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+									FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+											FROM CLIENT_GRP_MSTR W
+											WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+										) TT1
+									)
+                				)
+					)	  			
+	  			</if>
+		        GROUP BY LS.LOG_ITEM, DATE_FORMAT(LS.LOG_DT, '%y/%U')
+		  ) TT
+		  GROUP BY TT.LOGDATE
+		) CC ON DD.SELECTED_DATE = CC.LOGDATE
+	</select>
+	
+	<select id="selectViolatedMonthlyCount" parameterType="hashMap" resultMap="violatedCountInfo">
+		SELECT DD.SELECTED_DATE AS LOGDATE_STR, 
+		  IFNULL(CC.BOOT_LOG, 0) BOOTPROTECTOR_COUNT, 
+		  IFNULL(CC.EXE_LOG, 0) EXEPROTECTOR_COUNT, 
+		  IFNULL(CC.OS_LOG, 0) OSPROTECTOR_COUNT, 
+		  IFNULL(CC.MEDIA_LOG, 0) MEDIAPROTECTOR_COUNT 
+		FROM (
+		  SELECT DATE_FORMAT(SELECTED_DATE, '%y/%m') AS SELECTED_DATE FROM 
+		  	(SELECT ADDDATE('1970-01-01',T4.I*10000 + T3.I*1000 + T2.I*100 + T1.I*10 + T0.I) SELECTED_DATE FROM
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T0,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T1,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T2,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T3,
+		  	(SELECT 0 I UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) T4) V
+		  WHERE SELECTED_DATE BETWEEN #{fromDate} AND #{toDate}
+		  GROUP BY DATE_FORMAT(SELECTED_DATE, '%y/%m')
+		  ) DD LEFT JOIN (
+		  SELECT
+		      TT.LOGDATE,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "media_log" THEN TT.CNT END), 0) AS MEDIA_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "boot_log" THEN TT.CNT END), 0) AS BOOT_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "os_log" THEN TT.CNT END), 0) AS OS_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "exe_log" THEN TT.CNT END), 0) AS EXE_LOG,
+		      COALESCE(SUM(CASE WHEN TT.LOG_ITEM = "agent_log" THEN TT.CNT END), 0) AS AGENT_LOG
+		  FROM (
+	  			SELECT DATE_FORMAT(LS.LOG_DT, '%y/%m') AS LOGDATE, LS.LOG_ITEM, COUNT(LS.LOG_ITEM) AS CNT
+	  			FROM LOG_SECURITY LS
+	  			WHERE LS.LOG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59') AND LS.LOG_TP=#{defaultViolatedLogType}
+	  			<if test="adminId != null">
+            	AND LS.CLIENT_ID IN (
+                	SELECT CLIENT_ID FROM CLIENT_MSTR
+                	WHERE GRP_ID IN (
+								SELECT 'CGRPDEFAULT' UNION
+								SELECT GRP_ID
+								FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+									(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+									FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+											FROM CLIENT_GRP_MSTR W
+											WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+										) TT1
+									)
+                				)
+					)	  			
+	  			</if>
+		        GROUP BY LS.LOG_ITEM, DATE_FORMAT(LS.LOG_DT, '%y/%m')
+		  ) TT
+		  GROUP BY TT.LOGDATE
+		) CC ON DD.SELECTED_DATE = CC.LOGDATE
+	</select>
+	
+	<!-- 침해 단말기 리스트 조회 - 통계 -->
+	<select id="selectViolatedList" parameterType="hashMap" resultMap="violatedLogInfo">
+		SELECT LOG_SEQ, CLIENT_ID, USER_ID, LOG_ITEM, LOG_TP, LOG_VALUE, REG_DT, LOG_DT 
+		FROM LOG_SECURITY
+		WHERE DATE_FORMAT(LOG_DT, '%Y-%m-%d') = #{searchDate} AND LOG_TP=#{defaultViolatedLogType}
+		AND LOG_ITEM = CONCAT(#{searchType}, '_log')
+	</select>
+	
+	<!-- 침해 단말기 리스트 조회 - 통계 -->
+	<select id="selectViolatedListPaged" parameterType="hashMap" resultMap="violatedLogInfo">
+		SELECT LOG_SEQ, CLIENT_ID, USER_ID, LOG_ITEM, LOG_TP, LOG_VALUE, REG_DT, LOG_DT
+		FROM LOG_SECURITY
+		WHERE DATE_FORMAT(LOG_DT, '%Y-%m-%d') = #{searchDate} AND LOG_TP=#{defaultViolatedLogType}
+			AND LOG_ITEM = CONCAT(#{searchType}, '_log')
+		<if test="searchKey != null and searchKey != ''">
+		AND (CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR SUBSTRING(LOG_VALUE, 27) LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		<if test="adminId != null">
+		AND CLIENT_ID IN (
+           	SELECT CLIENT_ID FROM CLIENT_MSTR
+           	WHERE GRP_ID IN (
+				SELECT 'CGRPDEFAULT' UNION
+				SELECT GRP_ID
+				FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+					(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+							FROM CLIENT_GRP_MSTR W
+							WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+							) TT1
+					)
+           	)
+		)	  			
+		</if>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectViolatedTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(LS.LOG_SEQ) AS CNT
+		FROM LOG_SECURITY LS 
+		WHERE DATE_FORMAT(LOG_DT, '%Y-%m-%d') = #{searchDate} AND LOG_TP=#{defaultViolatedLogType}
+			AND LOG_ITEM = CONCAT(#{searchType}, '_log')
+		<if test="adminId != null">
+		AND CLIENT_ID IN (
+           	SELECT CLIENT_ID FROM CLIENT_MSTR
+           	WHERE GRP_ID IN (
+				SELECT 'CGRPDEFAULT' UNION
+				SELECT GRP_ID
+				FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+					(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+							FROM CLIENT_GRP_MSTR W
+							WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+							) TT1
+					)
+           	)
+		)	  			
+		</if>
+	</select>
+
+	<select id="selectViolatedFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(LS.LOG_SEQ) AS CNT
+		FROM LOG_SECURITY LS 
+		WHERE DATE_FORMAT(LOG_DT, '%Y-%m-%d') = #{searchDate} AND LOG_TP=#{defaultViolatedLogType}
+			AND LOG_ITEM = CONCAT(#{searchType}, '_log')
+		<if test="searchKey != null and searchKey != ''">
+		AND (CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR SUBSTRING(LOG_VALUE, 27) LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		<if test="adminId != null">
+		AND CLIENT_ID IN (
+           	SELECT CLIENT_ID FROM CLIENT_MSTR
+           	WHERE GRP_ID IN (
+				SELECT 'CGRPDEFAULT' UNION
+				SELECT GRP_ID
+				FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+					(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+							FROM CLIENT_GRP_MSTR W
+							WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+							) TT1
+					)
+           	)
+		)	  			
+		</if>
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+

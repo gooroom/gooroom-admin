@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ClientGroupDAO">
+	
+	<resultMap type="clientGroupVO" id="clientGroupInfo">
+		<result property="grpId" column="GRP_ID" />
+		<result property="grpNm" column="GRP_NM" />
+
+		<result property="uprGrpId" column="UPR_GRP_ID"/>
+		<result property="whleGrpId" column="WHLE_GRP_ID"/>
+		<result property="grpLevel" column="GRP_LEVEL"/>
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+
+		<result property="desktopConfigId" column="DESKTOP_CONFIG_ID"/>
+		<result property="desktopConfigNm" column="DESKTOP_CONFIG_NM"/>
+		<result property="desktopConfigInfo" column="DESKTOP_CONFIG_INFO"/>
+
+		<result property="clientConfigId" column="CLIENT_CONFIG_ID"/>
+		<result property="clientConfigNm" column="CLIENT_CONFIG_NM"/>
+
+		<result property="hostNameConfigId" column="HOSTNAME_CONFIG_ID"/>
+		<result property="hostNameConfigNm" column="HOSTNAME_CONFIG_NM"/>
+
+		<result property="updateServerConfigId" column="UPDATESERVER_CONFIG_ID"/>
+		<result property="updateServerConfigNm" column="UPDATESERVER_CONFIG_NM"/>
+
+		<result property="mediaRuleId" column="MEDIA_RULE_ID"/>
+		<result property="browserRuleId" column="BROWSER_RULE_ID"/>
+		<result property="securityRuleId" column="SECURITY_RULE_ID"/>
+		<result property="filteredSoftwareRuleId" column="FILTEREDSOFTWARE_RULE_ID"/>
+		<result property="ctrlCenterItemRuleId" column="CTRLCENTERITEM_RULE_ID"/>
+		<result property="policyKitRuleId" column="POLICYKIT_RULE_ID"/>
+		
+		<result property="comment" column="COMMENT"/>
+		<result property="regClientIp" column="REG_CLIENT_IP"/>
+
+		<result property="itemTotalCount" column="CLIENT_TOTALCOUNT"/>
+		<result property="itemCount" column="CLIENT_COUNT"/>
+
+		<result property="hasChildren" column="HASCHILDREN"/>
+		
+	</resultMap>
+	
+	<resultMap type="clientVO" id="clientInfo">
+		<result property="clientId" column="CLIENT_ID" />
+		<result property="clientName" column="CLIENT_NM"/>
+	</resultMap>
+	
+	<!-- select root client group info -->
+	<select id="selectRootChildrenClientGroupInfo" parameterType="String" resultMap="clientGroupInfo">
+		SELECT GM.GRP_NM, GM.UPR_GRP_ID, GM.GRP_LEVEL, 
+	       GM.GRP_ID, GM.WHLE_GRP_ID, GM.COMMENT, GM.REG_CLIENT_IP,
+	       (SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID) CLIENT_TOTALCOUNT,
+	       (SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID AND CM.STATUS_CD != 'STAT021') CLIENT_COUNT,
+	       GM.MOD_DT, GM.REG_DT, 
+	       CASE (SELECT COUNT(*)
+	             FROM CLIENT_GRP_MSTR SGM
+	             WHERE SGM.UPR_GRP_ID = GM.GRP_ID)
+	          WHEN 0 THEN 'false'
+	          ELSE 'true'
+	       END HASCHILDREN
+		FROM CLIENT_GRP_MSTR GM 
+		WHERE GM.UPR_GRP_ID = '0'
+		ORDER BY GM.GRP_NM
+	</select>
+	
+	<!-- select list of client group by parent group id (one depth) -->
+	<select id="selectChildrenClientGroupList" parameterType="String" resultMap="clientGroupInfo">
+		SELECT GM.GRP_NM, GM.UPR_GRP_ID, GM.GRP_LEVEL, 
+	       GM.GRP_ID, GM.WHLE_GRP_ID, GM.COMMENT, GM.REG_CLIENT_IP,
+	       (SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID) CLIENT_TOTALCOUNT,
+	       (SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID AND CM.STATUS_CD != 'STAT021') CLIENT_COUNT,
+	       GM.MOD_DT, GM.REG_DT, 
+	       CASE (SELECT COUNT(*)
+	             FROM CLIENT_GRP_MSTR SGM
+	             WHERE SGM.UPR_GRP_ID = GM.GRP_ID)
+	          WHEN 0 THEN 'false'
+	          ELSE 'true'
+	       END HASCHILDREN
+		FROM CLIENT_GRP_MSTR GM 
+		WHERE GM.UPR_GRP_ID = #{grpId}
+		ORDER BY GM.GRP_NM
+	</select>
+	
+	<!-- select list of client group by parent group id by admin (one depth) -->
+	<select id="selectChildrenClientGroupListByAdmin" parameterType="hashmap" resultMap="clientGroupInfo">
+		SELECT GM.GRP_NM, GM.UPR_GRP_ID, GM.GRP_LEVEL, 
+	       GM.GRP_ID, GM.WHLE_GRP_ID, GM.COMMENT, GM.REG_CLIENT_IP, 
+	       (SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID) CLIENT_TOTALCOUNT,
+	       (SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID AND CM.STATUS_CD != 'STAT021') CLIENT_COUNT,
+	       GM.MOD_DT, GM.REG_DT, 
+	       CASE (SELECT COUNT(*) FROM CLIENT_GRP_MSTR SGM WHERE SGM.UPR_GRP_ID = GM.GRP_ID)
+	          WHEN 0 THEN 'false'
+	          ELSE 'true'
+	       END HASCHILDREN
+		FROM CLIENT_GRP_MSTR GM 
+		<if test="adminId != null">
+			JOIN ADMIN_CLIENTGRP ACG ON GM.GRP_ID = ACG.GRP_ID AND ACG.ADMIN_ID = #{adminId}
+		</if>
+		WHERE GM.UPR_GRP_ID = #{grpId}
+		ORDER BY GM.GRP_NM	
+	</select>
+	
+	<!-- select list of client group by parent group id (all depth) -->
+	<select id="selectAllChildrenGroupList" parameterType="String" resultMap="clientGroupInfo">
+		SELECT GM.GRP_NM, GM.UPR_GRP_ID, GM.GRP_LEVEL, 
+	       GM.GRP_ID, GM.WHLE_GRP_ID, GM.MOD_DT, GM.REG_DT
+		FROM CLIENT_GRP_MSTR GM
+		WHERE GM.WHLE_GRP_ID LIKE
+         CONCAT((SELECT W.WHLE_GRP_ID
+                 FROM CLIENT_GRP_MSTR W
+                 WHERE W.GRP_ID = #{grpId}), '%')
+	</select>
+
+	<!-- select list of client group by parent group id List (all depth) -->
+	<select id="selectAllChildrenGroupListByParents" parameterType="hashmap" resultMap="clientGroupInfo">
+		SELECT GM.GRP_NM, GM.UPR_GRP_ID, GM.GRP_LEVEL, GM.GRP_ID,
+		       GM.WHLE_GRP_ID, GM.MOD_DT, GM.REG_DT
+		FROM CLIENT_GRP_MSTR GM
+		WHERE GM.WHLE_GRP_ID REGEXP
+		         (SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+		          FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+		                FROM CLIENT_GRP_MSTR W
+		                WHERE W.GRP_ID IN 
+		<foreach item="item" index="index" collection="groupIds" open="(" separator="," close=")">
+        	#{item}
+    	</foreach>
+				) GP)	
+	</select>
+	
+	<insert id="insertClientGroup" parameterType="clientGroupVO">
+	
+		<selectKey keyProperty="grpId" resultType="String" order="BEFORE">
+			SELECT CONCAT('CGRP', (LPAD((SELECT GRNEXTVAL('CLIENT_GROUP_SEQ')), 6, 0)))
+		</selectKey>
+
+		INSERT INTO CLIENT_GRP_MSTR
+			(GRP_ID, GRP_NM, UPR_GRP_ID, WHLE_GRP_ID, GRP_LEVEL, COMMENT, REG_CLIENT_IP, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT) 
+		VALUES (
+			#{grpId},
+			#{grpNm},
+			#{uprGrpId},
+			concat((SELECT W.WHLE_GRP_ID FROM CLIENT_GRP_MSTR W WHERE W.GRP_ID=#{uprGrpId}), #{grpId}, ';'),
+			(SELECT (M.GRP_LEVEL+1) NEXT_LEVEL FROM CLIENT_GRP_MSTR M WHERE M.GRP_ID=#{uprGrpId}),
+			#{comment},
+			#{regClientIp},
+			#{modUserId},
+			now(),
+			#{regUserId},
+			now()			
+		)
+
+	</insert>
+
+	<insert id="insertDefaultClientGroup" parameterType="clientGroupVO">
+
+		INSERT INTO CLIENT_GRP_MSTR
+			(GRP_ID, GRP_NM, COMMENT, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID)
+		VALUES (
+			#{grpId},
+			#{grpNm},
+			#{comment},
+			now(),
+			now(),
+			#{regUserId},
+			#{modUserId}
+		)
+
+	</insert>
+
+	<select id="selectClientGroupSimpleData" parameterType="hashMap" resultMap="GpmsCommonDAO.simpleDataInfo">
+		SELECT GM.GRP_ID AS VALUE, GM.GRP_NM AS NAME
+		FROM CLIENT_GRP_MSTR GM 
+		WHERE
+		<if test="grpId != null">
+    		GM.GRP_ID=#{grpId}
+  		</if>
+  		<if test="adminId != null and adminId != ''">
+  			GM.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID=#{adminId})
+  		</if> 
+	</select>
+
+	<select id="selectClientGroupList" parameterType="hashMap" resultMap="ClientGroupDAO.clientGroupInfo">
+		SELECT
+			GM.GRP_ID, GM.GRP_NM, IFNULL(GM.COMMENT, '') COMMENT, IFNULL(GM.REG_CLIENT_IP, '') REG_CLIENT_IP,  
+			GM.REG_DT, GM.MOD_DT, GM.REG_USER_ID, GM.MOD_USER_ID,
+			(SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID) CLIENT_TOTALCOUNT,
+			(SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID AND CM.STATUS_CD != 'STAT021') CLIENT_COUNT,
+			DESC_CONF.CONF_ID DESKTOP_CONFIG_ID,
+			RULE_CLIENTCONF.CONF_ID CLIENT_CONFIG_ID,
+			RULE_HOSTNAMECONF.CONF_ID HOSTNAME_CONFIG_ID,
+			RULE_UPDATESERVERCONF.CONF_ID UPDATESERVER_CONFIG_ID,
+			RULE_BROWSERRULE.CONF_ID BROWSER_RULE_ID,
+			RULE_MEDIARULE.CONF_ID MEDIA_RULE_ID,
+			RULE_SECURITYRULE.CONF_ID SECURITY_RULE_ID,
+			RULE_FILTEREDSWRULE.CONF_ID FILTEREDSOFTWARE_RULE_ID,
+			RULE_CTRLCENTERITEM.CONF_ID CTRLCENTERITEM_RULE_ID,
+			RULE_POLICYKIT.CONF_ID POLICYKIT_RULE_ID
+		FROM CLIENT_GRP_MSTR GM 
+			LEFT JOIN GR_GROUP_RULE_CONF DESC_CONF ON GM.GRP_ID = DESC_CONF.GRP_ID AND DESC_CONF.CONF_TP='DESKTOPCONF'
+			LEFT JOIN DESKTOP_CONF_INFO DCI ON DESC_CONF.CONF_ID = DCI.CONF_ID
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_CLIENTCONF ON GM.GRP_ID = RULE_CLIENTCONF.GRP_ID AND RULE_CLIENTCONF.CONF_TP='CLIENTCONF'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_HOSTNAMECONF ON GM.GRP_ID = RULE_HOSTNAMECONF.GRP_ID AND RULE_HOSTNAMECONF.CONF_TP='HOSTNAMECONF'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_UPDATESERVERCONF ON GM.GRP_ID = RULE_UPDATESERVERCONF.GRP_ID AND RULE_UPDATESERVERCONF.CONF_TP='UPDATESERVERCONF'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_BROWSERRULE ON GM.GRP_ID = RULE_BROWSERRULE.GRP_ID AND RULE_BROWSERRULE.CONF_TP='BROWSERRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_MEDIARULE ON GM.GRP_ID = RULE_MEDIARULE.GRP_ID AND RULE_MEDIARULE.CONF_TP='MEDIARULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_SECURITYRULE ON GM.GRP_ID = RULE_SECURITYRULE.GRP_ID AND RULE_SECURITYRULE.CONF_TP='SECURITYRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_FILTEREDSWRULE ON GM.GRP_ID = RULE_FILTEREDSWRULE.GRP_ID AND RULE_FILTEREDSWRULE.CONF_TP='FILTEREDSWRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_CTRLCENTERITEM ON GM.GRP_ID = RULE_CTRLCENTERITEM.GRP_ID AND RULE_CTRLCENTERITEM.CONF_TP='CTRLCENTERITEMRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_POLICYKIT ON GM.GRP_ID = RULE_POLICYKIT.GRP_ID AND RULE_POLICYKIT.CONF_TP='POLICYKITRULE'
+		<where>
+			<if test="adminId != null and adminId != ''">
+				GM.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID=#{adminId})
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectClientGroupListPaged" parameterType="hashMap" resultMap="clientGroupInfo">
+		SELECT
+			GM.GRP_ID, GM.GRP_NM, IFNULL(GM.COMMENT, '') COMMENT, IFNULL(GM.REG_CLIENT_IP, '') REG_CLIENT_IP,  
+			GM.REG_DT, GM.MOD_DT, GM.REG_USER_ID, GM.MOD_USER_ID,
+			(SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID) CLIENT_TOTALCOUNT,
+			(SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID AND CM.STATUS_CD != 'STAT021') CLIENT_COUNT,
+			DESC_CONF.CONF_ID DESKTOP_CONFIG_ID,
+			RULE_CLIENTCONF.CONF_ID CLIENT_CONFIG_ID,
+			RULE_HOSTNAMECONF.CONF_ID HOSTNAME_CONFIG_ID,
+			RULE_UPDATESERVERCONF.CONF_ID UPDATESERVER_CONFIG_ID,
+			RULE_BROWSERRULE.CONF_ID BROWSER_RULE_ID,
+			RULE_MEDIARULE.CONF_ID MEDIA_RULE_ID,
+			RULE_SECURITYRULE.CONF_ID SECURITY_RULE_ID,
+			RULE_FILTEREDSWRULE.CONF_ID FILTEREDSOFTWARE_RULE_ID,
+			RULE_CTRLCENTERITEM.CONF_ID CTRLCENTERITEM_RULE_ID,
+			RULE_POLICYKIT.CONF_ID POLICYKIT_RULE_ID,
+			CASE (SELECT COUNT(*)
+	             FROM CLIENT_GRP_MSTR SGM
+	             WHERE SGM.UPR_GRP_ID = GM.GRP_ID)
+	          WHEN 0 THEN 'false'
+	          ELSE 'true'
+	       END HASCHILDREN
+		FROM CLIENT_GRP_MSTR GM 
+			LEFT JOIN GR_GROUP_RULE_CONF DESC_CONF ON GM.GRP_ID = DESC_CONF.GRP_ID AND DESC_CONF.CONF_TP='DESKTOPCONF'
+			LEFT JOIN DESKTOP_CONF_INFO DCI ON DESC_CONF.CONF_ID = DCI.CONF_ID
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_CLIENTCONF ON GM.GRP_ID = RULE_CLIENTCONF.GRP_ID AND RULE_CLIENTCONF.CONF_TP='CLIENTCONF'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_HOSTNAMECONF ON GM.GRP_ID = RULE_HOSTNAMECONF.GRP_ID AND RULE_HOSTNAMECONF.CONF_TP='HOSTNAMECONF'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_UPDATESERVERCONF ON GM.GRP_ID = RULE_UPDATESERVERCONF.GRP_ID AND RULE_UPDATESERVERCONF.CONF_TP='UPDATESERVERCONF'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_BROWSERRULE ON GM.GRP_ID = RULE_BROWSERRULE.GRP_ID AND RULE_BROWSERRULE.CONF_TP='BROWSERRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_MEDIARULE ON GM.GRP_ID = RULE_MEDIARULE.GRP_ID AND RULE_MEDIARULE.CONF_TP='MEDIARULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_SECURITYRULE ON GM.GRP_ID = RULE_SECURITYRULE.GRP_ID AND RULE_SECURITYRULE.CONF_TP='SECURITYRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_FILTEREDSWRULE ON GM.GRP_ID = RULE_FILTEREDSWRULE.GRP_ID AND RULE_FILTEREDSWRULE.CONF_TP='FILTEREDSWRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_CTRLCENTERITEM ON GM.GRP_ID = RULE_CTRLCENTERITEM.GRP_ID AND RULE_CTRLCENTERITEM.CONF_TP='CTRLCENTERITEMRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_POLICYKIT ON GM.GRP_ID = RULE_POLICYKIT.GRP_ID AND RULE_POLICYKIT.CONF_TP='POLICYKITRULE'
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				GM.GRP_NM LIKE CONCAT('%', #{searchKey}, '%') 
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectClientGroupListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(GM.GRP_ID) AS CNT 
+		FROM CLIENT_GRP_MSTR GM
+	</select>
+
+	<select id="selectClientGroupListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(GM.GRP_ID) AS CNT 
+		FROM CLIENT_GRP_MSTR GM 
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				GM.GRP_NM LIKE CONCAT('%', #{searchKey}, '%') 
+			</if>
+		</where>
+	</select>
+
+	<select id="selectClientGroupData" parameterType="String" resultMap="clientGroupInfo">
+		SELECT
+			GM.GRP_ID, GM.GRP_NM, IFNULL(GM.COMMENT, '') COMMENT, IFNULL(GM.REG_CLIENT_IP, '') REG_CLIENT_IP,  
+			GM.GRP_LEVEL, GM.WHLE_GRP_ID,
+      		CASE (SELECT COUNT(*)
+	             FROM CLIENT_GRP_MSTR SGM
+	             WHERE SGM.UPR_GRP_ID = GM.GRP_ID)
+	          WHEN 0 THEN 'false'
+	          ELSE 'true'
+	       	END HASCHILDREN,  
+			GM.REG_DT, GM.MOD_DT, GM.REG_USER_ID, GM.MOD_USER_ID,
+			(SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID) CLIENT_TOTALCOUNT,
+			(SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID AND CM.STATUS_CD != 'STAT021') CLIENT_COUNT,
+			DESC_CONF.CONF_ID DESKTOP_CONFIG_ID,
+			RULE_CLIENTCONF.CONF_ID CLIENT_CONFIG_ID,
+			RULE_HOSTNAMECONF.CONF_ID HOSTNAME_CONFIG_ID,
+			RULE_UPDATESERVERCONF.CONF_ID UPDATESERVER_CONFIG_ID,
+			RULE_BROWSERRULE.CONF_ID BROWSER_RULE_ID,
+			RULE_MEDIARULE.CONF_ID MEDIA_RULE_ID,
+			RULE_SECURITYRULE.CONF_ID SECURITY_RULE_ID,
+			RULE_FILTEREDSWRULE.CONF_ID FILTEREDSOFTWARE_RULE_ID,
+			RULE_CTRLCENTERITEM.CONF_ID CTRLCENTERITEM_RULE_ID,
+			RULE_POLICYKIT.CONF_ID POLICYKIT_RULE_ID
+		FROM CLIENT_GRP_MSTR GM 
+			LEFT JOIN GR_GROUP_RULE_CONF DESC_CONF ON GM.GRP_ID = DESC_CONF.GRP_ID AND DESC_CONF.CONF_TP='DESKTOPCONF'
+			LEFT JOIN DESKTOP_CONF_INFO DCI ON DESC_CONF.CONF_ID = DCI.CONF_ID
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_CLIENTCONF ON GM.GRP_ID = RULE_CLIENTCONF.GRP_ID AND RULE_CLIENTCONF.CONF_TP='CLIENTCONF'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_HOSTNAMECONF ON GM.GRP_ID = RULE_HOSTNAMECONF.GRP_ID AND RULE_HOSTNAMECONF.CONF_TP='HOSTNAMECONF'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_UPDATESERVERCONF ON GM.GRP_ID = RULE_UPDATESERVERCONF.GRP_ID AND RULE_UPDATESERVERCONF.CONF_TP='UPDATESERVERCONF'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_BROWSERRULE ON GM.GRP_ID = RULE_BROWSERRULE.GRP_ID AND RULE_BROWSERRULE.CONF_TP='BROWSERRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_MEDIARULE ON GM.GRP_ID = RULE_MEDIARULE.GRP_ID AND RULE_MEDIARULE.CONF_TP='MEDIARULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_SECURITYRULE ON GM.GRP_ID = RULE_SECURITYRULE.GRP_ID AND RULE_SECURITYRULE.CONF_TP='SECURITYRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_FILTEREDSWRULE ON GM.GRP_ID = RULE_FILTEREDSWRULE.GRP_ID AND RULE_FILTEREDSWRULE.CONF_TP='FILTEREDSWRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_CTRLCENTERITEM ON GM.GRP_ID = RULE_CTRLCENTERITEM.GRP_ID AND RULE_CTRLCENTERITEM.CONF_TP='CTRLCENTERITEMRULE'
+			LEFT JOIN GR_GROUP_RULE_CONF RULE_POLICYKIT ON GM.GRP_ID = RULE_POLICYKIT.GRP_ID AND RULE_POLICYKIT.CONF_TP='POLICYKITRULE'
+		WHERE GM.GRP_ID=#{grpId}   
+	</select>
+
+	<select id="selectClientGroupNodeList" parameterType="hashmap" resultMap="clientGroupInfo">
+		SELECT
+			GM.GRP_ID, GM.GRP_NM, IFNULL(GM.COMMENT, '') COMMENT, IFNULL(GM.REG_CLIENT_IP, '') REG_CLIENT_IP,  
+			GM.GRP_LEVEL, GM.WHLE_GRP_ID,
+      		CASE (SELECT COUNT(*)
+	             FROM CLIENT_GRP_MSTR SGM
+	             WHERE SGM.UPR_GRP_ID = GM.GRP_ID)
+	          WHEN 0 THEN 'false'
+	          ELSE 'true'
+	       	END HASCHILDREN,  
+			GM.REG_DT, GM.MOD_DT, GM.REG_USER_ID, GM.MOD_USER_ID,
+			(SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID) CLIENT_TOTALCOUNT,
+			(SELECT COUNT(CM.CLIENT_ID) FROM CLIENT_MSTR CM WHERE CM.GRP_ID = GM.GRP_ID AND CM.STATUS_CD != 'STAT021') CLIENT_COUNT
+		FROM CLIENT_GRP_MSTR GM 
+		WHERE GM.GRP_ID IN 
+		<foreach item="item" index="index" collection="groupIds" open="(" separator="," close=")">
+        	#{item}
+    	</foreach>
+	</select>
+
+	<!-- check duplicate group name by parent group id  -->
+	<select id="isExistGroupNameByParentId" parameterType="hashmap" resultType="boolean">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END ISEXIST
+		FROM CLIENT_GRP_MSTR 
+		WHERE 
+			GRP_NM = #{groupName}
+			AND UPR_GRP_ID = #{parentGrpId}; 
+	</select>
+
+	<!-- check duplicate group name by group id  -->
+	<select id="isExistGroupNameByGroupId" parameterType="hashmap" resultType="boolean">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END ISEXIST
+		FROM CLIENT_GRP_MSTR 
+		WHERE 
+			GRP_NM = #{groupName}
+			AND UPR_GRP_ID = (SELECT UPR_GRP_ID FROM CLIENT_GRP_MSTR WHERE GRP_ID=#{grpId})
+			AND GRP_ID != #{grpId}; 
+	</select>
+
+	<delete id="deleteClientGroup" parameterType="String">
+		DELETE FROM CLIENT_GRP_MSTR WHERE GRP_ID = #{grpId};
+	</delete>
+
+	<delete id="deleteClientGroupList" parameterType="hashmap">
+		DELETE FROM CLIENT_GRP_MSTR WHERE GRP_ID IN 
+		<foreach item="item" index="index" collection="groupIds" open="(" separator="," close=")">
+        	#{item}
+    	</foreach>
+	</delete>
+
+	<delete id="___deleteClientGroupList" parameterType="hashmap">
+		DELETE FROM CLIENT_GRP_MSTR WHERE GRP_ID IN 
+		<foreach item="item" index="index" collection="groupIds" open="(" separator="," close=")">
+        	#{item}
+    	</foreach>
+	</delete>
+
+	<delete id="deleteClientGroupFromRule" parameterType="String">
+		DELETE FROM GR_GROUP_RULE_CONF WHERE GRP_ID = #{grpId};
+	</delete>
+
+	<delete id="deleteClientGroupListFromRule" parameterType="hashmap">
+		DELETE FROM GR_GROUP_RULE_CONF WHERE GRP_ID IN
+		<foreach item="item" index="index" collection="groupIds" open="(" separator="," close=")">
+        	#{item}
+    	</foreach>
+	</delete>
+
+	<delete id="deleteClientGroupForAdmin" parameterType="String">
+		DELETE FROM ADMIN_CLIENTGRP WHERE GRP_ID = #{grpId};
+	</delete>
+
+	<delete id="deleteClientGroupForNoti" parameterType="String">
+		DELETE FROM NOTICE_PUBLISH_TARGET WHERE TARGET_TYPE = '3' AND TARGET_ID = #{grpId};
+	</delete>
+
+	<update id="updateClientGroup" parameterType="clientGroupVO">
+
+		UPDATE CLIENT_GRP_MSTR SET GRP_NM = #{grpNm}, COMMENT = #{comment}, REG_CLIENT_IP = #{regClientIp} 
+		WHERE GRP_ID = #{grpId};
+
+	</update>
+
+	<update id="updateGroupToClient" parameterType="hashmap">
+		UPDATE CLIENT_MSTR SET GRP_ID = #{grpId}, MOD_USER_ID = #{modUserId}, MOD_DT = now()  
+		WHERE CLIENT_ID IN 		
+		<foreach item="item" index="index" collection="clientIds" open="(" separator="," close=")">
+        	#{item}
+    	</foreach>
+	</update>
+
+	<update id="updateGroupToClientForDelete" parameterType="hashmap">
+		UPDATE CLIENT_MSTR SET GRP_ID = #{newGroupId}, MOD_USER_ID = #{modUserId}, MOD_DT = now()  
+		WHERE GRP_ID = #{grpId}
+	</update>
+
+	<update id="updateGroupListToClientForDelete" parameterType="hashmap">
+		UPDATE CLIENT_MSTR SET GRP_ID = #{newGroupId}, MOD_USER_ID = #{modUserId}, MOD_DT = now()  
+		WHERE GRP_ID IN
+		<foreach item="item" index="index" collection="groupIds" open="(" separator="," close=")">
+        	#{item}
+    	</foreach>
+	</update>
+
+	<insert id="insertOrUpdateConfigWithGroup" parameterType="hashmap">
+		INSERT INTO GR_GROUP_RULE_CONF
+			(GRP_ID, CONF_ID, CONF_TP, REG_DT, REG_USER_ID) 
+		VALUES (#{grpId}, #{configId}, #{configTp}, now(), #{regUserId})
+		ON DUPLICATE KEY UPDATE CONF_ID=#{configId}
+	</insert>
+
+	<delete id="deleteConfigWithGroup" parameterType="String">
+		DELETE FROM GR_GROUP_RULE_CONF WHERE GRP_ID=#{grpId} AND CONF_TP=#{configTp};
+	</delete>
+
+	<insert id="insertGroupInAdminRelation" parameterType="hashmap">
+		INSERT INTO ADMIN_CLIENTGRP
+			(ADMIN_ID, REG_USER_ID, REG_DT, GRP_ID) 
+		VALUES (#{regUserId}, #{regUserId}, NOW(), #{grpId})
+	</insert>
+
+	<!-- 그룹에 속한 (온라인)단말 항목 조회 (하나의 그룹)-->
+	<select id="selectOnlineClientIdsByGroupId" parameterType="string" resultMap="clientInfo">
+		SELECT T.CLIENT_ID
+		FROM CLIENT_MSTR T
+			LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+	    WHERE T.STATUS_CD = 'STAT010' 
+		    AND CAST(COALESCE(TIMESTAMPDIFF(SECOND,CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+		    AND T.GRP_ID = #{grpId}
+	</select>
+
+	<!-- 그룹에 속한 (온라인)단말 항목 조회 (여러개 그룹)-->
+	<select id="selectOnlineClientIdsByGroupList" parameterType="map" resultMap="clientInfo">
+		SELECT T.CLIENT_ID
+		FROM CLIENT_MSTR T
+			LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+	    WHERE T.STATUS_CD = 'STAT010' 
+		    AND CAST(COALESCE(TIMESTAMPDIFF(SECOND,CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+		    AND T.GRP_ID IN
+			<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+        		#{item}
+    		</foreach>		    
+	</select>
+
+	<!-- 단말 그룹 아이디를 이용한 정책 아이디 정보 -->
+	<select id="selectClientConfIdByGroupId" parameterType="String" resultMap="clientGroupInfo">
+		SELECT GRP_ID,
+		  GROUP_CONCAT(IF(CONF_TP = 'CLIENTCONF', CONF_ID, NULL)) AS CLIENT_CONFIG_ID, 
+		  GROUP_CONCAT(IF(CONF_TP = 'HOSTNAMECONF', CONF_ID, NULL)) AS HOSTNAME_CONFIG_ID, 
+		  GROUP_CONCAT(IF(CONF_TP = 'UPDATESERVERCONF', CONF_ID, NULL)) AS UPDATESERVER_CONFIG_ID 
+		FROM GR_GROUP_RULE_CONF WHERE GRP_ID=#{grpId}
+	</select>
+
+	<!-- HISTORY  -->
+	<insert id="insertClientGroupHist" parameterType="hashmap">
+		INSERT INTO CLIENT_GRP_HIST
+			(HIST_SEQ, CHG_TP, GRP_ID, GRP_NM, UPR_GRP_ID, WHLE_GRP_ID, GRP_LEVEL, COMMENT, REG_CLIENT_IP, MOD_USER_ID, MOD_DT, 
+			REG_USER_ID, REG_DT, HIST_REG_DT, HIST_USER_ID)
+		SELECT (SELECT GRNEXTVAL('CLIENTGRPHIST_SEQ')), #{chgTp} AS CHG_TP, GRP_ID, GRP_NM, UPR_GRP_ID, WHLE_GRP_ID, GRP_LEVEL, COMMENT, REG_CLIENT_IP, MOD_USER_ID, MOD_DT, 
+			REG_USER_ID, REG_DT, now(), #{regUserId} AS HIST_USER_ID 
+		FROM CLIENT_GRP_MSTR WHERE GRP_ID=#{grpId};
+	</insert>
+
+</mapper>
