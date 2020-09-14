@@ -201,6 +201,36 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	}
 
 	/**
+	 * response whether max media cnt
+	 *
+	 * @return long total count number.
+	 * @throws SQLException
+	 */
+	public long selectSiteMaxMediaCnt(String siteId) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("selectSiteMaxMediaCnt", siteId);
+	}
+
+	/**
+	 * response whether register req
+	 *
+	 * @return long total count number.
+	 * @throws SQLException
+	 */
+	public long selectSiteRegisterReq(String siteId) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("selectSiteRegisterReq", siteId);
+	}
+
+	/**
+	 * response whether delete req
+	 *
+	 * @return long total count number.
+	 * @throws SQLException
+	 */
+	public long selectSiteDeleteReq(String siteId) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("selectSiteDeleteReq", siteId);
+	}
+
+	/**
 	 * response client configuration id by group id
 	 * 
 	 * @param groupId string group id
