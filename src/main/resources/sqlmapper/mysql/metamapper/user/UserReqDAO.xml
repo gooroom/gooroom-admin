@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserReqDAO">
+
+	<resultMap type="userReqVO" id="userReqInfo">
+		<result property="reqSeq" column="REQ_SEQ"/>
+		<result property="userId" column="USER_ID"/>
+		<result property="clientId" column="CLIENT_ID"/>
+		<result property="regDt" column="REG_DT"/>
+		<result property="actionType" column="ACTION_TYPE"/>
+		<result property="adminCheck" column="ADMIN_CHECK"/>
+		<result property="modDt" column="MOD_DT"/>
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="usbName" column="USB_NAME"/>
+		<result property="usbSerialNo" column="USB_SERIAL_NO"/>
+		<result property="usbProduct" column="USB_PRODUCT"/>
+		<result property="usbSize" column="USB_SIZE"/>
+		<result property="usbVendor" column="USB_VENDOR"/>
+	</resultMap>
+
+	<select id="selectUserReqListPaged" parameterType="String" resultMap="userReqInfo">
+		SELECT URM.REQ_SEQ,
+		URM.USER_ID,
+		URM.ACTION_TYPE,
+		URM.CLIENT_ID,
+		URM.REG_DT,
+		URP.USB_NAME,
+		URP.USB_SERIAL_NO,
+		URP.USB_PRODUCT,
+		URP.USB_SIZE,
+		URP.USB_VENDOR,
+		URM.MOD_DT,
+		URM.MOD_USER_ID,
+		URM.ADMIN_CHECK
+		FROM USER_REQ_MSTR URM
+		LEFT JOIN
+		USER_REQ_PROP URP
+		ON URM.REQ_SEQ = URP.REQ_SEQ
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				AND (URM.USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR URM.USB_NAME LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectUserReqListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(REQ_SEQ) AS CNT
+		FROM USER_REQ_MSTR
+	</select>
+
+	<select id="selectUserReqListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(REQ_SEQ) AS CNT
+		FROM USER_REQ_MSTR
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				AND (URM.USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR URM.USB_NAME LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+		</where>
+	</select>
+
+</mapper>
+
+

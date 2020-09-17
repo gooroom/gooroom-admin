@@ -33,6 +33,7 @@ import kr.gooroom.gpms.common.service.ExcelCommonService;
 import kr.gooroom.gpms.common.utils.CommonUtils;
 import kr.gooroom.gpms.dept.service.DeptService;
 import kr.gooroom.gpms.dept.service.DeptVO;
+import kr.gooroom.gpms.user.service.UserReqService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -76,6 +77,9 @@ public class UserController {
 
 	@Resource(name = "userService")
 	private UserService userService;
+
+	@Resource(name = "userReqService")
+	private UserReqService userReqService;
 
 	@Resource(name = "ctrlMstService")
 	private CtrlMstService ctrlMstService;
@@ -817,5 +821,62 @@ public class UserController {
 			logger.error("error in createUserSampleFileFromData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
+	}
+
+	/**
+	 * get user registration(usb media) request.
+	 * @return ResultVO result data bean
+	 *
+	 */
+	@PostMapping(value = "/readUserReqListPaged")
+	public @ResponseBody ResultVO readUserReqListPaged(HttpServletRequest req, HttpServletResponse res,
+														  ModelMap model) {
+
+		ResultPagingVO resultVO = new ResultPagingVO();
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		// << options >>
+		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
+		// search keyword
+		options.put("searchKey", searchKey);
+
+		// << paging >>
+		String paramOrderColumn = req.getParameter("orderColumn");
+		String paramOrderDir = req.getParameter("orderDir");
+		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
+		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+
+		if ("chUserId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "USER_ID");
+		} else if ("chRegDate".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "REG_DT");
+		} else if ("chActionType".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "ACTION_TYPE");
+		} else if ("chAdminCheck".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "ADMIN_CHECK");
+		} else if ("chModDate".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "MOD_DT");
+		}
+
+		options.put("paramOrderDir", paramOrderDir);
+		options.put("paramStart", Integer.parseInt(paramStart));
+		options.put("paramLength", Integer.parseInt(paramLength));
+
+		try {
+
+			resultVO = userReqService.getUserReqListPaged(options);
+			resultVO.setDraw(String.valueOf(req.getParameter("page")));
+			resultVO.setOrderColumn(paramOrderColumn);
+			resultVO.setOrderDir(paramOrderDir);
+			resultVO.setRowLength(paramLength);
+
+
+		} catch (Exception ex) {
+			logger.error("error in readUserReqListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			resultVO = null;
+		}
+
+		return resultVO;
 	}
 }

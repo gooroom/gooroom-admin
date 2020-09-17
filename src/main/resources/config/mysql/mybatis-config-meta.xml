@@ -31,6 +31,7 @@
 		<typeAlias type="kr.gooroom.gpms.user.service.AdminUserVO" alias="adminUserVO" />
 		<typeAlias type="kr.gooroom.gpms.user.service.UserRoleVO" alias="userRoleVO" />
 		<typeAlias type="kr.gooroom.gpms.user.service.UserVO" alias="userVO" />
+		<typeAlias type="kr.gooroom.gpms.user.service.UserReqVO" alias="userReqVO" />
 		<typeAlias type="kr.gooroom.gpms.user.service.UserAndRoleVO" alias="userAndRoleVO" />
 		<typeAlias type="kr.gooroom.gpms.user.service.UserAndClientVO" alias="userAndClientVO" />
 		<typeAlias type="kr.gooroom.gpms.user.service.UserTokenVO" alias="userTokenVO"/>
