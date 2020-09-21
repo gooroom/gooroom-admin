@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import javax.annotation.Resource;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1006,5 +1007,42 @@ public class CustomJobMaker {
 			createJobForClientSetupWithClients(GPMSConstants.JOB_MEDIA_RULE_CHANGE, null, clientIds);
 		}
 	}
-	
+
+	public void createJobForUserReq(String ClientId, HashMap<String, String> map) throws Exception {
+
+		Job[] jobs = new Job[1];
+		jobs[0] = Job.generateJobWithMap("config", "server_event_usb_whitelist", map);
+
+		String jsonStr = "";
+		StringWriter outputWriter = new StringWriter();
+
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			mapper.writeValue(outputWriter, jobs);
+			jsonStr = outputWriter.toString();
+
+		} catch (Exception jsonex) {
+			logger.error("CustomJobMaker.createJobForUserReq (make json) Exception occurred. ", jsonex);
+		} finally {
+			try {
+				if (outputWriter != null) {
+					outputWriter.close();
+				}
+			} catch (Exception finalex) {
+			}
+		}
+
+		JobVO jobVO = new JobVO();
+		jobVO.setJobData(jsonStr);
+		jobVO.setJobName("client_event_usb_whitelist");
+		jobVO.setRegUserId(LoginInfoHelper.getUserId());
+
+		// assign target clients
+		String[] clientArray = new String[1];
+		clientArray[0] = ClientId;
+		jobVO.setClientIds(clientArray);
+
+		jobService.createJob(jobVO);
+	}
 }

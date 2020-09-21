@@ -863,20 +863,62 @@ public class UserController {
 		options.put("paramLength", Integer.parseInt(paramLength));
 
 		try {
-
 			resultVO = userReqService.getUserReqListPaged(options);
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));
 			resultVO.setOrderColumn(paramOrderColumn);
 			resultVO.setOrderDir(paramOrderDir);
 			resultVO.setRowLength(paramLength);
-
-
 		} catch (Exception ex) {
 			logger.error("error in readUserReqListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 			resultVO = null;
 		}
+		return resultVO;
+	}
 
+	/**
+	 * 사용자 USB 등록/삭제 요청 승인 - array
+	 *
+	 * @param
+	 * @return ResultVO
+	 * @throws Exception
+	 */
+	@PostMapping(value = "/approvalUserReq")
+	public @ResponseBody ResultVO approvalUserReq(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+
+		String[] reqSeqs = req.getParameterValues("reqSeqs[]");
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			StatusVO status = userReqService.approvalUserReq(reqSeqs);
+			resultVO.setStatus(status);
+		} catch (Exception ex) {
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+		}
+		return resultVO;
+	}
+
+	/**
+	 * 사용자 USB 등록/삭제 요청 반려 - array
+	 *
+	 * @param
+	 * @return ResultVO
+	 * @throws Exception
+	 */
+	@PostMapping(value = "/denyUserReq")
+	public @ResponseBody ResultVO denyUserReq(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+
+		String[] reqSeqs = req.getParameterValues("reqSeqs[]");
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			StatusVO status = userReqService.denyUserReq(reqSeqs);
+			resultVO.setStatus(status);
+		} catch (Exception ex) {
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+		}
 		return resultVO;
 	}
 }

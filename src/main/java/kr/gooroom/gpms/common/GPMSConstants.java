@@ -297,4 +297,17 @@ public class GPMSConstants {
 	// statistics.
 	public static final String DEFAULT_VIOLATED_LOGTYPE = "취약";
 
+	// user Request
+	public static final String ACTION_REGISTERING = "registering";
+	public static final String ACTION_REGISTERING_CANCEL = "registering-cancel";
+	public static final String ACTION_UNREGISTERING = "unregistering";
+	public static final String ACTION_REGISTER_APPROVAL = "register-approval";
+	public static final String ACTION_REGISTER_DENY = "register-deny";
+	public static final String ACTION_UNREGISTER_APPROVAL = "unregister-approval";
+	public static final String ACTION_UNREGISTER_DENY = "unregister-deny";
+	public static final String ACTION_APPROVAL = "approval";
+	public static final String ACTION_DENY = "deny";
+	public static final String ACTION_WAITING = "waiting";
+
+
 }
