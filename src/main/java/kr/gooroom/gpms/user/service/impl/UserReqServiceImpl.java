@@ -124,7 +124,17 @@ public class UserReqServiceImpl implements UserReqService {
                     userReqVo.setAdminCheck(GPMSConstants.ACTION_UNREGISTER_APPROVAL);
                 }
                 //1. 관리자 확인(추가/삭제 승인) 업데이트
-                userReqDao.updateUserReq(userReqVo);
+                long reCnt = userReqDao.updateUserReq(userReqVo);
+                if (reCnt > 0) {
+                    if (reCnt > 0) {
+                        statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
+                                MessageSourceHelper.getMessage("approvalUserReq.result.update"));
+                    } else {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERTERROR,
+                                MessageSourceHelper.getMessage("approvalUserReq.result.noupdate"));
+                    }
+                }
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put("action", row[0].getActionType());
@@ -198,7 +208,17 @@ public class UserReqServiceImpl implements UserReqService {
                     userReqVo.setAdminCheck(GPMSConstants.ACTION_UNREGISTER_DENY);
                 }
                 //1. 관리자 확인(추가/삭제 반려) 업데이트
-                userReqDao.updateUserReq(userReqVo);
+                long reCnt = userReqDao.updateUserReq(userReqVo);
+                if (reCnt > 0) {
+                    if (reCnt > 0) {
+                        statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
+                                MessageSourceHelper.getMessage("denyUserReq.result.update"));
+                    } else {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERTERROR,
+                                MessageSourceHelper.getMessage("denyUserReq.result.noupdate"));
+                    }
+                }
 
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put("action", row[0].getActionType());
