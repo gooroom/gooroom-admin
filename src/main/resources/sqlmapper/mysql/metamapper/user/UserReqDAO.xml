@@ -61,6 +61,36 @@
 		</where>
 	</select>
 
+	<select id="selectUserReq" parameterType="String" resultMap="userReqInfo">
+		SELECT URM.REQ_SEQ,
+		       URM.USER_ID,
+		       URM.ACTION_TYPE,
+		       URM.CLIENT_ID,
+		       URM.REG_DT,
+		       URP.USB_NAME,
+		       URP.USB_SERIAL_NO,
+		       URP.USB_PRODUCT,
+		       URP.USB_SIZE,
+		       URP.USB_VENDOR,
+		       URM.MOD_DT,
+		       URM.MOD_USER_ID,
+		       URM.ADMIN_CHECK
+		FROM USER_REQ_MSTR URM
+		     LEFT JOIN
+		     USER_REQ_PROP URP
+		ON URM.REQ_SEQ = URP.REQ_SEQ
+		WHERE URM.REQ_SEQ = #{reqSeq}
+	</select>
+
+	<update id="updateUserReq" parameterType="userReqVO">
+		UPDATE USER_REQ_MSTR SET
+		       ADMIN_CHECK = #{adminCheck},
+		       MOD_DT = #{modDt},
+		       MOD_USER_ID = #{modUserId}
+		WHERE
+		       REQ_SEQ = #{reqSeq}
+	</update>
+
 </mapper>
 
 

@@ -928,7 +928,7 @@
 		                 AND CM.STATUS_CD = 'STAT010') P
 		WHERE !(P.UPDATE_TARGET_CNT = 0 AND P.UPDATE_MAINOS_CNT = 0)                  
 	</select>
-	
+
     <select id="selectOnlineClientIdsForNoticeInstantNotice" parameterType="String" resultMap="clientInfo">
        SELECT DISTINCT CLIENT_ID FROM CLIENT_ACCESS
        WHERE
@@ -953,4 +953,11 @@
            AND CAST(COALESCE(TIMESTAMPDIFF(SECOND,CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (POLLING_TIME+10)
     </select>
 
+	<select id="selectOnlineClientIdInClientId" parameterType="hashmap" resultMap="clientInfo">
+		SELECT T.CLIENT_ID
+		FROM CLIENT_MSTR T
+		LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+		WHERE T.STATUS_CD = 'STAT010' AND T.CLIENT_ID = #{clientId}
+		AND CAST(COALESCE(TIMESTAMPDIFF(SECOND,CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+	</select>
 </mapper>

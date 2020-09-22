@@ -141,14 +141,14 @@ public class UserReqServiceImpl implements UserReqService {
                     String clientId = ((ClientVO) vo.getData()[0]).getClientId();
                     String[] clientIds = new String[1];
                     clientIds[0] = clientId;
-
                     if(clientId.equals(row[0].getClientId())) {
                         //2. 온라인 상태면 job으로 등록
                         jobMaker.createJobForClientSetupWithClients(GPMSConstants.JOB_MEDIA_RULE_CHANGE, null, clientIds);
                     }
-                    //3. 처리 결과 job으로 등록
-                    jobMaker.createJobForUserReq(row[0].getClientId(), map);
                 }
+
+                //3. 처리 결과 job으로 등록
+                jobMaker.createJobForUserReq(row[0].getClientId(), map);
             }
         } catch (SQLException sqlEx) {
             logger.error("error in approvalUserReq : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -220,9 +220,10 @@ public class UserReqServiceImpl implements UserReqService {
                         //2. 온라인 상태면 job으로 등록
                         jobMaker.createJobForClientSetupWithClients(GPMSConstants.JOB_MEDIA_RULE_CHANGE, null, clientIds);
                     }
-                    //3. 처리 결과 job으로 등록
-                    jobMaker.createJobForUserReq(row[0].getClientId(), map);
                 }
+
+                //3. 처리 결과 job으로 등록
+                jobMaker.createJobForUserReq(row[0].getClientId(), map);
             }
         } catch (SQLException sqlEx) {
             logger.error("error in denyUserReq : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
