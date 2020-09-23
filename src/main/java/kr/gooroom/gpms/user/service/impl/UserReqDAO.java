@@ -19,6 +19,24 @@ public class UserReqDAO extends SqlSessionMetaDAO {
     private static final Logger logger = LoggerFactory.getLogger(AdminUserDAO.class);
 
     /**
+     * 사용자 USB 등록/삭제 요청 리스트
+     *
+     * @return UserReqVO List
+     * @throws SQLException
+     */
+    public List<UserReqVO> selectUserReqList(String userId) throws SQLException {
+        List<UserReqVO> re = null;
+        try {
+            re = sqlSessionMeta.selectList("selectUserReqList", userId);
+        } catch (Exception ex) {
+            logger.error("error in selectUserReqList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+            re = null;
+        }
+        return re;
+    }
+
+    /**
      * 사용자 USB 등록/삭제 요청 검색
      *
      * @return UserReqVO List

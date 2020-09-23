@@ -50,6 +50,44 @@ public class UserReqServiceImpl implements UserReqService {
     @Inject
     private CustomJobMaker jobMaker;
 
+    /**
+     * 사용자 USB 등록/삭제 요청 리스트
+     *
+     * @param userId String
+     * @return ResultVO result object
+     * @throws Exception
+     */
+    @Override
+    public ResultVO getUserReqList(String userId) throws Exception {
+
+        ResultPagingVO resultVO = new ResultPagingVO();
+
+        try {
+            List<UserReqVO> re = userReqDao.selectUserReqList(userId);
+            if (re != null && re.size() > 0) {
+
+                UserReqVO[] row = re.stream().toArray(UserReqVO[]::new);
+                resultVO.setData(row);
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.selectdata")));
+            } else {
+
+                Object[] o = new Object[0];
+                resultVO.setData(o);
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+                        MessageSourceHelper.getMessage("system.common.noselectdata")));
+            }
+        } catch (Exception ex) {
+            logger.error("error in getUserReqList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+            if (resultVO != null) {
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            }
+        }
+
+        return resultVO;
+    }
     
      /**
      * 사용자 요청(USB 등록/삭제) 리스트

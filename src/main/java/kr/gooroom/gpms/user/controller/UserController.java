@@ -828,6 +828,27 @@ public class UserController {
 	 * @return ResultVO result data bean
 	 *
 	 */
+	@PostMapping(value = "/readUserReqList")
+	public @ResponseBody ResultVO readUserReqList(HttpServletRequest req, HttpServletResponse res,
+	                                                   ModelMap model) {
+
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			resultVO = userReqService.getUserReqList(req.getParameter("userId"));
+		} catch (Exception ex) {
+			logger.error("error in readUserReqList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			resultVO = null;
+		}
+		return resultVO;
+	}
+
+	/**
+	 * get user registration(usb media) request.
+	 * @return ResultVO result data bean
+	 *
+	 */
 	@PostMapping(value = "/readUserReqListPaged")
 	public @ResponseBody ResultVO readUserReqListPaged(HttpServletRequest req, HttpServletResponse res,
 														  ModelMap model) {

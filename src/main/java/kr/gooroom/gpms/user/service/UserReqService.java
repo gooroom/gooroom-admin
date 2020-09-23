@@ -4,9 +4,19 @@ import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 
+import javax.xml.transform.Result;
 import java.util.HashMap;
 
 public interface UserReqService {
+
+    /**
+     * 사용자 USB 등록/삭제 요청 리스트
+     *
+     * @param userId String
+     * @return ResultVO result object
+     * @throws Exception
+     */
+    ResultVO getUserReqList(String userId) throws Exception;
 
      /**
      * 사용자 USB 등록/삭제 요청 리스트
