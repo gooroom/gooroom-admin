@@ -105,4 +105,47 @@ public class UserReqDAO extends SqlSessionMetaDAO {
         return (long) sqlSessionMeta.update("updateUserReq", vo);
     }
 
+
+    /**
+     * 사용자의 요청 데이타
+     * @param reqSeq
+     * @return
+     * @throws Exception
+     */
+    public List<UserReqVO> selectUserReqData(String reqSeq) throws Exception {
+        return sqlSessionMeta.selectList("selectUserReqData", reqSeq);
+    }
+
+    /**
+     * 관리자에 의한 usb 권한 회수 (사용자 요청 리스트로 추가됨)
+     *
+     * @param vo
+     * @return int
+     * @throws Exception
+     */
+    public int insertUserReqMstr(UserReqVO vo) throws Exception {
+        return sqlSessionMeta.insert("insertUserReqMstr", vo);
+    }
+
+    /**
+     * 매체 정보 저장
+     *
+     * @param vo
+     * @return int
+     * @throws Exception
+     */
+    public int insertUserReqProp(UserReqVO vo) throws Exception {
+        return sqlSessionMeta.insert("insertUserReqProp", vo);
+    }
+
+    /**
+     * 요청의 reqSeq 검색
+     * @param urmVo
+     * @return
+     * @throws Exception
+     */
+    public String selectUserReqSeq(UserReqVO urmVo) throws Exception {
+        return sqlSessionMeta.selectOne("selectUserReqSeq", urmVo);
+    }
+
 }

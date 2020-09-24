@@ -45,4 +45,14 @@ public interface UserReqService {
      */
     StatusVO denyUserReq(String[] reqSeqs) throws Exception;
 
+    /**
+     * 사용자 USB 권한 회수
+     *
+     * @param reqSeq string target request seq
+     * @return StatusVO result status object
+     * @throws Exception
+     */
+    StatusVO revokeUsbPermissionFromAdmin(String reqSeq) throws Exception ;
+
+
     }

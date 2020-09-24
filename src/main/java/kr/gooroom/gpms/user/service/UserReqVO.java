@@ -17,24 +17,17 @@ public class UserReqVO implements Serializable {
     private String adminCheck;
     private String modDt;
     private String modUserId;
+    private String status;
 
 
-    public String getReqSeq() {
-        return reqSeq;
-    }
-    public void setReqSeq(String reqSeq) {
-        this.reqSeq = reqSeq;
-    }
+    public String getReqSeq() { return reqSeq; }
+    public void setReqSeq(String reqSeq) { this.reqSeq = reqSeq; }
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
     public String getClientId() { return clientId; }
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
+    public void setClientId(String clientId) { this.clientId = clientId; }
     public String getRegDt() { return regDt; }
-    public void setRegDt(String regDt) {
-        this.regDt = regDt;
-    }
+    public void setRegDt(String regDt) { this.regDt = regDt; }
     public String getActionType() { return actionType; }
     public void setActionType(String actionType) { this.actionType = actionType; }
     public String getUsbName() { return usbName; }
@@ -47,14 +40,12 @@ public class UserReqVO implements Serializable {
     public void setUsbSize(String usbSize) { this.usbSize = usbSize; }
     public String getUsbVendor() { return usbVendor; }
     public void setUsbVendor(String usbVendor) { this.usbVendor = usbVendor; }
-    public String getAdminCheck() {
-        return adminCheck;
-    }
-    public void setAdminCheck(String adminCheck) {
-        this.adminCheck = adminCheck;
-    }
+    public String getAdminCheck() { return adminCheck; }
+    public void setAdminCheck(String adminCheck) { this.adminCheck = adminCheck; }
     public String getModDt() { return modDt; }
     public void setModDt(String modDt) { this.modDt = modDt; }
-    public String getModUserId(String userId) { return modUserId; }
+    public String getModUserId() { return modUserId; }
     public void setModUserId(String modUserId) { this.modUserId = modUserId; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

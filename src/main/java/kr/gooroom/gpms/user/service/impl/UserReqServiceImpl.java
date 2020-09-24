@@ -302,4 +302,88 @@ public class UserReqServiceImpl implements UserReqService {
         }
         return statusVO;
     }
+
+    /**
+     * 사용자 USB 권한 회수
+     *
+     * @param reqSeq string target request seq
+     * @return StatusVO result status object
+     * @throws Exception
+     */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
+    public StatusVO revokeUsbPermissionFromAdmin(String reqSeq) throws Exception {
+
+        StatusVO statusVO = new StatusVO();
+        UserReqVO userReqVo = new UserReqVO();
+        userReqVo.setModUserId(LoginInfoHelper.getUserId());
+        String modDt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+        try {
+            List<UserReqVO> re = userReqDao.selectUserReqData(reqSeq);
+            if (re != null && re.size() > 0) {
+                UserReqVO urVo = new UserReqVO();
+                urVo.setUserId(re.get(0).getUserId());
+                urVo.setClientId(re.get(0).getClientId());
+                urVo.setRegDt(re.get(0).getRegDt());
+                urVo.setActionType(re.get(0).getActionType());
+                urVo.setModUserId(re.get(0).getModUserId());
+                urVo.setModDt(modDt);
+                urVo.setStatus(re.get(0).getStatus());
+                urVo.setUsbName(re.get(0).getUsbName());
+                urVo.setUsbSerialNo(re.get(0).getUsbSerialNo());
+                urVo.setUsbProduct(re.get(0).getUsbProduct());
+                urVo.setUsbSize(re.get(0).getUsbSize());
+                urVo.setUsbVendor(re.get(0).getUsbVendor());
+                urVo.setUsbVendor(GPMSConstants.REQ_STS_USABLE);
+                urVo.setAdminCheck(GPMSConstants.ACTION_REGISTER_DENY);
+
+                // 1. 권한 회수 후 요청 리스트에 등록
+                long reCnt = userReqDao.insertUserReqMstr(urVo);
+                urVo.setReqSeq(userReqDao.selectUserReqSeq(urVo));
+                userReqDao.insertUserReqProp(urVo);
+
+                if (reCnt > 0) {
+                    if (reCnt > 0) {
+                        statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
+                                MessageSourceHelper.getMessage("UserReqRevoke.result.insert"));
+                    } else {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERTERROR,
+                                MessageSourceHelper.getMessage("UserReqRevoke.result.noinsert"));
+                    }
+                }
+
+                ResultVO vo = clientService.getOnlineClientIdByClientId(re.get(0).getClientId());
+                if (vo != null && vo.getData() != null && vo.getData().length > 0 ){
+                    String clientId = ((ClientVO) vo.getData()[0]).getClientId();
+                    String[] clientIds = new String[1];
+                    clientIds[0] = clientId;
+
+                    if(clientId.equals(re.get(0).getClientId())) {
+                        //2. 온라인 상태면 job으로 등록
+                        jobMaker.createJobForClientSetupWithClients(GPMSConstants.JOB_MEDIA_RULE_CHANGE, null, clientIds);
+                    }
+                }
+            }
+        } catch (SQLException sqlEx) {
+            logger.error("error in revokeUsbPermissionFromAdmin : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
+            if (statusVO != null) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            }
+            throw sqlEx;
+        } catch (Exception ex) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            logger.error("error in revokeUsbPermissionFromAdmin : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+            if (statusVO != null) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            }
+        }
+
+        return statusVO;
+    }
 }

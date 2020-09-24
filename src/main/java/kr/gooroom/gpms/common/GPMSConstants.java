@@ -97,6 +97,9 @@ public class GPMSConstants {
 	public static final String STS_REVOKED = "STAT021";
 	public static final String STS_EXPIRE = "STAT022";
 
+	public static final String REQ_STS_USABLE = "usable";
+	public static final String REQ_STS_EXPIRE = "expire";
+
 	public static final String STS_VIEW_REVOKE = "RVK";
 	public static final String STS_VIEW_OFFLINE = "OFF";
 	public static final String STS_VIEW_VIOLATED = "VLT";

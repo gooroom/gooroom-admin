@@ -942,4 +942,27 @@ public class UserController {
 		}
 		return resultVO;
 	}
+
+	/**
+	 * usb 권한 회수
+	 *
+	 * @param
+	 * @return ResultVO
+	 * @throws Exception
+	 */
+	@PostMapping(value = "/revokeUsbPermissionFromAdmin")
+	public @ResponseBody ResultVO revokeUsbPermissionFromAdmin(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+
+		String reqSeq = req.getParameter("reqSeq");
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			  StatusVO status = userReqService.revokeUsbPermissionFromAdmin(reqSeq);
+			  resultVO.setStatus(status);
+		} catch (Exception ex) {
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+		}
+		return resultVO;
+	}
 }
