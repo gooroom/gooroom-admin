@@ -17,11 +17,12 @@
 		<result property="usbProduct" column="USB_PRODUCT"/>
 		<result property="usbSize" column="USB_SIZE"/>
 		<result property="usbVendor" column="USB_VENDOR"/>
+		<result property="status" column="STATUS"/>
 	</resultMap>
 
 	<select id="selectUserReqList" parameterType="String" resultMap="userReqInfo">
 		SELECT URM.REQ_SEQ, URM.USER_ID, URM.ACTION_TYPE, URM.CLIENT_ID,
-		URM.REG_DT, URP.USB_NAME,
+		URM.REG_DT, URP.USB_NAME, URP.STATUS,
 		URP.USB_SERIAL_NO, URP.USB_PRODUCT, URP.USB_SIZE, URP.USB_VENDOR,
 		URM.MOD_DT, URM.MOD_USER_ID, URM.ADMIN_CHECK
 		FROM USER_REQ_MSTR URM
@@ -40,6 +41,7 @@
 		URP.USB_PRODUCT,
 		URP.USB_SIZE,
 		URP.USB_VENDOR,
+		URP.STATUS,
 		URM.MOD_DT,
 		URM.MOD_USER_ID,
 		URM.ADMIN_CHECK
@@ -84,7 +86,8 @@
 		       URP.USB_VENDOR,
 		       URM.MOD_DT,
 		       URM.MOD_USER_ID,
-		       URM.ADMIN_CHECK
+		       URM.ADMIN_CHECK,
+		       URP.STATUS
 		FROM USER_REQ_MSTR URM
 		     LEFT JOIN
 		     USER_REQ_PROP URP
