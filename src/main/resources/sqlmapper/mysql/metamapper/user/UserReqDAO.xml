@@ -99,7 +99,8 @@
 		UPDATE USER_REQ_MSTR SET
 		       ADMIN_CHECK = #{adminCheck},
 		       MOD_DT = #{modDt},
-		       MOD_USER_ID = #{modUserId}
+		       MOD_USER_ID = #{modUserId},
+		       STATUS = #{status}
 		WHERE
 		       REQ_SEQ = #{reqSeq}
 	</update>

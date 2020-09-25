@@ -157,8 +157,10 @@ public class UserReqServiceImpl implements UserReqService {
                 userReqVo.setReqSeq(reqSeqs[i]);
                 userReqVo.setModDt(modDt);
                 if (row[0].getActionType().equals(GPMSConstants.ACTION_REGISTERING)) {
+                    userReqVo.setStatus(GPMSConstants.REQ_STS_USABLE);
                     userReqVo.setAdminCheck(GPMSConstants.ACTION_REGISTER_APPROVAL);
                 } else if (row[0].getActionType().equals(GPMSConstants.ACTION_UNREGISTERING)) {
+                    userReqVo.setStatus(GPMSConstants.REQ_STS_REVOKE);
                     userReqVo.setAdminCheck(GPMSConstants.ACTION_UNREGISTER_APPROVAL);
                 }
                 //1. 관리자 확인(추가/삭제 승인) 업데이트
@@ -241,8 +243,10 @@ public class UserReqServiceImpl implements UserReqService {
                 userReqVo.setReqSeq(reqSeqs[i]);
                 userReqVo.setModDt(modDt);
                 if (row[0].getActionType().equals(GPMSConstants.ACTION_REGISTERING)) {
+                    userReqVo.setStatus(GPMSConstants.REQ_STS_REVOKE);
                     userReqVo.setAdminCheck(GPMSConstants.ACTION_REGISTER_DENY);
                 } else if (row[0].getActionType().equals(GPMSConstants.ACTION_UNREGISTERING)) {
+                    userReqVo.setStatus(GPMSConstants.REQ_STS_USABLE);
                     userReqVo.setAdminCheck(GPMSConstants.ACTION_UNREGISTER_DENY);
                 }
                 //1. 관리자 확인(추가/삭제 반려) 업데이트
