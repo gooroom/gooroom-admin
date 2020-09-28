@@ -105,6 +105,17 @@ public class UserReqDAO extends SqlSessionMetaDAO {
         return (long) sqlSessionMeta.update("updateUserReq", vo);
     }
 
+    /**
+     * 사용자 USB 추가/삭제에 대한 상태 업데이트
+     *
+     * @param vo MgServerConfVO gooroom server configuration data bean
+     * @return long data update result count.
+     * @throws SQLException
+     */
+    public long updateUserReqStatus(UserReqVO vo) throws SQLException {
+        return (long) sqlSessionMeta.update("updateUserReqStatus", vo);
+    }
+
 
     /**
      * 사용자의 요청 데이타

@@ -165,6 +165,7 @@ public class UserReqServiceImpl implements UserReqService {
                 }
                 //1. 관리자 확인(추가/삭제 승인) 업데이트
                 long reCnt = userReqDao.updateUserReq(userReqVo);
+                userReqDao.updateUserReqStatus(userReqVo);
                 if (reCnt > 0) {
                     if (reCnt > 0) {
                         statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
@@ -251,6 +252,7 @@ public class UserReqServiceImpl implements UserReqService {
                 }
                 //1. 관리자 확인(추가/삭제 반려) 업데이트
                 long reCnt = userReqDao.updateUserReq(userReqVo);
+                userReqDao.updateUserReqStatus(userReqVo);
                 if (reCnt > 0) {
                     if (reCnt > 0) {
                         statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,

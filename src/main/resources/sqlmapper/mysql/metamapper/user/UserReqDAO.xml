@@ -99,10 +99,16 @@
 		UPDATE USER_REQ_MSTR SET
 		       ADMIN_CHECK = #{adminCheck},
 		       MOD_DT = #{modDt},
-		       MOD_USER_ID = #{modUserId},
-		       STATUS = #{status}
+		       MOD_USER_ID = #{modUserId}
 		WHERE
 		       REQ_SEQ = #{reqSeq}
+	</update>
+
+	<update id="updateUserReqStatus" parameterType="userReqVO">
+		UPDATE USER_REQ_PROP SET
+		STATUS = #{status}
+		WHERE
+		REQ_SEQ = #{reqSeq}
 	</update>
 
 	<select id="selectUserReqData" parameterType="hashmap" resultMap="userReqInfo">
