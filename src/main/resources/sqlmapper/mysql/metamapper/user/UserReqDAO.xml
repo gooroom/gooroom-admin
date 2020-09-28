@@ -113,6 +113,7 @@
 
 	<select id="selectUserReqData" parameterType="hashmap" resultMap="userReqInfo">
 		SELECT URM.USER_ID,
+		URM.REQ_SEQ,
 		URM.CLIENT_ID,
 		URM.REG_DT,
 		URM.ACTION_TYPE,

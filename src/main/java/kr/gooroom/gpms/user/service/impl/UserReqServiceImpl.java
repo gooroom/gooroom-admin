@@ -338,7 +338,10 @@ public class UserReqServiceImpl implements UserReqService {
                 userReqDao.insertUserReqProp(urVo);
 
                 if (reCnt > 0) {
-                    if (reCnt > 0) {
+                    UserReqVO userReqVO = re.get(0);
+                    userReqVO.setStatus(GPMSConstants.REQ_STS_REVOKE);
+                    long reCnt1 = userReqDao.updateUserReqStatus(userReqVO);
+                    if (reCnt1 > 0) {
                         statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
                                 MessageSourceHelper.getMessage("UserReqRevoke.result.insert"));
                     } else {
