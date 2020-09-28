@@ -274,7 +274,18 @@ public class UserReqServiceImpl implements UserReqService {
                 map.put("usb_vendor", row[0].getUsbVendor());
                 map.put("usb_serial", row[0].getUsbSerialNo());
 
-                //2. 처리 결과 job으로 등록
+                ResultVO vo = clientService.getOnlineClientIdByClientId(row[0].getClientId());
+                if (vo != null && vo.getData() != null && vo.getData().length > 0 ){
+                    String clientId = ((ClientVO) vo.getData()[0]).getClientId();
+                    String[] clientIds = new String[1];
+                    clientIds[0] = clientId;
+                    if(clientId.equals(row[0].getClientId())) {
+                        //2. 온라인 상태면 job으로 등록
+                        jobMaker.createJobForClientSetupWithClients(GPMSConstants.JOB_MEDIA_RULE_CHANGE, null, clientIds);
+                    }
+                }
+
+                //3. 처리 결과 job으로 등록
                 jobMaker.createJobForUserReq(row[0].getClientId(), map);
             }
         } catch (SQLException sqlEx) {
