@@ -178,8 +178,8 @@ public class UserReqServiceImpl implements UserReqService {
                 }
 
                 HashMap<String, String> map = new HashMap<String, String>();
-                map.put("action", row[0].getActionType());
-                map.put("datetime", row[0].getModDt());
+                map.put("action", GPMSConstants.ACTION_REGISTER_APPROVAL);
+                map.put("datetime", modDt);
                 map.put("login_id", row[0].getUserId());
                 map.put("usb_name", row[0].getUsbName());
                 map.put("usb_product", row[0].getUsbProduct());
@@ -265,8 +265,8 @@ public class UserReqServiceImpl implements UserReqService {
                 }
 
                 HashMap<String, String> map = new HashMap<String, String>();
-                map.put("action", row[0].getActionType());
-                map.put("datetime", row[0].getModDt());
+                map.put("action", GPMSConstants.ACTION_REGISTER_APPROVAL);
+                map.put("datetime", modDt);
                 map.put("login_id", row[0].getUserId());
                 map.put("usb_name", row[0].getUsbName());
                 map.put("usb_product", row[0].getUsbProduct());
