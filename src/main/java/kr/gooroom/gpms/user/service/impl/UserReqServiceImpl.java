@@ -244,10 +244,10 @@ public class UserReqServiceImpl implements UserReqService {
                 userReqVo.setReqSeq(reqSeqs[i]);
                 userReqVo.setModDt(modDt);
                 if (row[0].getActionType().equals(GPMSConstants.ACTION_REGISTERING)) {
-                    userReqVo.setStatus(GPMSConstants.REQ_STS_REVOKE);
+                    userReqVo.setStatus(GPMSConstants.REQ_STS_UNUSABLE);
                     userReqVo.setAdminCheck(GPMSConstants.ACTION_REGISTER_DENY);
                 } else if (row[0].getActionType().equals(GPMSConstants.ACTION_UNREGISTERING)) {
-                    userReqVo.setStatus(GPMSConstants.REQ_STS_USABLE);
+                    userReqVo.setStatus(GPMSConstants.REQ_STS_UNUSABLE);
                     userReqVo.setAdminCheck(GPMSConstants.ACTION_UNREGISTER_DENY);
                 }
                 //1. 관리자 확인(추가/삭제 반려) 업데이트
@@ -334,13 +334,12 @@ public class UserReqServiceImpl implements UserReqService {
                 urVo.setActionType(re.get(0).getActionType());
                 urVo.setModUserId(re.get(0).getModUserId());
                 urVo.setModDt(modDt);
-                urVo.setStatus(re.get(0).getStatus());
+                urVo.setStatus(GPMSConstants.REQ_STS_REVOKE);
                 urVo.setUsbName(re.get(0).getUsbName());
                 urVo.setUsbSerialNo(re.get(0).getUsbSerialNo());
                 urVo.setUsbProduct(re.get(0).getUsbProduct());
                 urVo.setUsbSize(re.get(0).getUsbSize());
                 urVo.setUsbVendor(re.get(0).getUsbVendor());
-                urVo.setUsbVendor(GPMSConstants.REQ_STS_USABLE);
                 urVo.setAdminCheck(GPMSConstants.ACTION_REGISTER_DENY);
 
                 // 1. 권한 회수 후 요청 리스트에 등록
@@ -349,17 +348,12 @@ public class UserReqServiceImpl implements UserReqService {
                 userReqDao.insertUserReqProp(urVo);
 
                 if (reCnt > 0) {
-                    UserReqVO userReqVO = re.get(0);
-                    userReqVO.setStatus(GPMSConstants.REQ_STS_REVOKE);
-                    long reCnt1 = userReqDao.updateUserReqStatus(userReqVO);
-                    if (reCnt1 > 0) {
-                        statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
-                                MessageSourceHelper.getMessage("UserReqRevoke.result.insert"));
-                    } else {
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERTERROR,
-                                MessageSourceHelper.getMessage("UserReqRevoke.result.noinsert"));
-                    }
+	                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
+			                MessageSourceHelper.getMessage("UserReqRevoke.result.insert"));
+                } else {
+	                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+	                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERTERROR,
+			                MessageSourceHelper.getMessage("UserReqRevoke.result.noinsert"));
                 }
 
                 ResultVO vo = clientService.getOnlineClientIdByClientId(re.get(0).getClientId());

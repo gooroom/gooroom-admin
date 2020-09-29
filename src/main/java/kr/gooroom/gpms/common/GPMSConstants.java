@@ -98,6 +98,7 @@ public class GPMSConstants {
 	public static final String STS_EXPIRE = "STAT022";
 
 	public static final String REQ_STS_USABLE = "usable";
+	public static final String REQ_STS_UNUSABLE = "unusable";
 	public static final String REQ_STS_EXPIRE = "expire";
 	public static final String REQ_STS_REVOKE = "revoke";
 

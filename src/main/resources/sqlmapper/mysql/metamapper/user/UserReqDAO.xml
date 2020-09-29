@@ -139,8 +139,8 @@
 	</insert>
 
 	<insert id="insertUserReqProp" parameterType="map">
-		INSERT INTO USER_REQ_PROP (req_seq, user_id, usb_name, usb_serial_no, usb_product, usb_size, usb_vendor)
-		VALUES (#{reqSeq},#{userId},#{usbName},#{usbSerialNo},#{usbProduct},#{usbSize},#{usbVendor})
+		INSERT INTO USER_REQ_PROP (req_seq, status, user_id, usb_name, usb_serial_no, usb_product, usb_size, usb_vendor)
+		VALUES (#{reqSeq},#{status},#{userId},#{usbName},#{usbSerialNo},#{usbProduct},#{usbSize},#{usbVendor})
 	</insert>
 
 	<select id="selectUserReqSeq" resultType="String" parameterType="String">
