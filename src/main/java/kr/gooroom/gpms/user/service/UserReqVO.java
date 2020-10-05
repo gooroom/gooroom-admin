@@ -7,7 +7,6 @@ public class UserReqVO implements Serializable {
     private String reqSeq;
     private String userId;
     private String clientId;
-    private String regDt;
     private String actionType;
     private String usbName;
     private String usbSerialNo;
@@ -15,6 +14,8 @@ public class UserReqVO implements Serializable {
     private String usbSize;
     private String usbVendor;
     private String adminCheck;
+    private String regDt;
+    private String regUserId;
     private String modDt;
     private String modUserId;
     private String status;
@@ -28,6 +29,8 @@ public class UserReqVO implements Serializable {
     public void setClientId(String clientId) { this.clientId = clientId; }
     public String getRegDt() { return regDt; }
     public void setRegDt(String regDt) { this.regDt = regDt; }
+    public String getRegUserId() { return regUserId; }
+    public void setRegUserId(String regUserId) { this.regUserId = regUserId; }
     public String getActionType() { return actionType; }
     public void setActionType(String actionType) { this.actionType = actionType; }
     public String getUsbName() { return usbName; }

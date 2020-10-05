@@ -18,6 +18,15 @@ public interface UserReqService {
      */
     ResultVO getUserReqList(String userId) throws Exception;
 
+    /**
+     * 사용자 USB 등록/삭제 요청 데이터
+     *
+     * @param reqSeq String
+     * @return ResultVO result object
+     * @throws Exception
+     */
+    ResultVO getUserReqData(String reqSeq) throws Exception;
+
      /**
      * 사용자 USB 등록/삭제 요청 리스트
      *
@@ -26,6 +35,17 @@ public interface UserReqService {
      * @throws Exception
      */
     ResultPagingVO getUserReqListPaged(HashMap<String, Object> options) throws Exception;
+
+    /**
+     * 사용자 요청관리 로그
+     * <p>
+     * logging history data.
+     *
+     * @param options HashMap<String, Object> option data
+     * @return ResultPagingVO result data bean
+     * @throws Exception
+     */
+    public ResultPagingVO getUserReqActListPaged(HashMap<String, Object> options) throws Exception;
 
     /**
      * 사용자 USB 등록/삭제 요청 승인

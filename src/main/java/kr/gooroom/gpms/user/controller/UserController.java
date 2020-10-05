@@ -34,6 +34,7 @@ import kr.gooroom.gpms.common.utils.CommonUtils;
 import kr.gooroom.gpms.dept.service.DeptService;
 import kr.gooroom.gpms.dept.service.DeptVO;
 import kr.gooroom.gpms.user.service.UserReqService;
+import kr.gooroom.gpms.user.service.UserReqVO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -894,6 +895,77 @@ public class UserController {
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 			resultVO = null;
 		}
+		return resultVO;
+	}
+
+	/**
+	 * generate administrator user action log list data
+	 *
+	 * @param req HttpServletRequest
+	 * @return ResultVO result data bean
+	 *
+	 */
+	@PostMapping(value = "/readUserReqActListPaged")
+	public @ResponseBody ResultVO readUserReqActListPaged(HttpServletRequest req, HttpServletResponse res,
+	                                                    ModelMap model) {
+
+		ResultPagingVO resultVO = null;
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		try {
+			// << options >>
+			String reqSeq = StringUtils.defaultString(req.getParameter("reqSeq"));
+			String fromDate = StringUtils.defaultString(req.getParameter("fromDate"));
+			String toDate = StringUtils.defaultString(req.getParameter("toDate"));
+			if ("".equals(fromDate) || "".equals(toDate)) {
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				Calendar cal = Calendar.getInstance();
+				toDate = dateFormat.format(cal.getTime());
+				cal.add(Calendar.DATE, -20);
+				fromDate = dateFormat.format(cal.getTime());
+			}
+
+			options.put("reqSeq", reqSeq);
+			UserReqVO userReqVO = (UserReqVO) userReqService.getUserReqData(reqSeq).getData()[0];
+			options.put("userId", userReqVO.getUserId());
+			options.put("usbSerialNo", userReqVO.getUsbSerialNo());
+
+			options.put("searchKey", StringUtils.defaultString(((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "")));
+			options.put("fromDate", fromDate);
+			options.put("toDate", toDate);
+
+			// << paging >>
+			options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
+			options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+
+			// << order >>
+			options.put("paramOrderColumn", "REQ_SEQ");
+			options.put("paramOrderDir", StringUtils.defaultString(req.getParameter("orderDir")));
+
+			resultVO = userReqService.getUserReqActListPaged(options);
+
+			HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+			fromDateHm.put("name", "fromDate");
+			fromDateHm.put("value", fromDate);
+			HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+			toDateHm.put("name", "toDate");
+			toDateHm.put("value", toDate);
+			resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
+
+			resultVO.setDraw(String.valueOf(req.getParameter("page")));
+			resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
+			resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
+			resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+
+		} catch (Exception ex) {
+			logger.error("error in readUserReqActListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
 		return resultVO;
 	}
 

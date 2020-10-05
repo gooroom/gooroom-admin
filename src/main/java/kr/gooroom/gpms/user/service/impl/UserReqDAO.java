@@ -1,5 +1,6 @@
 package kr.gooroom.gpms.user.service.impl;
 
+import kr.gooroom.gpms.account.service.ActHistoryVO;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
@@ -77,15 +78,56 @@ public class UserReqDAO extends SqlSessionMetaDAO {
     }
 
     /**
+     * response administrator user action logging list paged
+     *
+     * @param options HashMap<String, Object> options for select
+     * @return ActHistoryVO List
+     * @throws SQLException
+     */
+    public List<UserReqVO> selectUserReqActListPaged(HashMap<String, Object> options) {
+        List<UserReqVO> re = null;
+        try {
+            re = sqlSessionMeta.selectList("selectUserReqActListPaged", options);
+        } catch (Exception ex) {
+            logger.error("error in selectUserReqActListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+            re = null;
+        }
+        return re;
+    }
+
+    /**
+     * response total count for administrator user action logging list data.
+     *
+     * @param options HashMap<String, Object> options for select
+     * @return long total count number.
+     * @throws SQLException
+     */
+    public long selectUserReqActListTotalCount(HashMap<String, Object> options) throws SQLException {
+        return (long) sqlSessionMeta.selectOne("selectUserReqActListTotalCount", options);
+    }
+
+    /**
+     * response filtered count for administrator user action logging list data.
+     *
+     * @param options HashMap<String, Object> options for select
+     * @return long filtered count number.
+     * @throws SQLException
+     */
+    public long selectUserReqActListFilteredCount(HashMap<String, Object> options) throws SQLException {
+        return (long) sqlSessionMeta.selectOne("selectUserReqActListFilteredCount", options);
+    }
+
+    /**
      * reqSeq로 해당 요청 검색
      *
      * @return UserReqVO List
      * @throws SQLException
      */
-    public List<UserReqVO> selectUserReq(String reqSeq) throws SQLException {
-        List<UserReqVO> re = null;
+    public UserReqVO selectUserReq(String reqSeq) throws SQLException {
+        UserReqVO re = null;
         try {
-            re = sqlSessionMeta.selectList("selectUserReq", reqSeq);
+            re = sqlSessionMeta.selectOne("selectUserReq", reqSeq);
         } catch (Exception ex) {
             logger.error("error in selectUserReq : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
@@ -159,4 +201,13 @@ public class UserReqDAO extends SqlSessionMetaDAO {
         return sqlSessionMeta.selectOne("selectUserReqSeq", urmVo);
     }
 
+    /**
+     * insert user req history
+     *
+     * @return long query result count
+     * @throws SQLException
+     */
+    public long createUserReqHist(UserReqVO vo) throws SQLException {
+        return (long) sqlSessionMeta.insert("insertUserReqHist", vo);
+    }
 }
