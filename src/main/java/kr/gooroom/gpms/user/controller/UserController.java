@@ -868,13 +868,15 @@ public class UserController {
 		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
 		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
 
-		if ("chUserId".equalsIgnoreCase(paramOrderColumn)) {
+		if("chReqSeq".equals(paramOrderColumn)) {
+			options.put("paramOrderColumn", "REQ_SEQ");
+		} else if ("chUserId".equalsIgnoreCase(paramOrderColumn)) {
 			options.put("paramOrderColumn", "USER_ID");
-		} else if ("chRegDate".equalsIgnoreCase(paramOrderColumn)) {
+		} else if ("chReqDate".equalsIgnoreCase(paramOrderColumn)) {
 			options.put("paramOrderColumn", "REG_DT");
 		} else if ("chActionType".equalsIgnoreCase(paramOrderColumn)) {
 			options.put("paramOrderColumn", "ACTION_TYPE");
-		} else if ("chAdminCheck".equalsIgnoreCase(paramOrderColumn)) {
+		} else if ("chAction".equalsIgnoreCase(paramOrderColumn)) {
 			options.put("paramOrderColumn", "ADMIN_CHECK");
 		} else if ("chModDate".equalsIgnoreCase(paramOrderColumn)) {
 			options.put("paramOrderColumn", "MOD_DT");
