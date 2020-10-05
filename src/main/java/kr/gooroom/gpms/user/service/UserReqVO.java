@@ -13,6 +13,7 @@ public class UserReqVO implements Serializable {
     private String usbProduct;
     private String usbSize;
     private String usbVendor;
+    private String usbModel;
     private String adminCheck;
     private String regDt;
     private String regUserId;
@@ -43,6 +44,8 @@ public class UserReqVO implements Serializable {
     public void setUsbSize(String usbSize) { this.usbSize = usbSize; }
     public String getUsbVendor() { return usbVendor; }
     public void setUsbVendor(String usbVendor) { this.usbVendor = usbVendor; }
+    public String getUsbModel() { return usbModel; }
+    public void setUsbModel(String usbModel) { this.usbModel = usbModel; }
     public String getAdminCheck() { return adminCheck; }
     public void setAdminCheck(String adminCheck) { this.adminCheck = adminCheck; }
     public String getModDt() { return modDt; }
