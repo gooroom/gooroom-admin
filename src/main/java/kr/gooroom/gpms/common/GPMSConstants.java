@@ -305,7 +305,7 @@ public class GPMSConstants {
 	// user Request
 	public static final String ACTION_REGISTERING = "registering";
 	public static final String ACTION_REGISTERING_CANCEL = "registering-cancel";
-	public static final String ACTION_REGISTERING_APPROVAL_CANCEL = "register-approval-cancel";
+	public static final String ACTION_REGISTER_APPROVAL_CANCEL = "register-approval-cancel";
 	public static final String ACTION_UNREGISTERING = "unregistering";
 	public static final String ACTION_REGISTER_APPROVAL = "register-approval";
 	public static final String ACTION_REGISTER_DENY = "register-deny";

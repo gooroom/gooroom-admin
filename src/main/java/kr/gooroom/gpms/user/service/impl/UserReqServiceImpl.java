@@ -411,7 +411,7 @@ public class UserReqServiceImpl implements UserReqService {
             if (re != null) {
                 re.setModUserId(LoginInfoHelper.getUserId());
                 re.setStatus(GPMSConstants.REQ_STS_REVOKE);
-                re.setAdminCheck(GPMSConstants.ACTION_REGISTERING_APPROVAL_CANCEL);
+                re.setAdminCheck(GPMSConstants.ACTION_REGISTER_APPROVAL_CANCEL);
 
                 // 1. 권한 회수 후 요청 리스트에 등록
                 long reCnt = userReqDao.updateUserReq(re);
@@ -435,7 +435,7 @@ public class UserReqServiceImpl implements UserReqService {
                 }
 
                 HashMap<String, String> map = new HashMap<String, String>();
-                map.put("action", GPMSConstants.ACTION_REGISTERING_APPROVAL_CANCEL);
+                map.put("action", GPMSConstants.ACTION_REGISTER_APPROVAL_CANCEL);
                 map.put("datetime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                 map.put("login_id", re.getUserId());
                 map.put("usb_name", re.getUsbName());
