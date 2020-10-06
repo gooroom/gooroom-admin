@@ -273,7 +273,11 @@ public class UserReqServiceImpl implements UserReqService {
                 }
 
                 HashMap<String, String> map = new HashMap<String, String>();
-                map.put("action", GPMSConstants.ACTION_REGISTER_APPROVAL);
+                if (re.getActionType().equals(GPMSConstants.ACTION_UNREGISTERING)) {
+                    map.put("action", GPMSConstants.ACTION_UNREGISTER_APPROVAL);
+                } else {
+                    map.put("action", GPMSConstants.ACTION_REGISTER_APPROVAL);
+                }
                 map.put("datetime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                 map.put("login_id", re.getUserId());
                 map.put("usb_name", re.getUsbName());
@@ -361,7 +365,11 @@ public class UserReqServiceImpl implements UserReqService {
                 }
 
                 HashMap<String, String> map = new HashMap<String, String>();
-                map.put("action", GPMSConstants.ACTION_REGISTER_DENY);
+                if (re.getActionType().equals(GPMSConstants.ACTION_UNREGISTERING)) {
+                    map.put("action", GPMSConstants.ACTION_UNREGISTER_DENY);
+                } else {
+                    map.put("action", GPMSConstants.ACTION_REGISTER_DENY);
+                }
                 map.put("datetime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                 map.put("login_id", re.getUserId());
                 map.put("usb_name", re.getUsbName());
