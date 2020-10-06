@@ -262,6 +262,16 @@ public class UserReqServiceImpl implements UserReqService {
                             MessageSourceHelper.getMessage("approvalUserReq.result.noupdate"));
                 }
 
+                //3. 같은 시리얼로 '반려' 신청된 항목 있으면 상태(expire) 변경
+                UserReqVO test = new UserReqVO();
+                test.setUserId(re.getUserId());
+                test.setUsbSerialNo(re.getUsbSerialNo());
+                UserReqVO denySerial = userReqDao.selectDenyReqList(test);
+                if (denySerial != null) {
+                    denySerial.setStatus(GPMSConstants.REQ_STS_EXPIRE);
+                    userReqDao.updateUserReqStatus(denySerial);
+                }
+
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put("action", GPMSConstants.ACTION_REGISTER_APPROVAL);
                 map.put("datetime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
@@ -280,12 +290,12 @@ public class UserReqServiceImpl implements UserReqService {
                     String[] clientIds = new String[1];
                     clientIds[0] = clientId;
                     if(clientId.equals(re.getClientId())) {
-                        //2. 온라인 상태면 job으로 등록
+                        //4. 온라인 상태면 job으로 등록
                         jobMaker.createJobForClientSetupWithClients(GPMSConstants.JOB_MEDIA_RULE_CHANGE, null, clientIds);
                     }
                 }
 
-                //3. 처리 결과 job으로 등록
+                //5. 처리 결과 job으로 등록
                 jobMaker.createJobForUserReq(re.getClientId(), map);
             }
         } catch (SQLException sqlEx) {

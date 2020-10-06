@@ -172,6 +172,28 @@
 		INSERT INTO USER_REQ_HIST (REQ_SEQ, USER_ID, USB_SERIAL_NO, CLIENT_ID, ACTION_TYPE, ADMIN_CHECK, REG_USER_ID, REG_DT)
 		VALUES ((SELECT GRNEXTVAL('USERREQUESTHIST_SEQ')), #{userId}, #{usbSerialNo}, #{clientId}, #{actionType}, #{adminCheck}, #{regUserId}, now())
 	</insert>
+
+	<select id="selectDenyReqList" parameterType="String" resultMap="userReqInfo">
+		SELECT URM.REQ_SEQ,
+		URM.USER_ID,
+		URM.ACTION_TYPE,
+		URM.CLIENT_ID,
+		URM.REG_DT,
+		URP.USB_NAME,
+		URP.USB_SERIAL_NO,
+		URP.USB_PRODUCT,
+		URP.USB_SIZE,
+		URP.USB_VENDOR, URP.USB_MODEL,
+		URM.MOD_DT,
+		URM.MOD_USER_ID,
+		URM.ADMIN_CHECK,
+		URP.STATUS
+		FROM USER_REQ_MSTR URM
+		LEFT JOIN
+		USER_REQ_PROP URP
+		ON URM.REQ_SEQ = URP.REQ_SEQ
+		WHERE URM.USER_ID = #{userId} AND URP.USB_SERIAL_NO = #{usbSerialNo} AND URM.ACTION_TYPE = "registering" AND URM.ADMIN_CHECK = "register-deny"
+	</select>
 </mapper>
 
 

@@ -210,4 +210,22 @@ public class UserReqDAO extends SqlSessionMetaDAO {
     public long createUserReqHist(UserReqVO vo) throws SQLException {
         return (long) sqlSessionMeta.insert("insertUserReqHist", vo);
     }
+
+    /**
+     * 같은 시리얼의 매체 요청중 반려 이력이 있었는지 검색
+     *
+     * @return UserReqVO List
+     * @throws SQLException
+     */
+    public UserReqVO selectDenyReqList(UserReqVO vo) throws SQLException {
+        UserReqVO re = null;
+        try {
+            re = sqlSessionMeta.selectOne("selectDenyReqList", vo);
+        } catch (Exception ex) {
+            logger.error("error in selectDenyReqList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+            re = null;
+        }
+        return re;
+    }
 }
