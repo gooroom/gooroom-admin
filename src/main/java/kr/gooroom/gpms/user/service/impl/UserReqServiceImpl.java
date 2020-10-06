@@ -272,6 +272,7 @@ public class UserReqServiceImpl implements UserReqService {
                 map.put("usb_vendor", re.getUsbVendor());
                 map.put("usb_model", re.getUsbModel());
                 map.put("usb_serial", re.getUsbSerialNo());
+                map.put("req_seq", re.getReqSeq());
 
                 ResultVO vo = clientService.getOnlineClientIdByClientId(re.getClientId());
                 if (vo != null && vo.getData() != null && vo.getData().length > 0 ){
@@ -359,6 +360,7 @@ public class UserReqServiceImpl implements UserReqService {
                 map.put("usb_vendor", re.getUsbVendor());
                 map.put("usb_model", re.getUsbModel());
                 map.put("usb_serial", re.getUsbSerialNo());
+                map.put("req_seq", re.getReqSeq());
 
                 ResultVO vo = clientService.getOnlineClientIdByClientId(re.getClientId());
                 if (vo != null && vo.getData() != null && vo.getData().length > 0 ) {
@@ -444,6 +446,7 @@ public class UserReqServiceImpl implements UserReqService {
                 map.put("usb_vendor", re.getUsbVendor());
                 map.put("usb_model", re.getUsbModel());
                 map.put("usb_serial", re.getUsbSerialNo());
+                map.put("req_seq", re.getReqSeq());
 
                 ResultVO vo = clientService.getOnlineClientIdByClientId(re.getClientId());
                 if (vo != null && vo.getData() != null && vo.getData().length > 0 ) {
