@@ -15,7 +15,6 @@
 		<result property="usbName" column="USB_NAME"/>
 		<result property="usbSerialNo" column="USB_SERIAL_NO"/>
 		<result property="usbProduct" column="USB_PRODUCT"/>
-		<result property="usbSize" column="USB_SIZE"/>
 		<result property="usbVendor" column="USB_VENDOR"/>
 		<result property="usbModel" column="USB_MODEL"/>
 		<result property="status" column="STATUS"/>
@@ -24,7 +23,7 @@
 	<select id="selectUserReqList" parameterType="String" resultMap="userReqInfo">
 		SELECT URM.REQ_SEQ, URM.USER_ID, URM.ACTION_TYPE, URM.CLIENT_ID,
 		URM.REG_DT, URP.USB_NAME, URP.STATUS,
-		URP.USB_SERIAL_NO, URP.USB_PRODUCT, URP.USB_SIZE, URP.USB_VENDOR, URP.USB_MODEL,
+		URP.USB_SERIAL_NO, URP.USB_PRODUCT, URP.USB_VENDOR, URP.USB_MODEL,
 		URM.MOD_DT, URM.MOD_USER_ID, URM.ADMIN_CHECK
 		FROM USER_REQ_MSTR URM
 			LEFT JOIN USER_REQ_PROP URP ON URM.REQ_SEQ = URP.REQ_SEQ
@@ -40,7 +39,6 @@
 		URP.USB_NAME,
 		URP.USB_SERIAL_NO,
 		URP.USB_PRODUCT,
-		URP.USB_SIZE,
 		URP.USB_VENDOR,
 		URP.USB_MODEL,
 		URP.STATUS,
@@ -115,7 +113,6 @@
 		       URP.USB_NAME,
 		       URP.USB_SERIAL_NO,
 		       URP.USB_PRODUCT,
-		       URP.USB_SIZE,
 		       URP.USB_VENDOR, URP.USB_MODEL,
 		       URM.MOD_DT,
 		       URM.MOD_USER_ID,
@@ -147,7 +144,7 @@
 	<select id="selectUserReqData" parameterType="hashmap" resultMap="userReqInfo">
 		SELECT URM.USER_ID, URM.REQ_SEQ, URM.CLIENT_ID, URM.REG_DT, URM.ACTION_TYPE, URM.ADMIN_CHECK,
 		URM.MOD_DT, URM.MOD_USER_ID,
-		URP.USB_NAME, URP.USB_SERIAL_NO, URP.USB_PRODUCT, URP.USB_SIZE, URP.USB_VENDOR, URP.USB_MODEL, URP.STATUS
+		URP.USB_NAME, URP.USB_SERIAL_NO, URP.USB_PRODUCT, URP.USB_VENDOR, URP.USB_MODEL, URP.STATUS
 		FROM USER_REQ_MSTR URM
 			LEFT JOIN USER_REQ_PROP URP ON URM.REQ_SEQ = URP.REQ_SEQ
 		WHERE URM.REQ_SEQ = #{reqSeq}
@@ -159,8 +156,8 @@
 	</insert>
 
 	<insert id="insertUserReqProp" parameterType="map">
-		INSERT INTO USER_REQ_PROP (req_seq, status, user_id, usb_name, usb_serial_no, usb_product, usb_size, usb_vendor, usb_model)
-		VALUES (#{reqSeq},#{status},#{userId},#{usbName},#{usbSerialNo},#{usbProduct},#{usbSize},#{usbVendor},#{usbModel})
+		INSERT INTO USER_REQ_PROP (req_seq, status, user_id, usb_name, usb_serial_no, usb_product, usb_vendor, usb_model)
+		VALUES (#{reqSeq},#{status},#{userId},#{usbName},#{usbSerialNo},#{usbProduct},#{usbVendor},#{usbModel})
 	</insert>
 
 	<select id="selectUserReqSeq" resultType="String" parameterType="String">

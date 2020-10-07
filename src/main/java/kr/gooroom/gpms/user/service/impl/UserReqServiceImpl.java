@@ -282,7 +282,6 @@ public class UserReqServiceImpl implements UserReqService {
                 map.put("login_id", re.getUserId());
                 map.put("usb_name", re.getUsbName());
                 map.put("usb_product", re.getUsbProduct());
-                map.put("usb_size", re.getUsbSize());
                 map.put("usb_vendor", re.getUsbVendor());
                 map.put("usb_model", re.getUsbModel());
                 map.put("usb_serial", re.getUsbSerialNo());
@@ -374,7 +373,6 @@ public class UserReqServiceImpl implements UserReqService {
                 map.put("login_id", re.getUserId());
                 map.put("usb_name", re.getUsbName());
                 map.put("usb_product", re.getUsbProduct());
-                map.put("usb_size", re.getUsbSize());
                 map.put("usb_vendor", re.getUsbVendor());
                 map.put("usb_model", re.getUsbModel());
                 map.put("usb_serial", re.getUsbSerialNo());
@@ -460,7 +458,6 @@ public class UserReqServiceImpl implements UserReqService {
                 map.put("login_id", re.getUserId());
                 map.put("usb_name", re.getUsbName());
                 map.put("usb_product", re.getUsbProduct());
-                map.put("usb_size", re.getUsbSize());
                 map.put("usb_vendor", re.getUsbVendor());
                 map.put("usb_model", re.getUsbModel());
                 map.put("usb_serial", re.getUsbSerialNo());
