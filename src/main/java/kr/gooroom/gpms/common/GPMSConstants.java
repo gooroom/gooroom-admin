@@ -271,6 +271,7 @@ public class GPMSConstants {
 	public static final String JOB_CLIENTCONF_HOMERESET_CHANGE = "set_homefolder_operation";
 	public static final String JOB_CLIENTCONF_LOGCONFIG_CHANGE = "get_log_config";
 	public static final String JOB_CLIENTCONF_POLICYKITUSER_CHANGE = "get_polkit_admin_config";
+	public static final String JOB_CLIENTCONF_MAXMEDIACNT_CHANGE = "get_usb_whitelist_max";
 
 	// LOGGING CODE
 	public static final String CODE_SYSERROR = "ERR9999";

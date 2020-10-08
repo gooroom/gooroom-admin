@@ -147,6 +147,7 @@ public class ClientConfServiceImpl implements ClientConfService {
 
 			long oldPollingTime = clientConfDao.selectSitePollingTime("");
 			long oldTrialCount = clientConfDao.selectSiteLoginTrialCount("");
+			long oldMaxMediaCnt = clientConfDao.selectSiteMaxMediaCnt("");
 
 			// update polling time and trial count and passwordRule
 			SiteConfVO confVo = new SiteConfVO();
@@ -183,6 +184,12 @@ public class ClientConfServiceImpl implements ClientConfService {
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put("trialCount", vo.getTrialCount());
 					clientConfDao.updateLoginTrialInUser(map);
+				}
+
+				if (Long.parseLong(vo.getMaxMediaCnt()) != oldMaxMediaCnt) {
+					// create client job for change max media count
+					HashMap<String, String> map = new HashMap<String, String>();
+					jobMaker.createJobForAllClient(GPMSConstants.JOB_CLIENTCONF_MAXMEDIACNT_CHANGE, map);
 				}
 			}
 
