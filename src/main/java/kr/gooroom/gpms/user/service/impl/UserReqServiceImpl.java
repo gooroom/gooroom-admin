@@ -338,7 +338,8 @@ public class UserReqServiceImpl implements UserReqService {
             for (int i = 0; i < reqSeqs.length; i++) {
                 UserReqVO re = userReqDao.selectUserReq(reqSeqs[i]);
                 re.setModUserId(LoginInfoHelper.getUserId());
-                re.setStatus(GPMSConstants.REQ_STS_UNUSABLE);
+                re.setStatus(re.getActionType().equals(GPMSConstants.ACTION_REGISTERING)
+                        ? GPMSConstants.REQ_STS_REVOKE : GPMSConstants.REQ_STS_USABLE);
                 re.setAdminCheck(re.getActionType().equals(GPMSConstants.ACTION_REGISTERING)
                         ? GPMSConstants.ACTION_REGISTER_DENY : GPMSConstants.ACTION_UNREGISTER_DENY);
 
