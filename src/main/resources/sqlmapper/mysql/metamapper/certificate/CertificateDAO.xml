@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CertificateDAO">
+
+	<select id="selectClientNameCount" parameterType="String" resultType="java.lang.Integer">
+		SELECT COUNT(*) CNT 
+		FROM CLIENT_MSTR WHERE CLIENT_ID = #{clientId}
+	</select>
+	
+	<select id="selectNextClinetNo" resultType="java.lang.Integer">
+		SELECT GRNEXTVAL('CLIENTID_SEQ') AS CLIENT_SEQ FROM DUAL
+	</select>
+	
+	
+	<insert id="insertCertificateInfo" parameterType="certificateVO">
+		
+		INSERT INTO CLIENT_MSTR
+			(CLIENT_ID, CLIENT_NM, CLIENT_OU, CERT_INFO, EXPIRATION_YMD, 
+			STATUS_CD, REG_DT, MOD_DT, REG_USER_ID, COMMENT) 
+		VALUES (
+			#{clientCN},
+			#{clientName},
+			#{clientOU},
+			#{certInfo},
+			#{expireDateSlim},
+			
+			#{clientStatus},
+			now(),
+			now(),
+			#{regUserId},
+			#{comment}
+		);
+
+	</insert>
+
+	<insert id="insertCertificateInfoExt" parameterType="certificateVO">
+
+		INSERT INTO CLIENT_EXT
+			(CLIENT_ID, MOD_DT) 
+		VALUES (
+			#{clientCN},
+			now()
+		);
+		
+	</insert>
+
+</mapper>

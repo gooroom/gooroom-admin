@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NoticeInstantNoticeDAO">
+
+	<resultMap type="noticeInstantNoticeVO" id="noticeInstantNotice">
+
+		<result property="noticeInstantNoticeId" column="NOTICE_INSTANT_ALARM_ID" />
+		<result property="noticePublishId" column="NOTICE_PUBLISH_ID"/>
+		<result property="regUserId" column="REG_USER_ID" />
+		<result property="regDt" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+
+	</resultMap>
+	
+	   <!-- 공지즉시알람 정보 생성 -->
+    <insert id="insertNoticeInstantNotice" parameterType="noticeInstantNoticeVO">
+        <selectKey keyProperty="noticeInstantNoticeId" resultType="String" order="BEFORE">
+            SELECT CONCAT('NTIA', (LPAD((SELECT GRNEXTVAL('NOTICEINSTANTALARM_SEQ')), 6, 0)))
+        </selectKey>
+        INSERT INTO NOTICE_INSTANT_ALARM
+            ( NOTICE_INSTANT_ALARM_ID, NOTICE_PUBLISH_ID, REG_USER_ID, REG_DT ) 
+        VALUES 
+            ( #{noticeInstantNoticeId}, #{noticePublishId}, #{regUserId}, now() )
+    </insert>
+	
+	<select id="selectNoticeInstantNoticeList" parameterType="hashMap" resultMap="noticeInstantNotice">
+		SELECT NOTICE_INSTANT_ALARM_ID, NOTICE_PUBLISH_ID, REG_USER_ID, REG_DT
+		FROM NOTICE_INSTANT_ALARM
+		WHERE NOTICE_PUBLISH_ID = #{noticePublishId}
+        ORDER BY ${paramOrderColumn} ${paramOrderDir}
+        LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectNoticeInstantNoticeListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(NOTICE_INSTANT_ALARM_ID) AS CNT 
+		FROM NOTICE_INSTANT_ALARM
+		WHERE NOTICE_PUBLISH_ID = #{noticePublishId}
+	</select>
+	
+	<select id="selectNoticeInstantNoticeListFilteredCount" parameterType="hashMap" resultType="long">
+        SELECT COUNT(NOTICE_INSTANT_ALARM_ID) AS CNT 
+        FROM NOTICE_INSTANT_ALARM
+        WHERE NOTICE_PUBLISH_ID = #{noticePublishId}
+	</select>
+
+</mapper>

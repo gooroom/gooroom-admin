@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CspDAO">
+
+	<resultMap type="cspVO" id="cspInfo">
+	
+		<result property="gcspId" column="GCSP_ID" />
+		<result property="gcspNm" column="GCSP_NM" />
+		<result property="statusCd" column="STATUS_CD" />
+		
+		<result property="expirationYmd" column="EXPIRATION_YMD" />
+
+		<result property="ipRanges" column="IP_RANGES" />
+		<result property="url" column="URL" />
+		<result property="comment" column="COMMENT" />
+		<result property="serialNo" column="SERIAL_NO" />
+		
+		<result property="modDt" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID" />
+		<result property="regDt" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID" />
+		
+		<result property="cert" column="CERT" />
+		<result property="priv" column="PRIV" />
+
+	</resultMap>
+	
+
+	<!-- 중복검사 -->
+	<select id="isExistGcspId" parameterType="String" resultType="boolean">
+	
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END ISEXIST FROM GCSP_MSTR WHERE GCSP_ID = #{gcspId}
+
+	</select>
+	
+
+	<!-- 리스트조회 -->
+	<select id="selectGcspDataList" parameterType="hashMap" resultMap="cspInfo">
+
+		SELECT 
+		  GM.GCSP_ID,
+		  GM.GCSP_NM,
+		  GM.STATUS_CD,
+		  DATE_FORMAT(STR_TO_DATE(GM.EXPIRATION_YMD, '%Y%m%d'), '%Y-%m-%d') AS EXPIRATION_YMD,
+		  GM.IP_RANGES,
+		  GM.URL,
+		  GM.COMMENT,
+		  GM.MOD_USER_ID,
+		  GM.MOD_DT,
+		  GM.REG_USER_ID,
+		  GM.REG_DT,
+		  GM.CERT,
+		  GM.PRIV
+		FROM GCSP_MSTR GM
+		<where>
+			<if test="gcspStatus != null and gcspStatus != ''">
+				GM.STATUS_CD = #{gcspStatus}
+			</if>
+			<if test="searchKey != null and searchKey != ''">
+				AND GM.GCSP_ID LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>		
+
+	</select>
+
+	<!-- 상세조회 -->
+	<select id="selectGcspData" parameterType="String" resultMap="cspInfo">
+
+		SELECT 
+		  GM.GCSP_ID,
+		  GM.GCSP_NM,
+		  GM.STATUS_CD,
+		  DATE_FORMAT(STR_TO_DATE(GM.EXPIRATION_YMD, '%Y%m%d'), '%Y-%m-%d') AS EXPIRATION_YMD,
+		  GM.IP_RANGES,
+		  GM.URL,
+		  GM.COMMENT,
+		  GM.MOD_USER_ID,
+		  GM.MOD_DT,
+		  GM.REG_USER_ID,
+		  GM.REG_DT,
+		  GM.CERT,
+		  GM.PRIV
+		FROM GCSP_MSTR GM
+		WHERE GCSP_ID=#{gcspId}
+
+	</select>
+	
+	<!-- 등록 -->
+	<insert id="insertGcspData" parameterType="cspVO">
+	
+		INSERT INTO GCSP_MSTR
+			(GCSP_ID, GCSP_NM, STATUS_CD, EXPIRATION_YMD,
+			IP_RANGES, URL, COMMENT,
+			CERT, PRIV, SERIAL_NO, 
+			MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT)
+		VALUES 
+			(#{gcspId}, #{gcspNm}, #{statusCd}, #{expirationYmd},
+			#{ipRanges}, #{url}, #{comment}, 
+			#{cert}, #{priv}, #{serialNo},
+			#{modUserId}, now(), #{regUserId}, now())
+	
+	</insert>
+	
+
+	<!-- 수정 -->
+	<update id="updateGcspData" parameterType="cspVO">
+
+		UPDATE GCSP_MSTR
+		SET GCSP_NM = #{gcspNm},
+		    IP_RANGES = #{ipRanges},
+		    URL = #{url},
+		    COMMENT = #{comment},
+		    MOD_USER_ID = #{modUserId},
+		    MOD_DT = now()
+		WHERE GCSP_ID=#{gcspId}
+		
+	</update>
+
+	<!-- 삭제 -->
+	<delete id="deleteGcspData" parameterType="cspVO">
+		
+		DELETE FROM GCSP_MSTR WHERE GCSP_ID=#{gcspId}
+
+	</delete>
+
+	<!-- 인증서 정보 저장 -->
+	<update id="updateGcspCert" parameterType="cspVO">
+
+		UPDATE GCSP_MSTR
+		SET CERT = #{cert}, PRIV = #{priv}, EXPIRATION_YMD = #{expirationYmd},
+		    MOD_USER_ID = #{modUserId},
+		    MOD_DT = now()
+		WHERE GCSP_ID=#{gcspId}
+		
+	</update>
+
+
+	<!-- 리스트조회 (Paged) -->
+	<select id="selectGcspListPaged" parameterType="hashMap" resultMap="cspInfo">
+
+		SELECT 
+		  GM.GCSP_ID,
+		  GM.GCSP_NM,
+		  GM.STATUS_CD,
+		  DATE_FORMAT(STR_TO_DATE(GM.EXPIRATION_YMD, '%Y%m%d'), '%Y-%m-%d') AS EXPIRATION_YMD,
+		  GM.IP_RANGES,
+		  GM.URL,
+		  GM.COMMENT,
+		  GM.MOD_USER_ID,
+		  GM.MOD_DT,
+		  GM.REG_USER_ID,
+		  GM.REG_DT,
+		  GM.CERT,
+		  GM.PRIV
+		FROM GCSP_MSTR GM
+		<where>
+			<if test="gcspStatus != null and gcspStatus != ''">
+				GM.STATUS_CD = #{gcspStatus}
+			</if>
+			<if test="searchKey != null and searchKey != ''">
+				AND (GM.GCSP_ID LIKE CONCAT('%', #{searchKey}, '%') OR GM.GCSP_NM LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+		</where>		
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectGcspListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(GM.GCSP_ID) AS CNT 
+		FROM GCSP_MSTR GM
+	</select>
+	
+	<select id="selectGcspListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(GM.GCSP_ID) AS CNT
+		FROM GCSP_MSTR GM
+		<where>
+			<if test="gcspStatus != null and gcspStatus != ''">
+				GM.STATUS_CD = #{gcspStatus}
+			</if>
+			<if test="searchKey != null and searchKey != ''">
+				AND (GM.GCSP_ID LIKE CONCAT('%', #{searchKey}, '%') OR GM.GCSP_NM LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+		</where>		
+	</select>
+
+</mapper>

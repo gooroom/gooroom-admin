@@ -1,0 +1,956 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ClientDAO">
+
+	<resultMap type="clientVO" id="clientInfo">
+	
+		<result property="clientId" column="CLIENT_ID" />
+		<result property="clientName" column="CLIENT_NM"/>
+		
+		<result property="keyInfo" column="CERT_INFO"/>
+		<result property="keyRenewDate" column="EXPIRATION_YMD" />
+		<result property="clientStatus" column="STATUS_CD"/>
+		
+		<result property="prodNo" column="PROD_NO"/>
+
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="comment" column="COMMENT"/>
+		
+		<result property="clientIp" column="CLIENT_IP"/>
+		<result property="patchVersion" column="PATCH_VERSION"/>
+
+		<result property="clientGroupName" column="GROUP_NAME"/>
+		<result property="clientGroupId" column="GROUP_ID"/>
+		
+		<result property="totalCnt" column="TOTAL_CNT"/>
+		<result property="updateTargetCnt" column="UPDATE_TARGET_CNT"/>
+		<result property="updateMainOsCnt" column="UPDATE_MAINOS_CNT"/>
+
+		<result property="isOn" column="ISON"/>
+		<result property="loginId" column="LOGIN_ID"/>
+		<result property="lastLoginTime" column="LAST_LOGIN_TIME"/>
+		
+		<result property="safeScore" column="SAFE_SCORE"/>
+		<result property="strgSize" column="STRG_SIZE"/>
+		<result property="strgUse" column="STRG_USE"/>
+		
+		<result property="isProtector" column="IS_PROTECTOR"/>
+		<result property="countBootProtector" column="COUNT_BOOTPROTECTOR"/>
+		<result property="countExeProtector" column="COUNT_EXEPROTECTOR"/>
+		<result property="countOsProtector" column="COUNT_OSPROTECTOR"/>
+		<result property="countMediaProtector" column="COUNT_MEDIAPROTECTOR"/>
+
+		<result property="isStopBootProtector" column="IS_BOOTPROTECTOR_STOP"/>
+		<result property="isStopExeProtector" column="IS_EXEPROTECTOR_STOP"/>
+		<result property="isStopOsProtector" column="IS_OSPROTECTOR_STOP"/>
+		<result property="isStopMediaProtector" column="IS_MEDIAPROTECTOR_STOP"/>
+		
+		<result property="useHomeReset" column="USEHOMERESET"/>
+		<result property="rootAllow" column="ROOTALLOW"/>
+		<result property="sudoAllow" column="SUDOALLOW"/>
+	</resultMap>
+	
+	<resultMap type="clientGroupVO" id="clientGroupInfo">
+		<result property="grpId" column="GRP_ID" />
+		<result property="grpNm" column="GRP_NM" />
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+
+		<result property="desktopConfigId" column="DESKTOP_CONFIG_ID"/>
+		<result property="desktopConfigNm" column="DESKTOP_CONFIG_NM"/>
+		<result property="desktopConfigInfo" column="DESKTOP_CONFIG_INFO"/>
+
+		<result property="clientConfigId" column="CLIENT_CONFIG_ID"/>
+		<result property="clientConfigNm" column="CLIENT_CONFIG_NM"/>
+
+		<result property="hostNameConfigId" column="HOSTNAME_CONFIG_ID"/>
+		<result property="hostNameConfigNm" column="HOSTNAME_CONFIG_NM"/>
+
+		<result property="updateServerConfigId" column="UPDATESERVER_CONFIG_ID"/>
+		<result property="updateServerConfigNm" column="UPDATESERVER_CONFIG_NM"/>
+
+		<result property="mediaRuleId" column="MEDIA_RULE_ID"/>
+		<result property="browserRuleId" column="BROWSER_RULE_ID"/>
+		<result property="clientCtrlRuleId" column="CLIENT_RULE_ID"/>
+
+		<result property="comment" column="COMMENT"/>
+		<result property="clientCount" column="CLIENT_COUNT"/>
+		
+	</resultMap>
+
+	<resultMap type="clientPackageVO" id="clientPackageInfo">
+	
+		<result property="clientId" column="CLIENT_ID" />
+		
+		<result property="packageId" column="PACKAGE_ID" />
+		<result property="packageArch" column="PACKAGE_ARCH" />
+		
+		<result property="installVer" column="INSTALL_VER" />
+		<result property="packageLastVer" column="PACKAGE_LAST_VER" />
+
+		<result property="totalCnt" column="TOTAL_CNT" />
+		<result property="updateTargetCnt" column="UPDATE_TARGET_CNT" />
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+		
+	</resultMap>
+
+	<resultMap type="clientSummaryVO" id="clientSummaryInfo">
+	
+		<result property="totalCount" column="TOTAL_COUNT" />
+		<result property="onCount" column="ON_COUNT" />
+		<result property="offCount" column="OFF_COUNT" />
+		<result property="revokeCount" column="REVOKE_COUNT" />
+
+		<result property="loginCount" column="LOGIN_COUNT" />
+		<result property="userCount" column="USER_COUNT" />
+
+		<result property="noUpdateCount" column="NOUPDATE_COUNT" />
+		<result property="updateCount" column="UPDATE_COUNT" />
+		<result property="mainUpdateCount" column="MAINUPDATE_COUNT" />
+		
+	</resultMap>
+
+	<resultMap type="updatePackageClientVO" id="updatePackageClientInfo">
+	
+		<result property="clientId" column="CLIENT_ID" />
+		<result property="clientNm" column="CLIENT_NM" />
+		
+		<result property="updateCount" column="UPDATE_TARGET_CNT" />
+		<result property="mainUpdateCount" column="UPDATE_MAINOS_CNT" />
+		
+	</resultMap>
+
+	<resultMap type="onlineClientAndUserVO" id="onlineClientAndUserInfo">
+	
+		<result property="userId" column="USER_ID" />
+		<result property="clientId" column="CLIENT_ID" />
+		
+		<result property="userBrowserRuleId" column="USER_BROWSERRULE_CONFID" />
+		<result property="userMediaRuleId" column="USER_MEDIARULE_CONFID" />
+		<result property="userSecurityRuleId" column="USER_SECURITYRULE_CONFID" />
+		<result property="userFilteredSoftwareRuleId" column="USER_FILTEREDSWRULE_CONFID" />
+		<result property="userCtrlCenterItemRuleId" column="USER_CTRLCENTERITEM_CONFID" />
+		<result property="userPolicyKitRuleId" column="USER_POLICYKIT_CONFID" />
+
+		<result property="deptBrowserRuleId" column="DEPT_BROWSERRULE_CONFID" />
+		<result property="deptMediaRuleId" column="DEPT_MEDIARULE_CONFID" />
+		<result property="deptSecurityRuleId" column="DEPT_SECURITYRULE_CONFID" />
+		<result property="deptFilteredSoftwareRuleId" column="DEPT_FILTEREDSWRULE_CONFID" />
+		<result property="deptCtrlCenterItemRuleId" column="DEPT_CTRLCENTERITEM_CONFID" />
+		<result property="deptPolicyKitRuleId" column="DEPT_POLICYKIT_CONFID" />
+
+		<result property="clientBrowserRuleId" column="CLIENT_BROWSERRULE_CONFID" />
+		<result property="clientMediaRuleId" column="CLIENT_MEDIARULE_CONFID" />
+		<result property="clientSecurityRuleId" column="CLIENT_SECURITYRULE_CONFID" />
+		<result property="clientFilteredSoftwareRuleId" column="CLIENT_FILTEREDSWRULE_CONFID" />
+		<result property="clientCtrlCenterItemRuleId" column="CLIENT_CTRLCENTERITEM_CONFID" />
+		<result property="clientPolicyKitRuleId" column="CLIENT_POLICYKIT_CONFID" />
+		
+	</resultMap>
+
+
+	<insert id="updateClient" parameterType="clientVO">
+		UPDATE CLIENT_MSTR SET
+			CLIENT_NM = #{clientName},
+			COMMENT = #{comment},
+			MOD_DT = now()
+		WHERE
+			CLIENT_ID = #{clientId}
+	</insert>
+
+	<insert id="updateClientExt" parameterType="clientVO">
+		UPDATE CLIENT_EXT SET
+			PROD_NO = #{prodNo},
+			IP = #{clientIp},
+			MOD_DT = now()
+		WHERE
+			CLIENT_ID = #{clientId}
+	</insert>
+
+	<select id="selectClientList" parameterType="hashMap" resultMap="clientInfo">
+		SELECT 
+			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT, T.REG_USER_ID, T.MOD_USER_ID, STR_TO_DATE(T.expiration_ymd, '%Y%m%d') EXPIRATION_YMD, 
+			TX.IP AS CLIENT_IP, TX.STRG_SIZE AS STRG_SIZE, TX.STRG_USE AS STRG_USE, IFNULL(TX.SAFE_SCORE, 0) AS SAFE_SCORE,
+			CGM.GRP_ID AS GROUP_ID, CGM.GRP_NM AS GROUP_NAME, 
+			IFNULL(CPS.TOTAL_CNT, 0) AS TOTAL_CNT, 
+			IFNULL(CPS.UPDATE_TARGET_CNT, 0) AS UPDATE_TARGET_CNT, 
+			IFNULL(CPS.UPDATE_MAINOS_CNT, 0) AS UPDATE_MAINOS_CNT,
+			IF (CSS.BOOT_PROTECTOR_CNT > 0 OR CSS.EXE_PROTECTOR_CNT > 0 OR CSS.OS_PROTECTOR_CNT > 0 OR CSS.MEDIA_PROTECTOR_CNT > 0, '1', '0') IS_PROTECTOR,
+			CSS.BOOT_PROTECTOR_CNT AS COUNT_BOOTPROTECTOR,
+			CSS.EXE_PROTECTOR_CNT AS COUNT_EXEPROTECTOR,
+			CSS.OS_PROTECTOR_CNT AS COUNT_OSPROTECTOR,
+			CSS.MEDIA_PROTECTOR_CNT AS COUNT_MEDIAPROTECTOR,
+			CIP2.PROP_VALUE AS USEHOMERESET,
+			CIP3.PROP_VALUE AS ROOTALLOW,
+			CIP4.PROP_VALUE AS SUDOALLOW,
+			CASE 
+				WHEN CAST(COALESCE(TIMESTAMPDIFF(SECOND, CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10) AND CA.CLIENT_ID IS NOT NULL 
+				THEN '1' 
+				ELSE '0' 
+			END AS ISON,
+			CASE 
+				WHEN CA.ON_USER_ID = '-' THEN SUBSTRING(CA.LOCAL_USER_ID, 2)
+        		ELSE CA.ON_USER_ID
+      		END AS LOGIN_ID,			
+			CA.ON_CHECK_DT LAST_LOGIN_TIME
+		FROM CLIENT_MSTR T 
+			LEFT JOIN CLIENT_EXT TX ON T.CLIENT_ID = TX.CLIENT_ID
+			LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+			LEFT JOIN CLIENT_PACKAGE_STATE CPS ON T.CLIENT_ID = CPS.CLIENT_ID
+			LEFT JOIN CLIENT_SECURITY_STATE CSS ON T.CLIENT_ID = CSS.CLIENT_ID
+			LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+			LEFT JOIN GR_GROUP_RULE_CONF GGRC ON GGRC.GRP_ID=CGM.GRP_ID AND GGRC.CONF_TP='CLIENTCONF'
+			LEFT JOIN CTRL_ITEM_PROP CIP2 ON CIP2.OBJ_ID=IFNULL(GGRC.CONF_ID, 'CLCFDEFAULT') AND CIP2.PROP_NM='USEHOMERESET'
+			LEFT JOIN CTRL_ITEM_PROP CIP3 ON CIP3.OBJ_ID=IFNULL(GGRC.CONF_ID, 'CLCFDEFAULT') AND CIP3.PROP_NM='ROOTALLOW'
+			LEFT JOIN CTRL_ITEM_PROP CIP4 ON CIP4.OBJ_ID=IFNULL(GGRC.CONF_ID, 'CLCFDEFAULT') AND CIP4.PROP_NM='SUDOALLOW'
+		<where>
+			<if test='isOnline != null and isOnline != ""'>
+				CAST(COALESCE(TIMESTAMPDIFF(SECOND, CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10) AND CA.CLIENT_ID IS NOT NULL
+			</if>
+			<if test='viewType != null and viewType != "" and viewType !="2"'>
+				AND IF (CSS.BOOT_PROTECTOR_CNT > 0 OR CSS.EXE_PROTECTOR_CNT > 0 OR CSS.OS_PROTECTOR_CNT > 0 OR CSS.MEDIA_PROTECTOR_CNT > 0, '1', '0') = #{viewType}
+			</if>
+			<choose>
+    			<when test='clientType != null and clientType.equalsIgnoreCase("STAT021")'>
+    				AND T.STATUS_CD = #{clientType}
+    			</when>
+				<when test='clientType != null and clientType != ""'>
+					AND T.STATUS_CD = #{clientType} AND T.STATUS_CD != 'STAT021'
+    			</when>
+			    <otherwise>
+      				AND T.STATUS_CD != 'STAT021'
+    			</otherwise>
+  			</choose>
+			<choose>
+    			<when test='groupId != null and groupId != ""'>
+					AND (T.GRP_ID IN 
+					<foreach item="item" index="index" collection="groupId" open="(" separator="," close=")">
+	    				#{item}
+	    			</foreach>
+	    			)
+    			</when>
+    			<otherwise>
+    				<if test="adminId != null">
+    					AND (T.GRP_ID IN (
+    						SELECT 'CGRPDEFAULT' UNION
+							SELECT GRP_ID
+							FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+								(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+									          FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+									                FROM CLIENT_GRP_MSTR W
+									                WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+													) TT1
+								)
+    					))
+    				</if>
+    			</otherwise>
+			</choose>
+			<if test='searchKey != null and searchKey != ""'>
+				AND (
+					T.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') 
+					OR T.CLIENT_NM LIKE CONCAT('%', #{searchKey}, '%')
+					OR CGM.GRP_NM LIKE CONCAT('%', #{searchKey}, '%')
+				)
+			</if>
+			<choose>
+    			<when test='clientSecure eq "1".toString()'>
+      				AND (CSS.BOOT_PROTECTOR_CNT > 0 OR CSS.EXE_PROTECTOR_CNT > 0 OR CSS.OS_PROTECTOR_CNT > 0 OR CSS.MEDIA_PROTECTOR_CNT > 0)
+    			</when>
+    			<when test='clientSecure eq "0".toString()'>
+      				AND (CSS.BOOT_PROTECTOR_CNT = 0 AND CSS.EXE_PROTECTOR_CNT = 0 AND CSS.OS_PROTECTOR_CNT = 0 AND CSS.MEDIA_PROTECTOR_CNT = 0)
+    			</when>
+			</choose>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength} 
+	</select>
+
+	<select id="selectClientTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(T.CLIENT_ID) AS CNT
+		FROM CLIENT_MSTR T 
+		WHERE T.STATUS_CD != 'STAT021'
+		<if test="adminId != null">
+			AND (T.GRP_ID IN (
+				SELECT 'CGRPDEFAULT' UNION
+				SELECT GRP_ID FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+					(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+								FROM CLIENT_GRP_MSTR W
+								WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+							) TT1
+						)
+				))
+		</if>
+	</select>
+
+	<select id="selectClientFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(T.CLIENT_ID) AS CNT
+		FROM CLIENT_MSTR T 
+			LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+			LEFT JOIN CLIENT_SECURITY_STATE CSS ON T.CLIENT_ID = CSS.CLIENT_ID
+			LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+		<where>
+			<if test="isOnline != null and isOnline != ''">
+				CAST(COALESCE(TIMESTAMPDIFF(SECOND, CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10) AND CA.CLIENT_ID IS NOT NULL
+			</if>
+			<if test='viewType != null and viewType != "" and viewType !="2"'>
+				AND IF (CSS.BOOT_PROTECTOR_CNT > 0 OR CSS.EXE_PROTECTOR_CNT > 0 OR CSS.OS_PROTECTOR_CNT > 0 OR CSS.MEDIA_PROTECTOR_CNT > 0, '1', '0') = #{viewType}
+			</if>
+			<choose>
+    			<when test='clientType != null and clientType.equalsIgnoreCase("STAT021")'>
+    				AND T.STATUS_CD = #{clientType}
+    			</when>
+				<when test='clientType != null and clientType != ""'>
+					AND T.STATUS_CD = #{clientType} AND T.STATUS_CD != 'STAT021'
+    			</when>
+			    <otherwise>
+      				AND T.STATUS_CD != 'STAT021'
+    			</otherwise>
+  			</choose>
+			<choose>
+    			<when test='groupId != null and groupId != ""'>
+					AND (T.GRP_ID IN 
+					<foreach item="item" index="index" collection="groupId" open="(" separator="," close=")">
+	    				#{item}
+	    			</foreach>
+	    			)
+    			</when>
+    			<otherwise>
+    				<if test="adminId != null">
+    					AND (T.GRP_ID IN (
+    						SELECT 'CGRPDEFAULT' UNION
+							SELECT GRP_ID
+							FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+								(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+									          FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+									                FROM CLIENT_GRP_MSTR W
+									                WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+													) TT1
+								)
+    					))
+    				</if>
+    			</otherwise>
+			</choose>
+			<if test="searchKey != null and searchKey != ''">
+				AND (
+					T.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') 
+					OR T.CLIENT_NM LIKE CONCAT('%', #{searchKey}, '%')
+					OR CGM.GRP_NM LIKE CONCAT('%', #{searchKey}, '%')
+				)
+			</if>
+			<choose>
+    			<when test="clientSecure eq '1'.toString()">
+      				AND (CSS.BOOT_PROTECTOR_CNT > 0 OR CSS.EXE_PROTECTOR_CNT > 0 OR CSS.OS_PROTECTOR_CNT > 0 OR CSS.MEDIA_PROTECTOR_CNT > 0)
+    			</when>
+    			<when test="clientSecure eq '0'.toString()">
+      				AND (CSS.BOOT_PROTECTOR_CNT = 0 AND CSS.EXE_PROTECTOR_CNT = 0 AND CSS.OS_PROTECTOR_CNT = 0 AND CSS.MEDIA_PROTECTOR_CNT = 0)
+    			</when>
+			</choose>
+		</where>
+
+	</select>
+
+	<!-- ################################################################################# -->
+	
+	<select id="selectClientListForGroups" parameterType="hashMap" resultMap="clientInfo">
+	
+		SELECT 
+			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT,
+			CGM.GRP_NM AS GROUP_NAME,
+			CGM.GRP_ID AS GROUP_ID,
+			IFNULL(CPS.TOTAL_CNT, 0) AS TOTAL_CNT,
+			IFNULL(CPS.UPDATE_TARGET_CNT, 0) AS UPDATE_TARGET_CNT,
+			IFNULL(CPS.UPDATE_MAINOS_CNT, 0) AS UPDATE_MAINOS_CNT
+		FROM CLIENT_MSTR T 
+			LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+			LEFT JOIN CLIENT_PACKAGE_STATE CPS ON T.CLIENT_ID = CPS.CLIENT_ID
+		<where>
+			T.STATUS_CD = 'STAT010'
+			<if test="groupId != null and groupId != ''">
+				AND (T.GRP_ID IN 
+				<foreach item="item" index="index" collection="groupId" open="(" separator="," close=")">
+    				#{item}
+    			</foreach>
+				<if test="hasDefaultGroup != null and hasDefaultGroup != ''">
+					OR T.GRP_ID IS NULL
+				</if>
+    			)
+			</if>
+		</where>
+		ORDER BY T.CLIENT_ID
+
+	</select>
+
+	<select id="selectClientListForAddingGroup" parameterType="String" resultMap="clientInfo">
+	
+		SELECT 
+			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT, 
+			T.REG_USER_ID, T.MOD_USER_ID, 
+			TX.IP AS CLIENT_IP, T.GRP_ID
+		FROM CLIENT_MSTR T 
+			LEFT JOIN CLIENT_EXT TX ON T.CLIENT_ID=TX.CLIENT_ID
+		WHERE T.CLIENT_ID IS NULL AND T.STATUS_CD='STAT010'
+
+	</select>
+
+	<select id="selectClientInfo" parameterType="String" resultMap="clientInfo">
+
+		SELECT T.CLIENT_ID, T.CLIENT_NM, T.CERT_INFO, T.EXPIRATION_YMD, 
+			T.STATUS_CD, T.REG_DT, T.MOD_DT, T.REG_USER_ID, T.MOD_USER_ID, IFNULL(T.COMMENT, '') COMMENT,
+			TX.PROD_NO,
+			TX.IP AS CLIENT_IP,
+			'' AS PATCH_VERSION,
+			CGM.GRP_NM AS GROUP_NAME,
+			T.GRP_ID AS GROUP_ID
+		FROM CLIENT_MSTR T 
+  			LEFT JOIN CLIENT_EXT TX ON T.CLIENT_ID = TX.CLIENT_ID
+  			LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
+		WHERE T.CLIENT_ID = #{clientId}
+
+	</select>
+
+	<!-- -->
+	<select id="isExistClientId" parameterType="String" resultType="boolean">
+	
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END ISEXIST FROM CLIENT_MSTR WHERE CLIENT_ID = #{clientId}
+
+	</select>
+	
+
+	<select id="selectClientListInGroup" parameterType="hashmap" resultMap="clientInfo">
+		SELECT 
+		  M.CLIENT_ID, M.CLIENT_NM, M.STATUS_CD, M.REG_DT, M.MOD_DT, 
+		  M.REG_USER_ID, M.MOD_USER_ID, 
+		  E.IP AS CLIENT_IP, GM.GRP_NM AS GROUP_NAME, GM.GRP_ID AS GROUP_ID
+		FROM CLIENT_MSTR M
+		  INNER JOIN CLIENT_GRP_MSTR GM ON M.GRP_ID = GM.GRP_ID
+		  LEFT JOIN CLIENT_EXT E ON M.CLIENT_ID = E.CLIENT_ID
+		WHERE GM.GRP_ID in 
+		<foreach item="item" index="index" collection="groupIds" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<update id="updateClientRevoke" parameterType="hashmap">
+		UPDATE CLIENT_MSTR SET
+			STATUS_CD = #{statusCd},
+			GRP_ID = #{grpId},
+			MOD_DT = now(), MOD_USER_ID = #{adminId}
+		WHERE
+			CLIENT_ID = #{clientId}
+	</update>
+	
+	<delete id="deleteClientExtension" parameterType="string">
+		DELETE FROM CLIENT_EXT WHERE CLIENT_ID = #{clientId}
+	</delete>
+
+	<delete id="deleteClientForNoti" parameterType="string">
+		DELETE FROM NOTICE_PUBLISH_TARGET WHERE TARGET_TYPE = '2' AND TARGET_ID = #{clientId};
+	</delete>
+
+	<delete id="deleteClientForSecurity" parameterType="string">
+		DELETE FROM CLIENT_SECURITY_STATE WHERE CLIENT_ID = #{clientId};
+	</delete>
+	
+	<delete id="deleteClientForProfile" parameterType="string">
+		DELETE FROM CLIENT_PROFILE_MSTR WHERE CLIENT_ID = #{clientId};
+	</delete>
+
+	<delete id="deleteClientForPackageState" parameterType="string">
+		DELETE FROM CLIENT_PACKAGE_STATE WHERE CLIENT_ID = #{clientId};
+	</delete>
+
+	<delete id="deleteClientForPackge" parameterType="string">
+		DELETE FROM CLIENT_PACKAGE WHERE CLIENT_ID = #{clientId};
+	</delete>
+	
+	<delete id="deleteClientForAccess" parameterType="string">
+		DELETE FROM CLIENT_ACCESS WHERE CLIENT_ID = #{clientId};
+	</delete>
+
+	<update id="updateJobTargetToRevoke" parameterType="hashmap">
+		UPDATE JOB_TRGT 
+			SET JOB_STAT = CONCAT(JOB_STAT, 'K'), MOD_DT = NOW()
+		WHERE CLIENT_ID = #{clientId} AND RIGHT(JOB_STAT,1) != 'K'
+	</update>
+
+	<insert id="insertRevokeHistory" parameterType="hashmap">
+		INSERT INTO CLIENT_MSTR_HIST (HIST_SEQ, CHG_TP, CLIENT_ID, CLIENT_NM, GRP_ID, CLIENT_OU, CERT_INFO, EXPIRATION_YMD, 
+				STATUS_CD, COMMENT, SERIAL_NO, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT, HIST_REG_DT, HIST_USER_ID)
+		SELECT (SELECT GRNEXTVAL('CLIENTMSTRHIST_SEQ')), #{chgTp} AS CHG_TP, CLIENT_ID, CLIENT_NM, GRP_ID, CLIENT_OU, CERT_INFO, EXPIRATION_YMD, 
+				STATUS_CD, COMMENT, SERIAL_NO, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT, NOW(), #{adminId} AS HIST_USER_ID
+     	FROM CLIENT_MSTR WHERE CLIENT_ID = #{clientId}
+	</insert>
+	
+	<select id="selectClientListInOnline" resultMap="clientInfo">
+		SELECT 
+			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT,
+			'1' ISON, 
+			T.REG_USER_ID, T.MOD_USER_ID,
+			STR_TO_DATE(T.expiration_ymd, '%Y%m%d') EXPIRATION_YMD 
+		FROM CLIENT_MSTR T 
+			LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+		WHERE CAST(COALESCE(TIMESTAMPDIFF(SECOND,CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+	</select>
+
+	<select id="selectClientInOnline" resultMap="clientInfo">
+		SELECT 
+			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT,
+			'1' ISON, 
+			T.REG_USER_ID, T.MOD_USER_ID,
+			STR_TO_DATE(T.expiration_ymd, '%Y%m%d') EXPIRATION_YMD 
+		FROM CLIENT_MSTR T 
+			LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+		WHERE CAST(COALESCE(TIMESTAMPDIFF(SECOND,CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+		LIMIT 1
+	</select>
+
+	<select id="selectAllClientInOnline" resultMap="clientInfo">
+		SELECT 
+			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT,
+			'1' ISON, 
+			T.REG_USER_ID, T.MOD_USER_ID,
+			STR_TO_DATE(T.expiration_ymd, '%Y%m%d') EXPIRATION_YMD 
+		FROM CLIENT_MSTR T 
+			LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+		WHERE CAST(COALESCE(TIMESTAMPDIFF(SECOND,CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+	</select>
+	
+	<select id="onlineClientIdsInUserConfDefault" parameterType="hashmap" resultMap="clientInfo">
+		SELECT SS.CLIENT_ID FROM (
+			SELECT CA.CLIENT_ID, CM1.GRP_ID
+			    FROM CLIENT_ACCESS CA 
+			      JOIN (
+			          SELECT USER_ID
+			          FROM GR_USER_RULE_CONF WHERE CONF_ID=#{confId}
+			          UNION ALL
+			          SELECT UM.USER_ID FROM USER_MSTR UM JOIN GR_DEPT_RULE_CONF GDRC ON UM.DEPT_CD = GDRC.DEPT_CD
+			          WHERE GDRC.CONF_ID=#{confId}
+			          ) UU ON CA.ON_USER_ID = UU.USER_ID
+			      LEFT JOIN CLIENT_MSTR CM1 ON CA.CLIENT_ID = CM1.CLIENT_ID
+	        UNION
+		    SELECT CM.CLIENT_ID, CM.GRP_ID
+		    FROM CLIENT_MSTR CM
+		      JOIN GR_GROUP_RULE_CONF GGRC ON CM.GRP_ID=GGRC.GRP_ID AND GGRC.CONF_ID=#{confId}
+		    UNION
+		    SELECT CM.CLIENT_ID, CM.GRP_ID
+		    FROM CLIENT_MSTR CM
+		      LEFT JOIN GR_GROUP_RULE_CONF GGRC ON CM.GRP_ID != GGRC.GRP_ID AND GGRC.CONF_TP=#{confTp}
+		  ) SS 
+		  LEFT JOIN CLIENT_ACCESS CA ON SS.CLIENT_ID = CA.CLIENT_ID      
+		WHERE CAST( COALESCE(TIMESTAMPDIFF(SECOND, CA.CHECK_DT, NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+	</select>
+	
+	<select id="onlineClientIdsInClientUseConfId" parameterType="hashmap" resultMap="clientInfo">
+		SELECT SS.CLIENT_ID FROM (
+			SELECT CA.CLIENT_ID, CM1.GRP_ID
+			    FROM CLIENT_ACCESS CA 
+			      JOIN (
+			          SELECT USER_ID
+			          FROM GR_USER_RULE_CONF WHERE CONF_ID=#{confId}
+			          UNION ALL
+			          SELECT UM.USER_ID FROM USER_MSTR UM JOIN GR_DEPT_RULE_CONF GDRC ON UM.DEPT_CD = GDRC.DEPT_CD
+			          WHERE GDRC.CONF_ID=#{confId}
+			          ) UU ON CA.ON_USER_ID = UU.USER_ID
+			      LEFT JOIN CLIENT_MSTR CM1 ON CA.CLIENT_ID = CM1.CLIENT_ID
+	        UNION
+		    SELECT CM.CLIENT_ID, CM.GRP_ID
+		    FROM CLIENT_MSTR CM
+		      JOIN GR_GROUP_RULE_CONF GGRC ON CM.GRP_ID=GGRC.GRP_ID AND GGRC.CONF_ID=#{confId}
+		  ) SS 
+		  LEFT JOIN CLIENT_ACCESS CA ON SS.CLIENT_ID = CA.CLIENT_ID      
+		WHERE CAST( COALESCE(TIMESTAMPDIFF(SECOND, CA.CHECK_DT, NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+	</select>
+
+	<select id="onlineClientIdsInUserIds" parameterType="hashmap" resultMap="onlineClientAndUserInfo">
+	
+	    SELECT CA.ON_USER_ID AS USER_ID, CA.CLIENT_ID, UM.dept_cd,
+		    GURC.USER_BROWSERRULE_CONFID, GURC.USER_MEDIARULE_CONFID, GURC.USER_SECURITYRULE_CONFID, GURC.USER_FILTEREDSWRULE_CONFID, GURC.USER_CTRLCENTERITEM_CONFID, GURC.USER_POLICYKIT_CONFID,
+			GDRC.DEPT_BROWSERRULE_CONFID, GDRC.DEPT_MEDIARULE_CONFID, GDRC.DEPT_SECURITYRULE_CONFID, GDRC.DEPT_FILTEREDSWRULE_CONFID, GDRC.DEPT_CTRLCENTERITEM_CONFID, GDRC.DEPT_POLICYKIT_CONFID,
+		    GGRC.CLIENT_BROWSERRULE_CONFID, GGRC.CLIENT_MEDIARULE_CONFID, GGRC.CLIENT_SECURITYRULE_CONFID, GGRC.CLIENT_FILTEREDSWRULE_CONFID, GGRC.CLIENT_CTRLCENTERITEM_CONFID, GGRC.CLIENT_POLICYKIT_CONFID
+	    FROM CLIENT_ACCESS CA
+	      LEFT JOIN (
+	        SELECT GURC1.USER_ID, 
+	          GROUP_CONCAT(IF(GURC1.CONF_TP = 'BROWSERRULE', GURC1.CONF_ID, NULL)) AS 'USER_BROWSERRULE_CONFID',
+	          GROUP_CONCAT(IF(GURC1.CONF_TP = 'MEDIARULE', GURC1.CONF_ID, NULL)) AS 'USER_MEDIARULE_CONFID',
+	          GROUP_CONCAT(IF(GURC1.CONF_TP = 'SECURITYRULE', GURC1.CONF_ID, NULL)) AS 'USER_SECURITYRULE_CONFID',
+	          GROUP_CONCAT(IF(GURC1.CONF_TP = 'FILTEREDSWRULE', GURC1.CONF_ID, NULL)) AS 'USER_FILTEREDSWRULE_CONFID',
+	          GROUP_CONCAT(IF(GURC1.CONF_TP = 'CTRLCENTERITEMRULE', GURC1.CONF_ID, NULL)) AS 'USER_CTRLCENTERITEM_CONFID',
+	          GROUP_CONCAT(IF(GURC1.CONF_TP = 'POLICYKITRULE', GURC1.CONF_ID, NULL)) AS 'USER_POLICYKIT_CONFID'
+	        FROM GR_USER_RULE_CONF GURC1
+	        GROUP BY GURC1.USER_ID
+	      ) GURC ON CA.ON_USER_ID = GURC.USER_ID
+          LEFT JOIN user_mstr um on CA.ON_USER_ID = um.user_id
+          LEFT JOIN (
+            SELECT GDRC1.DEPT_CD,
+              GROUP_CONCAT(IF(GDRC1.CONF_TP = 'BROWSERRULE', GDRC1.CONF_ID, NULL)) AS 'DEPT_BROWSERRULE_CONFID',
+              GROUP_CONCAT(IF(GDRC1.CONF_TP = 'MEDIARULE', GDRC1.CONF_ID, NULL)) AS 'DEPT_MEDIARULE_CONFID',
+              GROUP_CONCAT(IF(GDRC1.CONF_TP = 'SECURITYRULE', GDRC1.CONF_ID, NULL)) AS 'DEPT_SECURITYRULE_CONFID',
+              GROUP_CONCAT(IF(GDRC1.CONF_TP = 'FILTEREDSWRULE', GDRC1.CONF_ID, NULL)) AS 'DEPT_FILTEREDSWRULE_CONFID',
+              GROUP_CONCAT(IF(GDRC1.CONF_TP = 'CTRLCENTERITEMRULE', GDRC1.CONF_ID, NULL)) AS 'DEPT_CTRLCENTERITEM_CONFID',
+              GROUP_CONCAT(IF(GDRC1.CONF_TP = 'POLICYKITRULE', GDRC1.CONF_ID, NULL)) AS 'DEPT_POLICYKIT_CONFID'
+            FROM GR_DEPT_RULE_CONF GDRC1
+            GROUP BY GDRC1.DEPT_CD
+          ) GDRC ON um.dept_cd = GDRC.dept_cd
+	      LEFT JOIN client_mstr cm on CA.client_id = cm.client_id
+	      LEFT JOIN (
+	        SELECT GGRC1.GRP_ID, 
+	          GROUP_CONCAT(IF(GGRC1.CONF_TP = 'BROWSERRULE', GGRC1.CONF_ID, NULL)) AS 'CLIENT_BROWSERRULE_CONFID',
+	          GROUP_CONCAT(IF(GGRC1.CONF_TP = 'MEDIARULE', GGRC1.CONF_ID, NULL)) AS 'CLIENT_MEDIARULE_CONFID',
+	          GROUP_CONCAT(IF(GGRC1.CONF_TP = 'SECURITYRULE', GGRC1.CONF_ID, NULL)) AS 'CLIENT_SECURITYRULE_CONFID',
+	          GROUP_CONCAT(IF(GGRC1.CONF_TP = 'FILTEREDSWRULE', GGRC1.CONF_ID, NULL)) AS 'CLIENT_FILTEREDSWRULE_CONFID',
+	          GROUP_CONCAT(IF(GGRC1.CONF_TP = 'CTRLCENTERITEMRULE', GGRC1.CONF_ID, NULL)) AS 'CLIENT_CTRLCENTERITEM_CONFID',
+	          GROUP_CONCAT(IF(GGRC1.CONF_TP = 'POLICYKITRULE', GGRC1.CONF_ID, NULL)) AS 'CLIENT_POLICYKIT_CONFID'
+	        FROM GR_GROUP_RULE_CONF GGRC1
+	        GROUP BY GGRC1.GRP_ID
+	      ) GGRC ON cm.grp_id = GGRC.GRP_ID
+	    WHERE CA.ON_USER_ID IN 
+				<foreach item="item" index="index" collection="userIds" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+	    AND CAST( COALESCE(TIMESTAMPDIFF(SECOND, CA.CHECK_DT, NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+	
+	</select>
+	
+	<select id="onlineClientIdsInClientGroup" parameterType="hashmap" resultMap="clientInfo">
+		SELECT DISTINCT T.CLIENT_ID
+		FROM (SELECT CLIENT_ID, GRP_ID FROM CLIENT_MSTR AA WHERE AA.STATUS_CD = 'STAT010' AND AA.GRP_ID=#{groupId}) T
+			LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+		WHERE CAST(COALESCE(TIMESTAMPDIFF(SECOND,CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+	</select>
+
+	<select id="selectClientGroupIdByConf" parameterType="string" resultMap="clientGroupInfo">
+		SELECT GRP_ID FROM GR_GROUP_RULE_CONF WHERE CONF_ID = #{objId}
+	</select>
+	<select id="selectClientGroupIdByDefaultConf" parameterType="hashmap" resultMap="clientGroupInfo">
+		SELECT AA.GRP_ID FROM (
+			SELECT GG.GRP_ID, GGRC.CONF_ID, GGRC.CONF_TP 
+			FROM CLIENT_GRP_MSTR GG 
+			  LEFT JOIN GR_GROUP_RULE_CONF GGRC ON GG.GRP_ID = GGRC.GRP_ID
+			    AND GGRC.CONF_TP=#{confTp}
+			) AA
+		WHERE AA.CONF_ID IS NULL OR AA.CONF_ID=#{confId};
+	</select>
+	<select id="clientGroupsInClientConfArray" parameterType="hashmap" resultMap="clientGroupInfo">
+		SELECT GRP_ID FROM GR_GROUP_RULE_CONF WHERE CONF_ID IN 
+		<foreach item="item" index="index" collection="confIds" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="clientListAll" resultMap="clientInfo">
+	
+	    SELECT 
+			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT, 
+			T.REG_USER_ID, T.MOD_USER_ID,
+			STR_TO_DATE(T.expiration_ymd, '%Y%m%d') EXPIRATION_YMD 
+		FROM CLIENT_MSTR T 
+		WHERE STATUS_CD='STAT010'
+	
+	</select>
+	
+	<select id="selectViolatedClientList" resultMap="clientInfo">
+		SELECT CM.CLIENT_ID AS CLIENT_ID,
+		       CM.CLIENT_NM AS CLIENT_NM,
+		       CSS.BOOT_PROTECTOR_CNT AS COUNT_BOOTPROTECTOR,
+		       CSS.EXE_PROTECTOR_CNT AS COUNT_EXEPROTECTOR,
+		       CSS.OS_PROTECTOR_CNT AS COUNT_OSPROTECTOR,
+		       CSS.MEDIA_PROTECTOR_CNT AS COUNT_MEDIAPROTECTOR,
+		       IF(ISNULL(CSS.BOOT_PROTECTOR_ACT_STOP_DT), '1', '0') AS IS_BOOTPROTECTOR_STOP,
+		       IF(ISNULL(CSS.EXE_PROTECTOR_ACT_STOP_DT), '1', '0') AS IS_EXEPROTECTOR_STOP,
+		       IF(ISNULL(CSS.OS_PROTECTOR_ACT_STOP_DT), '1', '0') AS IS_OSPROTECTOR_STOP,
+		       IF(ISNULL(CSS.MEDIA_PROTECTOR_ACT_STOP_DT), '1', '0') AS IS_MEDIAPROTECTOR_STOP
+		FROM CLIENT_MSTR CM
+		     JOIN CLIENT_SECURITY_STATE CSS ON CM.CLIENT_ID = CSS.CLIENT_ID
+		WHERE     CM.STATUS_CD = 'STAT010'
+		      AND (CSS.BOOT_PROTECTOR_CNT > 0 OR CSS.EXE_PROTECTOR_CNT > 0 OR CSS.OS_PROTECTOR_CNT > 0 OR CSS.MEDIA_PROTECTOR_CNT > 0)
+			<if test="searchKey != null and searchKey != ''">
+				AND (CM.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR CM.CLIENT_NM LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+			<if test="adminId != null">
+				AND (CM.GRP_ID IN (
+					SELECT 'CGRPDEFAULT' UNION
+					SELECT GRP_ID
+					FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+						(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+						      FROM CLIENT_GRP_MSTR W
+						      WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+						) TT1
+					)
+				))
+			</if>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectViolatedClientListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(CM.CLIENT_ID) AS CNT 
+		FROM CLIENT_MSTR CM
+		     JOIN CLIENT_SECURITY_STATE CSS ON CM.CLIENT_ID = CSS.CLIENT_ID
+		WHERE     CM.STATUS_CD = 'STAT010'
+		      AND (CSS.BOOT_PROTECTOR_CNT > 0 OR CSS.EXE_PROTECTOR_CNT > 0 OR CSS.OS_PROTECTOR_CNT > 0 OR CSS.MEDIA_PROTECTOR_CNT > 0)
+			<if test="adminId != null">
+			  AND (CM.GRP_ID IN (
+				SELECT 'CGRPDEFAULT' UNION
+				SELECT GRP_ID FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+					(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+								FROM CLIENT_GRP_MSTR W
+								WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+							) TT1
+						)
+				))
+			</if>		      
+	</select>
+
+	<select id="selectViolatedClientListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(CM.CLIENT_ID) AS CNT 
+		FROM CLIENT_MSTR CM
+		     JOIN CLIENT_SECURITY_STATE CSS ON CM.CLIENT_ID = CSS.CLIENT_ID
+		WHERE     CM.STATUS_CD = 'STAT010'
+		      AND (CSS.BOOT_PROTECTOR_CNT > 0 OR CSS.EXE_PROTECTOR_CNT > 0 OR CSS.OS_PROTECTOR_CNT > 0 OR CSS.MEDIA_PROTECTOR_CNT > 0)
+			<if test="searchKey != null and searchKey != ''">
+				AND (CM.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR CM.CLIENT_NM LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+			<if test="adminId != null">
+			  AND (CM.GRP_ID IN (
+				SELECT 'CGRPDEFAULT' UNION
+				SELECT GRP_ID FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+					(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+								FROM CLIENT_GRP_MSTR W
+								WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+							) TT1
+						)
+				))
+			</if>		      
+	</select>
+
+	<select id="selectViolatedClientCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(CM.CLIENT_ID) AS CNT
+		FROM CLIENT_MSTR    CM
+		     JOIN CLIENT_SECURITY_STATE CSS ON CM.CLIENT_ID = CSS.CLIENT_ID
+		WHERE     CM.STATUS_CD = 'STAT010'
+		      AND (CSS.BOOT_PROTECTOR_CNT > 0 OR CSS.EXE_PROTECTOR_CNT > 0 OR CSS.OS_PROTECTOR_CNT > 0 OR CSS.MEDIA_PROTECTOR_CNT > 0)
+			<if test="adminId != null">
+			AND
+  				CM.GRP_ID IN (
+  					SELECT 'CGRPDEFAULT' UNION
+					SELECT GRP_ID
+					FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+						(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+							FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+									FROM CLIENT_GRP_MSTR W
+									WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+								) TT1
+						)
+    			)
+			</if>		   
+	</select>
+
+	<select id="selectTotalPackageListPaged" parameterType="hashmap" resultMap="clientPackageInfo">
+		SELECT PACKAGE_ID, PACKAGE_ARCH, PACKAGE_VER AS PACKAGE_LAST_VER, REG_DT AS MOD_DT
+		FROM PACKAGE_MSTR
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength} 
+	</select>
+
+
+	<select id="selectTotalPackageListTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(PACKAGE_ID) AS CNT
+		FROM PACKAGE_MSTR
+	</select>
+
+
+	<select id="selectTotalPackageListFilteredCount" parameterType="hashmap" resultType="long">
+	
+		SELECT COUNT(PACKAGE_ID) AS CNT
+		FROM PACKAGE_MSTR
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>
+
+	</select>
+
+
+	<select id="selectClientPackageListPaged" parameterType="hashmap" resultMap="clientPackageInfo">
+	
+		SELECT CP.CLIENT_ID, CP.PACKAGE_ID, CP.PACKAGE_ARCH, CP.INSTALL_VER, CP.PACKAGE_LAST_VER, CP.MOD_DT 
+			FROM CLIENT_PACKAGE CP
+		WHERE CP.CLIENT_ID=#{clientId}
+		<if test='searchKey != null and searchKey != ""'>
+			AND CP.PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+		</if>
+		<if test='isFiltered != null and "true".equals(isFiltered)'>
+			AND CP.INSTALL_VER != CP.PACKAGE_LAST_VER
+		</if>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+
+	</select>
+	
+	<select id="selectClientPackageListTotalCount" parameterType="hashmap" resultType="long">
+	
+		SELECT COUNT(CP.PACKAGE_ID) AS CNT 
+		FROM CLIENT_PACKAGE CP
+		WHERE CP.CLIENT_ID=#{clientId}
+		<if test='isFiltered != null and "true".equals(isFiltered)'>
+			AND CP.INSTALL_VER != CP.PACKAGE_LAST_VER
+		</if>
+		
+	</select>
+
+	<select id="selectClientPackageListFilteredCount" parameterType="hashmap" resultType="long">
+	
+		SELECT COUNT(CP.PACKAGE_ID) AS CNT 
+		FROM CLIENT_PACKAGE CP
+		WHERE CP.CLIENT_ID=#{clientId}
+		<if test="searchKey != null and searchKey != ''">
+			AND CP.PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+		</if>
+		<if test='isFiltered != null and "true".equals(isFiltered)'>
+			AND CP.INSTALL_VER != CP.PACKAGE_LAST_VER
+		</if>
+
+	</select>
+
+	<select id="selectClientStatusSummary" parameterType="hashMap" resultMap="clientSummaryInfo">
+		SELECT COUNT(P.CLIENT_ID) AS TOTAL_COUNT,
+	     COUNT(IF(P.ISON = 1, P.ISON, NULL)) AS ON_COUNT,
+	     COUNT(IF(P.ISON = 0 AND P.STATUS_CD = 'STAT010', P.ISON, NULL)) AS OFF_COUNT,
+	     COUNT(IF(P.STATUS_CD = 'STAT021', P.STATUS_CD, NULL)) AS REVOKE_COUNT
+	    FROM (
+	    	SELECT T.CLIENT_ID, T.STATUS_CD,
+	    		IF (CAST(COALESCE(TIMESTAMPDIFF(SECOND,CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10), '1','0') ISON,
+				  IFNULL(CA.ON_USER_ID, '-') LOGIN_ID
+			FROM CLIENT_MSTR T 
+				LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+			<if test="adminId != null">
+			WHERE
+  				T.GRP_ID IN (
+  					SELECT 'CGRPDEFAULT' UNION
+					SELECT GRP_ID
+					FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+						(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+							FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+									FROM CLIENT_GRP_MSTR W
+									WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+								) TT1
+						)
+    			)
+			</if>				
+		) P
+	</select>
+
+	<select id="selectLoginStatusSummary" parameterType="hashMap" resultMap="clientSummaryInfo">
+		SELECT COUNT(UM.USER_ID) AS USER_COUNT, COUNT(CA.ON_USER_ID) AS LOGIN_COUNT
+		FROM USER_MSTR UM
+            LEFT JOIN CLIENT_ACCESS CA ON UM.USER_ID = (
+                SELECT CA.ON_USER_ID
+                WHERE CA.ON_USER_ID IN (UM.USER_ID)
+                    AND CAST(COALESCE(TIMESTAMPDIFF(SECOND,CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10)
+                    AND CA.ON_USER_ID IS NOT NULL
+                    AND CA.ON_USER_ID != '-'
+                    AND LEFT(CA.ON_USER_ID, 1) != '+'
+            )
+		WHERE UM.STATUS = 'STAT010'
+            <if test="adminId != null">
+            AND UM.DEPT_CD IN (
+                SELECT 'DEPTDEFAULT' UNION
+                SELECT DEPT_CD
+                FROM DEPT_MSTR DM WHERE DM.WHLE_DEPT_CD REGEXP
+                    (SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+                        FROM (SELECT CONCAT('^', W.WHLE_DEPT_CD) GPATH
+                                FROM DEPT_MSTR W
+                                WHERE W.DEPT_CD IN (SELECT DEPT_CD FROM ADMIN_DEPT WHERE ADMIN_ID = #{adminId} AND DEPT_CD != 'DEPTDEFAULT')
+                            ) TT1
+                    )
+            )
+            </if>
+	</select>
+
+	<select id="selectUpdatePackageSummary" parameterType="hashMap" resultMap="clientSummaryInfo">
+		SELECT COUNT(IF(AA.ALL_STATUS = 'NO', AA.ALL_STATUS, NULL)) AS NOUPDATE_COUNT,
+		  COUNT(IF(AA.ALL_STATUS = 'YES', AA.ALL_STATUS, NULL)) AS UPDATE_COUNT,
+		  COUNT(IF(AA.MAIN_STATUS = 'YES', AA.MAIN_STATUS, NULL)) AS MAINUPDATE_COUNT
+		FROM (
+		SELECT IF(IFNULL(CPS.UPDATE_TARGET_CNT, 0) > 0 OR IFNULL(CPS.UPDATE_MAINOS_CNT, 0) > 0, 'YES', 'NO') AS ALL_STATUS,
+		       IF(IFNULL(CPS.UPDATE_MAINOS_CNT, 0) > 0, 'YES', 'NO') AS MAIN_STATUS
+		FROM CLIENT_MSTR    CM
+		     LEFT JOIN CLIENT_PACKAGE_STATE CPS ON CM.CLIENT_ID = CPS.CLIENT_ID
+		WHERE CM.STATUS_CD = 'STAT010'
+		<if test="adminId != null">
+		AND CM.GRP_ID IN (
+				SELECT 'CGRPDEFAULT' UNION
+				SELECT GRP_ID
+				FROM CLIENT_GRP_MSTR GM WHERE GM.WHLE_GRP_ID REGEXP
+					(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+						FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+								FROM CLIENT_GRP_MSTR W
+								WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+						) TT1
+					)
+   			)
+		</if>
+		) AA
+	</select>
+
+	<select id="selectUpdatePackageClientList" resultMap="updatePackageClientInfo">
+		SELECT P.CLIENT_ID,
+		       P.CLIENT_NM,
+		       P.UPDATE_TARGET_CNT,
+		       P.UPDATE_MAINOS_CNT
+		FROM (SELECT CM.CLIENT_ID,
+		             CM.CLIENT_NM,
+		             IFNULL(CPS.UPDATE_TARGET_CNT, 0)   AS UPDATE_TARGET_CNT,
+		             IFNULL(CPS.UPDATE_MAINOS_CNT, 0)   AS UPDATE_MAINOS_CNT
+		      FROM CLIENT_MSTR      CM
+		           LEFT JOIN CLIENT_PACKAGE_STATE CPS
+		              ON     CM.CLIENT_ID = CPS.CLIENT_ID
+		                 AND CM.STATUS_CD = 'STAT010') P
+		WHERE !(P.UPDATE_TARGET_CNT = 0 AND P.UPDATE_MAINOS_CNT = 0)                  
+	</select>
+	
+    <select id="selectOnlineClientIdsForNoticeInstantNotice" parameterType="String" resultMap="clientInfo">
+       SELECT DISTINCT CLIENT_ID FROM CLIENT_ACCESS
+       WHERE
+           (
+               (ON_USER_ID IN (SELECT TARGET_ID FROM NOTICE_PUBLISH_TARGET WHERE TARGET_TYPE = '0' AND NOTICE_PUBLISH_ID = #{noticePublishId}))
+               OR
+               (ON_USER_ID IN (SELECT UM.USER_ID FROM USER_MSTR UM LEFT JOIN NOTICE_PUBLISH_TARGET NPT ON (UM.DEPT_CD = NPT.TARGET_ID AND NPT.TARGET_TYPE = '1') WHERE NPT.NOTICE_PUBLISH_ID = #{noticePublishId}))
+               OR
+               (CLIENT_ID IN
+                   (SELECT ca.CLIENT_ID
+                   FROM CLIENT_ACCESS CA
+                       LEFT JOIN NOTICE_PUBLISH_TARGET NPT ON CA.CLIENT_ID = NPT.TARGET_ID AND NPT.TARGET_TYPE = '2'
+                   WHERE NPT.NOTICE_PUBLISH_ID = #{noticePublishId}))
+               OR
+               (CLIENT_ID IN
+                   (SELECT CA.CLIENT_ID
+                   FROM CLIENT_ACCESS CA
+                       LEFT JOIN CLIENT_MSTR CM ON CA.CLIENT_ID = CM.CLIENT_ID
+                       LEFT JOIN NOTICE_PUBLISH_TARGET NPT ON CM.GRP_ID = NPT.TARGET_ID AND NPT.TARGET_TYPE = '3'
+                   WHERE NPT.NOTICE_PUBLISH_ID = #{noticePublishId}))
+           )
+           AND CAST(COALESCE(TIMESTAMPDIFF(SECOND,CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (POLLING_TIME+10)
+    </select>
+
+</mapper>

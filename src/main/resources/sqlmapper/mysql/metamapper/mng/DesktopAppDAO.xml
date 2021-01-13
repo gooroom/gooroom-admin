@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="DesktopAppDAO">
+
+	<resultMap type="desktopAppVO" id="desktopAppInfo">
+		<result property="appId" column="APP_ID" />
+		<result property="appNm" column="APP_NM"/>
+		
+		<result property="appInfo" column="APP_INFO"/>
+		<result property="appGubun" column="APP_GUBUN" />
+		
+		<result property="appExec" column="APP_EXEC" />
+		<result property="appMountUrl" column="MOUNT_URL" />
+		<result property="appMountPoint" column="MOUNT_POINT" />
+
+		<result property="iconGubun" column="ICON_GUBUN"/>
+		<result property="iconId" column="ICON_ID"/>
+		<result property="iconUrl" column="ICON_URL"/>
+		
+		<result property="iconNm" column="ICON_NM"/>
+		<result property="iconGrpId" column="ICON_GRP_ID"/>
+		<result property="iconGrpNm" column="ICON_GRP_NM"/>
+		<result property="fileNm" column="FILE_NM"/>
+		<result property="filePath" column="FILE_PATH"/>
+		
+		<result property="statusCd" column="STATUS_CD"/>
+
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+	
+	</resultMap>
+
+
+	
+	<resultMap type="desktopItemVO" id="desktopItemListMap">
+		<result property="appId" column="app_id"/>
+		<result property="appGubun" column="app_gubun"/>
+		<result property="position" column="app_position"/>
+		<association property="desktop" column="{appId=app_id}" javaType="kr.gooroom.gpms.config.service.DesktopApplicationInfoVO" select="selectApplicationInfo"/>
+	</resultMap>
+	<resultMap type="desktopApplicationInfoVO" id="desktopApplicationInfoMap">
+		<result property="name" column="APP_NM"/>
+		<result property="comment" column="APP_INFO"/>
+		<result property="exec" column="APP_EXEC" />
+		<result property="iconGubun" column="ICON_GUBUN" />
+		<result property="icon" column="ICON_INFO" />
+	</resultMap>
+	<resultMap type="desktopMountInfoVO" id="desktopMountInfoMap">
+		<result property="name" column="APP_NM"/>
+		<result property="comment" column="APP_INFO"/>
+		<result property="protocol" column="MOUNT_PROTOCOL"/>
+		<result property="url" column="MOUNT_URL"/>
+		<result property="mountpoint" column="MOUNT_POINT" />
+		<result property="iconGubun" column="ICON_GUBUN" />
+		<result property="icon" column="ICON_INFO" />
+	</resultMap>
+	
+	<select id="selectNormalAppInfoList" resultMap="desktopAppInfo">
+	    SELECT DAI.APP_ID, DAI.APP_NM, DAI.APP_INFO, DAI.APP_GUBUN, DAI.APP_EXEC, 
+			  DAI.MOUNT_URL, DAI.MOUNT_POINT, DAI.ICON_GUBUN, DAI.ICON_ID, DAI.ICON_URL, 
+			  DAI.STATUS_CD, DAI.MOD_USER_ID, DAI.MOD_DT, DAI.REG_USER_ID, DAI.REG_DT
+		FROM DESKTOP_APP_INFO DAI
+		WHERE DAI.STATUS_CD='STAT010'
+	    ORDER BY DAI.APP_NM
+	</select>
+		
+	<select id="selectDesktopAppList" resultMap="desktopItemListMap">
+    	SELECT DAI.APP_ID, DAI.APP_GUBUN, 'bar' AS APP_POSITION
+		FROM DESKTOP_APP_INFO DAI
+		WHERE DAI.APP_GUBUN='application' AND DAI.STATUS_CD='STAT010';
+    </select>
+    <select id="selectApplicationInfo" resultMap="desktopApplicationInfoMap">
+		SELECT DAI.APP_NM, DAI.APP_INFO, DAI.APP_EXEC, DAI.ICON_GUBUN,
+    		IF(DAI.ICON_GUBUN='FAVICON', DAI.ICON_URL, 
+      			(SELECT FM.FILE_NM FROM THEME_ICON TI LEFT JOIN FILE_MSTR FM ON TI.FILE_NO=FM.FILE_NO
+      				WHERE TI.APP_NM=DAI.ICON_ID AND TI.THEME_ID='1')
+    			) AS ICON_INFO
+		FROM DESKTOP_APP_INFO DAI
+		WHERE DAI.APP_ID = #{appId} AND DAI.STATUS_CD='STAT010'
+    </select>
+    <select id="selectDesktopMountList" resultMap="desktopMountInfoMap">
+    	SELECT DAI.APP_NM, DAI.APP_INFO, '' AS MOUNT_PROTOCOL, DAI.MOUNT_URL, DAI.MOUNT_POINT
+		FROM DESKTOP_APP_INFO DAI
+		WHERE DAI.APP_GUBUN='mount' AND DAI.STATUS_CD='STAT010'
+    </select>
+	
+	<select id="selectDesktopAppListPaged" parameterType="hashmap" resultMap="desktopAppInfo">
+		SELECT DAI.APP_ID, DAI.APP_NM, DAI.APP_INFO, 
+			DAI.APP_EXEC, DAI.APP_GUBUN, DAI.MOUNT_URL, DAI.MOUNT_POINT, 
+			DAI.ICON_GUBUN, 
+			DAI.ICON_URL, 
+			TI.APP_NM AS ICON_NM, 
+			TI.APP_NM AS ICON_ID, 
+			TI.FILE_NO AS FILE_NO,
+			FM.FILE_NM, FM.FILE_PATH,
+			DAI.STATUS_CD, 
+			DAI.MOD_USER_ID, DAI.MOD_DT, DAI.REG_USER_ID, DAI.REG_DT 
+		FROM DESKTOP_APP_INFO DAI 
+			LEFT JOIN (SELECT MIN(THEME_ID), FILE_NO, APP_NM FROM THEME_ICON GROUP BY APP_NM) TI ON DAI.ICON_ID=TI.APP_NM
+			LEFT JOIN FILE_MSTR FM ON TI.FILE_NO=FM.FILE_NO
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				(DAI.APP_NM LIKE CONCAT('%', #{searchKey}, '%') OR DAI.APP_INFO LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+			<if test="status != null and status != ''">
+				AND DAI.STATUS_CD = #{status}
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectDesktopAppListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(DAI.APP_ID) AS CNT 
+		FROM DESKTOP_APP_INFO DAI
+	</select>
+
+	<select id="selectDesktopAppListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(DAI.APP_ID) AS CNT 
+		FROM DESKTOP_APP_INFO DAI
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				(DAI.APP_NM LIKE CONCAT('%', #{searchKey}, '%') OR DAI.APP_INFO LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+			<if test="status != null and status != ''">
+				AND DAI.STATUS_CD = #{status}
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectDesktopAppData" parameterType="string" resultMap="desktopAppInfo">
+
+		SELECT DAI.APP_ID, DAI.APP_NM, DAI.APP_INFO, 
+			DAI.APP_EXEC, DAI.APP_GUBUN, DAI.MOUNT_URL, DAI.MOUNT_POINT, 
+			DAI.ICON_GUBUN, 
+			DAI.ICON_URL, 
+      		DAI.ICON_ID,     
+			DAI.STATUS_CD, 
+			DAI.MOD_USER_ID, DAI.MOD_DT, DAI.REG_USER_ID, DAI.REG_DT 
+		FROM DESKTOP_APP_INFO DAI 
+		WHERE DAI.APP_ID = #{desktopAppId}
+	</select>
+
+	<insert id="insertDesktopAppData" parameterType="desktopAppVO">
+		<selectKey keyProperty="appId" resultType="String" order="BEFORE">
+			SELECT CONCAT('DEAP', (LPAD((SELECT GRNEXTVAL('DESKTOP_APP_SEQ')), 6, 0)))
+		</selectKey>
+		INSERT INTO DESKTOP_APP_INFO
+			(APP_ID, APP_NM, APP_INFO, APP_EXEC, ICON_GUBUN, 
+			ICON_URL, ICON_ID, STATUS_CD, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT,
+			APP_GUBUN, MOUNT_URL, MOUNT_POINT)
+		VALUES (
+			#{appId},
+			#{appNm},
+			#{appInfo},
+			#{appExec},
+			#{iconGubun},
+			#{iconUrl},
+			#{iconId},
+			#{statusCd},
+			#{modUserId},
+			now(),
+			#{regUserId},
+			now(),
+			#{appGubun},
+			#{appMountUrl},
+			#{appMountPoint}
+		)
+	</insert>
+	
+	<insert id="insertClonedDesktopAppData" parameterType="desktopAppVO">
+		<selectKey keyProperty="newAppId" resultType="string" order="BEFORE">
+			SELECT CONCAT('DEAP', (LPAD((SELECT GRNEXTVAL('DESKTOP_APP_SEQ')), 6, 0)))
+		</selectKey>
+		INSERT INTO DESKTOP_APP_INFO
+			(APP_ID, APP_NM, APP_INFO, APP_EXEC, ICON_GUBUN, 
+			ICON_URL, ICON_ID, STATUS_CD, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT,
+			APP_GUBUN, MOUNT_URL, MOUNT_POINT) 
+		SELECT #{newAppId}, CONCAT(APP_NM, '-복사본'), APP_INFO, APP_EXEC, ICON_GUBUN, 
+			ICON_URL, ICON_ID, STATUS_CD, #{modUserId}, now(), #{regUserId}, now(),
+			APP_GUBUN, MOUNT_URL, MOUNT_POINT
+		FROM DESKTOP_APP_INFO WHERE APP_ID=#{appId};
+	</insert>
+	
+	<update id="updateDesktopAppData" parameterType="desktopAppVO">
+		UPDATE DESKTOP_APP_INFO SET
+			APP_NM = #{appNm},
+			APP_INFO = #{appInfo},
+			APP_GUBUN = #{appGubun}, 
+			APP_EXEC = #{appExec},
+			MOUNT_URL = #{appMountUrl}, 
+			MOUNT_POINT = #{appMountPoint},
+			ICON_GUBUN = #{iconGubun},
+			ICON_URL = #{iconUrl},
+			ICON_ID = #{iconId},
+			STATUS_CD = #{statusCd},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now()
+		WHERE
+			APP_ID = #{appId};
+	</update>
+
+	<update id="updateDesktopAppStatus" parameterType="desktopAppVO">
+		UPDATE DESKTOP_APP_INFO SET
+			STATUS_CD = #{statusCd},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now()
+		WHERE
+			APP_ID = #{appId};
+	</update>
+
+	<delete id="deleteDesktopAppData" parameterType="desktopAppVO">
+		DELETE FROM DESKTOP_APP_INFO
+		WHERE
+			APP_ID = #{appId};
+	</delete>
+
+</mapper>

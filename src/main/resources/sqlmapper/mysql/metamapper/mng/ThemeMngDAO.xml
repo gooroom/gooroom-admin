@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ThemeMngDAO">
+
+	<resultMap type="themeVO" id="themeInfo">
+		<result property="themeId" column="THEME_ID" />
+		<result property="themeNm" column="THEME_NM" />
+		<result property="themeCmt" column="THEME_CMT" />
+		<result property="wallpaper" column="WALLPAPER" />
+		<result property="wallpaperFileNm" column="WALLPAPERFILENAME" />
+		<result property="wallpaperUrl" column="WALLPAPERURL" />
+
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		
+		<collection property="themeIcons" column="{iconAddress=ICON_ADDRESS,themeId=THEME_ID}" javaType="java.util.ArrayList" ofType="fileVO" select="selectIconFileListById" />
+	</resultMap>
+	
+	<resultMap type="fileVO" id="fileInfo">
+	
+		<result property="fileNo" column="FILE_NO" />
+		<result property="fileName" column="FILE_NM" />
+		
+		<result property="fileType" column="FILE_TP" />
+		<result property="filePath" column="FILE_PATH" />
+		
+		<result property="fileSize" column="FILE_SIZE" />
+		<result property="fileOriginalName" column="FILE_ORG_NM" />
+
+		<result property="fileEtcInfo" column="ETC_INFO" />
+		<result property="imgUrl" column="IMG_URL" />
+
+		<result property="deleteYn" column="DELETE_YN" />
+		<result property="regUserId" column="REG_USER_ID" />
+		<result property="regDate" column="REG_DT" />
+	
+	</resultMap>
+
+	<select id="selectThemeData" parameterType="hashmap" resultMap="themeInfo">
+		SELECT 
+			TM.THEME_ID, TM.THEME_NM, TM.THEME_CMT, TM.WALLPAPER, WM.WALLPAPER_NM, FM.FILE_NM AS WALLPAPERFILENAME, 
+			TM.MOD_USER_ID, TM.MOD_DT, TM.REG_USER_ID, TM.REG_DT, #{ICON_ADDRESS} AS ICON_ADDRESS
+		FROM THEME_MSTR TM 
+			LEFT JOIN WALLPAPER_MSTR WM ON TM.WALLPAPER=WM.WALLPAPER_ID
+    		LEFT JOIN FILE_MSTR FM ON WM.FILE_NO=FM.FILE_NO
+    	WHERE TM.THEME_ID=#{themeId};	
+	</select>
+
+	<select id="selectThemeList" parameterType="hashmap" resultMap="themeInfo">
+		SELECT 
+			TM.THEME_ID, TM.THEME_NM, TM.THEME_CMT, TM.WALLPAPER, WM.WALLPAPER_NM, FM.FILE_NM AS WALLPAPERFILENAME, 
+			TM.MOD_USER_ID, TM.MOD_DT, TM.REG_USER_ID, TM.REG_DT, #{ICON_ADDRESS} AS ICON_ADDRESS
+		FROM THEME_MSTR TM 
+			LEFT JOIN WALLPAPER_MSTR WM ON TM.WALLPAPER=WM.WALLPAPER_ID
+    		LEFT JOIN FILE_MSTR FM ON WM.FILE_NO=FM.FILE_NO	
+	</select>
+
+	<select id="selectThemeListPaged" parameterType="hashmap" resultMap="themeInfo">
+		SELECT 
+			TM.THEME_ID, TM.THEME_NM, TM.THEME_CMT, TM.WALLPAPER, WM.WALLPAPER_NM, FM.FILE_NM AS WALLPAPERFILENAME, 
+			TM.MOD_USER_ID, TM.MOD_DT, TM.REG_USER_ID, TM.REG_DT, #{ICON_ADDRESS} AS ICON_ADDRESS 
+		FROM THEME_MSTR TM 
+			LEFT JOIN WALLPAPER_MSTR WM ON TM.WALLPAPER=WM.WALLPAPER_ID
+    		LEFT JOIN FILE_MSTR FM ON WM.FILE_NO=FM.FILE_NO
+    	<where>
+			<if test="searchKey != null and searchKey != ''">
+				(TM.THEME_NM LIKE CONCAT('%', #{searchKey}, '%') OR TM.THEME_CMT LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectThemeListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(TM.THEME_ID) AS CNT 
+		FROM THEME_MSTR TM
+	</select>
+
+	<select id="selectThemeListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(TM.THEME_ID) AS CNT 
+		FROM THEME_MSTR TM
+    	<where>
+			<if test="searchKey != null and searchKey != ''">
+				(TM.THEME_NM LIKE CONCAT('%', #{searchKey}, '%') OR TM.THEME_CMT LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+		</where>
+	</select>
+	
+
+	<select id="selectIconFileListById" resultMap="fileInfo">
+		SELECT FM.FILE_NO, FM.FILE_NM, TI.APP_NM AS ETC_INFO, FM.FILE_TP, FM.FILE_PATH, FM.FILE_SIZE, 
+			FM.FILE_ORG_NM, FM.DELETE_YN, FM.REG_DT, FM.REG_USER_ID, #{iconAddress} AS IMG_URL
+		FROM THEME_ICON TI JOIN FILE_MSTR FM
+		ON TI.FILE_NO = FM.FILE_NO
+		WHERE TI.THEME_ID=#{themeId} AND FM.DELETE_YN='N';
+	</select>
+
+	<insert id="insertThemeData" parameterType="themeVO">
+		<selectKey keyProperty="themeId" resultType="string" order="BEFORE">
+			SELECT GRNEXTVAL('THEMEID_SEQ')
+		</selectKey>
+		INSERT INTO THEME_MSTR
+			(THEME_ID, THEME_NM, THEME_CMT, WALLPAPER, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT) 
+		VALUES (#{themeId}, #{themeNm}, #{themeCmt}, #{wallpaper}, #{modUserId}, now(), #{regUserId}, now())
+	</insert>
+
+	<insert id="insertThemeIconData" parameterType="hashmap">
+	
+		INSERT INTO THEME_ICON
+			(THEME_ID, APP_NM, FILE_NO, REG_USER_ID, REG_DT) 
+		VALUES (#{themeId}, #{appNm}, #{fileNo}, #{regUserId}, now())
+		ON DUPLICATE KEY UPDATE FILE_NO=#{fileNo}, REG_USER_ID=#{regUserId}, REG_DT=now()
+	</insert>
+
+	<update id="updateThemeData" parameterType="themeVO">
+		UPDATE THEME_MSTR SET
+			THEME_NM = #{themeNm}, 
+			THEME_CMT = #{themeCmt},
+			WALLPAPER = #{wallpaper},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now()
+		WHERE
+			THEME_ID = #{themeId}
+	</update>
+
+	<update id="deleteThemeData" parameterType="string">
+		DELETE FROM THEME_MSTR 
+		WHERE THEME_ID = #{themeId}
+	</update>
+
+	<update id="deleteThemeIconData" parameterType="string">
+		DELETE FROM THEME_ICON 
+		WHERE THEME_ID = #{themeId}
+	</update>
+	
+	
+</mapper>
+
+
+

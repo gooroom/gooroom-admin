@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="DeptDAO">
+
+	<resultMap type="deptVO" id="deptInfo">
+		<result property="deptNm" column="DEPT_NM" />
+		<result property="deptCd" column="DEPT_CD"/>
+		
+		<result property="uprDeptCd" column="UPR_DEPT_CD"/>
+		
+		<result property="whleDeptCd" column="WHLE_DEPT_CD"/>
+		<result property="deptLevel" column="DEPT_LEVEL"/>
+		
+		<result property="hasChildren" column="HASCHILDREN"/>
+
+		<result property="optYn" column="OPT_YN"/>
+		<result property="sortOrder" column="SORT_SORD"/>
+		
+		<result property="desktopConfId" column="DESKTOP_CONFID"/>
+		<result property="desktopConfNm" column="DESKTOP_CONFNM"/>
+		
+		<result property="itemCount" column="USER_CNT"/>
+		<result property="itemTotalCount" column="USER_TOTALCNT"/>
+		
+		<result property="browserRuleId" column="BROWSER_RULE_ID"/>
+		<result property="securityRuleId" column="SECURITY_RULE_ID"/>
+		<result property="mediaRuleId" column="MEDIA_RULE_ID"/>
+		<result property="filteredSoftwareRuleId" column="FILTEREDSOFTWARE_RULE_ID"/>
+		<result property="ctrlCenterItemRuleId" column="CTRLCENTERITEM_RULE_ID"/>
+		<result property="policyKitRuleId" column="POLICYKIT_RULE_ID"/>
+		
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+
+		<result property="isUseExpire" column="IS_USEEXPIRE"/>
+
+		<result property="expireDate" column="EXPIRE_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="isExpired" column="IS_EXPIRED"/>
+		<result property="uprExpireDate" column="PARENT_EXPIRE_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+	</resultMap>
+
+	<!-- 루트 조직 정보 -->
+	<select id="selectRootChildrenDeptInfo" parameterType="String" resultMap="deptInfo">
+		SELECT DM.DEPT_NM, 
+	       DM.DEPT_CD, DM.OPT_YN, DM.SORT_SORD, DM.WHLE_DEPT_CD, DM.DEPT_LEVEL, 
+	       DM.MOD_DT, DM.REG_DT, 
+	       (SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD) USER_TOTALCNT,
+	       (SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD AND UM.STATUS='STAT010') USER_CNT,
+	       CASE (SELECT COUNT(*) FROM DEPT_MSTR SDM WHERE SDM.UPR_DEPT_CD = DM.DEPT_CD)
+	          WHEN 0 THEN 'false'
+	          ELSE 'true'
+	       END AS HASCHILDREN,
+	       DM.EXPIRE_DT
+		FROM DEPT_MSTR DM 
+		WHERE DM.UPR_DEPT_CD = '0'
+	</select>
+
+	<!-- 하위 조직 리스트 (one depth) -->
+	<select id="selectChildrenDeptList" parameterType="String" resultMap="deptInfo">
+		SELECT DM.DEPT_NM, 
+	       DM.DEPT_CD, DM.OPT_YN, DM.SORT_SORD, DM.WHLE_DEPT_CD, DM.DEPT_LEVEL, 
+	       DM.MOD_DT, DM.REG_DT,
+		   IF(ISNULL(DM.EXPIRE_DT), "0", "1") AS IS_USEEXPIRE,
+	       (SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD) USER_TOTALCNT,
+	       (SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD AND UM.STATUS='STAT010') USER_CNT,
+	       CASE (SELECT COUNT(*) FROM DEPT_MSTR SDM WHERE SDM.UPR_DEPT_CD = DM.DEPT_CD)
+	          WHEN 0 THEN 'false'
+	          ELSE 'true'
+	       END AS HASCHILDREN,
+	       DM.EXPIRE_DT, IF(ISNULL(DM.EXPIRE_DT), "0", "1") AS IS_USEEXPIRE
+		FROM DEPT_MSTR DM
+		WHERE DM.UPR_DEPT_CD = #{deptCd}
+		ORDER BY DM.SORT_SORD
+	</select>
+
+	<!-- 하위 조직 리스트 by admin (one depth) -->
+	<select id="selectChildrenDeptListByAdmin" parameterType="hashmap" resultMap="deptInfo">
+		SELECT DM.DEPT_NM, DM.UPR_DEPT_CD, DM.DEPT_LEVEL, 
+	       DM.DEPT_CD, DM.WHLE_DEPT_CD, DM.OPT_YN, DM.SORT_SORD,  
+	       DM.MOD_DT, DM.REG_DT, 
+	       (SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD) USER_TOTALCNT,
+	       (SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD AND UM.STATUS='STAT010') USER_CNT,
+	       CASE (SELECT COUNT(*) FROM DEPT_MSTR SDM WHERE SDM.UPR_DEPT_CD = DM.DEPT_CD)
+	          WHEN 0 THEN 'false'
+	          ELSE 'true'
+	       END AS HASCHILDREN,
+	       DM.EXPIRE_DT,
+		   IF(ISNULL(DM.EXPIRE_DT), "0", "1") AS IS_USEEXPIRE,
+	       IF(DM.EXPIRE_DT &lt; CURDATE(), '1', '0') AS IS_EXPIRED,
+           (SELECT EXPIRE_DT FROM DEPT_MSTR WHERE DEPT_CD = #{deptCd}) AS PARENT_EXPIRE_DT
+		FROM DEPT_MSTR DM 
+    	<if test="adminId != null">
+			JOIN ADMIN_DEPT AD ON DM.DEPT_CD = AD.DEPT_CD AND AD.ADMIN_ID = #{adminId}
+		</if>
+		WHERE DM.UPR_DEPT_CD = #{deptCd}
+		ORDER BY DM.SORT_SORD
+	</select>
+
+	<!-- 하위 조직 리스트 (all depth) -->
+	<select id="selectAllChildrenDeptList" parameterType="String" resultMap="deptInfo">
+		SELECT DEPT_CD, DEPT_NM, UPR_DEPT_CD, WHLE_DEPT_CD, DEPT_LEVEL, OPT_YN,
+			SORT_SORD, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT, EXPIRE_DT,
+			IF(ISNULL(EXPIRE_DT), "0", "1") AS IS_USEEXPIRE
+		FROM DEPT_MSTR
+		WHERE WHLE_DEPT_CD LIKE
+         CONCAT((SELECT W.WHLE_DEPT_CD
+                 FROM DEPT_MSTR W
+                 WHERE W.DEPT_CD = #{deptCd}),
+                '%')
+	</select>
+	
+	<!-- 여러 조직의 하위 조직 리스트 (all depth) -->
+	<select id="selectAllChildrenDeptListByParents" parameterType="hashmap" resultMap="deptInfo">
+		SELECT DM.DEPT_CD, DM.DEPT_NM, DM.UPR_DEPT_CD, DM.WHLE_DEPT_CD, DM.DEPT_LEVEL, DM.OPT_YN, 
+				DM.SORT_SORD, DM.MOD_USER_ID, DM.MOD_DT, DM.REG_USER_ID, DM.REG_DT, DM.EXPIRE_DT,
+				IF(ISNULL(DM.EXPIRE_DT), "0", "1") AS IS_USEEXPIRE
+		FROM DEPT_MSTR DM
+		WHERE DM.WHLE_DEPT_CD REGEXP
+		         (SELECT REPLACE(GROUP_CONCAT(DPATH), ',', '|') AS DPATH
+		          FROM (SELECT CONCAT('^', W.WHLE_DEPT_CD) DPATH
+		                FROM DEPT_MSTR W
+		                WHERE W.DEPT_CD IN 
+		<foreach item="item" index="index" collection="deptCds" open="(" separator="," close=")">
+        	#{item}
+    	</foreach>
+				) DP)	
+	</select>
+	
+	<!-- 조직 정보 수정 -->
+	<update id="updateDeptData" parameterType="deptVO">
+		UPDATE DEPT_MSTR SET
+			DEPT_NM = #{deptNm},
+			OPT_YN = #{optYn},
+			SORT_SORD = #{sortOrder},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now(),
+			EXPIRE_DT = #{expireDate}
+		WHERE
+			DEPT_CD = #{deptCd}
+	</update>
+
+	<!-- 하위 조직 만료일 수정 -->
+	<update id="updateChildrenDeptExpireData" parameterType="deptVO">
+		UPDATE DEPT_MSTR SET
+			EXPIRE_DT = #{expireDate}
+		WHERE DEPT_CD IN (
+			SELECT * FROM (
+			SELECT DM.DEPT_CD
+			FROM DEPT_MSTR DM
+			WHERE     DM.WHLE_DEPT_CD LIKE
+			             (SELECT CONCAT(WHLE_DEPT_CD, '%')
+			              FROM DEPT_MSTR
+			              WHERE DEPT_CD = #{deptCd})
+			      AND DM.DEPT_CD != #{deptCd}
+			      AND DM.EXPIRE_DT > #{expireDate}		
+		) SUBDATA )
+	</update>
+
+	<!-- 조직 아이디 중복 확인 -->
+	<select id="isExistDeptCd" parameterType="String" resultType="boolean">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END ISEXIST FROM DEPT_MSTR WHERE DEPT_CD = #{deptCd}
+	</select>
+	
+	<!-- 조직 이름 중복 확인 (같은 조직 하위중) -->
+	<select id="isExistDeptNameByParentCd" parameterType="hashmap" resultType="boolean">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END ISEXIST
+		FROM DEPT_MSTR 
+		WHERE 
+			DEPT_NM = #{deptName}
+			AND UPR_DEPT_CD = #{parentDeptCd}; 
+	</select>	
+
+	<!-- 조직 이름 중복 확인 (같은 조직 하위중, 수정시) -->
+	<select id="isExistDeptNameByDeptCd" parameterType="hashmap" resultType="boolean">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END ISEXIST
+		FROM DEPT_MSTR 
+		WHERE 
+			DEPT_NM = #{deptName}
+			AND UPR_DEPT_CD = (SELECT UPR_DEPT_CD FROM DEPT_MSTR WHERE DEPT_CD=#{deptCd})
+			AND DEPT_CD != #{deptCd}; 
+	</select>
+
+	<!-- 조직정보 신규 생성 -->
+	<insert id="insertDeptRawData" parameterType="deptVO">
+		INSERT INTO DEPT_MSTR (
+			DEPT_CD, DEPT_NM, UPR_DEPT_CD, WHLE_DEPT_CD, DEPT_LEVEL,
+			OPT_YN, SORT_SORD,
+			MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT, EXPIRE_DT)
+		VALUES (
+			#{deptCd}, #{deptNm}, #{uprDeptCd}, #{whleDeptCd}, #{deptLevel}, 
+			#{optYn}, #{sortOrder}, 
+	        #{regUserId}, now(), #{regUserId}, now(), #{expireDate})
+	</insert>
+	
+	<!-- 조직정보 신규 생성 -->
+	<insert id="insertDeptMaster" parameterType="deptVO">
+		INSERT INTO DEPT_MSTR(DEPT_CD, DEPT_NM, UPR_DEPT_CD,
+						WHLE_DEPT_CD, 
+						DEPT_LEVEL,
+						OPT_YN, SORT_SORD,
+						MOD_USER_ID, MOD_DT,
+						REG_USER_ID, REG_DT,
+						EXPIRE_DT)
+		VALUES(#{deptCd}, #{deptNm}, #{uprDeptCd},
+				concat((SELECT W.WHLE_DEPT_CD FROM DEPT_MSTR W WHERE W.DEPT_CD=#{uprDeptCd}), #{deptCd}, ';'),
+				(SELECT (M.DEPT_LEVEL+1) NEXT_LEVEL FROM DEPT_MSTR M WHERE M.DEPT_CD=#{uprDeptCd}),
+				#{optYn}, #{sortOrder},
+				#{modUserId}, now(),
+				#{regUserId}, now(), #{expireDate})
+	</insert>
+	
+	<!-- 하위 포함하여 조직을 미허용으로 수정 -->
+	<update id="updateDeptUnusedWithChildren" parameterType="deptVO">
+		UPDATE DEPT_MSTR
+			SET OPT_YN = 'N'
+		WHERE WHLE_DEPT_CD LIKE (
+		CONCAT((SELECT * FROM (SELECT W.WHLE_DEPT_CD FROM DEPT_MSTR W WHERE W.DEPT_CD = #{deptCd}) A), '%'))
+	</update>
+
+	<!-- 조직 정보 삭제 -->
+	<delete id="deleteDeptWithChildren" parameterType="deptVO">
+		DELETE FROM DEPT_MSTR WHERE WHLE_DEPT_CD LIKE (
+		CONCAT((SELECT * FROM (SELECT W.WHLE_DEPT_CD FROM DEPT_MSTR W WHERE W.DEPT_CD = #{deptCd}) A), '%'))
+	</delete>
+
+	<!-- 조직 정보 전체 삭제 -->
+	<delete id="deleteDeptALL">
+		DELETE FROM DEPT_MSTR
+	</delete>
+	<!-- 조직 정보 테이블 전체 로우 수 -->
+	<select id="selectDeptALLCount" resultType="long">
+		SELECT COUNT(DEPT_CD) FROM DEPT_MSTR
+	</select>
+	
+	<insert id="insertOrUpdateConfigWithDept" parameterType="hashmap">
+		INSERT INTO GR_DEPT_RULE_CONF
+			(DEPT_CD, CONF_ID, CONF_TP, REG_DT, REG_USER_ID) 
+		VALUES (#{deptCd}, #{configId}, #{configTp}, now(), #{regUserId})
+		ON DUPLICATE KEY UPDATE CONF_ID=#{configId}
+	</insert>
+	
+	<delete id="deleteConfigWithDept" parameterType="String">
+		DELETE FROM GR_DEPT_RULE_CONF WHERE DEPT_CD=#{deptCd} AND CONF_TP=#{configTp};
+	</delete>
+	
+	<insert id="insertDeptInAdminRelation" parameterType="hashmap">
+		INSERT INTO ADMIN_DEPT
+			(ADMIN_ID, REG_USER_ID, REG_DT, DEPT_CD) 
+		VALUES (#{regUserId}, #{regUserId}, NOW(), #{deptCd})
+	</insert>
+	
+	<select id="selectDeptData" parameterType="hashMap" resultMap="deptInfo">
+		SELECT
+			DM.DEPT_NM, DM.DEPT_CD,
+			DM.UPR_DEPT_CD, DM.WHLE_DEPT_CD, DM.DEPT_LEVEL,
+			DM.OPT_YN, DM.SORT_SORD,
+			DM.REG_DT, DM.MOD_DT, DM.REG_USER_ID, DM.MOD_USER_ID, DM.EXPIRE_DT,
+			IF(ISNULL(DM.EXPIRE_DT), "0", "1") AS IS_USEEXPIRE,
+  			(SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD) USER_TOTALCNT,
+	       	(SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD AND UM.STATUS='STAT010') USER_CNT,
+			DESC_CONF.CONF_ID DESKTOP_CONFID,
+			RULE_BROWSERRULE.CONF_ID BROWSER_RULE_ID,
+			RULE_MEDIARULE.CONF_ID MEDIA_RULE_ID,
+			RULE_SECURITYRULE.CONF_ID SECURITY_RULE_ID,
+			RULE_FILTEREDSWRULE.CONF_ID FILTEREDSOFTWARE_RULE_ID,
+			RULE_CTRLCENTERITEM.CONF_ID CTRLCENTERITEM_RULE_ID,
+			RULE_POLICYKIT.CONF_ID POLICYKIT_RULE_ID
+		FROM DEPT_MSTR DM 
+			LEFT JOIN GR_DEPT_RULE_CONF DESC_CONF ON DM.DEPT_CD = DESC_CONF.DEPT_CD AND DESC_CONF.CONF_TP='DESKTOPCONF'
+			LEFT JOIN GR_DEPT_RULE_CONF RULE_BROWSERRULE ON DM.DEPT_CD = RULE_BROWSERRULE.DEPT_CD AND RULE_BROWSERRULE.CONF_TP='BROWSERRULE'
+			LEFT JOIN GR_DEPT_RULE_CONF RULE_MEDIARULE ON DM.DEPT_CD = RULE_MEDIARULE.DEPT_CD AND RULE_MEDIARULE.CONF_TP='MEDIARULE'
+			LEFT JOIN GR_DEPT_RULE_CONF RULE_SECURITYRULE ON DM.DEPT_CD = RULE_SECURITYRULE.DEPT_CD AND RULE_SECURITYRULE.CONF_TP='SECURITYRULE'
+			LEFT JOIN GR_DEPT_RULE_CONF RULE_FILTEREDSWRULE ON DM.DEPT_CD = RULE_FILTEREDSWRULE.DEPT_CD AND RULE_FILTEREDSWRULE.CONF_TP='FILTEREDSWRULE'
+			LEFT JOIN GR_DEPT_RULE_CONF RULE_CTRLCENTERITEM ON DM.DEPT_CD = RULE_CTRLCENTERITEM.DEPT_CD AND RULE_CTRLCENTERITEM.CONF_TP='CTRLCENTERITEMRULE'
+			LEFT JOIN GR_DEPT_RULE_CONF RULE_POLICYKIT ON DM.DEPT_CD = RULE_POLICYKIT.DEPT_CD AND RULE_POLICYKIT.CONF_TP='POLICYKITRULE'
+		WHERE
+		<if test="deptCd != null">
+    		DM.DEPT_CD=#{deptCd}
+  		</if>
+  		<if test="adminId != null and adminId != ''">
+    		DM.DEPT_CD IN (SELECT DEPT_CD FROM ADMIN_DEPT WHERE ADMIN_ID=#{adminId})
+  		</if> 
+	</select>
+
+	<select id="selectDeptNodeList" parameterType="hashmap" resultMap="deptInfo">
+		SELECT
+			DM.DEPT_NM, DM.DEPT_CD,
+			DM.UPR_DEPT_CD, DM.WHLE_DEPT_CD, DM.DEPT_LEVEL,
+			DM.OPT_YN, DM.SORT_SORD,
+			DM.REG_DT, DM.MOD_DT, DM.REG_USER_ID, DM.MOD_USER_ID, DM.EXPIRE_DT,
+  			(SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD) USER_TOTALCNT,
+	       	(SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD AND UM.STATUS='STAT010') USER_CNT
+		FROM DEPT_MSTR DM 
+		WHERE DM.DEPT_CD IN
+		<foreach item="item" index="index" collection="deptCds" open="(" separator="," close=")">
+        	#{item}
+    	</foreach>		
+  		<if test="adminId != null and adminId != ''">
+    		DM.DEPT_CD IN (SELECT DEPT_CD FROM ADMIN_DEPT WHERE ADMIN_ID=#{adminId})
+  		</if> 
+	</select>
+
+	<select id="selectDeptSimpleData" parameterType="hashMap" resultMap="GpmsCommonDAO.simpleDataInfo">
+		SELECT DM.DEPT_NM AS NAME, DM.DEPT_CD AS VALUE
+		FROM DEPT_MSTR DM 
+		WHERE
+		<if test="deptCd != null">
+    		DM.DEPT_CD=#{deptCd}
+  		</if>
+  		<if test="adminId != null and adminId != ''">
+    		DM.DEPT_CD IN (SELECT DEPT_CD FROM ADMIN_DEPT WHERE ADMIN_ID=#{adminId})
+  		</if> 
+	</select>
+	
+	<select id="selectDeptListPaged" parameterType="hashMap" resultMap="deptInfo">
+		SELECT 
+			DM.DEPT_NM, DM.DEPT_CD, DM.OPT_YN, DM.MOD_DT, DM.REG_DT, 
+  			(SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD) USER_TOTALCNT,
+	       	(SELECT COUNT(UM.USER_ID) FROM USER_MSTR UM WHERE UM.DEPT_CD = DM.DEPT_CD AND UM.STATUS='STAT010') USER_CNT,
+			IF(ISNULL(DM.EXPIRE_DT), "0", "1") AS IS_USEEXPIRE,
+		CASE (SELECT COUNT(*)
+	             FROM DEPT_MSTR SDM
+	             WHERE SDM.UPR_DEPT_CD = DM.DEPT_CD)
+	          WHEN 0 THEN 'FALSE'
+	          ELSE 'TRUE'
+	       END HASCHILDREN
+           PDM.EXPIRE_DT AS PARENT_EXPIRE_DT
+		FROM DEPT_MSTR DM LEFT JOIN DEPT_MSTR PDM ON DM.UPR_DEPT_CD = PDM.DEPT_CD
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				DM.DEPT_NM LIKE CONCAT('%', #{searchKey}, '%') 
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectDeptListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(DM.DEPT_CD) AS CNT 
+		FROM DEPT_MSTR DM
+	</select>
+	
+	<select id="selectDeptListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(DM.DEPT_CD) AS CNT 
+		FROM DEPT_MSTR DM 
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				DM.DEPT_NM LIKE CONCAT('%', #{searchKey}, '%') 
+			</if>
+		</where>
+	</select>
+
+	<!-- HISTORY  -->
+	<insert id="insertDeptHist" parameterType="hashmap">
+		INSERT INTO DEPT_MSTR_HIST
+			(HIST_SEQ, CHG_TP, DEPT_CD, DEPT_NM, UPR_DEPT_CD, WHLE_DEPT_CD, DEPT_LEVEL, OPT_YN, SORT_SORD, MOD_USER_ID, MOD_DT, 
+			REG_USER_ID, REG_DT, HIST_REG_DT, HIST_USER_ID)
+		SELECT (SELECT GRNEXTVAL('DEPTMSTRHIST_SEQ')), #{chgTp} AS 'CHG_TP', DEPT_CD, DEPT_NM, UPR_DEPT_CD, WHLE_DEPT_CD, DEPT_LEVEL, OPT_YN, SORT_SORD, MOD_USER_ID, MOD_DT,
+			REG_USER_ID, REG_DT, now(), #{regUserId} AS HIST_USER_ID 
+		FROM DEPT_MSTR WHERE DEPT_CD=#{deptCd};
+	</insert>
+	
+	<delete id="deleteDeptData" parameterType="String">
+		DELETE FROM DEPT_MSTR WHERE DEPT_CD = #{deptCd};
+	</delete>
+	
+	<delete id="deleteDeptFromRule" parameterType="String">
+		DELETE FROM GR_DEPT_RULE_CONF WHERE DEPT_CD = #{deptCd};
+	</delete>
+
+	<delete id="deleteDeptForAdmin" parameterType="String">
+		DELETE FROM ADMIN_DEPT WHERE DEPT_CD = #{deptCd};
+	</delete>
+
+	<delete id="deleteDeptForNoti" parameterType="String">
+		DELETE FROM NOTICE_PUBLISH_TARGET WHERE TARGET_TYPE = '1' AND TARGET_ID = #{deptCd};
+	</delete>
+	
+	<update id="updateDeptToUser" parameterType="hashmap">
+		UPDATE USER_MSTR SET DEPT_CD = #{deptCd}, MOD_USER_ID = #{modUserId}, MOD_DT = now()  
+		WHERE USER_ID IN 		
+		<foreach item="item" index="index" collection="userIds" open="(" separator="," close=")">
+        	#{item}
+    	</foreach>
+	</update>
+	
+</mapper>
+
+
+
+

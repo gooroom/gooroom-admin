@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="WallpaperMngDAO">
+
+	<resultMap type="wallpaperVO" id="wallpaperInfo">
+		<result property="wallpaperId" column="WALLPAPER_ID" />
+		<result property="wallpaperNm" column="WALLPAPER_NM"/>
+		
+		<result property="fileNo" column="FILE_NO"/>
+		<result property="fileNm" column="FILE_NM"/>
+		<result property="filePath" column="FILE_PATH"/>
+
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+	</resultMap>
+	
+	<select id="selectWallpaperList" parameterType="hashmap" resultMap="wallpaperInfo">
+		SELECT WM.WALLPAPER_ID, WM.WALLPAPER_NM,  
+      		WM.FILE_NO, FM.FILE_NM, FM.FILE_PATH, 
+			WM.MOD_USER_ID, WM.MOD_DT
+		FROM WALLPAPER_MSTR WM 
+			LEFT JOIN FILE_MSTR FM ON WM.FILE_NO=FM.FILE_NO
+	</select>
+
+	<select id="selectWallpaperData" parameterType="string" resultMap="wallpaperInfo">
+		SELECT WM.WALLPAPER_ID, WM.WALLPAPER_NM, WM.FILE_NO, FM.FILE_NM, WM.MOD_USER_ID, WM.MOD_DT
+		FROM WALLPAPER_MSTR WM 
+			LEFT JOIN FILE_MSTR FM ON IM.FILE_NO=FM.FILE_NO
+		WHERE WM.WALLPAPER_ID=#{wallpaperId}
+	</select>
+
+	<insert id="insertWallpaperData" parameterType="wallpaperVO">
+		<selectKey keyProperty="wallpaperId" resultType="string" order="BEFORE">
+			SELECT GRNEXTVAL('WALLPAPERID_SEQ')
+		</selectKey>
+		INSERT INTO WALLPAPER_MSTR
+			(WALLPAPER_ID, WALLPAPER_NM, FILE_NO, MOD_USER_ID, MOD_DT) 
+		VALUES (#{wallpaperId}, #{wallpaperNm}, #{fileNo}, #{modUserId}, now())
+	</insert>
+
+	<update id="updateWallpaperData" parameterType="wallpaperVO">
+		UPDATE WALLPAPER_MSTR SET
+			WALLPAPER_NM = #{wallpaperNm},
+			<if test="fileNo != null">FILE_NO=#{fileNo},</if>
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now()
+		WHERE
+			WALLPAPER_ID = #{wallpaperId}
+	</update>
+
+	<update id="deleteWallpaperData" parameterType="string">
+		DELETE FROM WALLPAPER_MSTR 
+		WHERE WALLPAPER_ID = #{wallpaperId}
+	</update>
+
+</mapper>
+
+
+

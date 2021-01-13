@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AdminUserDAO">
+
+	<resultMap type="adminUserVO" id="adminUserInfo">
+	
+		<result property="adminId" column="ADMIN_ID" />
+		<result property="adminNm" column="ADMIN_NM"/>
+		
+		<result property="adminPw" column="ADMIN_PW"/>
+		<result property="adminTp" column="ADMIN_TP"/>
+		
+		<result property="status" column="STATUS_CD"/>
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		<result property="pollingCycle" column="POLLING_CYCLE"/>
+		
+		<result property="connectIp" column="CONNECT_IP"/>
+		<result property="sessionId" column="SESSION_ID"/>
+	
+		<result property="isClientAdmin" column="ISCLIENTADMIN"/>
+		<result property="isUserAdmin" column="ISUSERADMIN"/>
+		<result property="isDesktopAdmin" column="ISDESKTOPADMIN"/>
+		<result property="isNoticeAdmin" column="ISNOTICEADMIN"/>
+		
+		<collection property="connIps" column="ADMIN_ID" javaType="java.util.ArrayList" ofType="String" select="selectConnIps" />
+		<collection property="grpInfoList" column="{adminId=admin_id}" javaType="java.util.ArrayList" ofType="GpmsCommonDAO.simpleDataInfo" select="ClientGroupDAO.selectClientGroupSimpleData" />
+		<collection property="deptInfoList" column="{adminId=admin_id}" javaType="java.util.ArrayList" ofType="GpmsCommonDAO.simpleDataInfo" select="DeptDAO.selectDeptSimpleData" />
+		
+	</resultMap>
+
+	<resultMap type="adminUserVO" id="adminUserDupInfo">
+	
+		<result property="adminId" column="ADMIN_ID" />
+		<result property="dupLoginTryIp" column="DUPLOGIN_TRY_IP"/>
+		<result property="dupLoginTryDate" column="DUPLOGIN_TRY_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		
+	</resultMap>
+
+	<!-- 관리자 연결 가능 IP 조회 -->
+	<select id="selectConnIps" resultType="String">
+		SELECT CONN_IP FROM ADMIN_CONNIP WHERE ADMIN_ID=#{adminId}
+    </select>
+
+	<!-- 관리자 단말그룹 정보 조회 -->
+	<select id="selectGrpIds" resultType="String">
+		SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID=#{adminId}
+    </select>
+
+	<!-- 관리자 조직 정보 조회 -->
+	<select id="selectDeptCds" resultType="String">
+		SELECT DEPT_CD FROM ADMIN_DEPT WHERE ADMIN_ID=#{adminId}
+    </select>
+
+	<!-- 관리자 리스트 조회 -->
+	<select id="selectAdminUserList" parameterType="String" resultMap="adminUserInfo">
+		SELECT ADMIN_ID, ADMIN_NM, ADMIN_PW, STATUS_CD, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT FROM ADMIN_MSTR
+	</select>
+
+	<!-- 관리자 리스트 조회 (Paged) -->
+	<select id="selectAdminUserListPaged" parameterType="String" resultMap="adminUserInfo">
+		SELECT AM.ADMIN_ID,
+		       AM.ADMIN_NM,
+		       '' AS ADMIN_PW,
+		       AM.ADMIN_TP,
+		       AM.STATUS_CD,
+		       AM.MOD_USER_ID,
+		       AM.MOD_DT,
+		       AM.REG_USER_ID,
+		       AM.REG_DT,
+		       
+		       IFNULL(AR.CLIENT_ADMIN, 0) ISCLIENTADMIN,
+		       IFNULL(AR.USER_ADMIN, 0) ISUSERADMIN,
+		       IFNULL(AR.DESKTOP_ADMIN, 0) ISDESKTOPADMIN,
+		       IFNULL(AR.NOTICE_ADMIN, 0) ISNOTICEADMIN
+		       
+		FROM ADMIN_MSTR AM
+		     LEFT JOIN
+		     (SELECT ADMIN_ID,
+		             COALESCE(SUM(CASE WHEN RULE_NAME = "client_admin" THEN HAS_RULE END),0) AS CLIENT_ADMIN,
+		             COALESCE(SUM(CASE WHEN RULE_NAME = "user_admin" THEN HAS_RULE END),0) AS USER_ADMIN,
+		             COALESCE(SUM(CASE WHEN RULE_NAME = "desktop_admin" THEN HAS_RULE END),0) AS DESKTOP_ADMIN,
+		             COALESCE(SUM(CASE WHEN RULE_NAME = "notice_admin" THEN HAS_RULE END),0) AS NOTICE_ADMIN
+		      FROM ADMIN_RULES
+		      GROUP BY ADMIN_ID) AR
+		        ON AM.ADMIN_ID = AR.ADMIN_ID
+		<where>
+			<if test="adminType != null and adminType != '' and adminType != 'ALL'">
+				AM.ADMIN_TP = #{adminType}
+			</if>
+			<if test="searchKey != null and searchKey != ''">
+				AND (AM.ADMIN_NM LIKE CONCAT('%', #{searchKey}, '%') OR AM.ADMIN_ID LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+			<if test="status != null and status != ''">
+				AND AM.STATUS_CD = #{status}
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectAdminUserListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(AM.ADMIN_ID) AS CNT FROM ADMIN_MSTR AM
+		<where>
+		<if test="status != null and status != ''">
+			AM.STATUS_CD = #{status}
+		</if>
+		</where>
+	</select>
+
+	<select id="selectAdminUserListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(AM.ADMIN_ID) AS CNT FROM ADMIN_MSTR AM 
+		<where>
+			<if test="adminType != null and adminType != '' and adminType != 'ALL'">
+				AM.ADMIN_TP = #{adminType}
+			</if>
+			<if test="searchKey != null and searchKey != ''">
+				AND (AM.ADMIN_NM LIKE CONCAT('%', #{searchKey}, '%') OR AM.ADMIN_ID LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+			<if test="status != null and status != ''">
+				AND AM.STATUS_CD = #{status}
+			</if>
+		</where>
+	</select>
+
+	<!-- 관리자 아이디 중복 확인 -->
+	<select id="isExistAdminUserId" parameterType="String" resultType="boolean">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END ISEXIST FROM ADMIN_MSTR WHERE ADMIN_ID = #{adminId}
+
+	</select>
+
+	<!-- 관리자 정보 등록 -->
+	<insert id="insertAdminUser" parameterType="adminUserVO">
+		INSERT INTO ADMIN_MSTR
+			(ADMIN_ID, ADMIN_NM, ADMIN_PW, ADMIN_TP, STATUS_CD, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT) 
+		VALUES 
+			(#{adminId}, 
+			#{adminNm},
+			SHA2(#{adminPw}, 256),
+			#{adminTp}, 
+			#{status},
+			#{modUserId}, now(),
+			#{regUserId}, now())
+	</insert>
+
+	<!-- 관리자 정보 조회 -->
+	<select id="selectAdminUserData" parameterType="String" resultMap="adminUserInfo">
+		SELECT AM.ADMIN_ID, AM.ADMIN_NM, AM.ADMIN_PW, AM.ADMIN_TP, AM.POLLING_CYCLE,
+		    AM.STATUS_CD, AM.MOD_USER_ID, AM.MOD_DT, AM.REG_USER_ID, AM.REG_DT,
+		    AP.CONNECT_IP, AP.SESSION_ID,
+		    
+		    IFNULL(AR.CLIENT_ADMIN, 0) ISCLIENTADMIN,
+		    IFNULL(AR.USER_ADMIN, 0) ISUSERADMIN,
+		    IFNULL(AR.DESKTOP_ADMIN, 0) ISDESKTOPADMIN,
+		    IFNULL(AR.NOTICE_ADMIN, 0) ISNOTICEADMIN
+		    
+		FROM ADMIN_MSTR AM
+		    LEFT JOIN
+		    (SELECT ADMIN_ID,
+		            COALESCE(SUM(CASE WHEN RULE_NAME = "client_admin" THEN HAS_RULE END),0) AS CLIENT_ADMIN,
+		            COALESCE(SUM(CASE WHEN RULE_NAME = "user_admin" THEN HAS_RULE END),0) AS USER_ADMIN,
+		            COALESCE(SUM(CASE WHEN RULE_NAME = "desktop_admin" THEN HAS_RULE END),0) AS DESKTOP_ADMIN,
+		            COALESCE(SUM(CASE WHEN RULE_NAME = "notice_admin" THEN HAS_RULE END),0) AS NOTICE_ADMIN
+		    FROM ADMIN_RULES
+		    GROUP BY ADMIN_ID) AR
+		    ON AM.ADMIN_ID = AR.ADMIN_ID
+		    LEFT JOIN ADMIN_PRESENT AP
+        	ON AM.ADMIN_ID = AP.ADMIN_ID
+		WHERE AM.ADMIN_ID = #{adminId}
+		<if test="isAuth != null and isAuth = 'yes'">
+			AND AM.STATUS_CD = 'STAT010'
+		</if>
+	</select>
+
+	<!-- 관리자 정보 수정 -->
+	<update id="updateAdminUserData" parameterType="adminUserVO">
+		UPDATE ADMIN_MSTR SET
+			ADMIN_NM = #{adminNm},
+			<if test="adminPw != null and adminPw != ''">
+    		ADMIN_PW = SHA2(#{adminPw}, 256),
+  			</if>
+			ADMIN_TP = #{adminTp},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now() 
+		WHERE
+			ADMIN_ID = #{adminId}
+	</update>
+
+	<!-- 관리자 설정 (pollingCycle) 수정 -->
+	<update id="updateCurrentAdminUserData" parameterType="adminUserVO">
+		UPDATE ADMIN_MSTR SET
+			POLLING_CYCLE = #{pollingCycle},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now()
+		WHERE
+			ADMIN_ID = #{adminId}
+	</update>
+	
+	<!-- 관리자 정보 삭제 -->
+	<update id="deleteAdminUserData" parameterType="adminUserVO">
+		UPDATE ADMIN_MSTR SET STATUS_CD = #{status} WHERE ADMIN_ID = #{adminId}
+	</update>
+
+	<!-- 관리자 정보 조회:인증!!!! -->
+	<select id="selectAdminUserAuthAndInfo" parameterType="hashmap" resultMap="adminUserInfo">
+		SELECT ADMIN_ID, ADMIN_NM
+		FROM ADMIN_MSTR
+		WHERE ADMIN_ID = #{adminId} AND ADMIN_PW = SHA2(#{adminPw}, 256)
+
+	</select>
+
+	
+	<!-- 관리자의 권한 등록(수정) -->	
+	<insert id="insertOrUpdateAdminRule" parameterType="hashmap">
+		INSERT INTO ADMIN_RULES
+			(ADMIN_ID, RULE_TYPE, RULE_NAME, HAS_RULE, REG_USER_ID, REG_DT)
+		VALUES (#{adminId}, #{ruleType}, #{ruleName}, #{ruleValue}, #{regUserId}, now())
+		ON DUPLICATE KEY UPDATE HAS_RULE=#{ruleValue}, REG_USER_ID=#{regUserId}, REG_DT=now()
+	</insert>
+	
+	<!-- 관리자 접속 아이피 삭제 -->
+	<delete id="deleteAdminUserConnIps" parameterType="string">
+		DELETE FROM ADMIN_CONNIP WHERE ADMIN_ID = #{adminId}
+	</delete>
+	
+	<!-- 관리자 접속 아이피 등록 -->
+	<insert id="insertAdminUserConnIp" parameterType="hashmap">
+		INSERT INTO ADMIN_CONNIP
+			(ADMIN_ID, REG_USER_ID, REG_DT, CONN_IP) 
+		VALUES (#{adminId}, #{regUserId}, now(), #{connIp})
+	</insert>
+
+	<!-- 관리자 관리대상 그룹 삭제 -->
+	<delete id="deleteAdminUserGrpIds" parameterType="string">
+		DELETE FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId}
+	</delete>
+
+	<!-- 관리자 관리대상 그룹 등록 -->
+	<insert id="insertAdminUserGrpId" parameterType="hashmap">
+		INSERT INTO ADMIN_CLIENTGRP
+			(ADMIN_ID, REG_USER_ID, REG_DT, GRP_ID) 
+		VALUES (#{adminId}, #{regUserId}, now(), #{grpId})
+	</insert>
+
+	<!-- 관리자 관리대상 조직 삭제 -->
+	<delete id="deleteAdminUserDeptCds" parameterType="string">
+		DELETE FROM ADMIN_DEPT WHERE ADMIN_ID = #{adminId}
+	</delete>
+
+	<!-- 관리자 관리대상 조직 등록 -->
+	<insert id="insertAdminUserDeptCd" parameterType="hashmap">
+		INSERT INTO ADMIN_DEPT
+			(ADMIN_ID, REG_USER_ID, REG_DT, DEPT_CD) 
+		VALUES (#{adminId}, #{regUserId}, now(), #{deptCd})
+	</insert>
+	
+	<!-- 관리자의 권한 등록(수정) -->	
+	<insert id="insertAdminUserPresentData" parameterType="hashmap">
+		INSERT INTO ADMIN_PRESENT
+			(ADMIN_ID, REG_DT, CONNECT_IP, SESSION_ID) 
+		VALUES (#{adminId}, now(), #{connectIp}, #{sessionId})
+		ON DUPLICATE KEY UPDATE ADMIN_ID=#{adminId}, CONNECT_IP=#{connectIp}, SESSION_ID=#{sessionId}, REG_DT=now()
+	</insert>
+
+	<!-- 관리자 관리대상 조직 삭제 -->
+	<delete id="deleteAdminUserPresentData" parameterType="string">
+		DELETE FROM ADMIN_PRESENT WHERE ADMIN_ID = #{adminId}
+	</delete>
+
+	<!-- 관리자 접속 정보에 중복 접속 요청 정보 수정 -->
+	<update id="updateDuplicateReqLoginData" parameterType="hashmap">
+		UPDATE ADMIN_PRESENT 
+			SET DUPLOGIN_TRY_IP = #{connectIp}, DUPLOGIN_TRY_DT = now() 
+		WHERE ADMIN_ID = #{adminId}
+	</update>
+
+	<!-- 관리자 중복 접속 요청 정보 조회 -->
+	<select id="selectDuplicateReqLoginData" parameterType="String" resultMap="adminUserDupInfo">
+		SELECT ADMIN_ID, DUPLOGIN_TRY_IP, DUPLOGIN_TRY_DT
+		FROM ADMIN_PRESENT
+		WHERE ADMIN_ID=#{adminId}
+	</select>
+
+	<!-- 관리자 접속 정보에 중복 접속 요청 정보 삭제 -->
+	<update id="updateLoginTrialData" parameterType="string">
+		UPDATE ADMIN_PRESENT 
+			SET DUPLOGIN_TRY_IP = '', DUPLOGIN_TRY_DT = null 
+		WHERE ADMIN_ID = #{adminId}
+	</update>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

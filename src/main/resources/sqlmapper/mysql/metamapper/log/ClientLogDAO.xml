@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="clientLogDAO">
+
+	<resultMap type="clientLogVO" id="clientLogInfo">
+		<result property="logSeq" column="LOG_SEQ"/>
+		<result property="clientId" column="CLIENT_ID"/>
+		<result property="userId" column="USER_ID"/>
+		<result property="logTp" column="LOG_TP"/>
+		<result property="logItem" column="LOG_ITEM"/>
+		<result property="logValue" column="LOG_VALUE"/>
+		<result property="regDt" column="REG_DT"/>
+	</resultMap>
+	
+	<select id="selectGeneralLogList" parameterType="hashmap" resultMap="clientLogInfo">
+		SELECT LOG_SEQ, CLIENT_ID, 
+			CASE
+    			WHEN SUBSTR(USER_ID, 1, 1) = '+' THEN CONCAT('[LU] ', SUBSTRING(USER_ID, 2))
+    			WHEN SUBSTR(USER_ID, 1, 1) = '-' THEN ''
+    			ELSE USER_ID
+			END USER_ID, 
+			LOG_TP, LOG_ITEM, LOG_VALUE, REG_DT 
+		FROM LOG_GENERAL
+		WHERE REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+		AND LOG_ITEM IN
+			<foreach item="item" index="index" collection="logItems" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		ORDER BY REG_DT ASC
+	</select>
+
+	<select id="selectGeneralLogListPaged" parameterType="hashmap" resultMap="clientLogInfo">
+		SELECT LOG_SEQ, CLIENT_ID, 
+			CASE
+    			WHEN SUBSTR(USER_ID, 1, 1) = '+' THEN CONCAT('[LU] ', SUBSTRING(USER_ID, 2))
+    			WHEN SUBSTR(USER_ID, 1, 1) = '-' THEN ''
+    			ELSE USER_ID
+			END USER_ID, 
+			LOG_TP, LOG_ITEM, LOG_VALUE, REG_DT 
+		FROM LOG_GENERAL
+		WHERE REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+		AND LOG_ITEM IN
+			<foreach item="item" index="index" collection="logItems" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		<if test="searchKey != null and searchKey != ''">
+		AND (CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR LOG_VALUE LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectGeneralLogTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(LG.LOG_SEQ) AS CNT
+		FROM LOG_GENERAL LG 
+		WHERE LG.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+	</select>
+
+	<select id="selectGeneralLogFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(LG.LOG_SEQ) AS CNT
+		FROM LOG_GENERAL LG 
+		WHERE LG.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+		AND LG.LOG_ITEM IN
+			<foreach item="item" index="index" collection="logItems" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		<if test="searchKey != null and searchKey != ''">
+		AND (LG.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR LG.USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR LG.LOG_VALUE LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+	</select>
+		
+	<select id="selectSecurityLogListPaged" parameterType="hashmap" resultMap="clientLogInfo">
+		SELECT LOG_SEQ, CLIENT_ID, 
+			CASE
+    			WHEN SUBSTR(USER_ID, 1, 1) = '+' THEN CONCAT('[LU] ', SUBSTRING(USER_ID, 2))
+    			WHEN SUBSTR(USER_ID, 1, 1) = '-' THEN ''
+    			ELSE USER_ID
+			END USER_ID, 
+			LOG_TP, LOG_ITEM, LOG_VALUE, REG_DT 
+		FROM LOG_SECURITY 
+		WHERE REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+			AND LOG_ITEM IN
+			<foreach item="item" index="index" collection="logItems" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		<if test="searchKey != null and searchKey != ''">
+			AND (CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR LOG_VALUE LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		<if test="adminId != null">
+			AND (CLIENT_ID IN (
+				SELECT CLIENT_ID FROM CLIENT_MSTR 
+				WHERE GRP_ID IN (
+				SELECT 'CGRPDEFAULT' 
+					UNION
+					SELECT GRP_ID FROM CLIENT_GRP_MSTR GM 
+					WHERE GM.WHLE_GRP_ID REGEXP
+						(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+			          		FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+			                		FROM CLIENT_GRP_MSTR W
+			                		WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+								 ) TT1
+						)
+				)			
+			))
+		</if>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectSecurityLogTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(LS.LOG_SEQ) AS CNT
+		FROM LOG_SECURITY LS 
+		WHERE LS.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+		<if test="adminId != null">
+			AND (LS.CLIENT_ID IN (
+				SELECT CLIENT_ID FROM CLIENT_MSTR 
+				WHERE GRP_ID IN (
+				SELECT 'CGRPDEFAULT' 
+					UNION
+					SELECT GRP_ID FROM CLIENT_GRP_MSTR GM 
+					WHERE GM.WHLE_GRP_ID REGEXP
+						(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+			          		FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+			                		FROM CLIENT_GRP_MSTR W
+			                		WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+								 ) TT1
+						)
+				)			
+			))
+		</if>
+		
+	</select>
+
+	<select id="selectSecurityLogFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(LS.LOG_SEQ) AS CNT
+		FROM LOG_SECURITY LS 
+		WHERE LS.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+		AND LS.LOG_ITEM IN
+			<foreach item="item" index="index" collection="logItems" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		<if test="searchKey != null and searchKey != ''">
+		AND (LS.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR LS.USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR LS.LOG_VALUE LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		<if test="adminId != null">
+			AND (LS.CLIENT_ID IN (
+				SELECT CLIENT_ID FROM CLIENT_MSTR 
+				WHERE GRP_ID IN (
+				SELECT 'CGRPDEFAULT' 
+					UNION
+					SELECT GRP_ID FROM CLIENT_GRP_MSTR GM 
+					WHERE GM.WHLE_GRP_ID REGEXP
+						(SELECT REPLACE(GROUP_CONCAT(GPATH), ',', '|') AS GPATH
+			          		FROM (SELECT CONCAT('^', W.WHLE_GRP_ID) GPATH
+			                		FROM CLIENT_GRP_MSTR W
+			                		WHERE W.GRP_ID IN (SELECT GRP_ID FROM ADMIN_CLIENTGRP WHERE ADMIN_ID = #{adminId} AND GRP_ID != 'CGRPDEFAULT')
+								 ) TT1
+						)
+				)			
+			))
+		</if>
+	</select>
+
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

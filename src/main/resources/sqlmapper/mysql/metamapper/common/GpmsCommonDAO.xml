@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="GpmsCommonDAO">
+
+	<resultMap type="nameAndValueVO" id="simpleDataInfo">
+		<result property="name" column="NAME" />
+		<result property="value" column="VALUE"/>
+	</resultMap>
+
+	<resultMap type="serverAddrInfoVO" id="ServerAddrInfo">
+	
+		<result property="gkmIp" column="KM_IP" />
+		<result property="gkmUrl" column="KM_URL" />
+		
+		<result property="glmIp" column="LM_IP" />
+		<result property="glmUrl" column="LM_URL" />
+		
+		<result property="grmIp" column="RM_IP" />
+		<result property="grmUrl" column="RM_URL" />
+
+		<result property="modifyDate" column="MOD_DT" />
+	
+	</resultMap>
+
+	<resultMap type="fileVO" id="FileInfo">
+	
+		<result property="fileNo" column="FILE_NO" />
+		<result property="fileName" column="FILE_NM" />
+		
+		<result property="fileType" column="FILE_TP" />
+		<result property="filePath" column="FILE_PATH" />
+		
+		<result property="fileSize" column="FILE_SIZE" />
+		<result property="fileOriginalName" column="FILE_ORG_NM" />
+
+		<result property="deleteYn" column="DELETE_YN" />
+		<result property="regUserId" column="REG_USER_ID" />
+		<result property="regDate" column="REG_DT" />
+	
+	</resultMap>
+
+	<!-- 서버 정보(ip, url) 조회 -->
+	<select id="selectServerAddrInfo" resultMap="ServerAddrInfo">
+
+		SELECT 
+  			KM_IP, LM_IP, RM_IP, 
+  			REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, 
+  			KM_URL, LM_URL, RM_URL,
+  			MOD_DT
+		FROM MG_SERVER;
+
+	</select>
+	
+	<insert id="insertUserActLogHistory" parameterType="hashMap">
+		INSERT INTO LOG_ADMIN_ACT
+			(LOG_SEQ, ACT_TP, ACT_ITEM, ACT_DATA, ACCESS_IP, ACT_USER_ID, ACT_DT)
+		VALUES (
+			(SELECT GRNEXTVAL('LOGADMIN_SEQ')),
+			#{actType},
+			#{actItem},
+			#{actData},
+			#{accessIp},
+			#{userId},
+			now())
+	</insert>
+
+	<select id="selectGpmsAvailableNetwork" resultType="String">
+		SELECT PROP_VALUE
+		FROM CTRL_ITEM_PROP WHERE OBJ_ID='ACIPDEFAULT'
+	</select>
+
+	<select id="selectGpmsAvailableNetworkByAdminId" parameterType="String" resultType="String">
+		SELECT CONN_IP 
+		FROM ADMIN_CONNIP WHERE ADMIN_ID=#{adminId};
+	</select>
+
+	<insert id="insertFileInfo" parameterType="fileVO">
+		<selectKey keyProperty="fileNo" resultType="string" order="BEFORE">
+			SELECT GRNEXTVAL('FILENO_SEQ')
+		</selectKey>
+		INSERT INTO FILE_MSTR
+			(FILE_NO, FILE_NM, FILE_TP, FILE_PATH, FILE_SIZE, FILE_ORG_NM, DELETE_YN, REG_DT, REG_USER_ID) 
+		VALUES (
+			#{fileNo},
+			#{fileName},
+			#{fileType},
+			#{filePath},
+			#{fileSize},
+			#{fileOriginalName},
+			#{deleteYn},
+			now(),
+			#{regUserId})
+	</insert>
+
+</mapper>

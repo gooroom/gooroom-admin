@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MigSampleDAO">
+	
+	<!-- ############################################################################# -->
+	<!-- ############################################################################# -->
+
+	<delete id="deleteDeptTempData">
+		DELETE FROM DEPT_MSTR_TEMP
+	</delete>
+	
+	<insert id="copyViewToDeptTemp">
+		INSERT INTO DEPT_MSTR_TEMP SELECT * FROM DEPT_MSTR_VIEW
+	</insert>
+
+	<select id="getCountForDeptDelete" resultType="long">
+		SELECT COUNT(*) CNT FROM 
+		DEPT_MSTR_TABLE DM LEFT JOIN DEPT_MSTR_TEMP DMT ON DM.DEPT_CD = DMT.DEPT_CD
+		WHERE DMT.DEPT_CD IS NULL
+	</select>
+
+	<select id="getCountForDeptUpdate" resultType="long">
+		SELECT COUNT(*) CNT FROM 
+		DEPT_MSTR_TABLE DM LEFT JOIN DEPT_MSTR_TEMP DMT ON DM.DEPT_CD = DMT.DEPT_CD
+		WHERE DMT.DEPT_NM != DM.DEPT_NM 
+		OR DMT.OPT_YN != DM.OPT_YN
+		OR DMT.UPR_DEPT_CD != DM.UPR_DEPT_CD
+		OR DMT.WHLE_DEPT_CD != DM.WHLE_DEPT_CD
+		OR DMT.EXPIRE_DT != DM.EXPIRE_DT
+		OR DMT.SORT_SORD != DM.SORT_SORD
+		OR DMT.MOD_DT != DM.MOD_DT
+		OR DMT.MOD_USER_ID != DM.MOD_USER_ID
+		OR DMT.REG_DT != DM.REG_DT
+		OR DMT.REG_USER_ID != DM.REG_USER_ID
+	</select>
+
+	<select id="getCountForDeptInsert" resultType="long">
+		SELECT COUNT(*) CNT FROM 
+		DEPT_MSTR_TEMP DMT LEFT JOIN DEPT_MSTR_TABLE DM ON DMT.DEPT_CD = DM.DEPT_CD
+		WHERE DM.DEPT_CD IS NULL;
+	</select>
+
+	<select id="getCountForDept" resultType="long">
+		SELECT COUNT(*) CNT FROM DEPT_MSTR_TABLE
+	</select>
+
+	<delete id="deleteForMigDeptData">
+	    DELETE FROM DEPT_MSTR_TABLE WHERE DEPT_CD IN (SELECT DEPT_CD FROM (
+	    SELECT DM.DEPT_CD FROM 
+			DEPT_MSTR_TABLE DM LEFT JOIN DEPT_MSTR_TEMP DMT ON DM.DEPT_CD = DMT.DEPT_CD
+		WHERE DMT.DEPT_CD IS NULL) DMM)
+	</delete>
+
+	<update id="updateForMigDeptData">
+		UPDATE DEPT_MSTR_TABLE ADM, (
+			SELECT DEPT_CD, DEPT_NM, UPR_DEPT_CD, WHLE_DEPT_CD, DEPT_LEVEL, OPT_YN, 
+				SORT_SORD, EXPIRE_DT, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT 
+			FROM DEPT_MSTR_TEMP
+			WHERE DEPT_CD IN (SELECT DEPT_CD FROM (
+			    SELECT DM.DEPT_CD FROM 
+					  DEPT_MSTR_TABLE DM LEFT JOIN DEPT_MSTR_TEMP DMT ON DM.DEPT_CD = DMT.DEPT_CD
+					WHERE DMT.DEPT_NM != DM.DEPT_NM 
+					OR DMT.OPT_YN != DM.OPT_YN
+					OR DMT.UPR_DEPT_CD != DM.UPR_DEPT_CD
+					OR DMT.WHLE_DEPT_CD != DM.WHLE_DEPT_CD
+					OR DMT.EXPIRE_DT != DM.EXPIRE_DT
+					OR DMT.SORT_SORD != DM.SORT_SORD
+					OR DMT.MOD_DT != DM.MOD_DT
+					OR DMT.MOD_USER_ID != DM.MOD_USER_ID
+					OR DMT.REG_DT != DM.REG_DT
+					OR DMT.REG_USER_ID != DM.REG_USER_ID
+			) DMM )
+		) BDM
+		SET ADM.DEPT_NM = BDM.DEPT_NM, 
+		ADM.UPR_DEPT_CD = BDM.UPR_DEPT_CD, 
+		ADM.WHLE_DEPT_CD = BDM.WHLE_DEPT_CD, 
+		ADM.DEPT_LEVEL = BDM.DEPT_LEVEL, 
+		ADM.OPT_YN = BDM.OPT_YN, 
+		ADM.SORT_SORD = BDM.SORT_SORD, 
+		ADM.EXPIRE_DT = BDM.EXPIRE_DT, 
+		ADM.MOD_USER_ID = BDM.MOD_USER_ID, 
+		ADM.MOD_DT = BDM.MOD_DT, 
+		ADM.REG_USER_ID = BDM.REG_USER_ID, 
+		ADM.REG_DT = BDM.REG_DT 
+		WHERE ADM.DEPT_CD = BDM.DEPT_CD
+	</update>
+	
+	<insert id="insertForMigDeptData">
+		INSERT INTO DEPT_MSTR_TABLE SELECT * FROM DEPT_MSTR_TEMP WHERE DEPT_CD IN (
+			SELECT DEPT_CD FROM (
+				SELECT DMT.DEPT_CD FROM 
+				DEPT_MSTR_TEMP DMT LEFT JOIN DEPT_MSTR_TABLE DM ON DMT.DEPT_CD = DM.DEPT_CD
+				WHERE DM.DEPT_CD IS NULL
+		) DMM )	
+	</insert>
+
+
+	<!-- ############################################################################# -->
+	<!-- ############################################################################# -->
+
+	<delete id="deleteUserTempData">
+		DELETE FROM USER_MSTR_TEMP
+	</delete>
+	
+	<insert id="copyViewToUserTemp">
+		INSERT INTO USER_MSTR_TEMP SELECT * FROM USER_MSTR_VIEW
+	</insert>
+
+	<select id="getCountForUserDelete" resultType="long">
+		SELECT COUNT(*) CNT FROM 
+		USER_MSTR_TABLE UM LEFT JOIN USER_MSTR_TEMP UMT ON UM.USER_ID = UMT.USER_ID
+		WHERE UMT.USER_ID IS NULL
+	</select>
+
+	<select id="getCountForUserUpdate" resultType="long">
+		SELECT COUNT(*) CNT FROM 
+		USER_MSTR_TABLE UM LEFT JOIN USER_MSTR_TEMP UMT ON UM.USER_ID = UMT.USER_ID
+		WHERE UMT.USER_NM != UM.USER_NM 
+		OR UMT.USER_PASSWD != UM.USER_PASSWD
+		OR UMT.USER_EMAIL != UM.USER_EMAIL
+		OR UMT.STATUS != UM.STATUS
+		OR UMT.EXPIRE_DT != UM.EXPIRE_DT
+		OR UMT.PASSWD_EXPIRE_DT != UM.PASSWD_EXPIRE_DT
+		OR UMT.GRADE != UM.GRADE
+		OR UMT.DEPT_CD != UM.DEPT_CD
+		OR UMT.MOD_DT != UM.MOD_DT
+		OR UMT.MOD_USER_ID != UM.MOD_USER_ID
+		OR UMT.REG_DT != UM.REG_DT
+		OR UMT.REG_USER_ID != UM.REG_USER_ID
+	</select>
+
+	<select id="getCountForUserInsert" resultType="long">
+		SELECT COUNT(*) CNT FROM 
+		USER_MSTR_TEMP UMT LEFT JOIN USER_MSTR_TABLE UM ON UMT.USER_ID = UM.USER_ID
+		WHERE UM.USER_ID IS NULL;
+	</select>
+
+	<select id="getCountForUser" resultType="long">
+		SELECT COUNT(*) CNT FROM USER_MSTR_TABLE
+	</select>
+
+	<delete id="deleteForMigUserData">
+	    DELETE FROM USER_MSTR_TABLE WHERE USER_ID IN (SELECT USER_ID FROM (
+	    SELECT UM.USER_ID FROM 
+			USER_MSTR_TABLE UM LEFT JOIN USER_MSTR_TEMP UMT ON UM.USER_ID = UMT.USER_ID
+		WHERE UMT.USER_ID IS NULL) UMM)
+	</delete>
+
+	<update id="updateForMigUserData">
+		UPDATE USER_MSTR_TABLE AUM, (
+			SELECT USER_ID, USER_NM, USER_PASSWD, USER_EMAIL, LOGIN_ID, STATUS, FIRST_LOGIN_DT, LAST_LOGIN_DT, 
+				NFC_SECRET_DATA, LAST_PASSWD_CH_DT, USER_PASSWD_STATUS, PASSWD_EXPIRE_DT, GRADE, SORT_SORD, DEPT_CD, 
+				CLIENT_ID, EXPIRE_DT, LOGIN_TRIAL, LOGIN_TRIAL_DT, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT 
+			FROM USER_MSTR_TEMP
+			WHERE USER_ID IN (SELECT USER_ID FROM (
+			    SELECT UM.USER_ID FROM 
+					  USER_MSTR_TABLE UM LEFT JOIN USER_MSTR_TEMP UMT ON UM.USER_ID = UMT.USER_ID
+					WHERE UMT.USER_NM != UM.USER_NM 
+						OR UMT.USER_PASSWD != UM.USER_PASSWD
+						OR UMT.USER_EMAIL != UM.USER_EMAIL
+						OR UMT.STATUS != UM.STATUS
+						OR UMT.EXPIRE_DT != UM.EXPIRE_DT
+						OR UMT.PASSWD_EXPIRE_DT != UM.PASSWD_EXPIRE_DT
+						OR UMT.GRADE != UM.GRADE
+						OR UMT.DEPT_CD != UM.DEPT_CD
+						OR UMT.MOD_DT != UM.MOD_DT
+						OR UMT.MOD_USER_ID != UM.MOD_USER_ID
+						OR UMT.REG_DT != UM.REG_DT
+						OR UMT.REG_USER_ID != UM.REG_USER_ID
+			) UMM )
+		) BUM
+		SET AUM.USER_NM = BUM.USER_NM,
+			AUM.USER_PASSWD = BUM.USER_PASSWD,
+			AUM.USER_EMAIL = BUM.USER_EMAIL,
+			AUM.STATUS = BUM.STATUS,
+			AUM.EXPIRE_DT = BUM.EXPIRE_DT,
+			AUM.PASSWD_EXPIRE_DT = BUM.PASSWD_EXPIRE_DT,
+			AUM.GRADE = BUM.GRADE,
+			AUM.DEPT_CD = BUM.DEPT_CD,
+			AUM.MOD_DT = BUM.MOD_DT,
+			AUM.MOD_USER_ID = BUM.MOD_USER_ID,
+			AUM.REG_DT = BUM.REG_DT,
+			AUM.REG_USER_ID = BUM.REG_USER_ID
+		WHERE AUM.USER_ID = BUM.USER_ID
+	</update>
+	
+	<insert id="insertForMigUserData">
+		INSERT INTO USER_MSTR_TABLE SELECT * FROM USER_MSTR_TEMP WHERE USER_ID IN (
+			SELECT USER_ID FROM (
+				SELECT UMT.USER_ID FROM 
+				USER_MSTR_TEMP UMT LEFT JOIN USER_MSTR_TABLE UM ON UMT.USER_ID = UM.USER_ID
+				WHERE UM.USER_ID IS NULL
+		) UMM )	
+	</insert>
+
+	<!-- ############################################################################# -->
+	<!-- ############################################################################# -->
+
+	<update id="updatePeriod" parameterType="String" >
+		UPDATE MIGSAMPLE_MSTR SET PERIOD = #{value} 
+	</update>
+
+	<update id="updateLimit" parameterType="String" >
+		UPDATE MIGSAMPLE_MSTR SET LIMIT_PERCENT = #{value}	
+	</update>
+
+	<select id="getLimitValue" resultType="int" >
+		SELECT LIMIT_PERCENT FROM MIGSAMPLE_MSTR LIMIT 1	
+	</select>
+
+</mapper>

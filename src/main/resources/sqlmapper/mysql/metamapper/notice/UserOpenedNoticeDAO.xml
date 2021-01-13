@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserOpenedNoticeDAO">
+
+	<resultMap type="userOpenedNoticeVO" id="userOpenedNotice">
+
+		<result property="userId" column="USER_ID" />
+		<result property="noticePublishId" column="NOTICE_PUBLISH_ID"/>
+		<result property="openedDt" column="OPENED_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+
+	</resultMap>
+
+    <!-- 사용자별 오픈 공지 정보 생성 -->
+    <insert id="insertUserOpenedNotice" parameterType="userOpenedNoticeVO">
+        INSERT INTO USER_OPENED_NOTICE
+            ( USER_ID, NOTICE_PUBLISH_ID, OPENED_DT ) 
+        VALUES 
+            ( #{userId}, #{noticePublishId}, now() )
+    </insert>
+	
+	<select id="selectUserOpenedNoticeCount" parameterType="String" resultType="long">
+		SELECT COUNT(USER_ID) AS CNT 
+		FROM USER_OPENED_NOTICE
+		WHERE NOTICE_PUBLISH_ID = #{noticePublishId}
+	</select>
+
+</mapper>

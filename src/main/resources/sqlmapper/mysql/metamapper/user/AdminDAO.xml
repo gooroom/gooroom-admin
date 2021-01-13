@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="adminDAO">
+
+	<resultMap type="accountVO" id="accountInfo">
+		
+		<result property="userId" column="USER_ID"/>
+		<result property="userName" column="USER_NAME"/>
+
+		<result property="password" column="PASSWORD"/>
+		<result property="statusCd" column="STATUS_CD"/>
+				
+		<result property="loginDate" column="LOGIN_DATE"/>
+		
+	</resultMap>
+
+	<resultMap type="actHistoryVO" id="actHistoryInfo">
+		<result property="logSeq" column="LOG_SEQ"/>
+		<result property="actTp" column="ACT_TP"/>
+		<result property="actItem" column="ACT_ITEM"/>
+		<result property="actData" column="ACT_DATA"/>
+		<result property="accessIp" column="ACCESS_IP"/>
+		<result property="actUserId" column="ACT_USER_ID"/>
+		<result property="actDt" column="ACT_DT"/>
+	</resultMap>
+	
+	<select id="selectAdminLoginInfo" parameterType="java.util.HashMap" resultMap="accountInfo">
+		SELECT
+			A.ADMIN_ID AS USER_ID,
+			A.ADMIN_NM AS USER_NAME,
+			A.ADMIN_PW AS PASSWORD,
+			A.STATUS_CD AS STATUS_CD,
+			NOW() AS LOGIN_DATE
+		FROM ADMIN_MSTR A
+		WHERE A.ADMIN_ID = #{userId}
+	</select>
+
+	<select id="selectAdminHistory" parameterType="java.util.HashMap" resultMap="actHistoryInfo">
+		SELECT LOG_SEQ,
+			ACT_TP,
+			ACT_ITEM,
+			ACT_DATA,
+			ACCESS_IP,
+			ACT_USER_ID,
+			ACT_DT
+		FROM LOG_ADMIN_ACT
+		WHERE ACT_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
+		AND ACT_USER_ID=#{adminId}
+		AND ACT_TP != 'R' AND ACT_TP != 'ETC' AND ACT_TP != 'M'
+		ORDER BY ACT_DT ASC
+	</select>
+	
+	<select id="selectAdminActListPaged" parameterType="hashmap" resultMap="actHistoryInfo">
+		SELECT LOG_SEQ,
+			ACT_TP,
+			ACT_ITEM,
+			ACT_DATA,
+			ACCESS_IP,
+			ACT_USER_ID,
+			ACT_DT
+		FROM LOG_ADMIN_ACT
+		WHERE ACT_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
+		AND ACT_USER_ID=#{adminId}
+		AND ACT_TP != 'R' AND ACT_TP != 'ETC' AND ACT_TP != 'M'
+		<if test="searchKey != null and searchKey != ''">
+		AND (ACT_ITEM LIKE CONCAT('%', #{searchKey}, '%') OR ACT_DATA LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		<if test="status != null and status != ''">
+		AND ACT_TP = #{status}
+		</if>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectAdminActListTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(LS.LOG_SEQ) AS CNT
+		FROM LOG_ADMIN_ACT LS 
+		WHERE LS.ACT_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+		AND ACT_USER_ID=#{adminId}
+		AND ACT_TP != 'R' AND ACT_TP != 'ETC' AND ACT_TP != 'M'
+	</select>
+
+	<select id="selectAdminActListFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(LS.LOG_SEQ) AS CNT
+		FROM LOG_ADMIN_ACT LS 
+		WHERE LS.ACT_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+		AND ACT_USER_ID=#{adminId}
+		AND ACT_TP != 'R' AND ACT_TP != 'ETC' AND ACT_TP != 'M'
+		<if test="searchKey != null and searchKey != ''">
+		AND (ACT_ITEM LIKE CONCAT('%', #{searchKey}, '%') OR ACT_DATA LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		<if test="status != null and status != ''">
+		AND ACT_TP = #{status}
+		</if>
+	</select>
+
+	<!-- 관리자 작업이력 조회 (Paged) -->
+	<select id="selectAdminRecordListPaged" parameterType="String" resultMap="actHistoryInfo">
+		SELECT LAA.LOG_SEQ, LAA.ACT_TP, LAA.ACT_ITEM, LAA.ACT_DATA, LAA.ACCESS_IP, LAA.ACT_USER_ID, LAA.ACT_DT
+		FROM LOG_ADMIN_ACT LAA
+		<where>
+			<if test="fromDate != null and fromDate != '' and toDate != null and toDate != ''">
+				LAA.ACT_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
+			</if>
+			<if test="searchKey != null and searchKey != ''">
+				AND (LAA.ACT_DATA LIKE CONCAT('%', #{searchKey}, '%') OR
+					LAA.ACT_ITEM LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+			<if test="adminId != null and adminId != ''">
+				AND LAA.ACT_USER_ID = #{adminId}
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectAdminRecordListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(LAA.LOG_SEQ) AS CNT 
+		FROM LOG_ADMIN_ACT LAA
+		<where>
+			<if test="fromDate != null and fromDate != '' and toDate != null and toDate != ''">
+				LAA.ACT_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
+			</if>
+		</where>
+	</select>
+
+	<select id="selectAdminRecordListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(LAA.LOG_SEQ) AS CNT 
+		FROM LOG_ADMIN_ACT LAA
+		<where>
+			<if test="fromDate != null and fromDate != '' and toDate != null and toDate != ''">
+				LAA.ACT_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
+			</if>
+			<if test="searchKey != null and searchKey != ''">
+				AND (LAA.ACT_DATA LIKE CONCAT('%', #{searchKey}, '%') OR
+					LAA.ACT_ITEM LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+			<if test="adminId != null and adminId != ''">
+				AND LAA.ACT_USER_ID = #{adminId}
+			</if>
+		</where> 
+	</select>
+
+</mapper>
+
+

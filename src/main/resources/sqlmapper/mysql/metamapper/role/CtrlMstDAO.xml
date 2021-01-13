@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CtrlMstDAO">
+
+	<resultMap type="ctrlItemVO" id="ctrlItemInfo">
+	
+		<result property="objId" column="OBJ_ID" />
+		<result property="objNm" column="OBJ_NM"/>
+		
+		<result property="mngObjTp" column="MNG_OBJ_TP"/>
+		
+		<result property="comment" column="COMMENT"/>
+		<result property="extValue" column="EXTVALUE"/>		
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		
+		<result property="newObjId" column="NEW_OBJ_ID" />
+	</resultMap>
+
+	<resultMap type="ctrlPropVO" id="ctrlPropInfo">
+	
+		<result property="objId" column="OBJ_ID" />
+		<result property="mngObjTp" column="MNG_OBJ_TP"/>
+
+		<result property="propId" column="PROP_ID"/>
+		<result property="propNm" column="PROP_NM"/>
+		<result property="propValue" column="PROP_VALUE"/>
+		
+		<result property="link" column="LINK"/>
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+	
+	</resultMap>
+
+	<resultMap type="ctrlItemVO" id="ctrlItemAndPropInfo">
+	
+		<result property="objId" column="OBJ_ID" />
+		<result property="objNm" column="OBJ_NM"/>
+		
+		<result property="mngObjTp" column="MNG_OBJ_TP"/>
+		<result property="comment" column="COMMENT"/>
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		
+		<collection property="propList" ofType="ctrlPropVO" resultMap="ctrlPropInfo" columnPrefix="PROP_"/>
+	
+	</resultMap>
+
+	<resultMap type="clientGroupVO" id="clientGroupInfo">
+		<result property="grpId" column="GRP_ID" />
+		<result property="grpNm" column="GRP_NM" />
+	</resultMap>
+
+	<resultMap type="ruleIdsVO" id="ruleIdsInfo">
+    
+		<result property="desktopConfId" column="DESKTOPCONF" />
+		<result property="securityRuleId" column="SECURITYRULE"/>
+		<result property="updateServerConfId" column="UPDATESERVERCONF" />
+		<result property="hostNameConfId" column="HOSTNAMECONF"/>
+		<result property="clientConfId" column="CLIENTCONF" />
+		<result property="browserRuleId" column="BROWSERRULE"/>
+		<result property="mediaRuleId" column="MEDIARULE" />
+		<result property="filteredSwRuleId" column="FILTEREDSWRULE"/>
+		<result property="ctrlCenterItemRuleId" column="CTRLCENTERITEMRULE"/>
+		<result property="policyKitRuleId" column="POLICYKITRULE"/>
+
+	</resultMap>
+
+
+	<!-- 정책 - 제어대상 관련 항목 리스트 조회 + 속성 -->
+	<select id="selectCtrlItemAndPropList" parameterType="hashMap" resultMap="ctrlItemAndPropInfo">
+	
+		SELECT M1.OBJ_ID, M1.OBJ_NM, M1.COMMENT,
+		       M1.MOD_DT, M1.MOD_USER_ID, M1.REG_DT, M1.REG_USER_ID,
+		       M1.OBJ_ID PROP_OBJ_ID,
+		       P1.PROP_NM PROP_PROP_NM,
+		       P1.PROP_VALUE PROP_PROP_VALUE
+		FROM (
+			      SELECT M.OBJ_ID,
+			             M.OBJ_NM,
+			             M.COMMENT COMMENT,
+			             M.MOD_DT,
+			             M.MOD_USER_ID,
+			             M.REG_DT,
+			             M.REG_USER_ID,
+			             M.OBJ_ID PROP_OBJ_ID
+			      FROM CTRL_ITEM_MSTR M
+			      WHERE M.MNG_OBJ_TP = #{mngObjTp}
+					<if test="adminId != null and adminId != ''">
+						AND (M.OBJ_ID LIKE '%DEFAULT' OR M.OBJ_ID LIKE '%STD' OR 
+					          M.REG_USER_ID = #{adminId} OR M.REG_USER_ID IN (SELECT ADMIN_ID FROM ADMIN_MSTR WHERE REG_USER_ID=#{adminId}))
+					</if>
+					<if test="partAdminId != null and partAdminId != ''">
+						AND (M.OBJ_ID LIKE '%DEFAULT' OR M.OBJ_ID LIKE '%STD' OR 
+					          M.REG_USER_ID = #{partAdminId} OR 
+					          M.REG_USER_ID = (SELECT REG_USER_ID FROM ADMIN_MSTR WHERE ADMIN_ID=#{partAdminId}))
+					</if>
+			      ORDER BY IF(M.OBJ_ID LIKE '%DEFAULT', '0', M.OBJ_ID)  ASC
+		      ) M1
+		     LEFT JOIN CTRL_ITEM_PROP P1 ON M1.OBJ_ID = P1.OBJ_ID
+	</select>
+	
+	<!-- 정책 - 제어대상 관련 항목 리스트 조회 + 속성  - 페이징 -->
+	<select id="selectCtrlItemAndPropListPaged" parameterType="hashMap" resultMap="ctrlItemAndPropInfo">
+		SELECT M1.OBJ_ID, M1.OBJ_NM, M1.COMMENT,
+		       M1.MOD_DT, M1.MOD_USER_ID, M1.REG_DT, M1.REG_USER_ID,
+		       M1.OBJ_ID PROP_OBJ_ID,
+		       P1.PROP_NM PROP_PROP_NM,
+		       P1.PROP_VALUE PROP_PROP_VALUE
+		FROM (
+		      SELECT M.OBJ_ID,
+		             M.OBJ_NM,
+		             M.COMMENT COMMENT,
+		             M.MOD_DT,
+		             M.MOD_USER_ID,
+		             M.REG_DT,
+			         M.REG_USER_ID,
+		             M.OBJ_ID PROP_OBJ_ID
+		      FROM CTRL_ITEM_MSTR M
+		      WHERE M.MNG_OBJ_TP = #{mngObjTp}
+		      <if test="adminId != null and adminId != ''">
+            	AND (M.OBJ_ID LIKE '%DEFAULT' OR M.OBJ_ID LIKE '%STD' OR 
+                  M.REG_USER_ID = #{adminId} OR M.REG_USER_ID IN (SELECT ADMIN_ID FROM ADMIN_MSTR WHERE REG_USER_ID=#{adminId}))
+		      </if>
+		      <if test="partAdminId != null and partAdminId != ''">
+		        AND (M.OBJ_ID LIKE '%DEFAULT' OR M.OBJ_ID LIKE '%STD' OR 
+                  M.REG_USER_ID = #{partAdminId} OR 
+                  M.REG_USER_ID = (SELECT REG_USER_ID FROM ADMIN_MSTR WHERE ADMIN_ID=#{partAdminId}))
+		      </if>
+		      <if test="searchKey != null and searchKey != ''">
+				AND (M.OBJ_ID LIKE CONCAT('%', #{searchKey}, '%') OR M.OBJ_NM LIKE CONCAT('%', #{searchKey}, '%') 
+					OR M.MOD_USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR M.REG_USER_ID LIKE CONCAT('%', #{searchKey}, '%')) 
+			  </if>
+		      ORDER BY IF(M.OBJ_ID LIKE '%DEFAULT', #{defaultOrderValue}, IF(M.OBJ_ID LIKE '%STD', #{defaultOrderSecondValue}, ${paramOrderColumn})) ${paramOrderDir}
+		      LIMIT #{paramStart}, #{paramLength}
+		      ) M1
+		     LEFT JOIN CTRL_ITEM_PROP P1 ON M1.OBJ_ID = P1.OBJ_ID
+	</select>
+	
+	<select id="selectCtrlItemAndPropListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(M.OBJ_ID) AS CNT
+		FROM CTRL_ITEM_MSTR M 
+		WHERE M.MNG_OBJ_TP = #{mngObjTp}
+	</select>
+	
+	<select id="selectCtrlItemAndPropListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(M.OBJ_ID) AS CNT
+		FROM CTRL_ITEM_MSTR M 
+		WHERE M.MNG_OBJ_TP = #{mngObjTp}
+		<if test="adminId != null and adminId != ''">
+			AND (M.OBJ_ID LIKE '%DEFAULT' OR M.OBJ_ID LIKE '%STD' OR 
+			     M.REG_USER_ID = #{adminId} OR M.REG_USER_ID IN (SELECT ADMIN_ID FROM ADMIN_MSTR WHERE REG_USER_ID=#{adminId}))
+		</if>
+		<if test="partAdminId != null and partAdminId != ''">
+	        AND (M.OBJ_ID LIKE '%DEFAULT' OR M.OBJ_ID LIKE '%STD' OR 
+                 M.REG_USER_ID = #{partAdminId} OR 
+                 M.REG_USER_ID = (SELECT REG_USER_ID FROM ADMIN_MSTR WHERE ADMIN_ID=#{partAdminId}))
+		</if>
+		<if test="searchKey != null and searchKey != ''">
+			AND (M.OBJ_ID LIKE CONCAT('%', #{searchKey}, '%') OR M.OBJ_NM LIKE CONCAT('%', #{searchKey}, '%')
+			 OR M.MOD_USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR M.REG_USER_ID LIKE CONCAT('%', #{searchKey}, '%')) 
+		</if>
+	</select>
+	
+	
+	
+	<!-- 정책 - 제어대상 관련 항목 리스트 조회 -->
+	<select id="selectCtrlItemList" parameterType="String" resultMap="ctrlItemInfo">
+		SELECT
+			OBJ_ID, OBJ_NM, MNG_OBJ_TP, COMMENT, 
+			MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID  
+		FROM CTRL_ITEM_MSTR
+		where MNG_OBJ_TP = #{mngObjTp}
+	</select>
+
+	<!-- 정책 - 제어대상 관련 항목 조회 -->
+	<select id="selectCtrlItem" parameterType="String" resultMap="ctrlItemInfo">
+		SELECT
+			OBJ_ID, OBJ_NM, MNG_OBJ_TP, COMMENT, 
+			MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID  
+		FROM CTRL_ITEM_MSTR
+		WHERE OBJ_ID=#{objId}
+	</select>
+
+	<!-- 정책 - 제어대상 관련 속성 리스트 조회 -->
+	<select id="selectCtrlPropList" parameterType="String" resultMap="ctrlPropInfo">
+		SELECT OBJ_ID, PROP_ID, PROP_NM, PROP_VALUE, LINK, MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID
+		FROM CTRL_ITEM_PROP
+		WHERE OBJ_ID=#{objId}
+	</select>
+
+	<!-- 속성을 사용하는 제어대상 관련 항목 조회 -->
+	<select id="selectParentCtrlItems" parameterType="hashmap" resultMap="ctrlItemInfo">
+		SELECT 
+			OBJ_ID, OBJ_NM, MNG_OBJ_TP, COMMENT, 
+			MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID
+		FROM CTRL_ITEM_MSTR
+		WHERE OBJ_ID IN (SELECT OBJ_ID FROM CTRL_ITEM_PROP 
+			WHERE PROP_VALUE IN 
+				<foreach item="item" index="index" collection="objIds" open="(" separator="," close=")">
+					#{item}
+				</foreach>)
+	</select>
+
+	<!-- 정책 - 제어대상 관련 항목 등록 -->
+	<insert id="insertCtrlItem" parameterType="ctrlItemVO">
+		INSERT INTO CTRL_ITEM_MSTR
+			(OBJ_ID, OBJ_NM, MNG_OBJ_TP, COMMENT, 
+			MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID) 
+		VALUES 
+			(#{objId}, #{objNm}, #{mngObjTp}, #{comment},
+			now(), #{modUserId}, now(), #{modUserId});
+		<selectKey keyProperty="objId" resultType="string" order="BEFORE">
+			<choose>
+    			<when test='standardObj'>
+    				SELECT CONCAT('${mngObjTpAbbr}', (LPAD((SELECT GRNEXTVAL('${mngObjTp}_SEQ')), 6, 0)), 'STD')
+    			</when>
+			    <otherwise>
+    				SELECT CONCAT('${mngObjTpAbbr}', (LPAD((SELECT GRNEXTVAL('${mngObjTp}_SEQ')), 6, 0)))
+    			</otherwise>
+  			</choose>			
+		</selectKey>
+	</insert>
+
+	<!-- 정책 - 제어대상 기본(디폴트) 항목 등록 -->
+	<insert id="insertCtrlDefaultItem" parameterType="ctrlItemVO">
+		INSERT INTO CTRL_ITEM_MSTR
+			(OBJ_ID, OBJ_NM, MNG_OBJ_TP, COMMENT, 
+			MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID) 
+		VALUES 
+			(#{objId}, #{objNm}, #{mngObjTp}, #{comment},
+			now(), #{modUserId}, now(), #{modUserId});
+		<selectKey keyProperty="objId" resultType="string" order="BEFORE">
+			SELECT CONCAT('${mngObjTpAbbr}', 'DEFAULT')
+		</selectKey>
+	</insert>
+
+	<!-- 정책 - 제어대상 관련 항목 수정 -->
+	<update id="updateCtrlItem" parameterType="ctrlItemVO">
+		UPDATE CTRL_ITEM_MSTR 
+		SET OBJ_NM = #{objNm}, MNG_OBJ_TP = #{mngObjTp}, COMMENT = #{comment}, 
+			MOD_DT = now(), MOD_USER_ID = #{modUserId} 
+		WHERE OBJ_ID = #{objId}
+	</update>
+
+	<!-- 정책 - 제어대상 관련 항목 삭제 -->
+	<delete id="deleteCtrlItem" parameterType="string">
+		DELETE FROM CTRL_ITEM_MSTR 
+		WHERE OBJ_ID = #{objId}
+	</delete>
+
+	<!-- 정책 - 제어대상 관련 속성 등록 -->
+	<insert id="insertCtrlProp" parameterType="ctrlPropVO">
+		INSERT INTO CTRL_ITEM_PROP
+			(OBJ_ID, PROP_ID, PROP_NM, PROP_VALUE, LINK, MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID)
+		VALUES 
+			(#{objId}, #{propId}, #{propNm}, #{propValue}, #{link},
+			now(), #{modUserId}, now(), #{modUserId});
+	</insert>
+
+	<!-- 정책 - 제어대상 관련 속성 수정 -->
+	<update id="updateCtrlProp" parameterType="ctrlPropVO">
+		UPDATE CTRL_ITEM_PROP 
+		SET PROP_ID = #{propId}, PROP_NM = #{propNm}, PROP_VALUE = #{propValue}, LINK = #{link}, 
+			MOD_DT = now(), MOD_USER_ID = #{modUserId} 
+		WHERE OBJ_ID = #{objId}
+	</update>
+
+	<!-- 정책 - 제어대상 관련 속성 삭제 -->
+	<delete id="deleteCtrlProp" parameterType="string">
+		DELETE FROM CTRL_ITEM_PROP 
+		WHERE OBJ_ID = #{objId}
+	</delete>
+
+	<!-- 정책 - 제어대상 관련 속성 삭제 -링크인 경우 삭제 -->
+	<delete id="deleteCtrlPropWithLink" parameterType="string">
+		DELETE FROM CTRL_ITEM_PROP 
+		WHERE LINK='T' AND PROP_VALUE = #{objId}
+	</delete>
+
+	<!-- 단말설정 삭제시 그룹매핑 테이블도 삭제 -->
+	<delete id="deleteCtrlItemInGroupMapper" parameterType="string">
+		DELETE FROM GR_GROUP_RULE_CONF WHERE CONF_ID = #{confId}
+	</delete>
+	
+	<!-- 설정을 사용하는 단말그룹 항목 조회 -->
+	<select id="selectClientGroupIdByConfId" parameterType="string" resultMap="clientGroupInfo">
+		SELECT GRP_ID FROM GR_GROUP_RULE_CONF WHERE CONF_ID=#{confId}
+	</select>
+
+	<!-- 설정을 사용하는 단말그룹 항목 조회 -->
+	<select id="selectConfIdInClientGroupId" parameterType="hashmap" resultType="String">
+		SELECT CONF_ID FROM GR_GROUP_RULE_CONF WHERE GRP_ID=#{groupId} AND CONF_TP=#{confType}
+	</select>
+
+	<!-- 정책 - 제어대상 관련 항목 복사 등록 -->
+	<insert id="insertClonedCtrlItem" parameterType="ctrlItemVO">
+		INSERT INTO CTRL_ITEM_MSTR (OBJ_ID, OBJ_NM, MNG_OBJ_TP, COMMENT, MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID)
+		SELECT #{newObjId}, CONCAT(OBJ_NM, '-복사본'), MNG_OBJ_TP, COMMENT, NOW(), #{modUserId}, NOW(), #{modUserId} 
+		FROM CTRL_ITEM_MSTR WHERE OBJ_ID=#{objId};
+		<selectKey keyProperty="newObjId" resultType="string" order="BEFORE">
+			<choose>
+    			<when test='@kr.gooroom.gpms.common.utils.CommonUtils@endsWith(objId, "STD")'>
+    				SELECT CONCAT('${mngObjTpAbbr}', (LPAD((SELECT GRNEXTVAL('${mngObjTp}_SEQ')), 6, 0)), 'STD')
+    			</when>
+			    <otherwise>
+    				SELECT CONCAT('${mngObjTpAbbr}', (LPAD((SELECT GRNEXTVAL('${mngObjTp}_SEQ')), 6, 0)))
+    			</otherwise>
+  			</choose>		
+		</selectKey>
+	</insert>
+	
+	<!-- 정책 - 제어대상 관련 속성 등록 -->
+	<insert id="insertClonedCtrlProp" parameterType="ctrlPropVO">
+		INSERT INTO CTRL_ITEM_PROP (OBJ_ID, PROP_ID, PROP_NM, PROP_VALUE, LINK, MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID)
+		SELECT #{newObjId}, PROP_ID, PROP_NM, PROP_VALUE, LINK, NOW(), #{modUserId}, NOW(), #{modUserId} 
+		FROM CTRL_ITEM_PROP WHERE OBJ_ID=#{objId};
+	</insert>
+	
+	<!-- 단말그룹 관련 정책 연계 정보 삭제 -->
+	<delete id="deleteGroupRuleConf" parameterType="hashmap">
+		DELETE FROM GR_GROUP_RULE_CONF 
+		WHERE CONF_ID = #{confId} AND CONF_TP = #{confTp};
+	</delete>
+
+	<!-- 부서 관련 정책 연계 정보 삭제 -->
+	<delete id="deleteDeptRuleConf" parameterType="hashmap">
+		DELETE FROM GR_DEPT_RULE_CONF 
+		WHERE CONF_ID = #{confId} AND CONF_TP = #{confTp};
+	</delete>
+
+	<!-- 사용자 관련 정책 연계 정보 삭제 -->
+	<delete id="deleteUserRuleConf" parameterType="hashmap">
+		DELETE FROM GR_USER_RULE_CONF 
+		WHERE CONF_ID = #{confId} AND CONF_TP = #{confTp};
+	</delete>
+
+	<!-- 온라인 사용자 대상 현재 정책 정보 조회를 위한 조회 쿼리 -->
+	<select id="selectRuleIdsByClientAndUser" parameterType="hashmap" resultMap="ruleIdsInfo">
+		SELECT 
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'HOSTNAMECONF' THEN BB.CONF_ID END), 'HOCFDEFAULT') AS HOSTNAMECONF,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'UPDATESERVERCONF' THEN BB.CONF_ID END), 'USCFDEFAULT') AS UPDATESERVERCONF,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'CLIENTCONF' THEN BB.CONF_ID END), 'CLCFDEFAULT') AS CLIENTCONF,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'BROWSERRULE' THEN BB.CONF_ID END), 'BCRUDEFAULT') AS BROWSERRULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'MEDIARULE' THEN BB.CONF_ID END), 'MCRUDEFAULT') AS MEDIARULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'SECURITYRULE' THEN BB.CONF_ID END), 'GSRUDEFAULT') AS SECURITYRULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'FILTEREDSWRULE' THEN BB.CONF_ID END), 'GSFIDEFAULT') AS FILTEREDSWRULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'CTRLCENTERITEMRULE' THEN BB.CONF_ID END), 'CTCIDEFAULT') AS CTRLCENTERITEMRULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'POLICYKITRULE' THEN BB.CONF_ID END), 'POKIDEFAULT') AS POLICYKITRULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'DESKTOPCONF' THEN BB.CONF_ID END), 'DECODEFAULT') AS DESKTOPCONF
+		FROM (
+		  SELECT MIN(AA.GRADE), AA.CONF_ID, AA.CONF_TP
+		  FROM (
+		    SELECT 'A' AS GRADE, GGRC.CONF_ID, GGRC.CONF_TP
+		    FROM GR_GROUP_RULE_CONF GGRC JOIN CLIENT_MSTR CM ON GGRC.GRP_ID = CM.GRP_ID
+		    WHERE CM.CLIENT_ID=#{clientId}
+		    UNION
+		    SELECT 'B' AS GRADE, GURC.CONF_ID, GURC.CONF_TP
+		    FROM GR_USER_RULE_CONF GURC
+		    WHERE GURC.USER_ID=#{userId}
+		    UNION
+		    SELECT 'C' AS GRADE, GDRC.CONF_ID, GDRC.CONF_TP
+		    FROM GR_DEPT_RULE_CONF GDRC JOIN USER_MSTR UM ON GDRC.DEPT_CD = UM.DEPT_CD
+		    WHERE UM.USER_ID=#{userId}
+		  ) AA
+		  GROUP BY AA.CONF_TP
+		) BB
+	</select>
+
+	<!-- 온라인 사용자 대상 현재 정책 정보 조회를 위한 조회 쿼리 -->
+	<select id="selectRuleIdsByClientAndEmptyUser" parameterType="hashmap" resultMap="ruleIdsInfo">
+		SELECT 
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'HOSTNAMECONF' THEN BB.CONF_ID END), 'HOCFDEFAULT') AS HOSTNAMECONF,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'UPDATESERVERCONF' THEN BB.CONF_ID END), 'USCFDEFAULT') AS UPDATESERVERCONF,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'CLIENTCONF' THEN BB.CONF_ID END), 'CLCFDEFAULT') AS CLIENTCONF,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'BROWSERRULE' THEN BB.CONF_ID END), '') AS BROWSERRULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'MEDIARULE' THEN BB.CONF_ID END), '') AS MEDIARULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'SECURITYRULE' THEN BB.CONF_ID END), '') AS SECURITYRULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'FILTEREDSWRULE' THEN BB.CONF_ID END), '') AS FILTEREDSWRULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'CTRLCENTERITEMRULE' THEN BB.CONF_ID END), 'CTCIDEFAULT') AS CTRLCENTERITEMRULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'POLICYKITRULE' THEN BB.CONF_ID END), 'POKIDEFAULT') AS POLICYKITRULE,
+		  IFNULL(MAX(CASE WHEN BB.CONF_TP = 'DESKTOPCONF' THEN BB.CONF_ID END), 'DECODEFAULT') AS DESKTOPCONF
+		FROM (
+		  SELECT MIN(AA.GRADE), AA.CONF_ID, AA.CONF_TP
+		  FROM (
+		    SELECT 'A' AS GRADE, GGRC.CONF_ID, GGRC.CONF_TP
+		    FROM GR_GROUP_RULE_CONF GGRC JOIN CLIENT_MSTR CM ON GGRC.GRP_ID = CM.GRP_ID
+		    WHERE CM.CLIENT_ID=#{clientId}
+		  ) AA
+		  GROUP BY AA.CONF_TP
+		) BB
+	</select>
+
+	<!-- 단말 그룹 아이디를 이용한 정책 아이디 정보 -->
+	<select id="selectRuleIdByGroupId" parameterType="String" resultMap="ruleIdsInfo">
+		SELECT GRP_ID,
+		  GROUP_CONCAT(IF(CONF_TP = 'BROWSERRULE', CONF_ID, NULL)) AS BROWSERRULE, 
+		  GROUP_CONCAT(IF(CONF_TP = 'SECURITYRULE', CONF_ID, NULL)) AS SECURITYRULE,
+		  GROUP_CONCAT(IF(CONF_TP = 'FILTEREDSWRULE', CONF_ID, NULL)) AS FILTEREDSWRULE,
+		  GROUP_CONCAT(IF(CONF_TP = 'CTRLCENTERITEMRULE', CONF_ID, NULL)) AS CTRLCENTERITEMRULE,
+		  GROUP_CONCAT(IF(CONF_TP = 'POLICYKITRULE', CONF_ID, NULL)) AS POLICYKITRULE,
+		  GROUP_CONCAT(IF(CONF_TP = 'MEDIARULE', CONF_ID, NULL)) AS MEDIARULE,
+		  GROUP_CONCAT(IF(CONF_TP = 'HOSTNAMECONF', CONF_ID, NULL)) AS HOSTNAMECONF,
+		  GROUP_CONCAT(IF(CONF_TP = 'UPDATESERVERCONF', CONF_ID, NULL)) AS UPDATESERVERCONF,
+		  GROUP_CONCAT(IF(CONF_TP = 'CLIENTCONF', CONF_ID, NULL)) AS CLIENTCONF,
+		  GROUP_CONCAT(IF(CONF_TP = 'DESKTOPCONF', CONF_ID, NULL)) AS DESKTOPCONF
+		FROM GR_GROUP_RULE_CONF WHERE GRP_ID=#{groupId}
+	</select>
+	
+	
+	<!-- 정책 - 제어대상 관련 항목 조회 -->
+	<select id="selectCtrlItemByGroupId" parameterType="String" resultMap="ctrlItemInfo">
+		SELECT MM.OBJ_ID, FF.EXTVALUE, MM.OBJ_NM, MM.MNG_OBJ_TP, MM.COMMENT, MM.MOD_DT, MM.MOD_USER_ID, MM.REG_DT, MM.REG_USER_ID
+			FROM CTRL_ITEM_MSTR MM JOIN 
+			(SELECT
+					IF(ISNULL(CC.GRP_ID), 'DEFAULT', 'GROUP' ) EXTVALUE, 
+					IFNULL(CC.GRP_ID, DD.GRP_ID) GRP_ID, 
+					IFNULL(CC.CONF_TP, DD.CONF_TP) CONF_TP, 
+					IFNULL(CC.CONF_ID, DD.CONF_ID) CONF_ID
+				FROM (SELECT GRP_ID, CONF_TP, CONF_ID FROM GR_GROUP_RULE_CONF AA WHERE AA.GRP_ID=#{groupId}) CC RIGHT JOIN
+		(SELECT GRP_ID,CONF_TP,CONF_ID FROM (
+		  SELECT #{groupId} GRP_ID, 'CLIENTCONF' CONF_TP, 'CLCFDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'HOSTNAMECONF' CONF_TP, 'HOCFDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'UPDATESERVERCONF' CONF_TP, 'USCFDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'BROWSERRULE' CONF_TP, 'BCRUDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'MEDIARULE' CONF_TP, 'MCRUDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'FILTEREDSWRULE' CONF_TP, 'GSFIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'CTRLCENTERITEMRULE' CONF_TP, 'CTCIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'POLICYKITRULE' CONF_TP, 'POKIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'SECURITYRULE' CONF_TP, 'GSRUDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'DESKTOPCONF' CONF_TP, 'DECODEFAULT' CONF_ID
+		) DF ) DD ON CC.CONF_TP=DD.CONF_TP) FF
+		ON MM.OBJ_ID = FF.CONF_ID
+	</select>
+	
+	<!-- 정책 - 제어대상 관련 속성 리스트 조회 -->
+	<select id="selectCtrlPropListByGroupId" parameterType="String" resultMap="ctrlPropInfo">
+		SELECT PP.OBJ_ID, SS.CONF_TP MNG_OBJ_TP, PP.PROP_ID, PP.PROP_NM, PP.PROP_VALUE, PP.LINK, PP.MOD_DT, PP.MOD_USER_ID, PP.REG_DT, PP.REG_USER_ID 
+				FROM CTRL_ITEM_PROP PP JOIN 
+				(SELECT 
+					IFNULL(CC.GRP_ID, DD.GRP_ID) GRP_ID, 
+					IFNULL(CC.CONF_TP, DD.CONF_TP) CONF_TP, 
+					IFNULL(CC.CONF_ID, DD.CONF_ID) CONF_ID
+				FROM (SELECT GRP_ID, CONF_TP, CONF_ID FROM GR_GROUP_RULE_CONF AA WHERE AA.GRP_ID=#{groupId}) CC RIGHT JOIN
+		(SELECT GRP_ID,CONF_TP,CONF_ID FROM (
+		  SELECT #{groupId} GRP_ID, 'CLIENTCONF' CONF_TP, 'CLCFDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'HOSTNAMECONF' CONF_TP, 'HOCFDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'UPDATESERVERCONF' CONF_TP, 'USCFDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'BROWSERRULE' CONF_TP, 'BCRUDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'MEDIARULE' CONF_TP, 'MCRUDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'FILTEREDSWRULE' CONF_TP, 'GSFIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'CTRLCENTERITEMRULE' CONF_TP, 'CTCIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'POLICYKITRULE' CONF_TP, 'POKIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'SECURITYRULE' CONF_TP, 'GSRUDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{groupId} GRP_ID, 'DESKTOPCONF' CONF_TP, 'DECODEFAULT' CONF_ID
+		) DF ) DD ON CC.CONF_TP=DD.CONF_TP) SS
+		ON PP.OBJ_ID = SS.CONF_ID
+	</select>
+
+
+
+
+	<!-- 정책 - 제어대상 관련 항목 조회 - 조직 : DEPT -->
+	<select id="selectCtrlItemByDeptCd" parameterType="String" resultMap="ctrlItemInfo">
+		SELECT MM.OBJ_ID, FF.EXTVALUE, MM.OBJ_NM, MM.MNG_OBJ_TP, MM.COMMENT, MM.MOD_DT, MM.MOD_USER_ID, MM.REG_DT, MM.REG_USER_ID
+			FROM CTRL_ITEM_MSTR MM JOIN 
+			(SELECT
+					IF(ISNULL(CC.DEPT_CD), 'DEFAULT', 'DEPT' ) EXTVALUE, 
+					IFNULL(CC.DEPT_CD, DD.DEPT_CD) DEPT_CD, 
+					IFNULL(CC.CONF_TP, DD.CONF_TP) CONF_TP, 
+					IFNULL(CC.CONF_ID, DD.CONF_ID) CONF_ID
+				FROM (SELECT DEPT_CD, CONF_TP, CONF_ID FROM GR_DEPT_RULE_CONF AA WHERE AA.DEPT_CD=#{deptCd}) CC RIGHT JOIN
+		(SELECT DEPT_CD,CONF_TP,CONF_ID FROM (
+		  SELECT #{deptCd} DEPT_CD, 'BROWSERRULE' CONF_TP, 'BCRUDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{deptCd} DEPT_CD, 'MEDIARULE' CONF_TP, 'MCRUDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{deptCd} DEPT_CD, 'FILTEREDSWRULE' CONF_TP, 'GSFIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{deptCd} DEPT_CD, 'CTRLCENTERITEMRULE' CONF_TP, 'CTCIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{deptCd} DEPT_CD, 'POLICYKITRULE' CONF_TP, 'POKIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{deptCd} DEPT_CD, 'SECURITYRULE' CONF_TP, 'GSRUDEFAULT' CONF_ID
+		) DF ) DD ON CC.CONF_TP=DD.CONF_TP) FF
+		ON MM.OBJ_ID = FF.CONF_ID
+	</select>
+
+	<!-- 정책 - 제어대상 관련 속성 리스트 조회 - 조직 : DEPT -->
+	<select id="selectCtrlPropListByDeptCd" parameterType="String" resultMap="ctrlPropInfo">
+		SELECT PP.OBJ_ID, SS.CONF_TP MNG_OBJ_TP, PP.PROP_ID, PP.PROP_NM, PP.PROP_VALUE, PP.LINK, PP.MOD_DT, PP.MOD_USER_ID, PP.REG_DT, PP.REG_USER_ID
+				FROM CTRL_ITEM_PROP PP JOIN 
+				(SELECT 
+					IFNULL(CC.DEPT_CD, DD.DEPT_CD) DEPT_CD, 
+					IFNULL(CC.CONF_TP, DD.CONF_TP) CONF_TP, 
+					IFNULL(CC.CONF_ID, DD.CONF_ID) CONF_ID
+				FROM (SELECT DEPT_CD, CONF_TP, CONF_ID FROM GR_DEPT_RULE_CONF AA WHERE AA.DEPT_CD=#{deptCd}) CC RIGHT JOIN
+		(SELECT DEPT_CD,CONF_TP,CONF_ID FROM (
+		  SELECT #{deptCd} DEPT_CD, 'BROWSERRULE' CONF_TP, 'BCRUDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{deptCd} DEPT_CD, 'MEDIARULE' CONF_TP, 'MCRUDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{deptCd} DEPT_CD, 'FILTEREDSWRULE' CONF_TP, 'GSFIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{deptCd} DEPT_CD, 'CTRLCENTERITEMRULE' CONF_TP, 'CTCIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{deptCd} DEPT_CD, 'POLICYKITRULE' CONF_TP, 'POKIDEFAULT' CONF_ID
+		  UNION 
+		  SELECT #{deptCd} DEPT_CD, 'SECURITYRULE' CONF_TP, 'GSRUDEFAULT' CONF_ID
+		) DF ) DD ON CC.CONF_TP=DD.CONF_TP) SS
+		ON PP.OBJ_ID = SS.CONF_ID
+	</select>
+
+
+
+	<!-- 정책 - 제어대상 관련 항목 조회 - 조직 : USER -->
+	<select id="selectCtrlItemByUserId" parameterType="String" resultMap="ctrlItemInfo">
+		SELECT MM.OBJ_ID,
+		       FF.EXTVALUE,
+		       MM.OBJ_NM,
+		       MM.MNG_OBJ_TP,
+		       MM.COMMENT,
+		       MM.MOD_DT,
+		       MM.MOD_USER_ID,
+		       MM.REG_DT, MM.REG_USER_ID
+		FROM CTRL_ITEM_MSTR MM
+		     JOIN
+		     (SELECT IF(ISNULL(UU.USER_ID),
+		                (IF(ISNULL(CC.DEPT_CD), 'DEFAULT', 'DEPT')),
+		                'USER')
+		                EXTVALUE,
+		             IFNULL(UU.USER_ID, DD.USER_ID)
+		                USER_ID,
+		             IFNULL(UU.CONF_TP, IFNULL(CC.CONF_TP, DD.CONF_TP))
+		                CONF_TP,
+		             IFNULL(UU.CONF_ID, IFNULL(CC.CONF_ID, DD.CONF_ID))
+		                CONF_ID
+		      FROM 
+		           (SELECT USER_ID, CONF_TP, CONF_ID
+		            FROM (SELECT #{userId} USER_ID,
+		                         'BROWSERRULE' CONF_TP,
+		                         'BCRUDEFAULT' CONF_ID
+		                  UNION
+		                  SELECT #{userId} USER_ID,
+		                         'MEDIARULE' CONF_TP,
+		                         'MCRUDEFAULT' CONF_ID
+		                  UNION
+		                  SELECT #{userId} USER_ID,
+		                         'FILTEREDSWRULE' CONF_TP,
+		                         'GSFIDEFAULT' CONF_ID
+		                  UNION
+		                  SELECT #{userId} USER_ID, 
+		                  		 'CTRLCENTERITEMRULE' CONF_TP, 
+		                  		 'CTCIDEFAULT' CONF_ID
+		  				  UNION 
+		                  SELECT #{userId} USER_ID, 
+		                  		 'POLICYKITRULE' CONF_TP, 
+		                  		 'POKIDEFAULT' CONF_ID
+		  				  UNION 
+		  			      SELECT #{userId} USER_ID,
+		                         'SECURITYRULE' CONF_TP,
+		                         'GSRUDEFAULT' CONF_ID) DF) DD
+					LEFT JOIN 		      	   
+		      	   (SELECT USER_ID, CONF_TP, CONF_ID
+		            FROM GR_USER_RULE_CONF BB
+		            WHERE BB.USER_ID = #{userId}) UU
+		            ON DD.CONF_TP = UU.CONF_TP
+		            LEFT JOIN 
+		            (SELECT DEPT_CD, CONF_TP, CONF_ID
+		             FROM GR_DEPT_RULE_CONF AA
+		             WHERE AA.DEPT_CD = (SELECT DEPT_CD
+                                        FROM USER_MSTR
+                                        WHERE USER_ID = #{userId})) CC
+		              ON DD.CONF_TP = CC.CONF_TP) FF
+		        ON MM.OBJ_ID = FF.CONF_ID	
+	</select>
+
+	<!-- 정책 - 제어대상 관련 속성 리스트 조회 - 조직 : USER -->
+	<select id="selectCtrlPropListByUserId" parameterType="String" resultMap="ctrlPropInfo">
+		SELECT PP.OBJ_ID,
+		       SS.CONF_TP MNG_OBJ_TP,
+		       PP.PROP_ID,
+		       PP.PROP_NM,
+		       PP.PROP_VALUE,
+		       PP.LINK,
+		       PP.MOD_DT,
+		       PP.MOD_USER_ID,
+		       PP.REG_DT, PP.REG_USER_ID
+		FROM CTRL_ITEM_PROP PP
+		     JOIN
+		     (SELECT 
+		             IFNULL(UU.USER_ID, DD.USER_ID)
+		                USER_ID,
+		             IFNULL(UU.CONF_TP, IFNULL(CC.CONF_TP, DD.CONF_TP))
+		                CONF_TP,
+		             IFNULL(UU.CONF_ID, IFNULL(CC.CONF_ID, DD.CONF_ID))
+		                CONF_ID
+		      FROM 
+		           (SELECT USER_ID, CONF_TP, CONF_ID
+		            FROM (SELECT #{userId} USER_ID,
+		                         'BROWSERRULE' CONF_TP,
+		                         'BCRUDEFAULT' CONF_ID
+		                  UNION
+		                  SELECT #{userId} USER_ID,
+		                         'MEDIARULE' CONF_TP,
+		                         'MCRUDEFAULT' CONF_ID
+		                  UNION
+		                  SELECT #{userId} USER_ID,
+		                         'FILTEREDSWRULE' CONF_TP,
+		                         'GSFIDEFAULT' CONF_ID
+		                  UNION
+		                  SELECT #{userId} USER_ID, 
+		                  		 'CTRLCENTERITEMRULE' CONF_TP, 
+		                  		 'CTCIDEFAULT' CONF_ID
+		  				  UNION 
+		                  SELECT #{userId} USER_ID, 
+		                  		 'POLICYKITRULE' CONF_TP, 
+		                  		 'POKIDEFAULT' CONF_ID
+		  				  UNION 
+		  			      SELECT #{userId} USER_ID,
+		                         'SECURITYRULE' CONF_TP,
+		                         'GSRUDEFAULT' CONF_ID) DF) DD
+					LEFT JOIN 		      	   
+		      	   (SELECT USER_ID, CONF_TP, CONF_ID
+		            FROM GR_USER_RULE_CONF BB
+		            WHERE BB.USER_ID = #{userId}) UU
+		            ON DD.CONF_TP = UU.CONF_TP
+		            LEFT JOIN 
+		            (SELECT DEPT_CD, CONF_TP, CONF_ID
+		             FROM GR_DEPT_RULE_CONF AA
+		             WHERE AA.DEPT_CD = (SELECT DEPT_CD
+                                        FROM USER_MSTR
+                                        WHERE USER_ID = #{userId})) CC
+		              ON DD.CONF_TP = CC.CONF_TP) SS
+		        ON PP.OBJ_ID = SS.CONF_ID
+	</select>
+
+
+
+</mapper>

@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="DesktopConfDAO">
+
+	<resultMap type="desktopConfVO" id="desktopConfInfo">
+	
+		<result property="confId" column="CONf_ID" />
+		<result property="newConfId" column="NEW_CONF_ID" />
+		<result property="confNm" column="CONF_NM"/>
+		<result property="confInfo" column="CONF_INFO"/>
+
+		<result property="themeId" column="THEME_ID"/>
+		<result property="themeNm" column="THEME_NM"/>
+
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER_ID"/>
+		
+		<result property="confGrade" column="GRADE"/>
+		
+		<collection property="apps" column="CONf_ID" javaType="java.util.ArrayList" ofType="desktopAppVO" select="selectAppInfoListByConfId" />
+	
+	</resultMap>
+	
+	<resultMap type="desktopAppVO" id="desktopAppInfo">
+		<result property="appId" column="APP_ID" />
+		<result property="appNm" column="APP_NM"/>
+		
+		<result property="appInfo" column="APP_INFO"/>
+		<result property="appGubun" column="APP_GUBUN" />
+		
+		<result property="appExec" column="APP_EXEC" />
+		<result property="appMountUrl" column="MOUNT_URL" />
+		<result property="appMountPoint" column="MOUNT_POINT" />
+
+		<result property="iconGubun" column="ICON_GUBUN"/>
+		<result property="iconId" column="ICON_ID"/>
+		<result property="iconUrl" column="ICON_URL"/>
+		
+		<result property="iconNm" column="ICON_NM"/>
+		<result property="iconGrpId" column="ICON_GRP_ID"/>
+		<result property="iconGrpNm" column="ICON_GRP_NM"/>
+		<result property="fileNm" column="FILE_NM"/>
+		<result property="filePath" column="FILE_PATH"/>
+		
+		<result property="statusCd" column="STATUS_CD"/>
+
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER_ID"/>
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+	
+	</resultMap>
+	
+	<resultMap type="desktopInfoVO" id="desktopInfoMap">
+		<result property="confId" column="conf_id"/>
+		<result property="confNm" column="conf_nm"/>
+		<result property="confInfo" column="conf_info" />
+		<result property="themeId" column="theme_id"/>
+		<result property="themeNm" column="theme_nm"/>
+		<result property="wallpaperNm" column="wallpaper_nm"/>
+		<result property="wallpaperFile" column="file_nm"/>
+		<result property="modUserId" column="mod_user_id"/>
+		<result property="modDt" column="mod_dt"/>
+		<result property="regUserId" column="reg_user_id"/>
+		<result property="regDt" column="reg_dt"/>
+		<result property="confGrade" column="GRADE"/>
+
+		<collection property="apps" column="{confId=conf_id,themeId=theme_id}" javaType="java.util.ArrayList" ofType="desktopItemVO" select="selectDesktopApplications" />
+		<collection property="mounts" column="{confId=conf_id,themeId=theme_id}" javaType="java.util.ArrayList" ofType="desktopItemVO" select="selectDesktopMounts" />
+	</resultMap>
+
+
+	
+	<resultMap type="desktopItemVO" id="desktopItemListMap">
+		<result property="appId" column="app_id"/>
+		<result property="appGubun" column="app_gubun"/>
+		<result property="position" column="app_position"/>
+		<result property="order" column="app_order" />
+		<result property="themeId" column="theme_id"/>
+		<association property="desktop" column="{appId=app_id,themeId=theme_id}" javaType="kr.gooroom.gpms.config.service.DesktopApplicationInfoVO" select="selectApplicationInfo"/>
+	</resultMap>
+	<resultMap type="desktopApplicationInfoVO" id="desktopApplicationInfoMap">
+		<result property="name" column="APP_NM"/>
+		<result property="comment" column="APP_INFO"/>
+		<result property="exec" column="APP_EXEC" />
+		<result property="iconGubun" column="ICON_GUBUN" />
+		<result property="icon" column="ICON_INFO" />
+	</resultMap>
+	<resultMap type="desktopMountInfoVO" id="desktopMountInfoMap">
+		<result property="name" column="APP_NM"/>
+		<result property="comment" column="APP_INFO"/>
+		<result property="protocol" column="MOUNT_PROTOCOL"/>
+		<result property="url" column="MOUNT_URL"/>
+		<result property="mountpoint" column="MOUNT_POINT" />
+		<result property="iconGubun" column="ICON_GUBUN" />
+		<result property="icon" column="ICON_INFO" />
+	</resultMap>
+
+	<!-- 데스크톱 환경설정 리스트조회 -->
+	<select id="selectDesktopConfList" parameterType="String" resultMap="desktopConfInfo">
+		SELECT 
+		  DCI.CONF_ID, DCI.CONF_NM, DCI.CONF_INFO, TM.THEME_ID, TM.THEME_NM, 
+		  DCI.REG_DT, DCI.MOD_DT, DCI.REG_USER_ID, DCI.MOD_USER_ID 
+		FROM DESKTOP_CONF_INFO DCI
+			LEFT JOIN THEME_MSTR TM ON DCI.THEME_ID=TM.THEME_ID
+		ORDER BY DCI.CONF_ID ASC
+	</select>
+
+	<!-- 데스크톱 환경설정 리스트조회 - 페이징 -->
+	<select id="selectDesktopConfListPaged" parameterType="hashMap" resultMap="desktopConfInfo">
+		SELECT 
+		  DCI.CONF_ID, DCI.CONF_NM, DCI.CONF_INFO, TM.THEME_ID, TM.THEME_NM, 
+		  DCI.REG_DT, DCI.MOD_DT, DCI.REG_USER_ID, DCI.MOD_USER_ID 
+		FROM DESKTOP_CONF_INFO DCI
+			LEFT JOIN THEME_MSTR TM ON DCI.THEME_ID=TM.THEME_ID
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				DCI.CONF_NM LIKE CONCAT('%', #{searchKey}, '%') 
+			</if>
+		</where>
+		ORDER BY IF(DCI.CONF_ID LIKE '%DEFAULT', #{defaultOrderValue}, IF(DCI.CONF_ID LIKE '%STD', #{defaultOrderSecondValue}, ${paramOrderColumn})) ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectDesktopConfListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(CONF_ID) AS CNT 
+		FROM DESKTOP_CONF_INFO
+	</select>
+
+	<select id="selectDesktopConfListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(DCI.CONF_ID) AS CNT 
+		FROM DESKTOP_CONF_INFO DCI
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				DCI.CONF_NM LIKE CONCAT('%', #{searchKey}, '%') 
+			</if>
+		</where>
+	</select>
+	
+	
+	<select id="selectAppInfoListByConfId" resultMap="desktopAppInfo">
+		SELECT DAI.APP_ID, DAI.APP_NM, DAI.APP_INFO, DAI.APP_GUBUN, DAI.APP_EXEC, 
+		  DAI.MOUNT_URL, DAI.MOUNT_POINT, DAI.ICON_GUBUN, DAI.ICON_ID, DAI.ICON_URL, 
+		  DAI.STATUS_CD, DAI.MOD_USER_ID, DAI.MOD_DT, DAI.REG_USER_ID, DAI.REG_DT
+		FROM DESKTOP_APP_INFO DAI
+		LEFT JOIN DESKTOP_CONF_APP DCA ON DAI.APP_ID = DCA.APP_ID
+		LEFT JOIN DESKTOP_CONF_INFO DCI ON DCA.CONF_ID = DCI.CONF_ID
+		WHERE DCI.CONF_ID = #{confId} AND DAI.STATUS_CD='STAT010'
+		ORDER BY DCA.APP_ORDER ASC
+	</select>
+	
+
+	<!-- 데스크톱 환경설정 등록 -->
+	<insert id="insertDesktopConf" parameterType="desktopConfVO">
+		INSERT INTO DESKTOP_CONF_INFO
+			(CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, REG_USER_ID, MOD_DT, MOD_USER_ID) 
+		VALUES (
+			#{confId},
+			#{confNm},
+			#{confInfo},
+			#{themeId},
+			now(),
+			#{regUserId},
+			now(),
+			#{modUserId}
+		);
+		<selectKey keyProperty="confId" resultType="string" order="BEFORE">
+			<choose>
+    			<when test='standardConf'>
+    				SELECT CONCAT('${mngObjTpAbbr}', (LPAD((SELECT GRNEXTVAL('${mngObjTp}_SEQ')), 6, 0)), 'STD')
+    			</when>
+			    <otherwise>
+    				SELECT CONCAT('${mngObjTpAbbr}', (LPAD((SELECT GRNEXTVAL('${mngObjTp}_SEQ')), 6, 0)))
+    			</otherwise>
+  			</choose>		
+		</selectKey>
+	</insert>
+	
+	<!-- 데스크톱 환경설정 복사 등록 -->
+	<insert id="insertClonedDesktopConf" parameterType="desktopConfVO">
+		INSERT INTO DESKTOP_CONF_INFO
+			(CONF_ID, CONF_NM, CONF_INFO, THEME_ID, 
+				REG_DT, REG_USER_ID, MOD_DT, MOD_USER_ID) 
+		SELECT #{newConfId}, CONCAT(CONF_NM, '-복사본'), CONF_INFO, THEME_ID, 
+			now(), #{regUserId}, now(), #{modUserId} 
+		FROM DESKTOP_CONF_INFO WHERE CONF_ID=#{confId};
+		<selectKey keyProperty="newConfId" resultType="string" order="BEFORE">
+			<choose>
+    			<when test='@kr.gooroom.gpms.common.utils.CommonUtils@endsWith(confId, "STD")'>
+    				SELECT CONCAT('${mngObjTpAbbr}', (LPAD((SELECT GRNEXTVAL('${mngObjTp}_SEQ')), 6, 0)), 'STD')
+    			</when>
+			    <otherwise>
+    				SELECT CONCAT('${mngObjTpAbbr}', (LPAD((SELECT GRNEXTVAL('${mngObjTp}_SEQ')), 6, 0)))
+    			</otherwise>
+  			</choose>		
+		</selectKey>
+	</insert>
+	
+	<!-- 데스크톱 환경설정에 앱 연동(등록) -->
+	<insert id="insertDesktopAppInConf" parameterType="desktopConfVO">
+		INSERT INTO DESKTOP_CONF_APP
+			(CONF_ID, APP_ID, APP_ORDER, REG_DT, REG_USER_ID) 
+		VALUES (
+			#{confId},
+			#{appId},
+			#{appOrder},
+			now(),
+			#{regUserId}
+		)
+	</insert>
+
+	<!-- 데스크톱 환경설정에 앱 연동(복사 등록) -->
+	<insert id="insertClonedDesktopAppInConf" parameterType="desktopConfVO">
+		INSERT INTO DESKTOP_CONF_APP (CONF_ID, APP_ID, APP_ORDER, REG_DT, REG_USER_ID) 
+		SELECT #{newConfId}, APP_ID, APP_ORDER, NOW(), #{regUserId} 
+		FROM DESKTOP_CONF_APP WHERE CONF_ID=#{confId};
+	</insert>
+
+
+	<!-- 데스크톱 환경설정 수정 -->
+	<update id="updateDesktopConf" parameterType="desktopConfVO">
+	
+		UPDATE DESKTOP_CONF_INFO 
+		SET 
+			CONF_NM = #{confNm}, 
+			CONF_INFO = #{confInfo}, 
+			THEME_ID = #{themeId},
+			MOD_DT = now(), 
+			MOD_USER_ID = #{modUserId}
+		WHERE 
+			CONF_ID = #{confId}
+	
+	</update>
+
+	<!-- 상세조회 -->
+	<select id="selectDesktopConf" parameterType="String" resultMap="desktopConfInfo">
+		SELECT 
+			DCI.CONF_ID, DCI.CONF_NM, DCI.CONF_INFO, 
+			DCI.THEME_ID, TM.THEME_NM, 
+			DCI.REG_DT, DCI.MOD_DT, DCI.REG_USER_ID, DCI.MOD_USER_ID 
+		FROM 
+			DESKTOP_CONF_INFO DCI LEFT JOIN THEME_MSTR TM ON DCI.THEME_ID = TM.THEME_ID
+		WHERE DCI.CONF_ID = #{desktopConfId}
+	</select>
+	
+	<!-- 데스크톱 환경설정 정보 삭제 -->
+	<delete id="deleteDesktopConf" parameterType="string">
+		DELETE FROM DESKTOP_CONF_INFO 
+		WHERE CONF_ID = #{desktopConfId}
+	</delete>
+
+	<!-- 데스크톱 환경설정 정보를 클라이언트 그룹에서 삭제 -->
+	<delete id="deleteDesktopConfInClientGroup" parameterType="string">
+		DELETE FROM GR_GROUP_RULE_CONF 
+		WHERE CONF_ID = #{desktopConfId}
+	</delete>
+	
+	<!-- 데스크톱 환경설정에서 앱정보 삭제 -->
+	<delete id="deleteDesktopAppsInConf" parameterType="string">
+		DELETE FROM DESKTOP_CONF_APP 
+		WHERE CONF_ID = #{desktopConfId}
+	</delete>
+
+	<select id="selectDesktopConfByGroupId" parameterType="string" resultMap="desktopConfInfo">
+	    SELECT CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, GRADE FROM (
+	  		SELECT CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, 'GROUP' AS GRADE
+	  		FROM DESKTOP_CONF_INFO 
+	  		WHERE CONF_ID = (
+	          SELECT RC.CONF_ID FROM GR_GROUP_RULE_CONF RC 
+	          WHERE RC.GRP_ID=#{groupId} AND RC.CONF_TP='DESKTOPCONF')
+	      UNION ALL
+	  		SELECT CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, 'DEFAULT' AS GRADE
+	  		FROM DESKTOP_CONF_INFO 
+	  		WHERE CONF_ID = 'DECODEFAULT') AS A
+	    LIMIT 1;
+    </select>	
+
+	<select id="selectDesktopConfByDeptCd" parameterType="string" resultMap="desktopConfInfo">
+	    SELECT CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, GRADE FROM (
+	  		SELECT CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, 'DEPT' AS GRADE
+	  		FROM DESKTOP_CONF_INFO 
+	  		WHERE CONF_ID = (
+	          SELECT RC.CONF_ID FROM GR_DEPT_RULE_CONF RC 
+	          WHERE RC.DEPT_CD=#{deptCd} AND RC.CONF_TP='DESKTOPCONF')
+	      UNION ALL
+	  		SELECT CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, 'DEFAULT' AS GRADE
+	  		FROM DESKTOP_CONF_INFO 
+	  		WHERE CONF_ID = 'DECODEFAULT') AS A
+	    LIMIT 1;
+    </select>	
+	
+	<select id="selectDesktopConfByUserId" parameterType="string" resultMap="desktopConfInfo">
+	    SELECT CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, GRADE FROM (
+	  		SELECT CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, 'USER' AS GRADE
+	  		FROM DESKTOP_CONF_INFO 
+	  		WHERE CONF_ID = (
+	          SELECT RC.CONF_ID FROM GR_USER_RULE_CONF RC 
+	          WHERE RC.USER_ID=#{userId} AND RC.CONF_TP='DESKTOPCONF')
+	      UNION ALL
+	  		SELECT CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, 'DEPT' AS GRADE
+	  		FROM DESKTOP_CONF_INFO 
+	  		WHERE CONF_ID = (
+	          SELECT RC.CONF_ID FROM GR_DEPT_RULE_CONF RC 
+	          WHERE RC.DEPT_CD=(SELECT UM.DEPT_CD FROM USER_MSTR UM WHERE UM.USER_ID=#{userId}) AND RC.CONF_TP='DESKTOPCONF')
+	      UNION ALL
+	  		SELECT CONF_ID, CONF_NM, CONF_INFO, THEME_ID, REG_DT, MOD_DT, REG_USER_ID, MOD_USER_ID, 'DEFAULT' AS GRADE
+	  		FROM DESKTOP_CONF_INFO 
+	  		WHERE CONF_ID = 'DECODEFAULT') AS A
+	    LIMIT 1;
+    </select>	
+	
+	<select id="selectDesktopInfoByConfId" parameterType="map" resultMap="desktopInfoMap">
+		SELECT aa.conf_id, aa.conf_nm, aa.conf_info, aa.theme_id, aa.mod_user_id, aa.mod_dt, aa.reg_user_id, aa.reg_dt, tm.theme_nm, wm.wallpaper_nm, fm.file_nm
+		FROM ( 
+			SELECT conf_id, conf_nm, conf_info, theme_id, mod_user_id, mod_dt, reg_user_id, reg_dt
+			FROM desktop_conf_info 
+			WHERE conf_id = #{confId}
+			) aa left join theme_mstr tm on tm.theme_id=aa.theme_id
+      		left join wallpaper_mstr wm on wm.wallpaper_id=tm.wallpaper
+      		left join file_mstr fm on wm.file_no=fm.file_no
+      		limit 1
+    </select>
+
+    <select id="selectDesktopApplications" resultMap="desktopItemListMap">
+    	SELECT DAI.APP_ID, DAI.APP_GUBUN, 'bar' AS APP_POSITION, DAC.APP_ORDER, DCI.THEME_ID
+		FROM DESKTOP_APP_INFO DAI
+			LEFT JOIN DESKTOP_CONF_APP DAC ON DAI.APP_ID = DAC.APP_ID
+			LEFT JOIN DESKTOP_CONF_INFO DCI ON DAC.CONF_ID = DCI.CONF_ID
+		WHERE DAC.CONF_ID=#{confId} AND DAI.APP_GUBUN='application' AND DAI.STATUS_CD='STAT010'
+    </select>
+
+
+    <select id="selectDesktopMounts" resultMap="desktopMountInfoMap">
+    	SELECT DAI.APP_NM, DAI.APP_INFO, '' AS MOUNT_PROTOCOL, DAI.MOUNT_URL, DAI.MOUNT_POINT
+		FROM DESKTOP_APP_INFO DAI
+			LEFT JOIN DESKTOP_CONF_APP DAC ON DAI.APP_ID = DAC.APP_ID
+		WHERE DAC.CONF_ID=#{confId} AND DAI.APP_GUBUN='mount' AND DAI.STATUS_CD='STAT010'
+    </select>
+
+    <select id="selectApplicationInfo" resultMap="desktopApplicationInfoMap">
+		SELECT DAI.APP_NM, DAI.APP_INFO, DAI.APP_EXEC, DAI.ICON_GUBUN,
+    		IF(DAI.ICON_GUBUN='FAVICON', DAI.ICON_URL, 
+      			(SELECT FM.FILE_NM FROM THEME_ICON TI LEFT JOIN FILE_MSTR FM ON TI.FILE_NO=FM.FILE_NO
+      				WHERE TI.APP_NM=DAI.ICON_ID AND TI.THEME_ID=#{themeId})
+    			) AS ICON_INFO
+		FROM DESKTOP_APP_INFO DAI
+		WHERE DAI.APP_ID = #{appId} AND DAI.STATUS_CD='STAT010'
+    </select>
+	
+</mapper>

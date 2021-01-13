@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SiteMngDAO">
+
+	<resultMap type="siteMngVO" id="siteMngInfo">
+	
+		<result property="siteId" column="SITE_ID" />
+		<result property="siteNm" column="SITE_NAME"/>
+		
+		<result property="comment" column="COMMENT"/>
+		<result property="status" column="STATUS"/>
+		<result property="pollingCycle" column="POLLING_CYCLE"/>
+		<result property="serverVersion" column="SERVER_VERSION"/>
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="modUserId" column="MOD_USER"/>
+	
+		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+		<result property="regUserId" column="REG_USER"/>
+	
+	</resultMap>
+
+	<!-- 사이트 리스트 조회 -->
+	<select id="selectSiteMngList" parameterType="String" resultMap="siteMngInfo">
+		SELECT 
+			SITE_ID, SITE_NAME, COMMENT, POLLING_CYCLE, 
+			SERVER_VERSION, STATUS, REG_USER, REG_DT, 
+			MOD_USER, MOD_DT 
+		FROM SITE_MSTR
+	</select>
+
+	<!-- 사이트 리스트 조회 (Paged) -->
+	<select id="selectSiteMngListPaged" parameterType="String" resultMap="siteMngInfo">
+		SELECT 
+			SM.SITE_ID, SM.SITE_NAME, SM.COMMENT, 
+			SM.POLLING_CYCLE, SM.SERVER_VERSION, SM.STATUS,
+			SM.MOD_USER_ID, SM.MOD_DT, SM.REG_USER_ID, SM.REG_DT 
+		FROM SITE_MSTR SM
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				SM.SITE_NAME LIKE CONCAT('%', #{searchKey}, '%') 
+				OR SM.SITE_ID LIKE CONCAT('%', #{searchKey}, '%')
+				OR SM.COMMENT LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+			<if test="status != null and status != ''">
+				AND SM.STATUS = #{status}
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+	
+	<select id="selectSiteMngListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(SM.SITE_ID) AS CNT 
+		FROM SITE_MSTR SM
+	</select>
+
+	<select id="selectSiteMngListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(SM.SITE_ID) AS CNT 
+		FROM SITE_MSTR SM 
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				SM.SITE_NAME LIKE CONCAT('%', #{searchKey}, '%') 
+				OR SM.SITE_ID LIKE CONCAT('%', #{searchKey}, '%')
+				OR SM.COMMENT LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+			<if test="status != null and status != ''">
+				AND SM.STATUS = #{status}
+			</if>
+		</where>
+	</select>
+
+	<!-- 사이트 정보 등록 -->
+	<insert id="insertSiteMng" parameterType="siteMngVO">
+		INSERT INTO SITE_MSTR
+			(SITE_ID, SITE_NAME, 
+			COMMENT, POLLING_CYCLE, SERVER_VERSION, STATUS, 
+			REG_USER, REG_DT, MOD_USER, MOD_DT) 
+		VALUES 
+			(#{siteId}, #{siteNm},
+			#{comment}, #{pollingCycle}, #{serverVersion}, #{status},
+			#{regUserId}, now(), #{modUserId}, now())
+	</insert>
+
+	<!-- 사이트 정보 조회 -->
+	<select id="selectSiteMngData" parameterType="String" resultMap="siteMngInfo">
+		SELECT 
+			SITE_ID, SITE_NAME, COMMENT, POLLING_CYCLE, 
+			SERVER_VERSION, STATUS, REG_USER, REG_DT, 
+			MOD_USER, MOD_DT 
+		FROM SITE_MSTR
+		WHERE SITE_ID = #{siteId}
+	</select>
+
+	<!-- 사이트 정보 수정 -->
+	<update id="updateSiteMngData" parameterType="siteMngVO">
+		UPDATE SITE_MSTR SET 
+			SITE_NAME = #{siteNm},
+			COMMENT = #{comment},
+			POLLING_CYCLE = #{pollingCycle},
+			SERVER_VERSION = #{serverVersion},
+			STATUS = #{status},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now() 
+		WHERE SITE_ID = #{siteId}
+	</update>
+
+	<!-- 사이트 상태 변경 -->
+	<update id="updateSiteStatusData" parameterType="siteMngVO">
+		UPDATE SITE_MSTR SET STATUS = #{status},
+			MOD_USER_ID = #{modUserId},
+			MOD_DT = now() 
+		WHERE SITE_ID = #{siteId}
+	</update>
+	
+	<!-- 사이트 정보 삭제 -->
+	<delete id="deleteSiteMngData" parameterType="siteMngVO">
+		DELETE FROM SITE_MSTR WHERE SITE_ID = #{siteId}
+	</delete>
+
+</mapper>
