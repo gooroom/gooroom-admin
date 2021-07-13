@@ -24,8 +24,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import kr.gooroom.gpms.common.service.GpmsCommonService;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
@@ -40,7 +40,7 @@ import kr.gooroom.gpms.common.utils.LoginInfoHelper;
  * @since 1.8
  */
 
-public class GPMSInterceptor extends HandlerInterceptorAdapter {
+public class GPMSInterceptor implements HandlerInterceptor {
 
 	// private static final Logger logger =
 	// LoggerFactory.getLogger(GPMSInterceptor.class);

@@ -9,6 +9,7 @@ import java.util.Date;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.config.service.CtrlItemVO;
 import kr.gooroom.gpms.config.service.CtrlPropVO;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 public class CommonUtils {
@@ -54,7 +55,7 @@ public class CommonUtils {
 
 	public static Date yyyyMMddToDate(String dateStr) {
 		try {
-			if(!StringUtils.isEmpty(yyyyMMdd)) {
+			if(!ObjectUtils.isEmpty(yyyyMMdd)) {
 				return yyyyMMdd.parse(dateStr);
 			}
 
