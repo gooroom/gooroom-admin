@@ -82,6 +82,9 @@ public class ClientVO implements Serializable {
 	private String updateTargetCnt;
 	private String updateMainOsCnt;
 
+	private String useCleanMode;
+	private String cleanModeAllow;
+
 	private String useHomeReset;
 	private String rootAllow;
 	private String sudoAllow;
@@ -364,6 +367,22 @@ public class ClientVO implements Serializable {
 
 	public void setUpdateMainOsCnt(String updateMainOsCnt) {
 		this.updateMainOsCnt = updateMainOsCnt;
+	}
+
+	public String getUseCleanMode() {
+		return useCleanMode;
+	}
+
+	public void setUseCleanMode(String useCleanMode) {
+		this.useCleanMode = useCleanMode;
+	}
+
+	public String getCleanModeAllow() {
+		return cleanModeAllow;
+	}
+
+	public void setCleanModeAllow(String cleanModeAllow) {
+		this.cleanModeAllow = cleanModeAllow;
 	}
 
 	public String getUseHomeReset() {

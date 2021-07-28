@@ -246,6 +246,7 @@ public class GPMSConstants {
 	public static final String CTRL_ITEM_USEHOMERESET = "USEHOMERESET";
 	public static final String CTRL_ITEM_ROOTALLOW = "ROOTALLOW";
 	public static final String CTRL_ITEM_SUDOALLOW = "SUDOALLOW";
+	public static final String CTRL_ITEM_CLEANMODEALLOW = "CLEANMODEALLOW";
 
 	// JOB NAME - media rule
 	public static final String JOB_MEDIA_RULE_CHANGE = "get_media_config";
@@ -264,6 +265,9 @@ public class GPMSConstants {
 
 	// JOB NAME - root / sudo aloow job
 	public static final String JOB_ACCOUNT_RULE_CHANGE = "get_account_config";
+
+	// JOB NAME - clean mode allow job
+	public static final String JOB_CLEANMODE_RULE_CHANGE = "get_cleanmode_config";
 
 	// JOB NAME - client configuration
 	public static final String JOB_CLIENTCONF_AGENTPOLLING_CHANGE = "set_serverjob_dispatch_time_config";
