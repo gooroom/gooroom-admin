@@ -3,4 +3,81 @@
 
 <mapper namespace="PortableImageDAO">
 
+    <resultMap type="portableImageVO" id="portableImage">
+
+        <result property="imageId" column="IMAGE_ID" />
+        <result property="name" column="NAME" />
+        <result property="url" column="URL" />
+        <result property="size" column="SIZE" />
+        <result property="createdDt" column="CREATED_DT" />
+        <result property="status" column="STATUS" />
+
+    </resultMap>
+
+    <!-- 포터블 이미지 정보 생성 -->
+    <insert id="insertPortableImage" parameterType="portableImageVO">
+        INSERT INTO PTGR_IMAGE
+            (IMAGE_ID, NAME, URL, SIZE, CREATED_DT, STATUS)
+        VALUES
+            (SELECT GRNEXTVAL('PTGRIMAGE_SEQ'), #{name}, #{url}, #{size}, #{createdDt}, #{status});
+    </insert>
+
+    <select id="selectPortableImageList">
+        SELECT
+            (IMAGE_ID, NAME, CREATED_DT, SIZE, STATUS,
+            ADMIN_ID, USER_ID, REG_DT)
+        FROM VIEW_PTGR_IMAGE;
+    </select>
+
+    <select id="selectPortableImageListByCondition" parameterType="hashmap">
+        SELECT
+            (IMAGE_ID, NAME, CREATED_DT, SIZE, STATUS,
+            ADMIN_ID, USER_ID, REG_DT)
+        FROM VIEW_PTGR_IMAGE
+        WHERE STATUS != 'REMOVE';
+    </select>
+
+    <!-- 이미지 파일 정보 업데이트 -->
+    <update id="updatePortableImage" parameterType="portableImageVO">
+        UPDATE PTGR_IMAGE
+        SET
+            (NAME = #{name}, URL = #{url}, SIZE = #{size},
+            CREATED_DT = now())
+        WHERE IMAGE_ID = #{imageId};
+    </update>
+
+    <!-- 이미지 상태 업데이트 (또는 상태 변경으로 삭제) -->
+    <update id="updateImageStatus" parameterType="hashMap">
+        UPDATE PTGR_IMAGE
+        SET STATUS = #{status}
+        WHERE IMAGE_ID = #{imageId};
+    </update>
+
+    <!-- 이미지 삭제 -->
+    <!--
+        <delete id="deletePortableImage" parameterType="Integer">
+            DELETE FROM PTGR_IMAGE
+            WHERE IMAGE_ID = #{imageId};
+        </delete>
+        <delete id="deletePortableImage" parameterType="hashMap">
+            DELETE FROM PTGR_IMAGE IN
+            <foreach item="item" index="index" collection="imageIds" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </delete>
+    -->
+    <delete id="deletePortableImage" parameterType="hashmap">
+        UPDATE PTGR_IMAGE
+        SET STATUS = 'REMOVE'
+        WHERE IMAGE_ID IN
+        <foreach collection="imageIds" item="item" index="index" open="(" separator="," close=")">
+            ${item.imageId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAllPortableImage">
+        UPDATE PTGR_IMAGE
+        SET STATUS = 'REMOVE'
+    </delete>
+
 </mapper>

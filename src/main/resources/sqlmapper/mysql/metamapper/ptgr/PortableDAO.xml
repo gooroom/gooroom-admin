@@ -3,4 +3,101 @@
 
 <mapper namespace="PotableDAO">
 
+    <resultMap type="portableVO" id="portable">
+
+        <result property="ptgrId" column="PTGR_ID" />
+        <result property="adminId" column="ADMIN_ID" />
+        <result property="userId" column="USER_ID" />
+        <result property="certId" column="CERT_ID" />
+        <result property="imageId" column="IMAGE_ID" />
+        <result property="logId" column="LOG_ID" />
+        <result property="isoPw" column="ISO_PW" />
+        <result property="redDt" column="REG_DT" />
+        <result property="beginDt" column="BEGIN_DT" />
+        <result property="expiredDt" column="EXPIRED_DT" />
+        <result property="notiType" column="NOTI_TYPE" />
+        <result property="notiEmail" column="NOTI_EMAIL" />
+        <result property="isBuildTransfer" column="IS_BUILD_TRANSFER" />
+        <result property="isBulk" column="IS_BULK" />
+        <result property="statusCd" column="STATUS_CD" />
+
+    </resultMap>
+    <!-- 포터블구름 정보 생성 -->
+    <insert id="insertPortableData" parameterType="portableVO">
+        INSERT INTO PTGR_MSTR
+            (PTGR_ID,
+            ADMIN_ID, USER_ID,
+            CERT_ID, IMAGE_ID, LOG_ID,
+            ISO_PW,
+            REG_DT, BEGIN_DT, EXPIRED_DT,
+            NOTI_TYPE, NOTI_EMAIL,
+            IS_BUILD_TRANSFER ,IS_BULK, STATUS_CD)
+        VALUES
+            (SELECT GRNEXTVAL('PTGRMSTR_SEQ'),
+            #{adminId}, #{userId}, #{logId}
+            #{certId}, #{imageId},
+            #{isoPw},
+            now(), #{beginDt}, #{expiredDt},
+            #{notiType}, #{notiEmail},
+            #{isBuildTransfer}, #{isBulk}, #{statusCd});
+    </insert>
+
+    <select id="selectPortableDataList" parameterType="Integer">
+        SELECT
+            (PTGR_ID, ADMIN_ID, USER_ID, CERT_ID,
+            RED_DT, BEGIN_DT, EXPIRED_DT,
+            IS_BUILD_TRANSFER, IS_PUBLISH,
+            NAME, URL, STATUS)
+        FROM VIEW_PTGR_ADMIN
+        WHERE ADMIN_ID IN
+            <foreach collection="id" item="item" open="(" separator="," close=")">
+                #{adminId}
+            </foreach>
+        OR ADMIN_ID IS NULL;
+    </select>
+
+    <select id="selectPortableDataListPaged" parameterType="hashmap">
+        SELECT
+            (PTGR_ID, ADMIN_ID, USER_ID, CERT_ID,
+            RED_DT, BEGIN_DT, EXPIRED_DT,
+            IS_BUILD_TRANSFER, IS_PUBLISH,
+            NAME, URL, STATUS)
+        FROM VIEW_PTGR_ADMIN
+        WHERE PTGR_ID IN
+            <foreach collection="item" item="item" open="(" separator="," close=")">
+                PTGR_ID=${item}
+            </foreach>
+    </select>
+
+    <update id="updatePortableData" parameterType="portableVO">
+        UPDATE PTGR_MSTR
+        SET ISO_PW = #{isoPw},
+            REG_DT = #{regDt},
+            BEGIN_DT = #{beginDt},
+            EXPIRED_DT = #{expiredDt},
+            IS_BUILD_TRANSFER = #{isBuildTransfer},
+            STATUS_CD = #{statusCd},
+        WHERE PTGR_ID = #{ptgrId};
+    </update>
+
+    <update id="updateAllPortableApprove" parameterType="Integer">
+        UPDATE PTGR_MSTR
+        SET STATUS_CD = 'APPROVE'
+
+    </update>
+
+    <!-- 삭제 -->
+    <delete id="deletePortableData" parameterType="hashmap">
+        DELETE FROM PTGR_MSTR
+        <!-- WHERE PTGR_ID = #{ptgrId}; -->
+        WHERE PTGR_ID IN
+            <foreach collection="item" item="item" open="(" separator="," close=")">
+                (PTGR_ID=#{item})
+            </foreach>
+    </delete>
+
+    <delete id="deleteAllPortableData">
+        DELETE FROM PTGR_MSTR;
+    </delete>
+
 </mapper>
