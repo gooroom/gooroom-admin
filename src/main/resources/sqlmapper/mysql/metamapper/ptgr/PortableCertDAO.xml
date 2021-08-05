@@ -7,28 +7,38 @@
 
         <result property="certId" column="CERT_ID" />
         <result property="certPw" column="CERT_PW" />
-        <result property="isPublish" column="IS_PUBLISH" />
+        <result property="certStatus" column="CERT_STATUS" />
         <result property="createdDt" column="CREATED_DT" />
         <result property="transferDt" column="TRANSFER_DT" />
         <result property="certPem" column="CERT_PEM" />
 
     </resultMap>
 
+    <select id="selectCertCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(*) CNT
+        FROM PTGR_CERT
+        WHERE CERT_ID = #{certId};
+    </select>
+
+    <select id="selectNextCertNo" resultType="java.lang.Integer">
+        SELECT GRNEXTVAL('PTGRCERT_SEQ') AS CERT_ID FROM DUAL;
+    </select>
+
     <!-- 인증서 정보 생성 -->
     <insert id="insertPortableCert" parameterType="portableCertVO">
         INSERT INTO PTGR_CERT
-            (CERT_ID, CERT_PW, IS_PUBLISH)
+            (CERT_ID, CERT_PW, CERT_STATUS, CREATED_DT, TRANSFER_DT, CERT_PEM)
         VALUES
-            (SELECT GRNEXTVAL('PTGRCERT_SEQ'), #{certPw}, #{isPublish});
+            (#{certId}, #{certPw}, #{certStatus}, #{createdDt}, #{transferDt}, #{certPem});
     </insert>
 
-    <select id="selectPortableCert" parameterType="Integer">
+    <select id="selectPortableCert" parameterType="java.lang.Integer" resultMap="portableCert">
         SELECT C.CREATED_DT, C.TRANSFER_DT
         FROM PTGR_CERT AS C
         WHERE C.CERT_ID = #{certId};
     </select>
 
-    <delete id="deletePortableCert" parameterType="Integer">
+    <delete id="deletePortableCert" parameterType="java.lang.Integer">
         DELETE FROM PTGR_CERT
         WHERE CERT_ID = #{certId};
     </delete>

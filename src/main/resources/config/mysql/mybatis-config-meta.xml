@@ -83,9 +83,9 @@
 		<typeAlias type="kr.gooroom.gpms.notice.service.NoticePublishTargetVO" alias="noticePublishTargetVO" />
 		<typeAlias type="kr.gooroom.gpms.notice.service.TargetNoticeVO" alias="targetNoticeVO" />
 
-		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableVO" alias="portable" />
-		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableCertVO" alias="portableCert" />
-		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableImageVO" alias="portableImage" />
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableVO" alias="portableVO" />
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableCertVO" alias="portableCertVO" />
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableImageVO" alias="portableImageVO" />
 
 	</typeAliases>
 	

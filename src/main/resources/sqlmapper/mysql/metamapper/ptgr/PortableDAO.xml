@@ -12,42 +12,68 @@
         <result property="imageId" column="IMAGE_ID" />
         <result property="logId" column="LOG_ID" />
         <result property="isoPw" column="ISO_PW" />
-        <result property="redDt" column="REG_DT" />
+        <result property="regDt" column="REG_DT" />
         <result property="beginDt" column="BEGIN_DT" />
         <result property="expiredDt" column="EXPIRED_DT" />
         <result property="notiType" column="NOTI_TYPE" />
         <result property="notiEmail" column="NOTI_EMAIL" />
-        <result property="isBuildTransfer" column="IS_BUILD_TRANSFER" />
+        <result property="buildStatus" column="BUILD_STATUS" />
+        <result property="approveStatus" column="APPROVE_STATUS" />
         <result property="isBulk" column="IS_BULK" />
         <result property="statusCd" column="STATUS_CD" />
 
     </resultMap>
+
+    <resultMap type="portableVO" id="portableView">
+
+        <result property="ptgrId" column="PTGR_ID" />
+        <result property="userId" column="USER_ID" />
+        <result property="certId" column="CERT_ID" />
+        <result property="regDt" column="REG_DT" />
+        <result property="beginDt" column="BEGIN_DT" />
+        <result property="expiredDt" column="EXPIRED_DT" />
+        <result property="buildStatus" column="BUILD_STATUS" />
+        <result property="approveStatus" column="APPROVE_STATUS" />
+        <result property="statusCd" column="STATUS_CD" />
+        <result property="certStatus" column="CERT_STATUS" />
+        <result property="imageName" column="IMAGE_NAME" />
+        <result property="imageUrl" column="IMAGE_URL" />
+        <result property="imageStatus" column="IMAGE_STATUS" />
+
+    </resultMap>
+
+    <select id="selectPortableCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(*) CNT
+        FROM PTGR_MSTR
+        WHERE PTGR_ID = #{ptgrId};
+    </select>
+
+    <select id="selectNextPortableNo" resultType="java.lang.Integer">
+        SELECT GRNEXTVAL('PTGRMSTR_SEQ') AS PTGR_ID FROM DUAL;
+    </select>
+
     <!-- 포터블구름 정보 생성 -->
     <insert id="insertPortableData" parameterType="portableVO">
         INSERT INTO PTGR_MSTR
-            (PTGR_ID,
-            ADMIN_ID, USER_ID,
-            CERT_ID, IMAGE_ID, LOG_ID,
-            ISO_PW,
+            (PTGR_ID, ADMIN_ID, USER_ID,
+            CERT_ID, IMAGE_ID, LOG_ID, ISO_PW,
             REG_DT, BEGIN_DT, EXPIRED_DT,
             NOTI_TYPE, NOTI_EMAIL,
-            IS_BUILD_TRANSFER ,IS_BULK, STATUS_CD)
+            BUILD_STATUS, APPROVE_STATUS, IS_BULK, STATUS_CD)
         VALUES
-            (SELECT GRNEXTVAL('PTGRMSTR_SEQ'),
-            #{adminId}, #{userId}, #{logId}
-            #{certId}, #{imageId},
-            #{isoPw},
+            (#{ptgrId}, #{adminId}, #{userId},
+            #{certId}, #{imageId}, #{logId}, #{isoPw},
             now(), #{beginDt}, #{expiredDt},
             #{notiType}, #{notiEmail},
-            #{isBuildTransfer}, #{isBulk}, #{statusCd});
+            #{buildStatus}, #{approveStatus}, #{isBulk}, #{statusCd});
     </insert>
 
-    <select id="selectPortableDataList" parameterType="Integer">
+    <select id="selectPortableDataList" parameterType="java.lang.Integer" resultMap="portableView">
         SELECT
-            (PTGR_ID, ADMIN_ID, USER_ID, CERT_ID,
+            (PTGR_ID, USER_ID, CERT_ID,
             RED_DT, BEGIN_DT, EXPIRED_DT,
-            IS_BUILD_TRANSFER, IS_PUBLISH,
-            NAME, URL, STATUS)
+            BUILD_STATUS, APPROVE_STATUS, STATUS_CD, CERT_STATUS,
+            IMAGE_NAME, IMAGE_URL, IMAGE_STATUS)
         FROM VIEW_PTGR_ADMIN
         WHERE ADMIN_ID IN
             <foreach collection="id" item="item" open="(" separator="," close=")">
@@ -56,12 +82,12 @@
         OR ADMIN_ID IS NULL;
     </select>
 
-    <select id="selectPortableDataListPaged" parameterType="hashmap">
+    <select id="selectPortableDataListPaged" parameterType="hashmap" resultMap="portableView">
         SELECT
-            (PTGR_ID, ADMIN_ID, USER_ID, CERT_ID,
+            (PTGR_ID, USER_ID, CERT_ID,
             RED_DT, BEGIN_DT, EXPIRED_DT,
-            IS_BUILD_TRANSFER, IS_PUBLISH,
-            NAME, URL, STATUS)
+            BUILD_STATUS, APPROVE_STATUS, STATUS_CD, CERT_STATUS,
+            IMAGE_NAME, IMAGE_URL, IMAGE_STATUS)
         FROM VIEW_PTGR_ADMIN
         WHERE PTGR_ID IN
             <foreach collection="item" item="item" open="(" separator="," close=")">
@@ -71,19 +97,31 @@
 
     <update id="updatePortableData" parameterType="portableVO">
         UPDATE PTGR_MSTR
-        SET ISO_PW = #{isoPw},
+        SET ADMIN_ID = #{adminId},
+            USER_ID = #{userId},
+            CERT_ID = #{certId},
+            IMAGE_ID = #{imageId},
+            LOG_ID = #[logId},
+            ISO_PW = #{isoPw},
             REG_DT = #{regDt},
             BEGIN_DT = #{beginDt},
             EXPIRED_DT = #{expiredDt},
-            IS_BUILD_TRANSFER = #{isBuildTransfer},
-            STATUS_CD = #{statusCd},
+            NOTI_TYPE = #{notiType},
+            NOTI_EMAIL = #{notiEmail},
+            BUILD_STATUS = #{buildStatus},
+            APPROVE_STATUS = #{approveStatus},
+            IS_BULK = #{isBulk},
+            STATUS_CD = #{statusCd}
         WHERE PTGR_ID = #{ptgrId};
     </update>
 
-    <update id="updateAllPortableApprove" parameterType="Integer">
+    <update id="updateAllPortableApprove" parameterType="java.lang.Integer">
         UPDATE PTGR_MSTR
         SET STATUS_CD = 'APPROVE'
-
+        WHERE PTGR_ID IN
+            <foreach collection="adminId" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
     </update>
 
     <!-- 삭제 -->
@@ -92,7 +130,7 @@
         <!-- WHERE PTGR_ID = #{ptgrId}; -->
         WHERE PTGR_ID IN
             <foreach collection="item" item="item" open="(" separator="," close=")">
-                (PTGR_ID=#{item})
+                #{item}
             </foreach>
     </delete>
 

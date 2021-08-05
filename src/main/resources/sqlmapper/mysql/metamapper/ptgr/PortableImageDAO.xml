@@ -6,35 +6,53 @@
     <resultMap type="portableImageVO" id="portableImage">
 
         <result property="imageId" column="IMAGE_ID" />
-        <result property="name" column="NAME" />
-        <result property="url" column="URL" />
-        <result property="size" column="SIZE" />
+        <result property="imageName" column="IMAGE_NAME" />
+        <result property="imageUrl" column="IMAGE_URL" />
+        <result property="imageSize" column="IMAGE_SIZE" />
         <result property="createdDt" column="CREATED_DT" />
-        <result property="status" column="STATUS" />
+        <result property="imageStatus" column="IMAGE_STATUS" />
 
     </resultMap>
+
+    <resultMap id="portableImageVO" type="imageView">
+        <result property="imageId" column="IMAGE_ID" />
+        <result property="imageName" column="IMAGE_NAME" />
+        <result property="createdDt" column="CREATED_DT" />
+        <result property="imageSize" column="IMAGE_SIZE" />
+        <result property="imageStatus" column="IMAGE_STATUS" />
+        <result property="userId" column="USER_ID" />
+        <result property="regDt" column="REG_DT" />
+    </resultMap>
+
+    <select id="selectImageCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(*) CNT
+        FROM PTGR_IMAGE
+        WHERE IMAGE_ID = #{imageId};
+    </select>
+
+    <select id="selectNextImageNo" resultType="java.lang.Integer">
+        SELECT GRNEXTVAL('PTGRIMAGE_SEQ') AS IMAGE_ID FROM DUAL;
+    </select>
 
     <!-- 포터블 이미지 정보 생성 -->
     <insert id="insertPortableImage" parameterType="portableImageVO">
         INSERT INTO PTGR_IMAGE
-            (IMAGE_ID, NAME, URL, SIZE, CREATED_DT, STATUS)
+            (IMAGE_ID, IMAGE_NAME, IMAGE_URL, IMAGE_SIZE, CREATED_DT, IMAGE_STATUS)
         VALUES
-            (SELECT GRNEXTVAL('PTGRIMAGE_SEQ'), #{name}, #{url}, #{size}, #{createdDt}, #{status});
+            (#{imageId}, #{imageName}, #{imageUrl}, #{imageSize}, #{createdDt}, #{imageStatus});
     </insert>
 
-    <select id="selectPortableImageList">
+    <select id="selectPortableImageList" resultMap="imageView">
         SELECT
-            (IMAGE_ID, NAME, CREATED_DT, SIZE, STATUS,
-            ADMIN_ID, USER_ID, REG_DT)
+            (IMAGE_ID, IMAGE_NAME, CREATED_DT, IMAGE_SIZE, IMAGE_STATUS, USER_ID, REG_DT)
         FROM VIEW_PTGR_IMAGE;
     </select>
 
-    <select id="selectPortableImageListByCondition" parameterType="hashmap">
+    <select id="selectPortableImageListByCondition" parameterType="hashmap" resultMap="imageView">
         SELECT
-            (IMAGE_ID, NAME, CREATED_DT, SIZE, STATUS,
-            ADMIN_ID, USER_ID, REG_DT)
+            (IMAGE_ID, IMAGE_NAME, CREATED_DT, IMAGE_SIZE, IMAGE_STATUS, USER_ID, REG_DT)
         FROM VIEW_PTGR_IMAGE
-        WHERE STATUS != 'REMOVE';
+        WHERE IMAGE_STATUS != 'REMOVE';
     </select>
 
     <!-- 이미지 파일 정보 업데이트 -->
@@ -49,7 +67,7 @@
     <!-- 이미지 상태 업데이트 (또는 상태 변경으로 삭제) -->
     <update id="updateImageStatus" parameterType="hashMap">
         UPDATE PTGR_IMAGE
-        SET STATUS = #{status}
+        SET IMAGE_STATUS = #{status}
         WHERE IMAGE_ID = #{imageId};
     </update>
 
@@ -68,7 +86,7 @@
     -->
     <delete id="deletePortableImage" parameterType="hashmap">
         UPDATE PTGR_IMAGE
-        SET STATUS = 'REMOVE'
+        SET IMAGE_STATUS = 'REMOVE'
         WHERE IMAGE_ID IN
         <foreach collection="imageIds" item="item" index="index" open="(" separator="," close=")">
             ${item.imageId}
@@ -77,7 +95,7 @@
 
     <delete id="deleteAllPortableImage">
         UPDATE PTGR_IMAGE
-        SET STATUS = 'REMOVE'
+        SET IMAGE_STATUS = 'REMOVE'
     </delete>
 
 </mapper>
