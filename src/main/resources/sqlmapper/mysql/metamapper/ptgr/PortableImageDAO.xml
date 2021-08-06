@@ -14,7 +14,7 @@
 
     </resultMap>
 
-    <resultMap id="portableImageVO" type="imageView">
+    <resultMap type="portableImageViewVO" id="imageView">
         <result property="imageId" column="IMAGE_ID" />
         <result property="name" column="NAME" />
         <result property="createdDt" column="CREATED_DT" />

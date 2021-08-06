@@ -3,14 +3,16 @@ package kr.gooroom.gpms.ptgr.service;
 import java.io.Serializable;
 import java.util.Date;
 
-public class PortableImageVO implements Serializable {
+public class PortableImageViewVO implements Serializable {
 
     int imageId;
     int size;
+    String userId;
     String name;
     String url;
     String status;
-    Date createdDt;
+    Date regDt;
+    Date createDt;
 
     public int getImageId() {
         return imageId;
@@ -26,6 +28,14 @@ public class PortableImageVO implements Serializable {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getName() {
@@ -52,11 +62,19 @@ public class PortableImageVO implements Serializable {
         this.status = status;
     }
 
-    public Date getCreatedDt() {
-        return createdDt;
+    public Date getRegDt() {
+        return regDt;
     }
 
-    public void setCreatedDt(Date createdDt) {
-        this.createdDt = createdDt;
+    public void setRegDt(Date regDt) {
+        this.regDt = regDt;
+    }
+
+    public Date getCreateDt() {
+        return createDt;
+    }
+
+    public void setCreateDt(Date createDt) {
+        this.createDt = createDt;
     }
 }

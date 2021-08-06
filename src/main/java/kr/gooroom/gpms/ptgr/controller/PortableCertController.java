@@ -1,12 +1,16 @@
 package kr.gooroom.gpms.ptgr.controller;
 
+import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultVO;
+import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.ptgr.PortableConstants;
+import kr.gooroom.gpms.ptgr.service.PortableCertService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 @Controller
 @RequestMapping("/portable")
@@ -14,8 +18,26 @@ public class PortableCertController {
 
     private static final Logger logger = LoggerFactory.getLogger(PortableCertController.class);
 
-    @GetMapping (value="/user/cert")
-    public ResultVO getCert (@RequestParam(value = "certId" ) String certId)  {
-        return null;
+    @Resource(name = "portableCertService")
+    private PortableCertService portableCertService;
+
+    @GetMapping (value="/user/cert/{certId}")
+    @ResponseBody
+    public ResultVO getCert (@PathVariable String  certId )  {
+
+        ResultVO resultVO = new ResultVO();
+        try
+        {
+            if (certId == null || certId.isEmpty()) {
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, ""));
+            }
+            else {
+                resultVO = portableCertService.readCertDataByCertId(certId);
+            }
+        } catch (Exception e) {
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, e.getMessage()));
+        }
+
+        return resultVO;
     }
 }

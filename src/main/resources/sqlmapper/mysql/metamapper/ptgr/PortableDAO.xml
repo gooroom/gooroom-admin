@@ -24,7 +24,7 @@
 
     </resultMap>
 
-    <resultMap type="portableVO" id="portableView">
+    <resultMap type="portableViewVO" id="portableView">
 
         <result property="ptgrId" column="PTGR_ID" />
         <result property="userId" column="USER_ID" />
@@ -64,21 +64,40 @@
             #{certId}, #{imageId}, #{logId}, #{isoPw},
             now(), #{beginDt}, #{expiredDt},
             #{notiType}, #{notiEmail},
-            #{buildStatus}, #{approveStatus}, #{isBulk}, #{statusCd});
+            #{buildStatus}, #{approveStatus}, #{bulk}, #{statusCd});
     </insert>
 
-    <select id="selectPortableDataList" parameterType="java.lang.Integer" resultMap="portableView">
-        SELECT
-            (PTGR_ID, USER_ID, CERT_ID,
-            REG_DT, BEGIN_DT, EXPIRED_DT,
-            BUILD_STATUS, APPROVE_STATUS, CERT_STATUS,
-            IMAGE_NAME, IMAGE_URL, IMAGE_STATUS)
+    <select id="selectPortableViewList" parameterType="hashMap" resultMap="portableView">
+        SELECT *
         FROM VIEW_PTGR_ADMIN
-        WHERE ADMIN_ID IN
-            <foreach collection="id" item="item" open="(" separator="," close=")">
-                #{adminId}
-            </foreach>
-        OR ADMIN_ID IS NULL;
+        <if test="adminId != null">
+            WHERE ADMIN_ID = #{adminId}
+        </if>
+        <if test="ptgrId != null">
+            WHERE PTGR_ID = #{ptgrId}
+        </if>
+        <if test="userId != null">
+            WHERE USER_ID = #{userId}
+        </if>
+    </select>
+
+    <select id="selectPortableDataList" parameterType="hashMap" resultMap="portable">
+        SELECT *
+        FROM PTGR_MSTR
+        <if test="adminId != null">
+            WHERE ADMIN_ID = #{adminId}
+        </if>
+        <if test="ptgrId != null">
+            WHERE PTGR_ID = #{ptgrId}
+        </if>
+    </select>
+
+    <select id="selectPortableDataListByAdminIdAndApprove" parameterType="hashMap" resultMap="portable">
+        SELECT *
+        FROM PTGR_MSTR
+        <if test="adminId != null">
+            WHERE ADMIN_ID = #{adminId} AND APPROVE_STATUS = "APPROVE00"
+        </if>
     </select>
 
     <select id="selectPortableDataListPaged" parameterType="hashmap" resultMap="portableView">
@@ -126,10 +145,9 @@
     <!-- 삭제 -->
     <delete id="deletePortableData" parameterType="hashmap">
         DELETE FROM PTGR_MSTR
-        <!-- WHERE PTGR_ID = #{ptgrId}; -->
         WHERE PTGR_ID IN
-            <foreach collection="item" item="item" open="(" separator="," close=")">
-                #{item}
+            <foreach collection="ptgrId" item="ptgrId" open="(" separator="," close=")">
+                #{ptgrId}
             </foreach>
     </delete>
 

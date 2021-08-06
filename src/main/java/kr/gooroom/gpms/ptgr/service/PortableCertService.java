@@ -31,4 +31,20 @@ public interface PortableCertService {
      * @throws Exception
      */
     StatusVO deleteCertDataByCertId(String certId) throws Exception;
+
+    /**
+     * 휴대형구름 인증서 Index
+     *
+     * @return int
+     * @throws Exception
+     */
+    int readNextCertDataIndex() throws Exception;
+
+    /**
+     * 휴대형구름 인증서 Count
+     *
+     * @return int
+     * @throws Exception
+     */
+    int readCertDataCount() throws Exception;
 }

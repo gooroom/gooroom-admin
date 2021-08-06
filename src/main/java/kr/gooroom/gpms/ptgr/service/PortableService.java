@@ -3,6 +3,8 @@ package kr.gooroom.gpms.ptgr.service;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 
+import java.util.HashMap;
+
 public interface PortableService {
 
     /**
@@ -20,24 +22,43 @@ public interface PortableService {
      * @return ResultVO
      * @throws Exception
      */
-    ResultVO readPortableData() throws Exception;
+    ResultVO readPortableView() throws Exception;
 
     /**
      * 휴대형구름 등록 정보 조회
-     * @Param adminId
+     *
+     * @Param options
      * @return ResultVO
      * @throws Exception
      */
-    ResultVO readPortableDataById(String adminId) throws Exception;
+    ResultVO readPortableViewById(HashMap<String, Object> options) throws Exception;
+
+    /**
+     * 휴대형구름 등록 정보 조회
+     *
+     * @Param options
+     * @return ResultVO
+     * @throws Exception
+     */
+    ResultVO readPortableDataById(HashMap<String, Object> options) throws Exception;
+
+    /**
+     * 휴대형구름 일괄 등록, 미승인 정보 조회
+     *
+     * @Param options
+     * @return ResultVO
+     * @throws Exception
+     */
+    ResultVO readPortableDataByAdminIdAndApprove(HashMap<String, Object> options) throws Exception;
 
     /**
      * 휴대형구름 발급 상태 업데이트
      *
-     * @param ptgrId
+     * @param portableVO
      * @return StatusVO
      * @throws Exception
      */
-    StatusVO  updatePortableDataForApprove(String ptgrId) throws Exception;
+    StatusVO  updatePortableData(PortableVO portableVO) throws Exception;
 
     /**
      * 휴대형구름 발급 상태 전체 업데이트
@@ -51,11 +72,11 @@ public interface PortableService {
     /**
      * 휴대형구름 신청 정보 삭제
      *
-     * @param ptgrId
+     * @param ids
      * @return StatusVO
      * @throws Exception
      */
-    StatusVO  deletePortableData(String ptgrId) throws Exception;
+    StatusVO  deletePortableData(HashMap<String, Object> ids) throws Exception;
 
     /**
      * 휴대형구름 신청 정보 전체 삭제
@@ -64,4 +85,8 @@ public interface PortableService {
      * @throws Exception
      */
     StatusVO  deleteAllPortableData() throws Exception;
+
+    int readNextPortableDataIndex() throws Exception;
+
+    int readPortableDataCount() throws Exception;
 }

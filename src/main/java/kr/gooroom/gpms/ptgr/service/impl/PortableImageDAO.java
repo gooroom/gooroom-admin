@@ -37,4 +37,12 @@ public class PortableImageDAO extends SqlSessionMetaDAO {
     public long deleteAllPortableImage () throws SQLException {
         return (long) sqlSessionMeta.delete("deleteAllPortableImage");
     }
+
+    public int selectNextPortableImageNumber() throws SQLException {
+        return sqlSessionMeta.selectOne("selectNextImageNo" );
+    }
+
+    public int selectPortableImageCount() throws SQLException {
+        return sqlSessionMeta.selectOne("selectNextImageCount" );
+    }
 }

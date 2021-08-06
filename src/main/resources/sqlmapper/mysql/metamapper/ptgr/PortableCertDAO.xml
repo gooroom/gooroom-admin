@@ -27,15 +27,15 @@
     <!-- 인증서 정보 생성 -->
     <insert id="insertPortableCert" parameterType="portableCertVO">
         INSERT INTO PTGR_CERT
-            (CERT_ID, CERT_PW, PUBLISH, CREATED_DT, TRANSFER_DT, CERT_PEM)
+            (CERT_ID, PASSWORD, PUBLISH, CREATED_DT, TRANSFER_DT, CERT_PEM)
         VALUES
-            (#{certId}, #{certPw}, #{publish}, #{createdDt}, #{transferDt}, #{certPem});
+            (#{certId}, #{password}, #{publish}, #{createdDt}, #{transferDt}, #{certPem});
     </insert>
 
-    <select id="selectPortableCert" parameterType="java.lang.Integer" resultMap="portableCert">
-        SELECT C.CREATED_DT, C.TRANSFER_DT
-        FROM PTGR_CERT AS C
-        WHERE C.CERT_ID = #{certId};
+    <select id="selectPortableCert" parameterType="java.lang.String" resultMap="portableCert">
+        SELECT *
+        FROM PTGR_CERT
+        WHERE CERT_ID = #{certId};
     </select>
 
     <delete id="deletePortableCert" parameterType="java.lang.Integer">

@@ -9,8 +9,8 @@ public class PortableVO implements Serializable {
     int logId;
     int certId;
     int imageId;
-    int isBulk;
-    int isBuildTransfer;
+    int bulk;
+    int buildStatus;
 
     String userId;
     String adminId;
@@ -18,6 +18,7 @@ public class PortableVO implements Serializable {
     String isoPw;
     String notiType;
     String notiEmail;
+    String approveStatus;
 
     String statusCd;
 
@@ -57,20 +58,20 @@ public class PortableVO implements Serializable {
         this.imageId = imageId;
     }
 
-    public int getIsBulk() {
-        return isBulk;
+    public int getBulk() {
+        return bulk;
     }
 
-    public void setIsBulk(int isBulk) {
-        this.isBulk = isBulk;
+    public void setBulk(int bulk) {
+        this.bulk = bulk;
     }
 
-    public int getIsBuildTransfer() {
-        return isBuildTransfer;
+    public int getBuildStatus() {
+        return buildStatus;
     }
 
-    public void setIsBuildTransfer(int isBuildTransfer) {
-        this.isBuildTransfer = isBuildTransfer;
+    public void setBuildStatus(int buildStatus) {
+        this.buildStatus = buildStatus;
     }
 
     public String getUserId() {
@@ -111,6 +112,14 @@ public class PortableVO implements Serializable {
 
     public void setNotiEmail(String notiEmail) {
         this.notiEmail = notiEmail;
+    }
+
+    public String getApproveStatus() {
+        return approveStatus;
+    }
+
+    public void setApproveStatus(String approveStatus) {
+        this.approveStatus = approveStatus;
     }
 
     public String getStatusCd() {

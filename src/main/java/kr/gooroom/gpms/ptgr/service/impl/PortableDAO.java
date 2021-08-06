@@ -2,6 +2,7 @@ package kr.gooroom.gpms.ptgr.service.impl;
 
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.ptgr.service.PortableVO;
+import kr.gooroom.gpms.ptgr.service.PortableViewVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -19,15 +20,27 @@ public class PortableDAO extends SqlSessionMetaDAO {
         return (long) sqlSessionMeta.insert("insertPortableData", vo);
     }
 
-    public List<PortableVO> selectPortableDataList() throws SQLException {
-        List<PortableVO> res = null;
-        res = sqlSessionMeta.selectList("selectPortableDataList");
+    public List<PortableViewVO> selectPortableViewList() throws SQLException {
+        List<PortableViewVO> res = null;
+        res = sqlSessionMeta.selectList("selectPortableViewList");
         return res;
     }
 
-    public List<PortableVO> selectPortableDataList(String id) throws SQLException {
+    public List<PortableViewVO> selectPortableViewList(HashMap<String, Object> options) throws SQLException {
+        List<PortableViewVO> res = null;
+        res = sqlSessionMeta.selectList("selectPortableViewList", options);
+        return res;
+    }
+
+    public List<PortableVO> selectPortableDataList(HashMap<String, Object> options) throws SQLException {
         List<PortableVO> res = null;
-        res = sqlSessionMeta.selectList("selectPortableDataList", id);
+        res = sqlSessionMeta.selectList("selectPortableDataList", options);
+        return res;
+    }
+
+    public List<PortableVO> selectPortableDataListByAdminIdAndApprove(HashMap<String, Object> options) throws SQLException {
+        List<PortableVO> res = null;
+        res = sqlSessionMeta.selectList("selectPortableDataListByAdminIdAndApprove", options);
         return res;
     }
 
@@ -45,11 +58,19 @@ public class PortableDAO extends SqlSessionMetaDAO {
         return (long) sqlSessionMeta.update("updateAllPortableApprove", adminId);
     }
 
-    public long deletePortableData (String ptgrId) throws SQLException {
-        return (long) sqlSessionMeta.delete("deletePortableData", ptgrId);
+    public long deletePortableData (HashMap<String, Object> ids) throws SQLException {
+        return (long) sqlSessionMeta.delete("deletePortableData", ids);
     }
 
     public long deleteAllPortableData () throws SQLException {
         return (long) sqlSessionMeta.delete("deleteAllPortableData");
+    }
+
+    public int selectNextPortableNumber() throws SQLException {
+        return sqlSessionMeta.selectOne("selectNextPortableNo" );
+    }
+
+    public int selectPortableCount() throws SQLException {
+        return sqlSessionMeta.selectOne("selectNextPortableCount" );
     }
 }

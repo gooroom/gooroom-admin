@@ -6,10 +6,10 @@ import java.util.Date;
 public class PortableCertVO implements Serializable {
 
     int certId;
+    int publish;
 
     String certPem;
-    String certPw;
-    Boolean isPublish;
+    String password;
     Date createdDt;
     Date transferDt;
 
@@ -21,6 +21,14 @@ public class PortableCertVO implements Serializable {
         this.certId = certId;
     }
 
+    public int getPublish() {
+        return publish;
+    }
+
+    public void setPublish(int publish) {
+        this.publish = publish;
+    }
+
     public String getCertPem() {
         return certPem;
     }
@@ -29,20 +37,12 @@ public class PortableCertVO implements Serializable {
         this.certPem = certPem;
     }
 
-    public String getCertPw() {
-        return certPw;
+    public String getPassword() {
+        return password;
     }
 
-    public void setCertPw(String certPw) {
-        this.certPw = certPw;
-    }
-
-    public Boolean getPublish() {
-        return isPublish;
-    }
-
-    public void setPublish(Boolean publish) {
-        isPublish = publish;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Date getCreatedDt() {

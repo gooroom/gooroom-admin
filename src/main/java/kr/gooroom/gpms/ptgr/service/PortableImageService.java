@@ -3,6 +3,8 @@ package kr.gooroom.gpms.ptgr.service;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 
+import java.util.HashMap;
+
 public interface PortableImageService {
 
     /**
@@ -29,7 +31,7 @@ public interface PortableImageService {
      * @return ResultVO
      * @throws Exception
      */
-    ResultVO readImageDataByUserId(String userId) throws Exception;
+    ResultVO readImageDataById(HashMap<String, Object> options) throws Exception;
 
     /**
      * 휴대형구름 이미지 정보
@@ -56,4 +58,20 @@ public interface PortableImageService {
      * @throws Exception
      */
     StatusVO deleteAllImageData() throws Exception;
+
+    /**
+     * 휴대형구름 이미지 Index
+     *
+     * @return int
+     * @throws Exception
+     */
+    int readNextImageDataIndex() throws Exception;
+
+    /**
+     * 휴대형구름 이미지 Count
+     *
+     * @return int
+     * @throws Exception
+     */
+    int readImageDataCount() throws Exception;
 }
