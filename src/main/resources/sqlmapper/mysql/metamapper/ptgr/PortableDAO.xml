@@ -19,7 +19,7 @@
         <result property="notiEmail" column="NOTI_EMAIL" />
         <result property="buildStatus" column="BUILD_STATUS" />
         <result property="approveStatus" column="APPROVE_STATUS" />
-        <result property="isBulk" column="IS_BULK" />
+        <result property="bulk" column="BULK" />
         <result property="statusCd" column="STATUS_CD" />
 
     </resultMap>
@@ -34,7 +34,6 @@
         <result property="expiredDt" column="EXPIRED_DT" />
         <result property="buildStatus" column="BUILD_STATUS" />
         <result property="approveStatus" column="APPROVE_STATUS" />
-        <result property="statusCd" column="STATUS_CD" />
         <result property="certStatus" column="CERT_STATUS" />
         <result property="imageName" column="IMAGE_NAME" />
         <result property="imageUrl" column="IMAGE_URL" />
@@ -59,7 +58,7 @@
             CERT_ID, IMAGE_ID, LOG_ID, ISO_PW,
             REG_DT, BEGIN_DT, EXPIRED_DT,
             NOTI_TYPE, NOTI_EMAIL,
-            BUILD_STATUS, APPROVE_STATUS, IS_BULK, STATUS_CD)
+            BUILD_STATUS, APPROVE_STATUS, BULK, STATUS_CD)
         VALUES
             (#{ptgrId}, #{adminId}, #{userId},
             #{certId}, #{imageId}, #{logId}, #{isoPw},
@@ -71,8 +70,8 @@
     <select id="selectPortableDataList" parameterType="java.lang.Integer" resultMap="portableView">
         SELECT
             (PTGR_ID, USER_ID, CERT_ID,
-            RED_DT, BEGIN_DT, EXPIRED_DT,
-            BUILD_STATUS, APPROVE_STATUS, STATUS_CD, CERT_STATUS,
+            REG_DT, BEGIN_DT, EXPIRED_DT,
+            BUILD_STATUS, APPROVE_STATUS, CERT_STATUS,
             IMAGE_NAME, IMAGE_URL, IMAGE_STATUS)
         FROM VIEW_PTGR_ADMIN
         WHERE ADMIN_ID IN
@@ -85,8 +84,8 @@
     <select id="selectPortableDataListPaged" parameterType="hashmap" resultMap="portableView">
         SELECT
             (PTGR_ID, USER_ID, CERT_ID,
-            RED_DT, BEGIN_DT, EXPIRED_DT,
-            BUILD_STATUS, APPROVE_STATUS, STATUS_CD, CERT_STATUS,
+            REG_DT, BEGIN_DT, EXPIRED_DT,
+            BUILD_STATUS, APPROVE_STATUS, CERT_STATUS,
             IMAGE_NAME, IMAGE_URL, IMAGE_STATUS)
         FROM VIEW_PTGR_ADMIN
         WHERE PTGR_ID IN
@@ -110,7 +109,7 @@
             NOTI_EMAIL = #{notiEmail},
             BUILD_STATUS = #{buildStatus},
             APPROVE_STATUS = #{approveStatus},
-            IS_BULK = #{isBulk},
+            BULK = #{bulk},
             STATUS_CD = #{statusCd}
         WHERE PTGR_ID = #{ptgrId};
     </update>

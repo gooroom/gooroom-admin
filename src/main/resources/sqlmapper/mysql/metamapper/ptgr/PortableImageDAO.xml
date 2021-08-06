@@ -6,20 +6,20 @@
     <resultMap type="portableImageVO" id="portableImage">
 
         <result property="imageId" column="IMAGE_ID" />
-        <result property="imageName" column="IMAGE_NAME" />
-        <result property="imageUrl" column="IMAGE_URL" />
-        <result property="imageSize" column="IMAGE_SIZE" />
+        <result property="name" column="NAME" />
+        <result property="url" column="URL" />
+        <result property="size" column="SIZE" />
         <result property="createdDt" column="CREATED_DT" />
-        <result property="imageStatus" column="IMAGE_STATUS" />
+        <result property="status" column="STATUS" />
 
     </resultMap>
 
     <resultMap id="portableImageVO" type="imageView">
         <result property="imageId" column="IMAGE_ID" />
-        <result property="imageName" column="IMAGE_NAME" />
+        <result property="name" column="NAME" />
         <result property="createdDt" column="CREATED_DT" />
-        <result property="imageSize" column="IMAGE_SIZE" />
-        <result property="imageStatus" column="IMAGE_STATUS" />
+        <result property="size" column="SIZE" />
+        <result property="status" column="STATUS" />
         <result property="userId" column="USER_ID" />
         <result property="regDt" column="REG_DT" />
     </resultMap>
@@ -37,20 +37,20 @@
     <!-- 포터블 이미지 정보 생성 -->
     <insert id="insertPortableImage" parameterType="portableImageVO">
         INSERT INTO PTGR_IMAGE
-            (IMAGE_ID, IMAGE_NAME, IMAGE_URL, IMAGE_SIZE, CREATED_DT, IMAGE_STATUS)
+            (IMAGE_ID, NAME, CREATED_DT, URL, SIZE, STATUS)
         VALUES
-            (#{imageId}, #{imageName}, #{imageUrl}, #{imageSize}, #{createdDt}, #{imageStatus});
+            (#{imageId}, #{name}, #{createdDt}, #{url}, #{size}, #{status});
     </insert>
 
     <select id="selectPortableImageList" resultMap="imageView">
         SELECT
-            (IMAGE_ID, IMAGE_NAME, CREATED_DT, IMAGE_SIZE, IMAGE_STATUS, USER_ID, REG_DT)
+            (IMAGE_ID, NAME, CREATED_DT, SIZE, STATUS, USER_ID, REG_DT)
         FROM VIEW_PTGR_IMAGE;
     </select>
 
     <select id="selectPortableImageListByCondition" parameterType="hashmap" resultMap="imageView">
         SELECT
-            (IMAGE_ID, IMAGE_NAME, CREATED_DT, IMAGE_SIZE, IMAGE_STATUS, USER_ID, REG_DT)
+            (IMAGE_ID, NAME, CREATED_DT, SIZE, STATUS, USER_ID, REG_DT)
         FROM VIEW_PTGR_IMAGE
         WHERE IMAGE_STATUS != 'REMOVE';
     </select>
@@ -59,8 +59,7 @@
     <update id="updatePortableImage" parameterType="portableImageVO">
         UPDATE PTGR_IMAGE
         SET
-            (NAME = #{name}, URL = #{url}, SIZE = #{size},
-            CREATED_DT = now())
+            (NAME = #{name}, URL = #{url}, SIZE = #{size}, CREATED_DT = now(), STATUS = #{status})
         WHERE IMAGE_ID = #{imageId};
     </update>
 
