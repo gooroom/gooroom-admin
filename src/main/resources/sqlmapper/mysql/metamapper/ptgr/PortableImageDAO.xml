@@ -43,30 +43,34 @@
     </insert>
 
     <select id="selectPortableImageList" resultMap="imageView">
-        SELECT
-            (IMAGE_ID, NAME, CREATED_DT, SIZE, STATUS, USER_ID, REG_DT)
-        FROM VIEW_PTGR_IMAGE;
+        SELECT *
+        FROM VIEW_PTGR_IMAGE
+        WHERE STATUS != 'REMOVE';
     </select>
 
     <select id="selectPortableImageListByCondition" parameterType="hashmap" resultMap="imageView">
         SELECT
             (IMAGE_ID, NAME, CREATED_DT, SIZE, STATUS, USER_ID, REG_DT)
         FROM VIEW_PTGR_IMAGE
-        WHERE IMAGE_STATUS != 'REMOVE';
+        WHERE STATUS != 'REMOVE';
     </select>
 
     <!-- 이미지 파일 정보 업데이트 -->
     <update id="updatePortableImage" parameterType="portableImageVO">
         UPDATE PTGR_IMAGE
         SET
-            (NAME = #{name}, URL = #{url}, SIZE = #{size}, CREATED_DT = now(), STATUS = #{status})
+        <if test="name!= null">NAME = #{name},</if>
+        <if test="url!= null">URL = #{url},</if>
+        <if test="size!= null">SIZE = #{size},</if>
+        <if test="status!= null">STATUS = #{status},</if>
+        CREATED_DT = now()
         WHERE IMAGE_ID = #{imageId};
     </update>
 
     <!-- 이미지 상태 업데이트 (또는 상태 변경으로 삭제) -->
-    <update id="updateImageStatus" parameterType="hashMap">
+    <update id="updatePortableImageStatus" parameterType="hashMap">
         UPDATE PTGR_IMAGE
-        SET IMAGE_STATUS = #{status}
+        SET STATUS = #{status}
         WHERE IMAGE_ID = #{imageId};
     </update>
 
@@ -85,10 +89,10 @@
     -->
     <delete id="deletePortableImage" parameterType="hashmap">
         UPDATE PTGR_IMAGE
-        SET IMAGE_STATUS = 'REMOVE'
+        SET STATUS = 'REMOVE'
         WHERE IMAGE_ID IN
-        <foreach collection="imageIds" item="item" index="index" open="(" separator="," close=")">
-            ${item.imageId}
+        <foreach collection="imageIds" item="imageIds"  open="(" separator="," close=")">
+            ${imageIds}
         </foreach>
     </delete>
 

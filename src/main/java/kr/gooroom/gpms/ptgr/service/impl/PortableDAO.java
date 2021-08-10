@@ -16,6 +16,13 @@ public class PortableDAO extends SqlSessionMetaDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(PortableDAO.class);
 
+
+    public List<String> checkCertID (HashMap<String, Object> options) throws SQLException {
+        List<String> res = null;
+        res = sqlSessionMeta.selectList("checkId", options);
+        return res;
+    }
+
     public long createPortableData(PortableVO vo) throws SQLException {
         return (long) sqlSessionMeta.insert("insertPortableData", vo);
     }

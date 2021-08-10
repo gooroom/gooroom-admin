@@ -41,6 +41,15 @@
 
     </resultMap>
 
+    <select id="checkId" parameterType="hashmap" resultType="java.lang.String">
+        SELECT CERT_ID
+        FROM VIEW_PTGR_ADMIN
+        WHERE CERT_ID IN
+        <foreach collection="certId" item="certId" open="(" separator="," close=")">
+            ${certId}
+        </foreach>
+    </select>
+
     <select id="selectPortableCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
         SELECT COUNT(*) CNT
         FROM PTGR_MSTR

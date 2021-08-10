@@ -28,6 +28,24 @@ public class PortableController {
 
     @Resource(name = "portableCertService")
     private PortableCertService portableCertService;
+
+    @GetMapping (value = "/admin/checkIds")
+    @ResponseBody
+    public ResultVO checkIds (@RequestBody List<String> ids)  {
+
+        ResultVO resultVO = new ResultVO();
+        try
+        {
+            HashMap<String, Object> options = new HashMap<String, Object>();
+            options.put("certId", ids);
+            resultVO = portableService.checkId(options);
+        } catch (Exception e) {
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, e.getMessage()));
+        }
+
+        return resultVO;
+    }
+
     /**
      * 휴대형구름 일괄 등록
      *

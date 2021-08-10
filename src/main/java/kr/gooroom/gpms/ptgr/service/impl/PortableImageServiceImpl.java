@@ -5,6 +5,7 @@ import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.ptgr.service.PortableImageService;
 import kr.gooroom.gpms.ptgr.service.PortableImageVO;
+import kr.gooroom.gpms.ptgr.service.PortableImageViewVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,7 @@ public class PortableImageServiceImpl implements PortableImageService {
         ResultVO resultVO = new ResultVO();
 
         try {
-            List<PortableImageVO> certVO = portableImageDAO.selectPortableImageList();
+            List<PortableImageViewVO> certVO = portableImageDAO.selectPortableImageList();
             if (certVO == null || certVO.size() == 0) {
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT, ""));
             } else {
@@ -86,12 +87,48 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public StatusVO deleteImageDataByImageId(String imageId) throws Exception {
+    public StatusVO updateImageData(PortableImageVO imageVO) throws Exception {
+        StatusVO statusVO = new StatusVO();
+
+        try {
+            long resultCnt = portableImageDAO.updatePortableImage(imageVO);
+            if (0 == resultCnt) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE, "");
+            } else {
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE, "");
+            }
+        }
+        catch (Exception e) {
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE, "");
+        }
+        return statusVO;
+    }
+
+    @Override
+    public StatusVO updateImageStatus(HashMap<String, Object> options) throws Exception {
+        StatusVO statusVO = new StatusVO();
+
+        try {
+            long resultCnt = portableImageDAO.updatePortableImageStatus(options);
+            if (0 == resultCnt) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE, "");
+            } else {
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE, "");
+            }
+        }
+        catch (Exception e) {
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE, "");
+        }
+        return statusVO;
+    }
+
+    @Override
+    public StatusVO deleteImageDataByImageId(HashMap<String, Object> ids) throws Exception {
 
         StatusVO statusVO = new StatusVO();
 
         try {
-            long resultCnt = portableImageDAO.deletePortableImage(imageId);
+            long resultCnt = portableImageDAO.deletePortableImage(ids);
             if (0 == resultCnt) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE, "");
             } else {

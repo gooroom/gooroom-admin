@@ -6,6 +6,14 @@ import kr.gooroom.gpms.common.service.StatusVO;
 import java.util.HashMap;
 
 public interface PortableService {
+    /**
+     * 휴대형구름 신규 등록
+     *
+     * @param options
+     * @return StatusVO
+     * @throws Exception
+     */
+    ResultVO checkId (HashMap<String, Object> options) throws Exception;
 
     /**
      * 휴대형구름 신규 등록

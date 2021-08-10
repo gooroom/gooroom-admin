@@ -43,13 +43,30 @@ public interface PortableImageService {
     ResultVO readImageDataByAdminId(String adminId) throws Exception;
 
     /**
-     * 휴대형구름 이미지 발급 정보 삭제
+     * 휴대형구름 이미지 정보 업데이트
      *
-     * @param imageId
+     * @Param imageVO
      * @return StatusVO
      * @throws Exception
      */
-    StatusVO deleteImageDataByImageId(String imageId) throws Exception;
+    StatusVO updateImageData (PortableImageVO imageVO) throws Exception;
+
+    /**
+     * 휴대형구름 이미지 정보 업데이트
+     *
+     * @Param imageVO
+     * @return StatusVO
+     * @throws Exception
+     */
+    StatusVO updateImageStatus (HashMap<String, Object> options) throws Exception;
+    /**
+     * 휴대형구름 이미지 발급 정보 삭제
+     *
+     * @param ids
+     * @return StatusVO
+     * @throws Exception
+     */
+    StatusVO deleteImageDataByImageId(HashMap<String, Object> ids) throws Exception;
 
     /**
      * 휴대형구름 이미지 발급 정보 삭제
