@@ -9,15 +9,6 @@ public interface PortableService {
     /**
      * 휴대형구름 신규 등록
      *
-     * @param options
-     * @return StatusVO
-     * @throws Exception
-     */
-    ResultVO checkId (HashMap<String, Object> options) throws Exception;
-
-    /**
-     * 휴대형구름 신규 등록
-     *
      * @param portableVO
      * @return StatusVO
      * @throws Exception

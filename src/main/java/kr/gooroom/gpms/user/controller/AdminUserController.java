@@ -215,6 +215,7 @@ public class AdminUserController {
 		paramVO.setIsUserAdmin(req.getParameter("isUserAdmin"));
 		paramVO.setIsDesktopAdmin(req.getParameter("isDesktopAdmin"));
 		paramVO.setIsNoticeAdmin(req.getParameter("isNoticeAdmin"));
+		paramVO.setIsPortableAdmin(req.getParameter("isPortableAdmin"));
 
 		// array : conect ip
 		String[] connIps = req.getParameterValues("connIps[]");
@@ -286,6 +287,7 @@ public class AdminUserController {
 		paramVO.setIsUserAdmin(req.getParameter("isUserAdmin"));
 		paramVO.setIsDesktopAdmin(req.getParameter("isDesktopAdmin"));
 		paramVO.setIsNoticeAdmin(req.getParameter("isNoticeAdmin"));
+		paramVO.setIsPortableAdmin(req.getParameter("isPortableAdmin"));
 
 		// array : conect ip
 		String[] connIps = req.getParameterValues("connIps[]");

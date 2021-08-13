@@ -23,27 +23,6 @@ public class PortableServiceImpl implements PortableService {
     private PortableDAO portableDAO;
 
     @Override
-    public ResultVO checkId(HashMap<String, Object> options) throws Exception {
-
-        ResultVO resultVO = new ResultVO();
-
-        try {
-            List<String> portableVO = portableDAO.checkCertID(options);
-            if (portableVO == null || portableVO.size() == 0) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT, ""));
-            } else {
-                resultVO.setData(portableVO.toArray());
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT, ""));
-            }
-        }
-        catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT, ""));
-        }
-
-        return resultVO;
-    }
-
-    @Override
     public StatusVO createPortableData(PortableVO portableVO) throws Exception {
 
         StatusVO statusVO = new StatusVO();

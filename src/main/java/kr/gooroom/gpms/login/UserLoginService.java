@@ -62,6 +62,7 @@ public class UserLoginService implements UserDetailsService {
 				if("1".equals(vo.getIsUserAdmin())) { roles.add(new Role("ROLE_USER_ADMIN")); }
 				if("1".equals(vo.getIsNoticeAdmin())) { roles.add(new Role("ROLE_NOTICE_ADMIN")); }
 				if("1".equals(vo.getIsDesktopAdmin())) { roles.add(new Role("ROLE_DESKTOP_ADMIN")); }
+				if("1".equals(vo.getIsPortableAdmin())) { roles.add(new Role("ROLE_PORTABLE_ADMIN")); }
 
 				break;
 			default:

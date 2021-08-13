@@ -62,6 +62,15 @@ public interface UserService {
 	StatusVO isNoExistUserId(String userId) throws Exception;
 
 	/**
+	 * check duplicate user id list
+	 *
+	 * @param ids list of user id
+	 * @return ResultVO result data bean
+	 * @throws Exception
+	 */
+	ResultVO isNoExistInUserIdList(HashMap<String, Object> ids) throws Exception;
+
+	/**
 	 * create new user data
 	 * 
 	 * @param userVO UserVO data bean

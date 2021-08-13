@@ -61,7 +61,8 @@ public class AdminUserVO implements Serializable {
 	private String isUserAdmin;
 	private String isDesktopAdmin;
 	private String isNoticeAdmin;
-	
+	private String isPortableAdmin;
+
 	private String dupLoginTryIp;
 	private Date dupLoginTryDate;
 
@@ -81,7 +82,8 @@ public class AdminUserVO implements Serializable {
 				return getIsDesktopAdmin();
 			case "isNoticeAdmin":
 				return getIsNoticeAdmin();
-
+			case "isPortableAdmin":
+				return getIsPortableAdmin();
 			default:
 				return "";
 			}
@@ -279,5 +281,11 @@ public class AdminUserVO implements Serializable {
 		this.dupLoginTryDate = dupLoginTryDate;
 	}
 
-	
+	public String getIsPortableAdmin() {
+		return isPortableAdmin;
+	}
+
+	public void setIsPortableAdmin(String isPortableAdmin) {
+		this.isPortableAdmin = isPortableAdmin;
+	}
 }

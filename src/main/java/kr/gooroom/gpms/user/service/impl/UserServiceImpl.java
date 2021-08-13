@@ -435,8 +435,42 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
+	 * check duplicate user id list
+	 *
+	 * @param ids list of user id
+	 * @return ResultVO result data bean
+	 * @throws Exception
+	 */
+	@Override
+	public ResultVO isNoExistInUserIdList(HashMap<String, Object> ids) throws Exception {
+
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			List<String> idList = userDao.selectUserListForDuplicateUserId(ids);
+			if (idList.size() == 0) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_NODUPLICATE,
+						MessageSourceHelper.getMessage("user.result.noduplicate")));
+			} else {
+				resultVO.setData(idList.toArray());
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DUPLICATE,
+						MessageSourceHelper.getMessage("user.result.duplicate")));
+			}
+		} catch (Exception ex) {
+			logger.error("error in duplicate id : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
 	 * create new user data
-	 * 
+	 *
 	 * @param vo UserVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception

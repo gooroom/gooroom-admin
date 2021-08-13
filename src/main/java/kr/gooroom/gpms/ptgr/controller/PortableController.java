@@ -1,16 +1,24 @@
 package kr.gooroom.gpms.ptgr.controller;
 
+import kr.gooroom.gpms.account.service.AccountVO;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.ptgr.PortableConstants;
 import kr.gooroom.gpms.ptgr.service.*;
+import kr.gooroom.gpms.user.service.UserService;
+import kr.gooroom.gpms.user.service.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,16 +37,21 @@ public class PortableController {
     @Resource(name = "portableCertService")
     private PortableCertService portableCertService;
 
-    @GetMapping (value = "/admin/checkIds")
-    @ResponseBody
-    public ResultVO checkIds (@RequestBody List<String> ids)  {
 
+    @Resource(name = "userService")
+    private UserService userService;
+
+    @PostMapping (value = "/admin/checkUserId")
+    @ResponseBody
+    public ResultVO checkUserIdInList(HttpServletRequest req, HttpServletResponse res)  {
+
+        String[] ids = req.getParameter("ids").split(",");
         ResultVO resultVO = new ResultVO();
         try
         {
             HashMap<String, Object> options = new HashMap<String, Object>();
-            options.put("certId", ids);
-            resultVO = portableService.checkId(options);
+            options.put("userId", ids);
+            resultVO = userService.isNoExistInUserIdList(options);
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, e.getMessage()));
         }
@@ -49,23 +62,36 @@ public class PortableController {
     /**
      * 휴대형구름 일괄 등록
      *
-     * @param ptgrListVO
+     * @param portableListVO
      * @return ResultVO
      */
     @PostMapping(value = "/admin/infos")
     @ResponseBody
-    public ResultVO registerInfos (@RequestBody List<PortableVO> ptgrListVO) {
+    public ResultVO registerInfos (@ModelAttribute  PortableListVO portableListVO) {
 
         ResultVO resultVO = new ResultVO();
+        List<PortableVO> ptgrListVO =  portableListVO.getPortableListVO();
         //1.
         if (ptgrListVO.size() == 0) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, ""));
             return resultVO;
         }
 
+        AccountVO vo1  =  LoginInfoHelper.getAccountVO();
         try
         {
             for (PortableVO vo : ptgrListVO) {
+                //사용자 등록
+                /*
+
+                UserVO userVO = new UserVO();
+                userVO.setUserId(vo.getUserId());
+                String hashedPassword = passwordEncoder.encodePassword(vo.get, null);
+                userVO.setUserPasswd();
+                userService.createUserData(userVO);
+                 */
+
+                //인증서 생성
                 //이미지 테이블 생성
                 int imageId;
                 imageId = portableImageService.readNextImageDataIndex();
@@ -82,6 +108,8 @@ public class PortableController {
                 portableCertVO.setPublish(0);
                 portableCertService.createCertData(portableCertVO);
                 vo.setCertId(certId);
+                //인증서 생성
+
 
                 int ptgrId;
                 ptgrId = portableService.readNextPortableDataIndex();
@@ -144,6 +172,19 @@ public class PortableController {
 
             PortableVO vo = (PortableVO)resultVO.getData()[0];
             vo.setApproveStatus(PortableConstants.STATUS_APPROVE_PROCEDURE_1);
+            //인증서 생성..
+            String userId = vo.getUserId();
+            ResultVO userResultVO = userService.readUserData(userId);
+            if (userResultVO.getData().length == 0) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR,"user not found");
+                return statusVO;
+            }
+            UserVO userVO = (UserVO)userResultVO.getData()[0];
+            String userPw = userVO.getUserPasswd();
+
+
+            //user pw
+
 
             //빌드서버 요청!!!
             //정보 저장

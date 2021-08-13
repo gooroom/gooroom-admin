@@ -3,7 +3,7 @@ package kr.gooroom.gpms.ptgr.service;
 import java.io.Serializable;
 import java.util.Date;
 
-public class PortableVO implements Serializable {
+public class PortableVO extends PortableUserVO implements Serializable {
 
     int ptgrId;
     int logId;

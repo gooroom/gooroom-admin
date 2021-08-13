@@ -613,5 +613,15 @@ public class UserDAO extends SqlSessionMetaDAO {
 		return (long) sqlSessionMeta.delete("deleteUserForNoti", userId);
 	}
 
-
+	/**
+	 * user id duplicate checklist .
+	 * @param ids
+	 * @return list
+	 * @throws SQLException
+	 */
+	public List<String> selectUserListForDuplicateUserId (HashMap<String, Object> ids) throws SQLException {
+		List<String> res = null;
+		res = sqlSessionMeta.selectList("selectUserListForDuplicateUserId", ids);
+		return res;
+	}
 }
