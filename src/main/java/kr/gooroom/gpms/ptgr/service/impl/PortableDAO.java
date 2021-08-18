@@ -35,7 +35,7 @@ public class PortableDAO extends SqlSessionMetaDAO {
 
     public List<PortableViewVO> selectPortableViewList(HashMap<String, Object> options) throws SQLException {
         List<PortableViewVO> res = null;
-        res = sqlSessionMeta.selectList("selectPortableViewList", options);
+        res = sqlSessionMeta.selectList("selectPortableViewListPaged", options);
         return res;
     }
 
@@ -77,7 +77,11 @@ public class PortableDAO extends SqlSessionMetaDAO {
         return sqlSessionMeta.selectOne("selectNextPortableNo" );
     }
 
-    public int selectPortableCount() throws SQLException {
-        return sqlSessionMeta.selectOne("selectNextPortableCount" );
+    public long  selectPortableTotalCount(HashMap<String, Object> options) throws SQLException {
+        return sqlSessionMeta.selectOne("selectPortableTotalCount", options );
+    }
+
+    public long selectPortableFilteredCount(HashMap<String, Object> options) throws SQLException {
+        return sqlSessionMeta.selectOne("selectPortableFilteredCount", options);
     }
 }

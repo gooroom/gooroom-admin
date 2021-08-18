@@ -1,5 +1,6 @@
 package kr.gooroom.gpms.ptgr.service;
 
+import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 
@@ -26,11 +27,19 @@ public interface PortableService {
     /**
      * 휴대형구름 등록 정보 조회
      *
+     * @return ResultVO
+     * @throws Exception
+     */
+    ResultPagingVO readPortableViewPaged(HashMap<String, Object> options) throws Exception;
+
+    /**
+     * 휴대형구름 등록 정보 조회
+     *
      * @Param options
      * @return ResultVO
      * @throws Exception
      */
-    ResultVO readPortableViewById(HashMap<String, Object> options) throws Exception;
+    ResultPagingVO readPortableViewById(HashMap<String, Object> options) throws Exception;
 
     /**
      * 휴대형구름 등록 정보 조회
@@ -87,5 +96,5 @@ public interface PortableService {
 
     int readNextPortableDataIndex() throws Exception;
 
-    int readPortableDataCount() throws Exception;
+    long readPortableDataCount() throws Exception;
 }

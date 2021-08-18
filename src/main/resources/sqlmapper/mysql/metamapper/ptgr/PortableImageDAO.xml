@@ -24,10 +24,9 @@
         <result property="regDt" column="REG_DT" />
     </resultMap>
 
-    <select id="selectImageCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    <select id="selectImageCount" resultType="java.lang.Integer">
         SELECT COUNT(*) CNT
         FROM PTGR_IMAGE
-        WHERE IMAGE_ID = #{imageId};
     </select>
 
     <select id="selectNextImageNo" resultType="java.lang.Integer">

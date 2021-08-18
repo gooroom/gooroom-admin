@@ -1,5 +1,7 @@
 package kr.gooroom.gpms.ptgr.service;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -22,8 +24,11 @@ public class PortableVO extends PortableUserVO implements Serializable {
 
     String statusCd;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     Date regDt;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     Date beginDt;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     Date expiredDt;
 
     public int getPtgrId() {

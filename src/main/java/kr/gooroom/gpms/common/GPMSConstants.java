@@ -320,5 +320,8 @@ public class GPMSConstants {
 	public static final String ACTION_DENY = "deny";
 	public static final String ACTION_WAITING = "waiting";
 
-
+	// Portable
+	public static final String PORTABLE_CERTPATH = prop.getProperty("gooroom.user.portable.certificate.path");
+	public static final String PORTABLE_CERTFILENAME = prop.getProperty("gooroom.user.portable.certificate.filename");
+	public static final String PORTABLE_KEYFILENAME = prop.getProperty("gooroom.user.portable.privatekey.filename");
 }

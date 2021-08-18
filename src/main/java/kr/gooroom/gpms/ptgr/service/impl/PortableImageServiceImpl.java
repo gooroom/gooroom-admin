@@ -3,6 +3,7 @@ package kr.gooroom.gpms.ptgr.service.impl;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.ptgr.service.PortableImageService;
 import kr.gooroom.gpms.ptgr.service.PortableImageVO;
 import kr.gooroom.gpms.ptgr.service.PortableImageViewVO;
@@ -29,13 +30,16 @@ public class PortableImageServiceImpl implements PortableImageService {
         try {
             long resultCnt = portableImageDAO.createPortableImage(portableImageVO);
             if (0 == resultCnt) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERT, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERT,
+                        MessageSourceHelper.getMessage("portable.result.noinsertimage"));
             } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
+                        MessageSourceHelper.getMessage("portable.result.insertimage"));
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERT, "");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
 
         return statusVO;
@@ -49,14 +53,17 @@ public class PortableImageServiceImpl implements PortableImageService {
         try {
             List<PortableImageViewVO> certVO = portableImageDAO.selectPortableImageList();
             if (certVO == null || certVO.size() == 0) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT, ""));
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.noselectdata")));
             } else {
                 resultVO.setData(certVO.toArray());
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT, ""));
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.selectdata")));
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT, ""));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
         return resultVO;
     }
@@ -69,14 +76,17 @@ public class PortableImageServiceImpl implements PortableImageService {
         try {
             List<PortableImageVO> certVO = portableImageDAO.selectPortableImageList(options);
             if (certVO == null || certVO.size() == 0) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT, ""));
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.noselectdata")));
             } else {
                 resultVO.setData(certVO.toArray());
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT, ""));
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.selectdata")));
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT, ""));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
         return resultVO;
     }
@@ -93,13 +103,16 @@ public class PortableImageServiceImpl implements PortableImageService {
         try {
             long resultCnt = portableImageDAO.updatePortableImage(imageVO);
             if (0 == resultCnt) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE,
+                        MessageSourceHelper.getMessage("portable.result.noupdateimage"));
             } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+                        MessageSourceHelper.getMessage("portable.result.updateimage"));
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE, "");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
         return statusVO;
     }
@@ -111,13 +124,16 @@ public class PortableImageServiceImpl implements PortableImageService {
         try {
             long resultCnt = portableImageDAO.updatePortableImageStatus(options);
             if (0 == resultCnt) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE,
+                        MessageSourceHelper.getMessage("portable.result.noupdateimage"));
             } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+                        MessageSourceHelper.getMessage("portable.result.updateimage"));
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE, "");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
         return statusVO;
     }
@@ -130,13 +146,16 @@ public class PortableImageServiceImpl implements PortableImageService {
         try {
             long resultCnt = portableImageDAO.deletePortableImage(ids);
             if (0 == resultCnt) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.nodeleteimage"));
             } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.deleteimage"));
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE, "");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
 
         return statusVO;
@@ -150,13 +169,16 @@ public class PortableImageServiceImpl implements PortableImageService {
         try {
             long resultCnt = portableImageDAO.deleteAllPortableImage();
             if (0 == resultCnt) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.nodeleteimage"));
             } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.deleteimage"));
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE, "");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
 
         return statusVO;

@@ -201,7 +201,7 @@ public class CertificateUtils {
 		vo.setCertificatePem(certBs.toString("UTF-8"));
 
 		PemObject priPemObject;
-		if (pw.isEmpty())
+		if (pw == null || pw.length() == 0)
 		{
 			priPemObject = new PemObject("RSA PRIVATE KEY", pair.getPrivate().getEncoded());
 		} else {

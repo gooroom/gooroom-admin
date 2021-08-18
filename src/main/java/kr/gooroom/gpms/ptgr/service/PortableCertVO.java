@@ -9,7 +9,8 @@ public class PortableCertVO implements Serializable {
     int publish;
 
     String certPem;
-    String password;
+    String certPath;
+    String keyPath;
     Date createdDt;
     Date transferDt;
 
@@ -37,12 +38,20 @@ public class PortableCertVO implements Serializable {
         this.certPem = certPem;
     }
 
-    public String getPassword() {
-        return password;
+    public String getCertPath() {
+        return certPath;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setCertPath(String certPath) {
+        this.certPath = certPath;
+    }
+
+    public String getKeyPath() {
+        return keyPath;
+    }
+
+    public void setKeyPath(String keyPath) {
+        this.keyPath = keyPath;
     }
 
     public Date getCreatedDt() {

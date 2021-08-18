@@ -24,6 +24,15 @@ public interface PortableCertService {
     ResultVO readCertDataByCertId(String certId) throws Exception;
 
     /**
+     * 휴대형구름 인증서 업데이트
+     *
+     * @param portableCertVO
+     * @return StatusVO
+     * @throws Exception
+     */
+    StatusVO updateCertData(PortableCertVO portableCertVO) throws Exception;
+
+    /**
      * 휴대형구름 인증서 삭제
      *
      * @param certId

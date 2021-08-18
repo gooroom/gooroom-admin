@@ -86,6 +86,10 @@
 		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableVO" alias="portableVO" />
 		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableCertVO" alias="portableCertVO" />
 		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableImageVO" alias="portableImageVO" />
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableLogVO" alias="portableLogVO" />
+
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableViewVO" alias="portableViewVO" />
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableImageViewVO" alias="portableImageViewVO" />
 
 	</typeAliases>
 	

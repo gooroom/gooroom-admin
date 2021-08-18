@@ -50,10 +50,24 @@
         </foreach>
     </select>
 
-    <select id="selectPortableCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
-        SELECT COUNT(*) CNT
-        FROM PTGR_MSTR
-        WHERE PTGR_ID = #{ptgrId};
+    <select id="selectPortableTotalCount"  parameterType="hashmap" resultType="java.lang.Long">
+        SELECT COUNT(PTGR_ID) CNT
+        FROM VIEW_PTGR_ADMIN
+        <where>
+            <if test="adminID != null">
+                ADMIN_ID=#{adminId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectPortableFilteredCount" parameterType="hashmap" resultType="java.lang.Long">
+        SELECT COUNT(PTGR_ID) CNT
+        FROM VIEW_PTGR_ADMIN
+        <where>
+            <if test="searchKey != null and searchKey != ''">
+                ADMIN_ID LIKE CONCAT('%', #{searchKey}, '%') OR USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR APPROVE_STATUS LIKE CONCAT('%', #{searchKey}, '%'))
+            </if>
+        </where>
     </select>
 
     <select id="selectNextPortableNo" resultType="java.lang.Integer">
@@ -79,15 +93,29 @@
     <select id="selectPortableViewList" parameterType="hashMap" resultMap="portableView">
         SELECT *
         FROM VIEW_PTGR_ADMIN
-        <if test="adminId != null">
-            WHERE ADMIN_ID = #{adminId}
+    </select>
+
+    <select id="selectPortableViewListPaged" parameterType="hashMap" resultMap="portableView">
+        SELECT *
+        FROM VIEW_PTGR_ADMIN
+        <where>
+            <if test="adminId != null">
+                ADMIN_ID = #{adminId}
+            </if>
+            <if test="ptgrId != null">
+                PTGR_ID = #{ptgrId}
+            </if>
+            <if test="userId != null">
+                USER_ID = #{userId}
+            </if>
+            <if test="searchKey != null and searchKey != ''">
+                ADMIN_ID LIKE CONCAT('%', #{searchKey}, '%') OR USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR APPROVE_STATUS LIKE CONCAT('%', #{searchKey}, '%'))
+            </if>
+        </where>
+        <if test="paramOrderColumn != null">
+            ORDER BY ${paramOrderColumn} ${paramOrderDir}
         </if>
-        <if test="ptgrId != null">
-            WHERE PTGR_ID = #{ptgrId}
-        </if>
-        <if test="userId != null">
-            WHERE USER_ID = #{userId}
-        </if>
+        LIMIT #{paramStart}, #{paramLength}
     </select>
 
     <select id="selectPortableDataList" parameterType="hashMap" resultMap="portable">

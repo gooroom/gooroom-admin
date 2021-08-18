@@ -1,7 +1,6 @@
 package kr.gooroom.gpms.ptgr.service;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class PortableUserVO implements Serializable {
 

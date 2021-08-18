@@ -3,6 +3,7 @@ package kr.gooroom.gpms.ptgr.service.impl;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.ptgr.service.PortableCertService;
 import kr.gooroom.gpms.ptgr.service.PortableCertVO;
 import org.slf4j.Logger;
@@ -27,13 +28,16 @@ public class PortableCertServiceImpl implements PortableCertService {
         try {
             long resultCnt = portableCertDAO.createPortableCert(portableCertVO);
             if (0 == resultCnt) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERT, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERT,
+                        MessageSourceHelper.getMessage("portable.result.noinsertcert"));
             } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
+                        MessageSourceHelper.getMessage("portable.result.insertcert"));
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERT, "");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
 
         return statusVO;
@@ -46,17 +50,43 @@ public class PortableCertServiceImpl implements PortableCertService {
         try {
             PortableCertVO certVO = portableCertDAO.selectPortableCert(certId);
             if (certVO == null ) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT, ""));
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.noselectdata")));
             } else {
                 resultVO.setData(new Object[] {certVO});
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT, ""));
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.selectdata")));
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT, ""));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;
+    }
+
+    @Override
+    public StatusVO updateCertData(PortableCertVO portableCertVO) throws Exception {
+
+        StatusVO statusVO = new StatusVO();
+
+        try {
+            long resultCnt = portableCertDAO.updatePortableCert(portableCertVO);
+            if (0 == resultCnt) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATE,
+                        MessageSourceHelper.getMessage("portable.result.noupdatecert"));
+            } else {
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+                        MessageSourceHelper.getMessage("portable.result.updatecert"));
+            }
+        }
+        catch (Exception e) {
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SUCCESS));
+        }
+
+        return statusVO;
     }
 
     @Override
@@ -67,13 +97,16 @@ public class PortableCertServiceImpl implements PortableCertService {
         try {
             long resultCnt = portableCertDAO.deletePortableCert(certId);
             if (0 == resultCnt) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.nodeletecert"));
             } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE, "");
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.deletecert"));
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE, "");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SUCCESS));
         }
 
         return statusVO;

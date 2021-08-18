@@ -23,6 +23,10 @@ public class PortableCertDAO extends SqlSessionMetaDAO {
         return res;
     }
 
+    public long updatePortableCert(PortableCertVO vo) throws SQLException {
+        return (long) sqlSessionMeta.update("updatePortableCert", vo);
+    }
+
     public long deletePortableCert(String certId) throws SQLException {
         return (long) sqlSessionMeta.delete("deletePortableCert", certId);
     }
