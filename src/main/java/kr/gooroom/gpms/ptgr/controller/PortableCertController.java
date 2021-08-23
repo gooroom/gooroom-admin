@@ -3,6 +3,7 @@ package kr.gooroom.gpms.ptgr.controller;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.ptgr.PortableConstants;
 import kr.gooroom.gpms.ptgr.service.PortableCertService;
 import org.slf4j.Logger;
@@ -21,21 +22,23 @@ public class PortableCertController {
     @Resource(name = "portableCertService")
     private PortableCertService portableCertService;
 
-    @GetMapping (value="/user/cert/{certId}")
+    @PostMapping (value="/readCert")
     @ResponseBody
-    public ResultVO getCert (@PathVariable String  certId )  {
+    public ResultVO getCert (@RequestParam(value= "certId") String certId) {
 
         ResultVO resultVO = new ResultVO();
         try
         {
             if (certId == null || certId.isEmpty()) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, ""));
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                        MessageSourceHelper.getMessage("portable.result.errdata")));
             }
             else {
                 resultVO = portableCertService.readCertDataByCertId(certId);
             }
         } catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, e.getMessage()));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.MSG_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;

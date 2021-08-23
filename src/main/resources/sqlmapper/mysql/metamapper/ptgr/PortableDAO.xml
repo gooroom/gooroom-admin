@@ -61,11 +61,19 @@
     </select>
 
     <select id="selectPortableFilteredCount" parameterType="hashmap" resultType="java.lang.Long">
-        SELECT COUNT(PTGR_ID) CNT
+        SELECT COUNT(PTGR_ID) AS CNT
         FROM VIEW_PTGR_ADMIN
         <where>
             <if test="searchKey != null and searchKey != ''">
-                ADMIN_ID LIKE CONCAT('%', #{searchKey}, '%') OR USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR APPROVE_STATUS LIKE CONCAT('%', #{searchKey}, '%'))
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'USER_ID'">
+                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'IMAGE_STATUS'">
+                    AND IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
             </if>
         </where>
     </select>
@@ -99,17 +107,26 @@
         SELECT *
         FROM VIEW_PTGR_ADMIN
         <where>
+            REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
             <if test="adminId != null">
-                ADMIN_ID = #{adminId}
+                AND ADMIN_ID = #{adminId}
             </if>
             <if test="ptgrId != null">
-                PTGR_ID = #{ptgrId}
+                AND PTGR_ID = #{ptgrId}
             </if>
             <if test="userId != null">
-                USER_ID = #{userId}
+                AND USER_ID = #{userId}
             </if>
             <if test="searchKey != null and searchKey != ''">
-                ADMIN_ID LIKE CONCAT('%', #{searchKey}, '%') OR USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR APPROVE_STATUS LIKE CONCAT('%', #{searchKey}, '%'))
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'USER_ID'">
+                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'IMAGE_STATUS'">
+                    AND IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
             </if>
         </where>
         <if test="paramOrderColumn != null">
@@ -126,6 +143,12 @@
         </if>
         <if test="ptgrId != null">
             WHERE PTGR_ID = #{ptgrId}
+        </if>
+        <if test="ptgrIds != null">
+            WHERE PTGR_ID IN
+            <foreach collection="ptgrIds" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
         </if>
     </select>
 
@@ -183,13 +206,52 @@
     <delete id="deletePortableData" parameterType="hashmap">
         DELETE FROM PTGR_MSTR
         WHERE PTGR_ID IN
-            <foreach collection="ptgrId" item="ptgrId" open="(" separator="," close=")">
+            <foreach collection="ptgrIds" item="ptgrId" open="(" separator="," close=")">
                 #{ptgrId}
             </foreach>
+    </delete>
+
+    <delete id="deletePortableDataById" parameterType="java.lang.Integer">
+        DELETE FROM PTGR_MSTR
+        WHERE PTGR_ID = #{ptgrId}
     </delete>
 
     <delete id="deleteAllPortableData">
         DELETE FROM PTGR_MSTR;
     </delete>
 
+    <!-- History -->
+    <insert id="insertPortableDataHist" parameterType="portableVO">
+        INSERT INTO PTGR_MSTR_HIST
+        (HIST_ID, PTGR_ID, ADMIN_ID, USER_ID,
+         CERT_ID, IMAGE_ID, LOG_ID, ISO_PW,
+         REG_DT, BEGIN_DT, EXPIRED_DT,
+         NOTI_TYPE, NOTI_EMAIL,
+         BUILD_STATUS, APPROVE_STATUS, BULK, STATUS_CD,
+         HIST_REG_DT)
+        VALUES (
+         (SELECT GRNEXTVAL('PTGRHIST_SEQ')),
+         #{ptgrId}, #{adminId}, #{userId},
+         #{certId}, #{imageId}, #{logId}, #{isoPw},
+         #{regDt}, #{beginDt}, #{expiredDt},
+         #{notiType}, #{notiEmail},
+         #{buildStatus}, #{approveStatus}, #{bulk}, #{statusCd}, now(6));
+    </insert>
+
+    <insert id="insertPortableDataAllHist">
+        INSERT INTO PTGR_MSTR_HIST
+        (HIST_ID, PTGR_ID, ADMIN_ID, USER_ID,
+         CERT_ID, IMAGE_ID, LOG_ID, ISO_PW,
+         REG_DT, BEGIN_DT, EXPIRED_DT,
+         NOTI_TYPE, NOTI_EMAIL,
+         BUILD_STATUS, APPROVE_STATUS, BULK, STATUS_CD,
+         HIST_REG_DT)
+         SELECT (SELECT GRNEXTVAL('PTGRHIST_SEQ')),
+                PTGR_ID, ADMIN_ID, USER_ID,
+                CERT_ID, IMAGE_ID, LOG_ID, ISO_PW,
+                REG_DT, BEGIN_DT, EXPIRED_DT,
+                NOTI_TYPE, NOTI_EMAIL,
+                BUILD_STATUS, APPROVE_STATUS, BULK, STATUS_CD,
+                now(6) FROM PTGR_MSTR;
+    </insert>
 </mapper>

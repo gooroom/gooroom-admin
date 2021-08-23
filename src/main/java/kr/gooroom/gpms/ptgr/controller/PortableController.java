@@ -1,11 +1,10 @@
 package kr.gooroom.gpms.ptgr.controller;
 
-import kr.gooroom.gpms.account.service.AccountVO;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
-import kr.gooroom.gpms.common.utils.LoginInfoHelper;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.gkm.utils.CertificateUtils;
 import kr.gooroom.gpms.gkm.utils.CertificateVO;
 import kr.gooroom.gpms.gkm.utils.FileUtils;
@@ -67,16 +66,34 @@ public class PortableController {
         callback = new CompletionHandler<StatusVO, PortableVO>() {
             @Override
             public void completed(StatusVO statusVO, PortableVO portableVO) {
+                System.out.println("completed" + Thread.currentThread().getName());
                 try {
                     if (statusVO.getResult() == GPMSConstants.MSG_SUCCESS) {
-                        portableVO.setApproveStatus(PortableConstants.STATUS_APPROVE_PROCEDURE_1);
-                        portableService.updatePortableData(portableVO);
-                        logger.debug("portable approve success : {}", statusVO.getMessage());
+                        //승인 상태 변경
+                        portableVO.setApproveStatus(PortableConstants.STATUS_APPROVE);
+
                         //빌드 서버 요청
 
+                        //빌드 전달 상태 변경
+                        portableVO.setBuildStatus(PortableConstants.STATUS_BUILD_REQUEST);
+                        portableService.updatePortableData(portableVO);
+
+                        //이미지 신청 상태 변경
+                        HashMap<String,Object> options = new HashMap<>();
+                        options.put("imageId", portableVO.getImageId());
+                        ResultVO ret = portableImageService.readImageDataById(options);
+                        if (ret.getData() == null) {
+                            String msg = MessageSourceHelper.getMessage("system.common.noselectdata");
+                            createLog(portableVO, GPMSConstants.CODE_NODATA, msg, PortableConstants.LOG_WARN);
+                            return;
+                        }
+                        PortableImageVO portableImageVO = (PortableImageVO)ret.getData()[0];
+                        portableImageVO.setStatus(PortableConstants.STATUS_IMAGE_CREATE);
+                        portableImageService.updateImageData(portableImageVO);
+                        logger.debug("portable approve success : {}", statusVO.getMessage());
                     } else {
-                        int logId = createLog(statusVO, portableVO);
-                        portableVO.setStatusCd("ERROR");
+                        int logId = createLog(portableVO, statusVO.getResultCode(), statusVO.getMessage(), PortableConstants.LOG_WARN);
+                        portableVO.setStatusCd(PortableConstants.LOG_WARN);
                         portableVO.setLogId(logId);
                         portableService.updatePortableData(portableVO);
                         logger.debug("portable approve fail: {}", statusVO.getMessage());
@@ -89,13 +106,11 @@ public class PortableController {
             @Override
             public void failed(Throwable throwable, PortableVO portableVO) {
                 try {
-                    StatusVO statusVo = new StatusVO();
-                    statusVo.setResultCode("ERROR");
-                    statusVo.setMessage(throwable.getMessage());
-                    int logId = createLog(statusVo, portableVO);
-                    portableVO.setStatusCd("ERROR");
+                    int logId = createLog(portableVO, PortableConstants.LOG_ERROR, throwable.getMessage(), PortableConstants.LOG_ERROR);
+                    portableVO.setStatusCd(PortableConstants.LOG_ERROR);
                     portableVO.setLogId(logId);
                     portableService.updatePortableData(portableVO);
+                    logger.debug("portable approve fail: {}", throwable.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -115,7 +130,8 @@ public class PortableController {
             options.put("userId", ids);
             resultVO = userService.isNoExistInUserIdList(options);
         } catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, e.getMessage()));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;
@@ -127,22 +143,23 @@ public class PortableController {
      * @param portableListVO
      * @return ResultVO
      */
-    @PostMapping(value = "/admin/infos")
+    @PostMapping(value = "/registerPortableDataList")
     @ResponseBody
-    public ResultVO registerInfos (@ModelAttribute  PortableListVO portableListVO) {
+    public ResultVO registerPortableDataList (@ModelAttribute  PortableListVO portableListVO) {
 
         ResultVO resultVO = new ResultVO();
         List<PortableVO> ptgrListVO =  portableListVO.getPortableListVO();
         //1.
         if (ptgrListVO.size() == 0) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, ""));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                    MessageSourceHelper.getMessage("portable.result.errparam")));
             return resultVO;
         }
 
-        AccountVO vo1  =  LoginInfoHelper.getAccountVO();
         try
         {
             for (PortableVO vo : ptgrListVO) {
+                StatusVO statusVO = null;
                 //사용자 등록
                 UserVO userVO = new UserVO();
                 userVO.setUserId(vo.getUserId());
@@ -150,15 +167,29 @@ public class PortableController {
                 userVO.setDeptCd("DEPTDEFAULT");
                 userVO.setUserNm(vo.getUserNm());
                 userVO.setUserEmail(vo.getNotiEmail());
-                userService.createUserData(userVO);
+                statusVO = userService.createUserData(userVO);
+
+                if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
+                   resultVO.setStatus(statusVO);
+                   logger.debug("not create user: {}", userVO.getUserId());
+                   return resultVO;
+                }
 
                 //이미지 테이블 생성
                 int imageId;
                 imageId = portableImageService.readNextImageDataIndex();
                 PortableImageVO portableImageVO = new PortableImageVO();
                 portableImageVO.setImageId(imageId);
-                portableImageVO.setStatus(PortableConstants.STATUS_IMAGE_PROCEDURE_0);
-                portableImageService.createImageData(portableImageVO);
+                portableImageVO.setStatus(PortableConstants.STATUS_IMAGE_REQUEST);
+                statusVO = portableImageService.createImageData(portableImageVO);
+
+                if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
+                    resultVO.setStatus(statusVO);
+                    userService.deleteUserData(userVO.getUserId());
+                    logger.debug("not create image table: {}", imageId);
+                    return resultVO;
+                }
+
                 vo.setImageId(imageId);
 
                 //인증서 테이블 생성
@@ -167,27 +198,45 @@ public class PortableController {
                 PortableCertVO portableCertVO = new PortableCertVO();
                 portableCertVO.setCertId(certId);
                 portableCertVO.setPublish(0);
-                portableCertService.createCertData(portableCertVO);
+                statusVO = portableCertService.createCertData(portableCertVO);
+
+                if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
+                    resultVO.setStatus(statusVO);
+                    userService.deleteUserData(userVO.getUserId());
+                    portableImageService.deleteImageDataByImageId(imageId);
+                    logger.debug("not create cert table: {}", certId);
+                    return resultVO;
+                }
+
                 vo.setCertId(certId);
 
                 int ptgrId;
                 ptgrId = portableService.readNextPortableDataIndex();
                 vo.setPtgrId(ptgrId);
+                vo.setApproveStatus(PortableConstants.STATUS_APPROVE_REQUEST);
+                statusVO = portableService.createPortableData(vo);
 
-                vo.setApproveStatus(PortableConstants.STATUS_APPROVE_PROCEDURE_0);
-                portableService.createPortableData(vo);
+                if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
+                    resultVO.setStatus(statusVO);
+                    userService.deleteUserData(userVO.getUserId());
+                    portableImageService.deleteImageDataByImageId(imageId);
+                    portableCertService.deleteCertDataByCertId(certId);
+                    logger.debug("not create portable table: {}", ptgrId);
+                    return resultVO;
+                }
             }
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, PortableConstants.CODE_PTGR_SUCCESS, ""));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_CREATE, ""));
         } catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, e.getMessage()));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;
     };
 
-    @GetMapping (value = "/admin/infos")
+    @PostMapping (value = "/readPortableDataList")
     @ResponseBody
-    public ResultVO getInfos (@RequestParam(value = "adminId", required = false) String adminId) {
+    public ResultVO getPortableDataList (@RequestParam(value = "adminId", required = false) String adminId) {
         ResultVO resultVO = new ResultVO();
         try
         {
@@ -200,15 +249,16 @@ public class PortableController {
                 resultVO = portableService.readPortableDataById(options);
             }
         } catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, e.getMessage()));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;
     };
 
-    @GetMapping (value = "/admin/infoListPaged")
+    @PostMapping (value = "/readPortableDataListPaged")
     @ResponseBody
-    public ResultPagingVO getInfoEx (HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+    public ResultPagingVO getPortableDataPaged (HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
         ResultPagingVO resultVO = new ResultPagingVO();
         try
@@ -220,64 +270,99 @@ public class PortableController {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Calendar cal = Calendar.getInstance();
                 toDate = dateFormat.format(cal.getTime());
-                cal.add(Calendar.DATE, -1);
+                cal.add(Calendar.YEAR, -1);
                 fromDate = dateFormat.format(cal.getTime());
             }
             options.put("fromDate", fromDate);
             options.put("toDate", toDate);
 
             String adminId = req.getParameter("adminId");
-            options.put("adminId", req.getParameter(adminId));
-
-            options.put("searchKey", StringUtils.defaultString(((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "")));
+            if (adminId != null && !adminId.isEmpty())
+                options.put("adminId", req.getParameter(adminId));
 
             options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
             options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
 
+            String searchType = req.getParameter("searchType");
+            if (searchType != null) {
+                if (searchType.equalsIgnoreCase("chUserId")) {
+                    options.put("searchType", "USER_ID");
+                }
+                else if (searchType.equalsIgnoreCase("chImagePublish")) {
+                    options.put("searchType", "IMAGE_STATUS");
+                }
+                else {
+                    options.put("searchType", "ALL");
+                }
+            }
+            options.put("searchKey", StringUtils.defaultString(((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "")));
+
             String paramOrderColumn = req.getParameter("orderColumn");
-            options.put("paramOrderColumn", paramOrderColumn);
+            if (paramOrderColumn != null) {
+                if (paramOrderColumn.equalsIgnoreCase("chRegDate")) {
+                    options.put("paramOrderColumn", "REG_DT");
+                }
+                else if (paramOrderColumn.equalsIgnoreCase("chUserIdl")) {
+                    options.put("paramOrderColumn", "USER_ID");
+                }
+                else {
+                    options.put("paramOrderColumn", "PTGR_ID");
+                }
+            }
             String paramOrderDir = req.getParameter("orderDir");
             options.put("paramOrderDir", paramOrderDir);
 
             resultVO = portableService.readPortableViewPaged(options);
 
-            //TODO Date
+            HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+            fromDateHm.put("name", "fromDate");
+            fromDateHm.put("value", fromDate);
+            HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+            toDateHm.put("name", "toDate");
+            toDateHm.put("value", toDate);
+            resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
 
             resultVO.setDraw(String.valueOf(req.getParameter("page")));
             resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
             resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
             resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
         } catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, e.getMessage()));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;
     };
 
-    @PostMapping(value = "/admin/approve/{ptgrId}")
+    @PostMapping(value = "/updateApprove")
     @ResponseBody
-    public StatusVO updateInfoForApprove(@PathVariable String ptgrId) {
+    public StatusVO updateInfoForApprove(@RequestParam(value= "ptgrId") String ptgrId) {
 
         StatusVO statusVO = new StatusVO();
 
         if (ptgrId== null || ptgrId.isEmpty()) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR,"");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                    MessageSourceHelper.getMessage("portable.result.errparam"));
+            logger.debug("portable id is null : {}", ptgrId);
             return statusVO;
         }
 
         asyncPortableApprove(ptgrId);
-        statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, PortableConstants.CODE_PTGR_SUCCESS,"");
+        statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+                MessageSourceHelper.getMessage("portable.result.approve"));
         return statusVO;
     }
 
-    @PostMapping (value ="/admin/approve")
+    @PostMapping (value ="/updateAllApprove")
     @ResponseBody
     public StatusVO updateAllInfoForApprove (@RequestParam(value ="adminId") String adminId) {
 
         StatusVO statusVO = new StatusVO();
 
         if (adminId == null || adminId.isEmpty()) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR,"");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                    MessageSourceHelper.getMessage("portable.result.errparam"));
+            logger.debug("portable admin id is null : {}", adminId);
             return statusVO;
         }
 
@@ -289,8 +374,7 @@ public class PortableController {
             ResultVO resultVO;
             resultVO = portableService.readPortableDataByAdminIdAndApprove(options);
             if (resultVO.getData() == null || resultVO.getData().length == 0) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR,"");
-                return statusVO;
+                return resultVO.getStatus();
             }
 
             Object[] objs = resultVO.getData();
@@ -299,29 +383,33 @@ public class PortableController {
                 asyncPortableApprove(Integer.toString(vo.getPtgrId()));
                 System.out.println(vo.getPtgrId());
             }
+            statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,"");
         } catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR,"");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
         return statusVO;
     }
 
-    @DeleteMapping (value = "/admin/infos")
+    @PostMapping (value = "/deletePortableDataList")
     @ResponseBody
-    public StatusVO deleteInfo (@RequestBody List<String> ids)  {
+    public StatusVO deletePortableDatalist (HttpServletRequest req, HttpServletResponse res)  {
 
+        String[] ids = req.getParameter("ids").split(",");
         StatusVO statusVO = new StatusVO();
         try
         {
-            if (ids.size() == 0) {
+            if (ids.length == 0 || ids[0].equals("")) {
                 statusVO = portableService.deleteAllPortableData();
             }
             else {
                 HashMap<String, Object> options = new HashMap<String, Object>();
-                options.put("ptgrId", ids);
+                options.put("ptgrIds", ids);
                 statusVO = portableService.deletePortableData(options);
             }
         } catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR,"");
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
 
         return statusVO;
@@ -333,7 +421,7 @@ public class PortableController {
      * @param ptgrVO
      * @return ResultVO
      */
-    @PostMapping(value = "/user/info")
+    @PostMapping(value = "/user/registerPortableData")
     @ResponseBody
     public StatusVO registerInfo (@ModelAttribute PortableVO ptgrVO) {
         StatusVO statusVO = new StatusVO();
@@ -344,8 +432,13 @@ public class PortableController {
             imageId = portableImageService.readNextImageDataIndex();
             PortableImageVO portableImageVO = new PortableImageVO();
             portableImageVO.setImageId(imageId);
-            portableImageVO.setStatus(PortableConstants.STATUS_IMAGE_PROCEDURE_0);
-            portableImageService.createImageData(portableImageVO);
+            portableImageVO.setStatus(PortableConstants.STATUS_IMAGE_REQUEST);
+
+            statusVO = portableImageService.createImageData(portableImageVO);
+            if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
+                logger.debug("not create image table: {}", imageId);
+                return statusVO;
+            }
             ptgrVO.setImageId(imageId);
             //인증서 테이블 생성
             int certId;
@@ -353,25 +446,38 @@ public class PortableController {
             PortableCertVO portableCertVO = new PortableCertVO();
             portableCertVO.setCertId(certId);
             portableCertVO.setPublish(0);
-            portableCertService.createCertData(portableCertVO);
+
+            statusVO = portableCertService.createCertData(portableCertVO);
+            if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
+                portableImageService.deleteImageDataByImageId(imageId);
+                logger.debug("not create image table: {}", imageId);
+                return statusVO;
+            }
             ptgrVO.setCertId(certId);
 
             int ptgrId;
             ptgrId = portableService.readNextPortableDataIndex();
             ptgrVO.setPtgrId(ptgrId);
+            ptgrVO.setApproveStatus(PortableConstants.STATUS_APPROVE_REQUEST);
 
-            ptgrVO.setApproveStatus(PortableConstants.STATUS_APPROVE_PROCEDURE_0);
             statusVO = portableService.createPortableData(ptgrVO);
+            if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
+                portableImageService.deleteImageDataByImageId(imageId);
+                portableCertService.deleteCertDataByCertId(certId);
+                logger.debug("not create portable table: {}", ptgrId);
+                return statusVO;
+            }
         } catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, e.getMessage());
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
 
         return statusVO;
     };
 
-    @GetMapping (value = "/user/info")
+    @PostMapping (value = "/user/readPortableData")
     @ResponseBody
-    public ResultVO getInfo (@RequestParam(value = "userId") String userId) {
+    public ResultVO getPortableDataListOfUser (@RequestParam(value = "userId") String userId) {
 
         ResultVO resultVO = new ResultVO();
         try
@@ -380,25 +486,27 @@ public class PortableController {
             options.put("userId", userId);
             resultVO = portableService.readPortableViewById(options);
         } catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR, e.getMessage()));
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;
     };
 
-
-    private int createLog (StatusVO statusVO, PortableVO portableVO) throws Exception {
+    private int createLog (PortableVO portableVO, String code, String message, String level) throws Exception {
         PortableLogVO logVO = new PortableLogVO();
         logVO.setLogId(portableLogService.readNextLogDataIndex());
         logVO.setPtgrId(portableVO.getPtgrId());
         logVO.setAdminId(portableVO.getAdminId());
         logVO.setUserId(portableVO.getUserId());
-        logVO.setErrorStatus(statusVO.getResultCode());
-        logVO.setLogLevel("ERROR");
-        logVO.setLogValue(statusVO.getMessage());
+        logVO.setErrorStatus(code);
+        logVO.setLogLevel(level);
+        logVO.setLogValue(message);
         portableLogService.createLogData(logVO);
+        logger.debug("create log : \n {}", logVO.toString());
         return logVO.getLogId();
     }
+
     private void asyncPortableApprove (String pId) {
 
         Runnable addJob = () -> {
@@ -416,6 +524,7 @@ public class PortableController {
             Security.addProvider(new BouncyCastleProvider());
             StatusVO statusVO = new StatusVO();
             PortableVO vo = new PortableVO();
+            System.out.println("Runnable" + Thread.currentThread().getName());
             try
             {
                 String ptgrId = queue.take();
@@ -425,7 +534,8 @@ public class PortableController {
                 ResultVO resultVO;
                 resultVO = portableService.readPortableDataById(options);
                 if (resultVO.getData().length == 0) {
-                    statusVO.setResultInfo(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR,"user not found");
+                    statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                            MessageSourceHelper.getMessage("portable.result.errdata"));
                     callback.completed(statusVO, vo);
                     return;
                 }
@@ -435,7 +545,8 @@ public class PortableController {
                 String userId = vo.getUserId();
                 ResultVO userResultVO = userService.readUserData(userId);
                 if (userResultVO.getData().length == 0) {
-                    statusVO.setResultInfo(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR,"user not found");
+                    statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                            MessageSourceHelper.getMessage("portable.result.erruser"));
                     callback.completed(statusVO, vo);
                     return;
                 }
@@ -464,7 +575,8 @@ public class PortableController {
 
                 ResultVO certResultVO  = portableCertService.readCertDataByCertId(Integer.toString(vo.getCertId()));
                 if (certResultVO.getData().length == 0) {
-                    statusVO.setResultInfo(GPMSConstants.MSG_FAIL, PortableConstants.CODE_PTGR_ERR,"user not found");
+                    statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                            MessageSourceHelper.getMessage("portable.result.errdata"));
                     //인증서 삭제...
                     FileUtils.delete(certFile);
                     FileUtils.delete(privateFile);
@@ -473,7 +585,7 @@ public class PortableController {
                 }
                 PortableCertVO ptgrCertVO = (PortableCertVO)certResultVO.getData()[0];
                 ptgrCertVO.setCreatedDt(new Date());
-                ptgrCertVO.setPublish(1);
+                ptgrCertVO.setPublish(1); //발급완료
                 ptgrCertVO.setCertPath(certPath.toString());
                 ptgrCertVO.setKeyPath(keyPath.toString());
                 StatusVO certStatusVO = portableCertService.updateCertData(ptgrCertVO);
@@ -483,13 +595,9 @@ public class PortableController {
                     callback.completed(certStatusVO, vo);
                     return;
                 }
-                //빌드서버 요청!!!
-                //정보 저장
-                //vo.setApproveStatus(PortableConstants.STATUS_APPROVE_PROCEDURE_1);
-                //statusVO = portableService.updatePortableData(vo);
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, PortableConstants.CODE_PTGR_SUCCESS,"");
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+                        MessageSourceHelper.getMessage("portable.result.apprroving"));
                 callback.completed(statusVO, vo);
-                System.out.println(vo.getPtgrId());
                 list.remove(ptgrId);
             } catch (Exception e) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,e.getMessage());

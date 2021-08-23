@@ -5,14 +5,17 @@ import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.ptgr.service.PortableService;
-import kr.gooroom.gpms.ptgr.service.PortableVO;
-import kr.gooroom.gpms.ptgr.service.PortableViewVO;
+import kr.gooroom.gpms.gkm.utils.FileUtils;
+import kr.gooroom.gpms.ptgr.PortableConstants;
+import kr.gooroom.gpms.ptgr.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,6 +26,74 @@ public class PortableServiceImpl implements PortableService {
 
     @Resource(name = "portableDAO")
     private PortableDAO portableDAO;
+
+    @Resource(name = "portableImageDAO")
+    private PortableImageDAO portableImageDAO;
+
+    @Resource(name = "portableCertDAO")
+    private PortableCertDAO portableCertDAO;
+
+    @Resource(name = "portableLogDAO")
+    private PortableLogDAO logDAO;
+
+    private void createLog (PortableVO portableVO, String code, String message) throws Exception {
+        PortableLogVO logVO = new PortableLogVO();
+        logVO.setLogId(logDAO.selectNextPortableLogNumber());
+        logVO.setPtgrId(portableVO.getPtgrId());
+        logVO.setAdminId(portableVO.getAdminId());
+        logVO.setUserId(portableVO.getUserId());
+        logVO.setErrorStatus(code);
+        logVO.setLogLevel(PortableConstants.LOG_WARN);
+        logVO.setLogValue(MessageSourceHelper.getMessage(message));
+        logDAO.createPortableLog(logVO);
+        logger.debug("create log : \n {}", logVO.toString());
+    }
+
+    private boolean deletePortableDataAndRelationData(List<PortableVO> ptgrList) throws Exception {
+        for (PortableVO vo : ptgrList) {
+            long ret = portableDAO.deletePortableDataById(vo.getPtgrId());
+            if (ret == 0) {
+                createLog(vo, GPMSConstants.CODE_DELETE, "portable.result.nodelete");
+                return false;
+            }
+            //Insert History
+            ret = portableDAO.createPortableDataHist(vo);
+            if (ret == 0) {
+                createLog(vo, GPMSConstants.CODE_CREATE, "portable.result.noinserthist");
+            }
+            // ImageTable
+            PortableImageVO imageVO = portableImageDAO.selectPortableImageByImageId(vo.getImageId());
+            if (imageVO == null ) {
+                createLog(vo, GPMSConstants.CODE_SELECT, "portable.result.noselectimage");
+            }
+            else {
+                ret = portableImageDAO.createPortableImageHist(imageVO);
+                if (ret == 0) {
+                    createLog(vo, GPMSConstants.CODE_CREATE, "portable.result.noinsertimagehist");
+                }
+                ret = portableImageDAO.deletePortableImage(vo.getImageId());
+                if (ret == 0) {
+                    createLog(vo, GPMSConstants.CODE_DELETE, "portable.result.nodeleteimage");
+                }
+            }
+            // CertTable
+            PortableCertVO certVO =  portableCertDAO.selectPortableCert(Integer.toString(vo.getCertId()));
+            if (certVO == null) {
+                createLog(vo, GPMSConstants.CODE_SELECT, "portable.result.noselectcert");
+            }
+            else {
+                ret = portableCertDAO.deletePortableCert(vo.getCertId());
+                if (ret == 0) {
+                    createLog(vo, GPMSConstants.CODE_DELETE, "portable.result.nodeletecert");
+                }
+                //File remove
+                String certPath = certVO.getCertPath();
+                Path path = Paths.get(certPath);
+                FileUtils.delete(new File(path.getParent().toString()));
+            }
+        }
+        return true;
+    }
 
     @Override
     public StatusVO createPortableData(PortableVO portableVO) throws Exception {
@@ -205,6 +276,21 @@ public class PortableServiceImpl implements PortableService {
         StatusVO statusVO = new StatusVO();
 
         try {
+            List<PortableVO> ptgrList = portableDAO.selectPortableDataList(ids);
+            if (ptgrList.size() == 0) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                        MessageSourceHelper.getMessage("system.common.noselectdata"));
+                return statusVO;
+            }
+            boolean ret = deletePortableDataAndRelationData(ptgrList);
+            if (ret) {
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.delete"));
+            } else {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.nodelete"));
+            }
+/*
             long resultCnt = portableDAO.deletePortableData(ids);
             if (0 == resultCnt) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
@@ -213,6 +299,7 @@ public class PortableServiceImpl implements PortableService {
                 statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
                         MessageSourceHelper.getMessage("portable.result.delete"));
             }
+ */
         }
         catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
@@ -228,6 +315,14 @@ public class PortableServiceImpl implements PortableService {
         StatusVO statusVO = new StatusVO();
 
         try {
+            //인증서 삭제
+            FileUtils.delete(new File(GPMSConstants.PORTABLE_CERTPATH));
+            portableCertDAO.deletePortableCertAll();
+            //이미지 히스토리 복사 & 삭제
+            portableImageDAO.createPortableAllImageHist();
+            portableImageDAO.deletePortableImageAll();
+            //신청정보 히스트로 복사 & 삭제
+            portableDAO.createPortableDataAllHist();
             long resultCnt = portableDAO.deleteAllPortableData();
             if (0 == resultCnt) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,

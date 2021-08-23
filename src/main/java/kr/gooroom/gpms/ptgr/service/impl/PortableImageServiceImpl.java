@@ -139,12 +139,11 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public StatusVO deleteImageDataByImageId(HashMap<String, Object> ids) throws Exception {
-
+    public StatusVO removeImageDataByImageId(int id) throws Exception {
         StatusVO statusVO = new StatusVO();
 
         try {
-            long resultCnt = portableImageDAO.deletePortableImage(ids);
+            long resultCnt = portableImageDAO.removePortableImage(id);
             if (0 == resultCnt) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
                         MessageSourceHelper.getMessage("portable.result.nodeleteimage"));
@@ -162,12 +161,57 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public StatusVO deleteAllImageData() throws Exception {
+    public StatusVO removeImageDataByImageIds(HashMap<String, Object> ids) throws Exception {
 
         StatusVO statusVO = new StatusVO();
 
         try {
-            long resultCnt = portableImageDAO.deleteAllPortableImage();
+            long resultCnt = portableImageDAO.removePortableImages(ids);
+            if (0 == resultCnt) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.nodeleteimage"));
+            } else {
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.deleteimage"));
+            }
+        }
+        catch (Exception e) {
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+        }
+
+        return statusVO;
+    }
+
+    @Override
+    public StatusVO removeAllImageData() throws Exception {
+
+        StatusVO statusVO = new StatusVO();
+
+        try {
+            long resultCnt = portableImageDAO.removeAllPortableImage();
+            if (0 == resultCnt) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.nodeleteimage"));
+            } else {
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.deleteimage"));
+            }
+        }
+        catch (Exception e) {
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+        }
+
+        return statusVO;
+    }
+
+    @Override
+    public StatusVO deleteImageDataByImageId(int id) {
+        StatusVO statusVO = new StatusVO();
+
+        try {
+            long resultCnt = portableImageDAO.deletePortableImage(id);
             if (0 == resultCnt) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
                         MessageSourceHelper.getMessage("portable.result.nodeleteimage"));

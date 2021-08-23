@@ -12,7 +12,7 @@ public class PortableVO extends PortableUserVO implements Serializable {
     int certId;
     int imageId;
     int bulk;
-    int buildStatus;
+    int buildStatus; // 빌드전달결과
 
     String userId;
     String adminId;
@@ -20,15 +20,15 @@ public class PortableVO extends PortableUserVO implements Serializable {
     String isoPw;
     String notiType;
     String notiEmail;
-    String approveStatus;
+    String approveStatus; //승인상태(요청,완료,재승인)
 
     String statusCd;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     Date regDt;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     Date beginDt;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     Date expiredDt;
 
     public int getPtgrId() {

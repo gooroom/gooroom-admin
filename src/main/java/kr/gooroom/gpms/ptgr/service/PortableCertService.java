@@ -39,7 +39,7 @@ public interface PortableCertService {
      * @return StatusVO
      * @throws Exception
      */
-    StatusVO deleteCertDataByCertId(String certId) throws Exception;
+    StatusVO deleteCertDataByCertId(int certId) throws Exception;
 
     /**
      * 휴대형구름 인증서 Index

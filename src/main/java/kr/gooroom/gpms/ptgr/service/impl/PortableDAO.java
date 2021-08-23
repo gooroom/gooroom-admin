@@ -27,6 +27,14 @@ public class PortableDAO extends SqlSessionMetaDAO {
         return (long) sqlSessionMeta.insert("insertPortableData", vo);
     }
 
+    public long createPortableDataHist(PortableVO vo) throws SQLException {
+        return (long) sqlSessionMeta.insert("insertPortableDataHist", vo);
+    }
+
+    public long createPortableDataAllHist() throws SQLException {
+        return (long) sqlSessionMeta.insert("insertPortableDataAllHist");
+    }
+
     public List<PortableViewVO> selectPortableViewList() throws SQLException {
         List<PortableViewVO> res = null;
         res = sqlSessionMeta.selectList("selectPortableViewList");
@@ -67,6 +75,10 @@ public class PortableDAO extends SqlSessionMetaDAO {
 
     public long deletePortableData (HashMap<String, Object> ids) throws SQLException {
         return (long) sqlSessionMeta.delete("deletePortableData", ids);
+    }
+
+    public long deletePortableDataById (int ptgrId) throws SQLException {
+        return (long) sqlSessionMeta.delete("deletePortableDataById", ptgrId);
     }
 
     public long deleteAllPortableData () throws SQLException {

@@ -6,7 +6,7 @@ import java.util.Date;
 public class PortableCertVO implements Serializable {
 
     int certId;
-    int publish;
+    int publish; //발급절차
 
     String certPem;
     String certPath;

@@ -59,14 +59,32 @@ public interface PortableImageService {
      * @throws Exception
      */
     StatusVO updateImageStatus (HashMap<String, Object> options) throws Exception;
+
     /**
-     * 휴대형구름 이미지 발급 정보 삭제
+     * 휴대형구름 이미지 발급 정보 변경 - 삭제
+     *
+     * @param id
+     * @return StatusVO
+     * @throws Exception
+     */
+    StatusVO removeImageDataByImageId(int id) throws Exception;
+
+    /**
+     * 휴대형구름 이미지 발급 정보 변경 - 삭제
      *
      * @param ids
      * @return StatusVO
      * @throws Exception
      */
-    StatusVO deleteImageDataByImageId(HashMap<String, Object> ids) throws Exception;
+    StatusVO removeImageDataByImageIds(HashMap<String, Object> ids) throws Exception;
+
+    /**
+     * 휴대형구름 이미지 발급 정보 변경 - 삭제
+     *
+     * @return StatusVO
+     * @throws Exception
+     */
+    StatusVO removeAllImageData() throws Exception;
 
     /**
      * 휴대형구름 이미지 발급 정보 삭제
@@ -74,7 +92,7 @@ public interface PortableImageService {
      * @return StatusVO
      * @throws Exception
      */
-    StatusVO deleteAllImageData() throws Exception;
+    StatusVO deleteImageDataByImageId(int id);
 
     /**
      * 휴대형구름 이미지 Index

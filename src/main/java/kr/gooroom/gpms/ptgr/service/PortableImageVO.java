@@ -9,7 +9,7 @@ public class PortableImageVO implements Serializable {
     int size;
     String name;
     String url;
-    String status;
+    String status; //신청/생성/경로전송/완료/삭제
     Date createdDt;
 
     public int getImageId() {

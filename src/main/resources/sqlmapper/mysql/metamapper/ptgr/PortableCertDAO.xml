@@ -56,4 +56,7 @@
         WHERE CERT_ID = #{certId};
     </delete>
 
+    <delete id="deletePortableCertAll">
+        DELETE FROM PTGR_CERT
+    </delete>
 </mapper>

@@ -27,7 +27,7 @@
 
     <insert id="insertPortableLog" parameterType="portableLogVO">
         INSERT INTO PTGR_LOG
-            (LOG_ID, PRGR_ID, USER_ID, ADMIN_ID, ERROR_STATUS, LOG_DT, LOG_LEVEL, LOG_VALUE)
+            (LOG_ID, PTGR_ID, USER_ID, ADMIN_ID, ERROR_STATUS, LOG_DT, LOG_LEVEL, LOG_VALUE)
         VALUES
             ((SELECT GRNEXTVAL('PTGRLOG_SEQ')), #{ptgrId}, #{userId}, #{adminId}, #{errorStatus}, now(6), #{logLevel}, #{logValue});
     </insert>

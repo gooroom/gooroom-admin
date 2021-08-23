@@ -90,7 +90,7 @@ public class PortableCertServiceImpl implements PortableCertService {
     }
 
     @Override
-    public StatusVO deleteCertDataByCertId(String certId) throws Exception {
+    public StatusVO deleteCertDataByCertId(int certId) throws Exception {
 
         StatusVO statusVO = new StatusVO();
 

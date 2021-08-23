@@ -19,6 +19,14 @@ public class PortableImageDAO extends SqlSessionMetaDAO {
         return (long) sqlSessionMeta.insert("insertPortableImage", vo);
     }
 
+    public long createPortableImageHist(PortableImageVO vo) throws SQLException {
+        return (long) sqlSessionMeta.insert("insertPortableImageHist", vo);
+    }
+
+    public long createPortableAllImageHist() throws SQLException {
+        return (long) sqlSessionMeta.insert("insertPortableAllImageHist");
+    }
+
     public List<PortableImageViewVO> selectPortableImageList () throws SQLException {
         List<PortableImageViewVO> res = null;
         res = sqlSessionMeta.selectList("selectPortableImageList");
@@ -31,18 +39,37 @@ public class PortableImageDAO extends SqlSessionMetaDAO {
         return res;
     }
 
+    public PortableImageVO selectPortableImageByImageId (int imageId) throws SQLException {
+        PortableImageVO res = null;
+        res = sqlSessionMeta.selectOne("selectPortableImageByImageId", imageId);
+        return res;
+    }
+
     public long updatePortableImage (PortableImageVO imageVO) throws SQLException {
         return (long) sqlSessionMeta.update("updatePortableImage", imageVO);
     }
     public long updatePortableImageStatus (HashMap<String, Object> options) throws SQLException {
         return (long) sqlSessionMeta.update("updatePortableImageStatus", options);
     }
-    public long deletePortableImage (HashMap<String, Object> ids) throws SQLException {
-        return (long) sqlSessionMeta.delete("deletePortableImage", ids);
+
+    public long removePortableImage (int imageId) throws SQLException {
+        return (long) sqlSessionMeta.delete("removePortableImageById", imageId);
     }
 
-    public long deleteAllPortableImage () throws SQLException {
-        return (long) sqlSessionMeta.delete("deleteAllPortableImage");
+    public long removePortableImages (HashMap<String, Object> ids) throws SQLException {
+        return (long) sqlSessionMeta.delete("removePortableImage", ids);
+    }
+
+    public long removeAllPortableImage () throws SQLException {
+        return (long) sqlSessionMeta.delete("removeAllPortableImage");
+    }
+
+    public long deletePortableImage (int imageId) throws SQLException {
+        return (long) sqlSessionMeta.delete("deletePortableImageById", imageId);
+    }
+
+    public long deletePortableImageAll () throws SQLException {
+        return (long) sqlSessionMeta.delete("deletePortableImageAll");
     }
 
     public int selectNextPortableImageNumber() throws SQLException {

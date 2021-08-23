@@ -54,6 +54,12 @@
         WHERE STATUS != 'REMOVE';
     </select>
 
+    <select id="selectPortableImageByImageId" parameterType="java.lang.Integer" resultMap="portableImage">
+        SELECT *
+        FROM PTGR_IMAGE
+        WHERE IMAGE_ID = #{imageId};
+    </select>
+
     <!-- 이미지 파일 정보 업데이트 -->
     <update id="updatePortableImage" parameterType="portableImageVO">
         UPDATE PTGR_IMAGE
@@ -62,7 +68,7 @@
         <if test="url!= null">URL = #{url},</if>
         <if test="size!= null">SIZE = #{size},</if>
         <if test="status!= null">STATUS = #{status},</if>
-        CREATED_DT = now()
+        CREATED_DT = now(6)
         WHERE IMAGE_ID = #{imageId};
     </update>
 
@@ -86,7 +92,13 @@
             </foreach>
         </delete>
     -->
-    <delete id="deletePortableImage" parameterType="hashmap">
+    <delete id="removePortableImage" parameterType="java.lang.Integer">
+        UPDATE PTGR_IMAGE
+        SET STATUS = 'REMOVE'
+        WHERE IMAGE_ID = ${imageId}
+    </delete>
+
+    <delete id="removePortableImages" parameterType="hashmap">
         UPDATE PTGR_IMAGE
         SET STATUS = 'REMOVE'
         WHERE IMAGE_ID IN
@@ -95,9 +107,31 @@
         </foreach>
     </delete>
 
-    <delete id="deleteAllPortableImage">
+    <delete id="removeAllPortableImage">
         UPDATE PTGR_IMAGE
         SET IMAGE_STATUS = 'REMOVE'
     </delete>
 
+    <delete id="deletePortableImageById" parameterType="java.lang.Integer">
+        DELETE FROM PTGR_IMAGE
+        WHERE IMAGE_ID = #{imageId}
+    </delete>
+
+    <delete id="deletePortableImageAll">
+        DELETE FROM PTGR_IMAGE
+    </delete>
+
+    <insert id="insertPortableImageHist" parameterType="portableImageVO">
+        INSERT INTO PTGR_IMAGE_HIST
+            (HIST_ID, IMAGE_ID, NAME, URL, SIZE, CREATED_DT, STATUS, HIST_REG_DT)
+        VALUES (
+            (SELECT GRNEXTVAL('PTGRIMAGEHIST_SEQ')),
+            #{imageId}, #{name}, #{url}, #{size},  #{createdDt}, #{status}, now(6));
+    </insert>
+
+    <insert id="insertPortableAllImageHist">
+        INSERT INTO PTGR_IMAGE_HIST
+            (HIST_ID, IMAGE_ID, NAME, URL, SIZE, CREATED_DT, STATUS, HIST_REG_DT)
+        SELECT(SELECT GRNEXTVAL('PTGRIMAGEHIST_SEQ')) AS HIST_ID, IMAGE_ID, NAME, URL, SIZE, CREATED_DT, STATUS, now(6) FROM PTGR_IMAGE;
+    </insert>
 </mapper>
