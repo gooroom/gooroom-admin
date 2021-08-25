@@ -69,32 +69,35 @@ public class PortableController {
                 System.out.println("completed" + Thread.currentThread().getName());
                 try {
                     if (statusVO.getResult() == GPMSConstants.MSG_SUCCESS) {
-                        //승인 상태 변경
-                        portableVO.setApproveStatus(PortableConstants.STATUS_APPROVE);
-
-                        //빌드 서버 요청
-
-                        //빌드 전달 상태 변경
-                        portableVO.setBuildStatus(PortableConstants.STATUS_BUILD_REQUEST);
-                        portableService.updatePortableData(portableVO);
-
                         //이미지 신청 상태 변경
                         HashMap<String,Object> options = new HashMap<>();
                         options.put("imageId", portableVO.getImageId());
-                        ResultVO ret = portableImageService.readImageDataById(options);
+                        ResultVO ret = portableImageService.readImageDataById(portableVO.getImageId());
                         if (ret.getData() == null) {
-                            String msg = MessageSourceHelper.getMessage("system.common.noselectdata");
-                            createLog(portableVO, GPMSConstants.CODE_NODATA, msg, PortableConstants.LOG_WARN);
+                            String msg = "completed: No image table information";
+                            int logId = createLog(portableVO, GPMSConstants.CODE_NODATA, msg, PortableConstants.LOG_WARN);
+                            portableVO.setLogId(logId);
+                            portableVO.setApproveStatus(PortableConstants.STATUS_APPROVE_REREQUEST);
+                            portableService.updatePortableData(portableVO);
                             return;
                         }
                         PortableImageVO portableImageVO = (PortableImageVO)ret.getData()[0];
                         portableImageVO.setStatus(PortableConstants.STATUS_IMAGE_CREATE);
                         portableImageService.updateImageData(portableImageVO);
+                        //승인 상태 변경
+                        portableVO.setApproveStatus(PortableConstants.STATUS_APPROVE);
+                        //빌드 전달 상태 변경
+                        portableVO.setBuildStatus(PortableConstants.STATUS_BUILD_REQUEST);
+                        portableService.updatePortableData(portableVO);
+                        //빌드 서버 요청
+
                         logger.debug("portable approve success : {}", statusVO.getMessage());
                     } else {
-                        int logId = createLog(portableVO, statusVO.getResultCode(), statusVO.getMessage(), PortableConstants.LOG_WARN);
+                        String msg = "completed: fail " + statusVO.getMessage();
+                        int logId = createLog(portableVO, statusVO.getResultCode(), msg, PortableConstants.LOG_WARN);
                         portableVO.setStatusCd(PortableConstants.LOG_WARN);
                         portableVO.setLogId(logId);
+                        portableVO.setApproveStatus(PortableConstants.STATUS_APPROVE_REREQUEST);
                         portableService.updatePortableData(portableVO);
                         logger.debug("portable approve fail: {}", statusVO.getMessage());
                     }
@@ -106,9 +109,11 @@ public class PortableController {
             @Override
             public void failed(Throwable throwable, PortableVO portableVO) {
                 try {
-                    int logId = createLog(portableVO, PortableConstants.LOG_ERROR, throwable.getMessage(), PortableConstants.LOG_ERROR);
+                    String msg = "failed:  " + throwable.getMessage();
+                    int logId = createLog(portableVO, PortableConstants.LOG_ERROR, msg, PortableConstants.LOG_ERROR);
                     portableVO.setStatusCd(PortableConstants.LOG_ERROR);
                     portableVO.setLogId(logId);
+                    portableVO.setApproveStatus(PortableConstants.STATUS_APPROVE_REREQUEST);
                     portableService.updatePortableData(portableVO);
                     logger.debug("portable approve fail: {}", throwable.getMessage());
                 } catch (Exception e) {
@@ -118,7 +123,12 @@ public class PortableController {
         };
     }
 
-    @PostMapping (value = "/admin/checkUserId")
+    /**
+     * 사용자 아이디 중복 체크
+     *
+     * @return ResultVO
+     */
+    @PostMapping (value = "/checkUserId")
     @ResponseBody
     public ResultVO checkUserIdInList(HttpServletRequest req, HttpServletResponse res)  {
 
@@ -132,6 +142,7 @@ public class PortableController {
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            e.printStackTrace();
         }
 
         return resultVO;
@@ -149,30 +160,39 @@ public class PortableController {
 
         ResultVO resultVO = new ResultVO();
         List<PortableVO> ptgrListVO =  portableListVO.getPortableListVO();
-        //1.
+
         if (ptgrListVO.size() == 0) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
                     MessageSourceHelper.getMessage("portable.result.errparam")));
             return resultVO;
         }
 
+        String adminId = "";
         try
         {
             for (PortableVO vo : ptgrListVO) {
                 StatusVO statusVO = null;
+                adminId = vo.getAdminId();
                 //사용자 등록
-                UserVO userVO = new UserVO();
-                userVO.setUserId(vo.getUserId());
-                userVO.setUserPasswd(vo.getUserPw());
-                userVO.setDeptCd("DEPTDEFAULT");
-                userVO.setUserNm(vo.getUserNm());
-                userVO.setUserEmail(vo.getNotiEmail());
-                statusVO = userService.createUserData(userVO);
+                UserVO userVO;
+                resultVO = userService.readUserData(vo.getUserId());
+                if (resultVO.getData().length == 0) {
+                    userVO = new UserVO();
+                    userVO.setUserId(vo.getUserId());
+                    userVO.setUserPasswd(vo.getUserPw());
+                    userVO.setDeptCd("DEPTDEFAULT");
+                    userVO.setUserNm(vo.getUserNm());
+                    userVO.setUserEmail(vo.getNotiEmail());
+                    statusVO = userService.createUserData(userVO);
 
-                if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
-                   resultVO.setStatus(statusVO);
-                   logger.debug("not create user: {}", userVO.getUserId());
-                   return resultVO;
+                    if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
+                        resultVO.setStatus(statusVO);
+                        logger.debug("not create user: {}", userVO.getUserId());
+                        return resultVO;
+                    }
+                }
+                else {
+                    userVO = (UserVO)resultVO.getData()[0];
                 }
 
                 //이미지 테이블 생성
@@ -213,7 +233,7 @@ public class PortableController {
                 int ptgrId;
                 ptgrId = portableService.readNextPortableDataIndex();
                 vo.setPtgrId(ptgrId);
-                vo.setApproveStatus(PortableConstants.STATUS_APPROVE_REQUEST);
+                vo.setApproveStatus(PortableConstants.STATUS_APPROVE);
                 statusVO = portableService.createPortableData(vo);
 
                 if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
@@ -225,15 +245,37 @@ public class PortableController {
                     return resultVO;
                 }
             }
+            //승인...
+            HashMap<String, Object> options = new HashMap<String, Object>();
+            options.put("adminId", adminId);
+            options.put("approveStatus", PortableConstants.STATUS_APPROVE);
+            resultVO = portableService.readPortableDataByAdminIdAndApprove(options);
+            if (resultVO != null && resultVO.getData() != null) {
+                Object[] objs = resultVO.getData();
+                for (Object obj: objs) {
+                    PortableVO vo = (PortableVO)obj;
+                    asyncPortableApprove(Integer.toString(vo.getPtgrId()));
+                }
+            }
+            else {
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_CREATE, ""));
+            }
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_CREATE, ""));
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            e.printStackTrace();
         }
 
         return resultVO;
     };
 
+    /**
+     * 휴대형구름 정보
+     *
+     * @param adminId
+     * @return ResultVO
+     */
     @PostMapping (value = "/readPortableDataList")
     @ResponseBody
     public ResultVO getPortableDataList (@RequestParam(value = "adminId", required = false) String adminId) {
@@ -251,11 +293,17 @@ public class PortableController {
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            e.printStackTrace();
         }
 
         return resultVO;
     };
 
+    /**
+     * 휴대형구름 정보 (페이지)
+     *
+     * @return ResultVO
+     */
     @PostMapping (value = "/readPortableDataListPaged")
     @ResponseBody
     public ResultPagingVO getPortableDataPaged (HttpServletRequest req, HttpServletResponse res, ModelMap model) {
@@ -312,8 +360,11 @@ public class PortableController {
             String paramOrderDir = req.getParameter("orderDir");
             options.put("paramOrderDir", paramOrderDir);
 
-            resultVO = portableService.readPortableViewPaged(options);
+            String paramLang = req.getParameter("lang");
+            options.put("lang", paramLang);
 
+            resultVO = portableService.readPortableViewPaged(options);
+            /*
             HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
             fromDateHm.put("name", "fromDate");
             fromDateHm.put("value", fromDate);
@@ -321,6 +372,7 @@ public class PortableController {
             toDateHm.put("name", "toDate");
             toDateHm.put("value", toDate);
             resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
+             */
 
             resultVO.setDraw(String.valueOf(req.getParameter("page")));
             resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
@@ -329,14 +381,21 @@ public class PortableController {
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            e.printStackTrace();
         }
 
         return resultVO;
     };
 
+    /**
+     * 휴대형 구름 신청 정보 개별 승인
+     *
+     * @param ptgrId
+     * @return ResultVO
+     */
     @PostMapping(value = "/updateApprove")
     @ResponseBody
-    public StatusVO updateInfoForApprove(@RequestParam(value= "ptgrId") String ptgrId) {
+    public StatusVO updatePortableDataApprove(@RequestParam(value= "ptgrId") String ptgrId) {
 
         StatusVO statusVO = new StatusVO();
 
@@ -347,12 +406,80 @@ public class PortableController {
             return statusVO;
         }
 
-        asyncPortableApprove(ptgrId);
-        statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
-                MessageSourceHelper.getMessage("portable.result.approve"));
+        ResultVO resultVO = null;
+        HashMap<String, Object> options = new HashMap<String, Object>();
+
+        try {
+            options.put("ptgrId", ptgrId);
+            resultVO = portableService.readPortableDataById(options);
+        } catch (Exception e) {
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            return statusVO;
+        }
+
+        if (resultVO == null || resultVO.getData().length == 0) {
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                    MessageSourceHelper.getMessage("portable.result.errdata"));
+            return statusVO;
+        }
+
+        PortableVO ptgrVO = (PortableVO) resultVO.getData()[0];
+        try {
+            statusVO = portableApprove(ptgrVO);
+
+            if (statusVO.getResult() == GPMSConstants.MSG_SUCCESS) {
+                //이미지 신청 상태 변경
+                options.clear();
+                options.put("imageId", ptgrVO.getImageId());
+                ResultVO ret = portableImageService.readImageDataById(ptgrVO.getImageId());
+                if (ret.getData() == null) {
+                    String msg = "updatePortableDataApprove : No image table information";
+                    createLog(ptgrVO, GPMSConstants.CODE_NODATA, msg, PortableConstants.LOG_WARN);
+                    statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                            MessageSourceHelper.getMessage("portable.result.errdata"));
+                    return statusVO;
+                }
+                PortableImageVO portableImageVO = (PortableImageVO) ret.getData()[0];
+                portableImageVO.setStatus(PortableConstants.STATUS_IMAGE_CREATE);
+                portableImageService.updateImageData(portableImageVO);
+
+                //승인 상태 변경
+                ptgrVO.setApproveStatus(PortableConstants.STATUS_APPROVE);
+                //빌드 서버 요청
+
+                //빌드 전달 상태 변경
+                ptgrVO.setBuildStatus(PortableConstants.STATUS_BUILD_REQUEST);
+                portableService.updatePortableData(ptgrVO);
+
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+                        MessageSourceHelper.getMessage("portable.result.apprroving"));
+
+                logger.debug("portable approve success : {}", statusVO.getMessage());
+            } else {
+                String msg = "updatePortableDataApprove : failed " + statusVO.getMessage();
+                int logId = createLog(ptgrVO, statusVO.getResultCode(), msg, PortableConstants.LOG_WARN);
+                ptgrVO.setStatusCd(PortableConstants.LOG_WARN);
+                ptgrVO.setLogId(logId);
+                ptgrVO.setApproveStatus(PortableConstants.STATUS_APPROVE_REREQUEST);
+                portableService.updatePortableData(ptgrVO);
+                logger.debug("portable approve fail: {}", statusVO.getMessage());
+            }
+        } catch (Exception e) {
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            e.printStackTrace();
+        }
+
         return statusVO;
     }
 
+    /**
+     * 휴대형 구름 신청 정보 전체 승인
+     *
+     * @param adminId
+     * @return ResultVO
+     */
     @PostMapping (value ="/updateAllApprove")
     @ResponseBody
     public StatusVO updateAllInfoForApprove (@RequestParam(value ="adminId") String adminId) {
@@ -387,10 +514,16 @@ public class PortableController {
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            e.printStackTrace();
         }
         return statusVO;
     }
 
+    /**
+     * 휴대형 구름 신청 정보 삭제
+     *
+     * @return ResultVO
+     */
     @PostMapping (value = "/deletePortableDataList")
     @ResponseBody
     public StatusVO deletePortableDatalist (HttpServletRequest req, HttpServletResponse res)  {
@@ -410,7 +543,10 @@ public class PortableController {
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            e.printStackTrace();
         }
+
+        System.out.println(statusVO.getResult() + ":" + statusVO.getResultCode() + ":" + statusVO.getMessage());
 
         return statusVO;
     }
@@ -421,7 +557,7 @@ public class PortableController {
      * @param ptgrVO
      * @return ResultVO
      */
-    @PostMapping(value = "/user/registerPortableData")
+    @PostMapping(value = "/registerPortableData")
     @ResponseBody
     public StatusVO registerInfo (@ModelAttribute PortableVO ptgrVO) {
         StatusVO statusVO = new StatusVO();
@@ -470,12 +606,19 @@ public class PortableController {
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            e.printStackTrace();
         }
 
         return statusVO;
     };
 
-    @PostMapping (value = "/user/readPortableData")
+    /**
+     * 휴대형구름 정보
+     *
+     * @param userId
+     * @return ResultVO
+     */
+    @PostMapping (value = "/readPortableData")
     @ResponseBody
     public ResultVO getPortableDataListOfUser (@RequestParam(value = "userId") String userId) {
 
@@ -488,11 +631,15 @@ public class PortableController {
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            e.printStackTrace();
         }
 
         return resultVO;
     };
 
+    /**
+     * 휴대형 구름 로그 생성
+     */
     private int createLog (PortableVO portableVO, String code, String message, String level) throws Exception {
         PortableLogVO logVO = new PortableLogVO();
         logVO.setLogId(portableLogService.readNextLogDataIndex());
@@ -507,6 +654,113 @@ public class PortableController {
         return logVO.getLogId();
     }
 
+    /**
+     * 동기 휴대형 구름 신청정보 승인 및 빌드 서버 전달
+     */
+    private StatusVO portableApprove (PortableVO vo) {
+
+        Security.addProvider(new BouncyCastleProvider());
+        StatusVO statusVO = new StatusVO();
+        try {
+            //인증서 생성..
+            String userId = vo.getUserId();
+            ResultVO userResultVO = userService.readUserData(userId);
+            if (userResultVO.getData().length == 0) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                        MessageSourceHelper.getMessage("portable.result.erruser"));
+                return statusVO;
+            }
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            cal.add(Calendar.YEAR, 1);
+            Date yearFromNow = cal.getTime();
+
+            UserVO userVO = (UserVO) userResultVO.getData()[0];
+            String userPw = userVO.getUserPasswd();
+            CertificateUtils certUtils = new CertificateUtils();
+            CertificateVO certVO = certUtils.createGcspCertificate(userId, yearFromNow, new BigInteger(64, new SecureRandom()), userPw);
+            //인증서 파일 저장
+            Path certPath = Paths.get(GPMSConstants.PORTABLE_CERTPATH, userId, Integer.toString(vo.getCertId()), GPMSConstants.PORTABLE_CERTFILENAME);
+
+            File rootPath = new File(certPath.getParent().toString());
+            if (!rootPath.exists())
+                rootPath.mkdirs();
+
+            File certFile = new File(certPath.toString());
+            FileUtils.writeContent(certFile, certVO.getCertificatePem());
+            Path keyPath = Paths.get(GPMSConstants.PORTABLE_CERTPATH, userId, Integer.toString(vo.getCertId()), GPMSConstants.PORTABLE_KEYFILENAME);
+            File privateFile = new File(keyPath.toString());
+            FileUtils.writeContent(privateFile, certVO.getPrivateKeyPem());
+
+            ResultVO certResultVO = portableCertService.readCertDataByCertId(Integer.toString(vo.getCertId()));
+            if (certResultVO.getData().length == 0) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                        MessageSourceHelper.getMessage("portable.result.errdata"));
+                //인증서 삭제...
+                FileUtils.delete(certFile);
+                FileUtils.delete(privateFile);
+                return statusVO;
+            }
+            PortableCertVO ptgrCertVO = (PortableCertVO) certResultVO.getData()[0];
+            ptgrCertVO.setCreatedDt(new Date());
+            ptgrCertVO.setPublish(1); //발급완료
+            ptgrCertVO.setCertPath(certPath.toString());
+            ptgrCertVO.setKeyPath(keyPath.toString());
+            StatusVO certStatusVO = portableCertService.updateCertData(ptgrCertVO);
+            if (certStatusVO.getResultCode() == GPMSConstants.MSG_FAIL) {
+                FileUtils.delete(certFile);
+                FileUtils.delete(privateFile);
+                return statusVO;
+            }
+
+            if (statusVO.getResult() == GPMSConstants.MSG_SUCCESS) {
+                //승인 상태 변경
+                vo.setApproveStatus(PortableConstants.STATUS_APPROVE);
+                //빌드 서버 요청
+
+                //빌드 전달 상태 변경
+                vo.setBuildStatus(PortableConstants.STATUS_BUILD_REQUEST);
+                portableService.updatePortableData(vo);
+
+                //이미지 신청 상태 변경
+                HashMap<String, Object> options = new HashMap<>();
+                options.put("imageId", vo.getImageId());
+                ResultVO ret = portableImageService.readImageDataById(vo.getImageId());
+                if (ret.getData() == null) {
+                    String msg = "portableApprove : No image table information";
+                    createLog(vo, GPMSConstants.CODE_NODATA, msg, PortableConstants.LOG_WARN);
+                    statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                            MessageSourceHelper.getMessage("portable.result.errdata"));
+                    return statusVO;
+                }
+                PortableImageVO portableImageVO = (PortableImageVO) ret.getData()[0];
+                portableImageVO.setStatus(PortableConstants.STATUS_IMAGE_CREATE);
+                portableImageService.updateImageData(portableImageVO);
+                logger.debug("portable approve success : {}", statusVO.getMessage());
+            } else {
+                String msg = "portableApprove :  failed " + statusVO.getMessage();
+                int logId = createLog(vo, statusVO.getResultCode(), msg, PortableConstants.LOG_WARN);
+                vo.setStatusCd(PortableConstants.LOG_WARN);
+                vo.setLogId(logId);
+                portableService.updatePortableData(vo);
+                logger.debug("portable approve fail: {}", statusVO.getMessage());
+                return statusVO;
+            }
+            statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+                    MessageSourceHelper.getMessage("portable.result.apprroving"));
+        } catch (Exception e) {
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR, e.getMessage());
+            e.printStackTrace();
+            return statusVO;
+        }
+
+        return statusVO;
+    }
+
+    /**
+     * 비동기 휴대형 구름 신청정보 승인 및 빌드 서버 전달
+     */
     private void asyncPortableApprove (String pId) {
 
         Runnable addJob = () -> {
@@ -602,6 +856,7 @@ public class PortableController {
             } catch (Exception e) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,e.getMessage());
                 callback.failed(e, vo);
+                e.printStackTrace();
             }
         };
 

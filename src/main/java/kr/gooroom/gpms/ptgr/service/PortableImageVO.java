@@ -1,5 +1,7 @@
 package kr.gooroom.gpms.ptgr.service;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -9,7 +11,8 @@ public class PortableImageVO implements Serializable {
     int size;
     String name;
     String url;
-    String status; //신청/생성/경로전송/완료/삭제
+    int status; //신청/생성/경로전송/완료/삭제
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     Date createdDt;
 
     public int getImageId() {
@@ -44,11 +47,11 @@ public class PortableImageVO implements Serializable {
         this.url = url;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

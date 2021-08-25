@@ -12,7 +12,7 @@ public class PortableImageViewVO implements Serializable {
     String url;
     String status;
     Date regDt;
-    Date createDt;
+    Date createdDt;
 
     public int getImageId() {
         return imageId;
@@ -70,11 +70,11 @@ public class PortableImageViewVO implements Serializable {
         this.regDt = regDt;
     }
 
-    public Date getCreateDt() {
-        return createDt;
+    public Date getCreatedDt() {
+        return createdDt;
     }
 
-    public void setCreateDt(Date createDt) {
-        this.createDt = createDt;
+    public void setCreatedDt(Date createdDt) {
+        this.createdDt = createdDt;
     }
 }

@@ -36,8 +36,9 @@ public class PortableCertServiceImpl implements PortableCertService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in createCertData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
@@ -59,8 +60,9 @@ public class PortableCertServiceImpl implements PortableCertService {
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            logger.error("error in readCertDataByCertId: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return resultVO;
@@ -82,8 +84,9 @@ public class PortableCertServiceImpl implements PortableCertService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SUCCESS));
+            logger.error("error in updateCertData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
@@ -105,8 +108,9 @@ public class PortableCertServiceImpl implements PortableCertService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SUCCESS));
+            logger.error("error in deleteCertDataByCertId: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;

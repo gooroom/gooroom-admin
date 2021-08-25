@@ -1,18 +1,25 @@
 package kr.gooroom.gpms.ptgr.controller;
 
 import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.ptgr.PortableConstants;
 import kr.gooroom.gpms.ptgr.service.PortableImageService;
 import kr.gooroom.gpms.ptgr.service.PortableImageVO;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,21 +32,119 @@ public class PortableImageController {
     @Resource(name = "portableImageService")
     private PortableImageService portableImageService;
 
-    @PostMapping(value="/readImageList")
+    /**
+     * 휴대형 구름 이미지 정보
+     *
+     * @return ResultVO
+     */
+    @PostMapping(value="/readImageListEx")
     @ResponseBody
     public ResultVO getImageList() {
         ResultVO resultVO = new ResultVO();
         try
         {
-            resultVO = portableImageService.readImageData();
+            resultVO = portableImageService.readImageData(null);
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            e.printStackTrace();
         }
         return resultVO;
     }
 
-    @PostMapping(value="/admin/updateImageList")
+    /**
+     * 휴대형 구름 이미지 정보
+     *
+     * @return ResultPagingVO
+     */
+    @PostMapping(value="/readImageList")
+    @ResponseBody
+    public ResultPagingVO getImageListPaged(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+
+        ResultPagingVO resultVO = new ResultPagingVO();
+        try
+        {
+            HashMap<String, Object> options = new HashMap<String, Object>();
+            String fromDate = StringUtils.defaultString(req.getParameter("fromDate"));
+            String toDate = StringUtils.defaultString(req.getParameter("toDate"));
+            if ("".equals(fromDate) || "".equals(toDate)) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Calendar cal = Calendar.getInstance();
+                toDate = dateFormat.format(cal.getTime());
+                cal.add(Calendar.YEAR, -1);
+                fromDate = dateFormat.format(cal.getTime());
+            }
+            options.put("fromDate", fromDate);
+            options.put("toDate", toDate);
+
+            options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
+            options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+
+            String searchType = req.getParameter("searchType");
+            if (searchType != null) {
+                if (searchType.equalsIgnoreCase("chUserId")) {
+                    options.put("searchType", "USER_ID");
+                }
+                else if (searchType.equalsIgnoreCase("chRegDate")) {
+                    options.put("searchType", "REG_DT");
+                }
+                else if (searchType.equalsIgnoreCase("chCreateDate")) {
+                    options.put("searchType", "CREATED_DT");
+                }
+                else {
+                    options.put("searchType", "ALL");
+                }
+            }
+
+            options.put("searchKey", StringUtils.defaultString(((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "")));
+
+            String paramOrderColumn = req.getParameter("orderColumn");
+            if (paramOrderColumn != null) {
+                if (paramOrderColumn.equalsIgnoreCase("chRegDate")) {
+                    options.put("paramOrderColumn", "REG_DT");
+                }
+                else if (paramOrderColumn.equalsIgnoreCase("chUserIdl")) {
+                    options.put("paramOrderColumn", "USER_ID");
+                }
+                else {
+                    options.put("paramOrderColumn", "CREATED_DT");
+                }
+            }
+            String paramOrderDir = req.getParameter("orderDir");
+            options.put("paramOrderDir", paramOrderDir);
+
+            String paramLang = req.getParameter("lang");
+            options.put("lang", paramLang);
+
+            resultVO = portableImageService.readImageData(options);
+
+            HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+            fromDateHm.put("name", "fromDate");
+            fromDateHm.put("value", fromDate);
+            HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+            toDateHm.put("name", "toDate");
+            toDateHm.put("value", toDate);
+            resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
+
+            resultVO.setDraw(String.valueOf(req.getParameter("page")));
+            resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
+            resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
+            resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+        } catch (Exception e) {
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            e.printStackTrace();
+        }
+        return resultVO;
+    }
+
+    /**
+     * 휴대형 구름 이미지 정보 업데이트
+     *
+     * @param imageVO
+     * @return StatusVO
+     */
+    @PostMapping(value="/updateImageList")
     @ResponseBody
     public StatusVO updateImageList  (@RequestBody PortableImageVO imageVO)  {
 
@@ -55,12 +160,20 @@ public class PortableImageController {
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            e.printStackTrace();
         }
 
         return statusVO;
     }
 
-    @PostMapping(value="/admin/updateImage")
+    /**
+     * 휴대형 구름 이미지 정보 상태 업데이트
+     *
+     * @param imageId
+     * @param status
+     * @return StatusVO
+     */
+    @PostMapping(value="/updateImage")
     @ResponseBody
     public StatusVO updateImageStatusByImageId (@RequestParam(value= "imageId") String imageId,
                                                 @RequestParam(value= "status") String status)  {
@@ -80,19 +193,26 @@ public class PortableImageController {
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            e.printStackTrace();
         }
 
         return statusVO;
     }
 
+    /**
+     * 휴대형 구름 이미지 삭제
+     *
+     * @return StatusVO
+     */
     @PostMapping (value="deleteImageList")
     @ResponseBody
-    public StatusVO deleteImageList (@RequestBody List<String> ids)  {
+    public StatusVO deleteImageList (HttpServletRequest req, HttpServletResponse res)  {
 
+        String[] ids = req.getParameter("ids").split(",");
         StatusVO statusVO = new StatusVO();
         try
         {
-            if (ids.size() == 0) {
+            if (ids.length == 0 || ids[0].equals("")) {
                 statusVO = portableImageService.removeAllImageData();
             }
             else {
@@ -103,6 +223,7 @@ public class PortableImageController {
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            e.printStackTrace();
         }
 
         return statusVO;

@@ -43,7 +43,7 @@
 
     <select id="checkId" parameterType="hashmap" resultType="java.lang.String">
         SELECT CERT_ID
-        FROM VIEW_PTGR_ADMIN
+        FROM PTGR_MSTR
         WHERE CERT_ID IN
         <foreach collection="certId" item="certId" open="(" separator="," close=")">
             ${certId}
@@ -52,17 +52,16 @@
 
     <select id="selectPortableTotalCount"  parameterType="hashmap" resultType="java.lang.Long">
         SELECT COUNT(PTGR_ID) CNT
-        FROM VIEW_PTGR_ADMIN
+        FROM PTGR_MSTR
         <where>
             <if test="adminID != null">
                 ADMIN_ID=#{adminId}
             </if>
         </where>
     </select>
-
-    <select id="selectPortableFilteredCount" parameterType="hashmap" resultType="java.lang.Long">
+    <select id="selectPortableFilteredCountEx" parameterType="hashmap" resultType="java.lang.Long">
         SELECT COUNT(PTGR_ID) AS CNT
-        FROM VIEW_PTGR_ADMIN
+        FROM PTGR_MSTR
         <where>
             <if test="searchKey != null and searchKey != ''">
                 <if test="searchType != null and searchType == 'ALL'">
@@ -73,6 +72,42 @@
                 </if>
                 <if test="searchType != null and searchType == 'IMAGE_STATUS'">
                     AND IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectPortableFilteredCount" parameterType="hashmap" resultType="java.lang.Long">
+        SELECT COUNT(P.PTGR_ID) AS CNT FROM PTGR_MSTR as P
+        LEFT JOIN (SELECT IMAGE_ID, NAME as IMAGE_NAME, URL as IMAGE_URL, STATUS FROM PTGR_IMAGE) as I ON P.IMAGE_ID = I.IMAGE_ID
+        <choose>
+            <when test="lang != null and lang == 'en'">
+                LEFT JOIN (SELECT STATUS_ID, STATUS_EN as IMAGE_STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </when>
+            <otherwise>
+                LEFT JOIN (SELECT STATUS_ID, STATUS_KR as IMAGE_STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </otherwise>
+        </choose>
+        <where>
+            P.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            <if test="adminId != null">
+                AND P.ADMIN_ID = #{adminId}
+            </if>
+            <if test="ptgrId != null">
+                AND P.PTGR_ID = #{ptgrId}
+            </if>
+            <if test="userId != null">
+                AND P.USER_ID = #{userId}
+            </if>
+            <if test="searchKey != null and searchKey != ''">
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND P.USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR S.IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'USER_ID'">
+                    AND P.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'IMAGE_STATUS'">
+                    AND S.IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
                 </if>
             </if>
         </where>
@@ -98,14 +133,28 @@
             #{buildStatus}, #{approveStatus}, #{bulk}, #{statusCd});
     </insert>
 
-    <select id="selectPortableViewList" parameterType="hashMap" resultMap="portableView">
-        SELECT *
-        FROM VIEW_PTGR_ADMIN
+    <select id="selectPortableViewList"  resultMap="portableView">
+        SELECT P.PTGR_ID, P.USER_ID, P.ADMIN_ID, P.CERT_ID, P.REG_DT, P.BEGIN_DT, P.EXPIRED_DT, P.BUILD_STATUS,
+        P.APPROVE_STATUS, C.CERT_STATUS, I.IMAGE_NAME, I.IMAGE_URL, S.IMAGE_STATUS FROM PTGR_MSTR as P
+        LEFT JOIN (SELECT PUBLISH as CERT_STATUS, CERT_ID FROM PTGR_CERT) as C ON P.CERT_ID = C.CERT_ID
+        LEFT JOIN (SELECT IMAGE_ID, NAME as IMAGE_NAME, URL as IMAGE_URL, STATUS FROM PTGR_IMAGE) as I ON P.IMAGE_ID = I.IMAGE_ID
+        LEFT JOIN (SELECT STATUS_ID, STATUS_KR as IMAGE_STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
     </select>
 
     <select id="selectPortableViewListPaged" parameterType="hashMap" resultMap="portableView">
-        SELECT *
-        FROM VIEW_PTGR_ADMIN
+        SELECT P.PTGR_ID, P.USER_ID, P.ADMIN_ID, P.CERT_ID, P.REG_DT, P.BEGIN_DT, P.EXPIRED_DT, P.BUILD_STATUS,
+               P.APPROVE_STATUS, C.CERT_STATUS, I.IMAGE_NAME, I.IMAGE_URL, S.IMAGE_STATUS FROM PTGR_MSTR as P
+            LEFT JOIN (SELECT PUBLISH as CERT_STATUS, CERT_ID FROM PTGR_CERT) as C ON P.CERT_ID = C.CERT_ID
+            LEFT JOIN (SELECT IMAGE_ID, NAME as IMAGE_NAME, URL as IMAGE_URL, STATUS FROM PTGR_IMAGE) as I ON P.IMAGE_ID = I.IMAGE_ID
+            <choose>
+                <when test="lang != null and lang == 'en'">
+                    LEFT JOIN (SELECT STATUS_ID, STATUS_EN as IMAGE_STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+                </when>
+                <otherwise>
+                    LEFT JOIN (SELECT STATUS_ID, STATUS_KR as IMAGE_STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+                </otherwise>
+            </choose>
+
         <where>
             REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
             <if test="adminId != null">
@@ -156,21 +205,8 @@
         SELECT *
         FROM PTGR_MSTR
         <if test="adminId != null">
-            WHERE ADMIN_ID = #{adminId} AND APPROVE_STATUS = "APPROVE00"
+            WHERE ADMIN_ID = #{adminId} AND APPROVE_STATUS = #{approveStatus}
         </if>
-    </select>
-
-    <select id="selectPortableDataListPaged" parameterType="hashmap" resultMap="portableView">
-        SELECT
-            (PTGR_ID, USER_ID, CERT_ID,
-            REG_DT, BEGIN_DT, EXPIRED_DT,
-            BUILD_STATUS, APPROVE_STATUS, CERT_STATUS,
-            IMAGE_NAME, IMAGE_URL, IMAGE_STATUS)
-        FROM VIEW_PTGR_ADMIN
-        WHERE PTGR_ID IN
-            <foreach collection="item" item="item" open="(" separator="," close=")">
-                PTGR_ID=${item}
-            </foreach>
     </select>
 
     <update id="updatePortableData" parameterType="portableVO">

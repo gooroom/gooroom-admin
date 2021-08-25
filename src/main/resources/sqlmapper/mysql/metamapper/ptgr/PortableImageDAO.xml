@@ -14,7 +14,7 @@
 
     </resultMap>
 
-    <resultMap type="portableImageViewVO" id="imageView">
+    <resultMap type="portableImageViewVO" id="portableImageView">
         <result property="imageId" column="IMAGE_ID" />
         <result property="name" column="NAME" />
         <result property="createdDt" column="CREATED_DT" />
@@ -24,15 +24,44 @@
         <result property="regDt" column="REG_DT" />
     </resultMap>
 
-    <select id="selectImageCount" resultType="java.lang.Integer">
-        SELECT COUNT(*) CNT
-        FROM PTGR_IMAGE
-    </select>
-
     <select id="selectNextImageNo" resultType="java.lang.Integer">
         SELECT GRNEXTVAL('PTGRIMAGE_SEQ') AS IMAGE_ID FROM DUAL;
     </select>
 
+    <select id="selectPortableImageTotalCount" parameterType="hashmap" resultType="java.lang.Long">
+        SELECT COUNT(IMAGE_ID) CNT
+        FROM PTGR_IMAGE
+    </select>
+
+    <select id="selectPortableImageFilteredCount" parameterType="hashmap" resultType="java.lang.Long">
+        SELECT COUNT(I.IMAGE_ID) AS CNT FROM PTGR_IMAGE AS I
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS U ON I.IMAGE_ID = U.IMAGE_ID
+        <choose>
+            <when test="lang != null and lang == 'en'">
+                LEFT JOIN (SELECT STATUS_ID, STATUS_EN as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </when>
+            <otherwise>
+                LEFT JOIN (SELECT STATUS_ID, STATUS_KR as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </otherwise>
+        </choose>
+        <where>
+            I.STATUS != 3
+            <if test="searchKey != null and searchKey != ''">
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND U.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'REG_DT'">
+                    AND U.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+                </if>
+                <if test="searchType != null and searchType == 'CREATED_DT'">
+                    AND I.CREATED_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+                </if>
+                <if test="searchType != null and searchType == 'USER_ID'">
+                    AND U.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+            </if>
+        </where>
+    </select>
     <!-- 포터블 이미지 정보 생성 -->
     <insert id="insertPortableImage" parameterType="portableImageVO">
         INSERT INTO PTGR_IMAGE
@@ -41,17 +70,45 @@
             (#{imageId}, #{name}, #{createdDt}, #{url}, #{size}, #{status});
     </insert>
 
-    <select id="selectPortableImageList" resultMap="imageView">
-        SELECT *
-        FROM VIEW_PTGR_IMAGE
-        WHERE STATUS != 'REMOVE';
+    <select id="selectPortableImageList" resultMap="portableImageView">
+        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, P.USER_ID, P.REG_DT FROM PTGR_IMAGE AS I
+        LEFT JOIN (SELECT STATUS_ID, STATUS_KR AS STATUS FROM PTGR_IMAGE_STATUS) AS S ON I.STATUS = S.STATUS_ID
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS p ON I.IMAGE_ID = P.IMAGE_ID
+        WHERE I.STATUS != 3;
     </select>
 
-    <select id="selectPortableImageListByCondition" parameterType="hashmap" resultMap="imageView">
-        SELECT
-            (IMAGE_ID, NAME, CREATED_DT, SIZE, STATUS, USER_ID, REG_DT)
-        FROM VIEW_PTGR_IMAGE
-        WHERE STATUS != 'REMOVE';
+    <select id="selectPortableImageListByCondition" parameterType="hashmap" resultMap="portableImageView">
+        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, P.USER_ID, P.REG_DT FROM PTGR_IMAGE AS I
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS p ON I.IMAGE_ID = P.IMAGE_ID
+        <choose>
+            <when test="lang != null and lang == 'en'">
+                LEFT JOIN (SELECT STATUS_ID, STATUS_EN as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </when>
+            <otherwise>
+                LEFT JOIN (SELECT STATUS_ID, STATUS_KR as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </otherwise>
+        </choose>
+        <where>
+            I.STATUS != 3
+            <if test="searchKey != null and searchKey != ''">
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'REG_DT'">
+                    AND REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+                </if>
+                <if test="searchType != null and searchType == 'CREATED_DT'">
+                    AND CREATED_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+                </if>
+                <if test="searchType != null and searchType == 'USER_ID'">
+                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+            </if>
+        </where>
+        <if test="paramOrderColumn != null">
+            ORDER BY ${paramOrderColumn} ${paramOrderDir}
+        </if>
+        LIMIT #{paramStart}, #{paramLength}
     </select>
 
     <select id="selectPortableImageByImageId" parameterType="java.lang.Integer" resultMap="portableImage">
@@ -94,13 +151,13 @@
     -->
     <delete id="removePortableImage" parameterType="java.lang.Integer">
         UPDATE PTGR_IMAGE
-        SET STATUS = 'REMOVE'
+        SET STATUS = 3
         WHERE IMAGE_ID = ${imageId}
     </delete>
 
     <delete id="removePortableImages" parameterType="hashmap">
         UPDATE PTGR_IMAGE
-        SET STATUS = 'REMOVE'
+        SET STATUS = 3
         WHERE IMAGE_ID IN
         <foreach collection="imageIds" item="imageIds"  open="(" separator="," close=")">
             ${imageIds}
@@ -109,7 +166,7 @@
 
     <delete id="removeAllPortableImage">
         UPDATE PTGR_IMAGE
-        SET IMAGE_STATUS = 'REMOVE'
+        SET STATUS = 3
     </delete>
 
     <delete id="deletePortableImageById" parameterType="java.lang.Integer">

@@ -1,6 +1,7 @@
 package kr.gooroom.gpms.ptgr.service.impl;
 
 import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
@@ -9,6 +10,7 @@ import kr.gooroom.gpms.ptgr.service.PortableImageVO;
 import kr.gooroom.gpms.ptgr.service.PortableImageViewVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -38,55 +40,65 @@ public class PortableImageServiceImpl implements PortableImageService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in createImageData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
     }
 
     @Override
-    public ResultVO readImageData() throws Exception {
+    public ResultPagingVO readImageData(HashMap<String, Object> options) throws Exception {
 
-        ResultVO resultVO = new ResultVO();
+        ResultPagingVO resultVO = new ResultPagingVO();
 
         try {
-            List<PortableImageViewVO> certVO = portableImageDAO.selectPortableImageList();
-            if (certVO == null || certVO.size() == 0) {
+            List<PortableImageViewVO> imageVO = portableImageDAO.selectPortableImageList(options);
+
+            if (imageVO == null || imageVO.size() == 0) {
+                Object[] o = new Object[0];
+                resultVO.setData(o);
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
                         MessageSourceHelper.getMessage("system.common.noselectdata")));
             } else {
-                resultVO.setData(certVO.toArray());
+                long totalCount = portableImageDAO.selectPortableImageTotalCount(options);
+                long filteredCount = portableImageDAO.selectPortableImageFilteredCount(options);
+                resultVO.setData(imageVO.toArray());
+                resultVO.setRecordsTotal(String.valueOf(totalCount));
+                resultVO.setRecordsFiltered(String.valueOf(filteredCount));
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
                         MessageSourceHelper.getMessage("system.common.selectdata")));
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            logger.error("error in readImageData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
         return resultVO;
     }
 
     @Override
-    public ResultVO readImageDataById(HashMap<String, Object> options) throws Exception {
+    public ResultVO readImageDataById(int imageId) throws Exception {
 
         ResultVO resultVO = new ResultVO();
 
         try {
-            List<PortableImageVO> certVO = portableImageDAO.selectPortableImageList(options);
-            if (certVO == null || certVO.size() == 0) {
+            PortableImageVO  imageVO = portableImageDAO.selectPortableImageByImageId(imageId);
+            if (imageVO == null) {
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
                         MessageSourceHelper.getMessage("system.common.noselectdata")));
             } else {
-                resultVO.setData(certVO.toArray());
+                resultVO.setData(new Object[] {imageVO});
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
                         MessageSourceHelper.getMessage("system.common.selectdata")));
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            logger.error("error in readImageDataById: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
         return resultVO;
     }
@@ -111,8 +123,9 @@ public class PortableImageServiceImpl implements PortableImageService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in updateImageData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
         return statusVO;
     }
@@ -132,8 +145,9 @@ public class PortableImageServiceImpl implements PortableImageService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in updateImageStatus: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
         return statusVO;
     }
@@ -153,8 +167,9 @@ public class PortableImageServiceImpl implements PortableImageService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in removeImageDataByImageId: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
@@ -176,8 +191,9 @@ public class PortableImageServiceImpl implements PortableImageService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in removeImageDataByImageIds: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
@@ -199,15 +215,16 @@ public class PortableImageServiceImpl implements PortableImageService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in removeAllImageData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
     }
 
     @Override
-    public StatusVO deleteImageDataByImageId(int id) {
+    public StatusVO deleteImageDataByImageId(int id) throws Exception {
         StatusVO statusVO = new StatusVO();
 
         try {
@@ -221,8 +238,9 @@ public class PortableImageServiceImpl implements PortableImageService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in deleteImageDataByImageId: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
@@ -234,7 +252,7 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public int readImageDataCount() throws Exception {
-        return portableImageDAO.selectPortableImageCount();
+    public long readImageDataCount() throws Exception {
+        return portableImageDAO.selectPortableImageTotalCount(null);
     }
 }

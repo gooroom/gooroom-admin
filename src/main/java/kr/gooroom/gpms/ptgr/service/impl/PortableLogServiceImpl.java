@@ -38,8 +38,9 @@ public class PortableLogServiceImpl implements PortableLogService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in createLogData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
@@ -62,8 +63,9 @@ public class PortableLogServiceImpl implements PortableLogService {
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            logger.error("error in readLogData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
         return resultVO;
     }
@@ -85,8 +87,9 @@ public class PortableLogServiceImpl implements PortableLogService {
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            logger.error("error in readLogDataByOptions: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
         return resultVO;
     }
@@ -107,8 +110,9 @@ public class PortableLogServiceImpl implements PortableLogService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in deleteAllLogData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
         return statusVO;
     }

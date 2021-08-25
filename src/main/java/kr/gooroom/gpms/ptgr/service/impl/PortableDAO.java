@@ -59,12 +59,6 @@ public class PortableDAO extends SqlSessionMetaDAO {
         return res;
     }
 
-    public List<PortableVO> selectPortableDataListPaged(HashMap<String, Object> options) throws SQLException {
-        List<PortableVO> res = null;
-        res = sqlSessionMeta.selectList("selectPortableDataListPaged", options);
-        return res;
-    }
-
     public long updatePortableData(PortableVO vo) throws SQLException {
         return (long) sqlSessionMeta.update("updatePortableData", vo);
     }

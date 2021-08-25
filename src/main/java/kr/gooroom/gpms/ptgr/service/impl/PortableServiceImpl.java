@@ -88,8 +88,10 @@ public class PortableServiceImpl implements PortableService {
                 }
                 //File remove
                 String certPath = certVO.getCertPath();
-                Path path = Paths.get(certPath);
-                FileUtils.delete(new File(path.getParent().toString()));
+                if (certPath != null && !certPath.isEmpty()) {
+                    Path path = Paths.get(certPath);
+                    FileUtils.delete(new File(path.getParent().toString()));
+                }
             }
         }
         return true;
@@ -111,8 +113,9 @@ public class PortableServiceImpl implements PortableService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in createPortableData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
@@ -135,8 +138,9 @@ public class PortableServiceImpl implements PortableService {
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            logger.error("error in readPortableView: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return resultVO;
@@ -153,6 +157,8 @@ public class PortableServiceImpl implements PortableService {
             long filteredCount = portableDAO.selectPortableFilteredCount(options);
 
             if (portableVO == null || portableVO.size() == 0) {
+                Object[] o = new Object[0];
+                resultVO.setData(o);
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
                         MessageSourceHelper.getMessage("system.common.noselectdata")));
             } else {
@@ -164,8 +170,9 @@ public class PortableServiceImpl implements PortableService {
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            logger.error("error in readPortableViewPaged: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return resultVO;
@@ -188,8 +195,9 @@ public class PortableServiceImpl implements PortableService {
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            logger.error("error in readPortableViewById: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return resultVO;
@@ -212,8 +220,9 @@ public class PortableServiceImpl implements PortableService {
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            logger.error("error in readPortableDataById: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return resultVO;
@@ -236,8 +245,9 @@ public class PortableServiceImpl implements PortableService {
             }
         }
         catch (Exception e) {
-            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            logger.error("error in readPortableDataByAdminIdAndApprove: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return resultVO;
@@ -258,8 +268,9 @@ public class PortableServiceImpl implements PortableService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in updatePortableData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
@@ -290,20 +301,11 @@ public class PortableServiceImpl implements PortableService {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
                         MessageSourceHelper.getMessage("portable.result.nodelete"));
             }
-/*
-            long resultCnt = portableDAO.deletePortableData(ids);
-            if (0 == resultCnt) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
-                        MessageSourceHelper.getMessage("portable.result.nodelete"));
-            } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
-                        MessageSourceHelper.getMessage("portable.result.delete"));
-            }
- */
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in deletePortableData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;
@@ -333,8 +335,9 @@ public class PortableServiceImpl implements PortableService {
             }
         }
         catch (Exception e) {
-            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+            logger.error("error in deleteAllPortableData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
         }
 
         return statusVO;

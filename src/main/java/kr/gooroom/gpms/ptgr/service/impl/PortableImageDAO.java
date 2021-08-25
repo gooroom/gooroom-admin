@@ -33,8 +33,8 @@ public class PortableImageDAO extends SqlSessionMetaDAO {
         return res;
     }
 
-    public List<PortableImageVO> selectPortableImageList (HashMap<String, Object> options) throws SQLException {
-        List<PortableImageVO> res = null;
+    public List<PortableImageViewVO> selectPortableImageList (HashMap<String, Object> options) throws SQLException {
+        List<PortableImageViewVO> res = null;
         res = sqlSessionMeta.selectList("selectPortableImageListByCondition", options);
         return res;
     }
@@ -53,11 +53,11 @@ public class PortableImageDAO extends SqlSessionMetaDAO {
     }
 
     public long removePortableImage (int imageId) throws SQLException {
-        return (long) sqlSessionMeta.delete("removePortableImageById", imageId);
+        return (long) sqlSessionMeta.delete("removePortableImage", imageId);
     }
 
     public long removePortableImages (HashMap<String, Object> ids) throws SQLException {
-        return (long) sqlSessionMeta.delete("removePortableImage", ids);
+        return (long) sqlSessionMeta.delete("removePortableImages", ids);
     }
 
     public long removeAllPortableImage () throws SQLException {
@@ -76,7 +76,11 @@ public class PortableImageDAO extends SqlSessionMetaDAO {
         return sqlSessionMeta.selectOne("selectNextImageNo" );
     }
 
-    public int selectPortableImageCount() throws SQLException {
-        return sqlSessionMeta.selectOne("selectNextImageCount" );
+    public long  selectPortableImageTotalCount(HashMap<String, Object> options) throws SQLException {
+        return sqlSessionMeta.selectOne("selectPortableImageTotalCount", options );
+    }
+
+    public long selectPortableImageFilteredCount(HashMap<String, Object> options) throws SQLException {
+        return sqlSessionMeta.selectOne("selectPortableImageFilteredCount", options);
     }
 }
