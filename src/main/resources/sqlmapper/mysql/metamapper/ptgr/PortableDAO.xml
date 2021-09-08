@@ -209,6 +209,15 @@
         </if>
     </select>
 
+    <select id="selectPortableReapproveCount" parameterType="hashMap" resultType="java.lang.Long">
+        SELECT COUNT(PTGR_ID) AS CNT
+        FROM PTGR_MSTR
+        WHERE APPROVE_STATUS = 'REAPPROVE'
+        <if test="adminId != null">
+            AND ADMIN_ID = #{adminId}
+        </if>
+    </select>
+
     <update id="updatePortableData" parameterType="portableVO">
         UPDATE PTGR_MSTR
         SET ADMIN_ID = #{adminId},

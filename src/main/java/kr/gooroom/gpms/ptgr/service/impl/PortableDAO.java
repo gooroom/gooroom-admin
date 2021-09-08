@@ -59,6 +59,10 @@ public class PortableDAO extends SqlSessionMetaDAO {
         return res;
     }
 
+    public long selectPortableReapproveCount(HashMap<String, Object> options)  throws  SQLException {
+        return (long) sqlSessionMeta.selectOne("selectPortableReapproveCount", options);
+    }
+
     public long updatePortableData(PortableVO vo) throws SQLException {
         return (long) sqlSessionMeta.update("updatePortableData", vo);
     }

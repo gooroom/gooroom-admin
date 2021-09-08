@@ -146,7 +146,7 @@ public class PortableImageController {
      */
     @PostMapping(value="/updateImageList")
     @ResponseBody
-    public StatusVO updateImageList  (@RequestBody PortableImageVO imageVO)  {
+    public StatusVO updateImageList  (@ModelAttribute PortableImageVO imageVO)  {
 
         StatusVO statusVO = new StatusVO();
         if (imageVO == null) {

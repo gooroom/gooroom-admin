@@ -46,15 +46,15 @@
         </choose>
         <where>
             I.STATUS != 3
+            <if test="searchType != null and searchType == 'REG_DT'">
+                AND U.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            </if>
+            <if test="searchType != null and searchType == 'CREATED_DT'">
+                AND I.CREATED_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            </if>
             <if test="searchKey != null and searchKey != ''">
                 <if test="searchType != null and searchType == 'ALL'">
                     AND U.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
-                </if>
-                <if test="searchType != null and searchType == 'REG_DT'">
-                    AND U.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
-                </if>
-                <if test="searchType != null and searchType == 'CREATED_DT'">
-                    AND I.CREATED_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
                 </if>
                 <if test="searchType != null and searchType == 'USER_ID'">
                     AND U.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
@@ -79,7 +79,7 @@
 
     <select id="selectPortableImageListByCondition" parameterType="hashmap" resultMap="portableImageView">
         SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, P.USER_ID, P.REG_DT FROM PTGR_IMAGE AS I
-        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS p ON I.IMAGE_ID = P.IMAGE_ID
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS P ON I.IMAGE_ID = P.IMAGE_ID
         <choose>
             <when test="lang != null and lang == 'en'">
                 LEFT JOIN (SELECT STATUS_ID, STATUS_EN as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
@@ -90,17 +90,17 @@
         </choose>
         <where>
             I.STATUS != 3
+            <if test="searchType != null and searchType == 'REG_DT'">
+                AND REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            </if>
+            <if test="searchType != null and searchType == 'CREATED_DT'">
+                AND CREATED_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            </if>
             <if test="searchKey != null and searchKey != ''">
                 <if test="searchType != null and searchType == 'ALL'">
                     AND USER_ID LIKE CONCAT('%', #{searchKey}, '%')
                 </if>
-                <if test="searchType != null and searchType == 'REG_DT'">
-                    AND REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
-                </if>
-                <if test="searchType != null and searchType == 'CREATED_DT'">
-                    AND CREATED_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
-                </if>
-                <if test="searchType != null and searchType == 'USER_ID'">
+               <if test="searchType != null and searchType == 'USER_ID'">
                     AND USER_ID LIKE CONCAT('%', #{searchKey}, '%')
                 </if>
             </if>

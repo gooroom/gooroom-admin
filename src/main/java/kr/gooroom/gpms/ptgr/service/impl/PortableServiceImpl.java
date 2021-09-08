@@ -254,6 +254,26 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
+    public ResultVO readPortableArroveState(HashMap<String, Object> options) throws Exception {
+
+        ResultVO resultVO = new ResultVO();
+
+        try {
+            long cnt = portableDAO.selectPortableReapproveCount (options);
+            resultVO.setData(new Object[] {cnt});
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+                    MessageSourceHelper.getMessage("system.common.selectdata")));
+        }
+        catch (Exception e) {
+            logger.error("error in readPortableDataByAdminIdAndApprove: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
+        }
+
+        return resultVO;
+    }
+
+    @Override
     public StatusVO updatePortableData(PortableVO portableVO) throws Exception {
         StatusVO statusVO = new StatusVO();
 
@@ -320,10 +340,8 @@ public class PortableServiceImpl implements PortableService {
             //인증서 삭제
             FileUtils.delete(new File(GPMSConstants.PORTABLE_CERTPATH));
             portableCertDAO.deletePortableCertAll();
-            //이미지 히스토리 복사 & 삭제
             portableImageDAO.createPortableAllImageHist();
             portableImageDAO.deletePortableImageAll();
-            //신청정보 히스트로 복사 & 삭제
             portableDAO.createPortableDataAllHist();
             long resultCnt = portableDAO.deleteAllPortableData();
             if (0 == resultCnt) {

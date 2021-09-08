@@ -9,7 +9,7 @@ public class PortableConstants {
 
     public static final String STATUS_APPROVE_REQUEST = "REQUEST";
     public static final String STATUS_APPROVE= "APPROVE";
-    public static final String STATUS_APPROVE_REREQUEST = "REREQUEST";
+    public static final String STATUS_APPROVE_REAPPROVE= "REAPPROVE";
 
     public static final int STATUS_IMAGE_REQUEST = 0; //"REQUEST";
     public static final int STATUS_IMAGE_CREATE = 1; //"CREATE";

@@ -324,4 +324,9 @@ public class GPMSConstants {
 	public static final String PORTABLE_CERTPATH = prop.getProperty("gooroom.user.portable.certificate.path");
 	public static final String PORTABLE_CERTFILENAME = prop.getProperty("gooroom.user.portable.certificate.filename");
 	public static final String PORTABLE_KEYFILENAME = prop.getProperty("gooroom.user.portable.privatekey.filename");
+	public static final String PORTABLE_JENKINS_JOBNAME = prop.getProperty("gooroom.config.portable.jenkins.jobname");
+	public static final String PORTABLE_JENKINS_URL = prop.getProperty("gooroom.config.portable.jenkins.url");
+	public static final String PORTABLE_JENKINS_USER = prop.getProperty("gooroom.config.portable.jenkins.user");
+	public static final String PORTABLE_JENKINS_TOKEN = prop.getProperty("gooroom.config.portable.jenkins.token");
+	public static final String PORTABLE_SERVER_API = prop.getProperty("gooroom.config.portable.server");
 }

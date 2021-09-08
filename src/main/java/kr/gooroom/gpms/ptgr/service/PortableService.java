@@ -60,6 +60,15 @@ public interface PortableService {
     ResultVO readPortableDataByAdminIdAndApprove(HashMap<String, Object> options) throws Exception;
 
     /**
+     * 휴대형구름 승인 여부 조회
+     *
+     * @param adminId
+     * @return StatusVO
+     * @throws Exception
+     */
+    ResultVO readPortableArroveState (HashMap<String, Object> adminId) throws Exception;
+
+    /**
      * 휴대형구름 발급 상태 업데이트
      *
      * @param portableVO
