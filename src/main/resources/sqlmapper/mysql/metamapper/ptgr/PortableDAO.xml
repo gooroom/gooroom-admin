@@ -179,7 +179,7 @@
             </if>
         </where>
         <if test="paramOrderColumn != null">
-            ORDER BY ${paramOrderColumn} ${paramOrderDir}
+            ORDER BY ${paramOrderColumn} ${paramOrderDir}, PTGR_ID ${paramOrderDir}
         </if>
         LIMIT #{paramStart}, #{paramLength}
     </select>

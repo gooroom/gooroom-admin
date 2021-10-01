@@ -450,8 +450,32 @@ public class PortableController {
         }
 
         PortableVO ptgrVO = (PortableVO) resultVO.getData()[0];
-
         //TODO 이미지 발급 상태 정보가 실패의 경우 젠킨스 빌드만 다시 호출함
+        if (ptgrVO.getApproveStatus().equals(PortableConstants.STATUS_APPROVE_REAPPROVE)) {
+            try {
+                ResultVO imageResultVO = portableImageService.readImageDataById(ptgrVO.getImageId());
+                if (imageResultVO != null || imageResultVO.getData().length != 0) {
+                    PortableImageVO imageVO = (PortableImageVO) imageResultVO.getData()[0];
+                    if (imageVO.getStatus() == PortableConstants.STATUS_IMAGE_COPIED_FAIL) {
+
+                        ptgrVO.setApproveStatus(PortableConstants.STATUS_APPROVE);
+                        portableService.updatePortableData(ptgrVO);
+                        imageVO.setStatus(PortableConstants.STATUS_IMAGE_CREATE);
+                        portableImageService.updateImageData(imageVO);
+
+                        callJenkinsForFileCopy(ptgrVO, imageVO);
+                        statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+                                MessageSourceHelper.getMessage("portable.result.approve"));
+                        return statusVO;
+                    }
+                }
+            } catch (Exception e) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+                e.printStackTrace();
+            }
+        }
+
         try {
             statusVO = portableApprove(ptgrVO);
             if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
@@ -507,6 +531,33 @@ public class PortableController {
             Object[] objs = resultVO.getData();
             for (Object obj: objs) {
                 PortableVO vo = (PortableVO)obj;
+
+                //TODO 이미지 발급 상태 정보가 실패의 경우 젠킨스 빌드만 다시 호출함
+                if (vo.getApproveStatus().equals(PortableConstants.STATUS_APPROVE_REAPPROVE)){
+                    try {
+                        ResultVO imageResultVO = portableImageService.readImageDataById(vo.getImageId());
+                        if (imageResultVO != null || imageResultVO.getData().length != 0) {
+                            PortableImageVO imageVO = (PortableImageVO) imageResultVO.getData()[0];
+                            if (imageVO.getStatus() == PortableConstants.STATUS_IMAGE_COPIED_FAIL) {
+
+                                vo.setApproveStatus(PortableConstants.STATUS_APPROVE);
+                                portableService.updatePortableData(vo);
+                                imageVO.setStatus(PortableConstants.STATUS_IMAGE_CREATE);
+                                portableImageService.updateImageData(imageVO);
+
+                                callJenkinsForFileCopy(vo, imageVO);
+                                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+                                        MessageSourceHelper.getMessage("portable.result.approve"));
+                                continue;
+                            }
+                        }
+                    } catch (Exception e) {
+                        statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                                MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+                        e.printStackTrace();
+                        continue;
+                    }
+                }
                 asyncPortableApprove(Integer.toString(vo.getPtgrId()));
                 System.out.println(vo.getPtgrId());
             }
@@ -664,6 +715,23 @@ public class PortableController {
         params.add("root.pem=@"+Paths.get(GPMSConstants.ROOT_CERTPATH,GPMSConstants.ROOT_CERTFILENAME));
         params.add("cert.pem=@"+ptgrCertVO.getCertPath());
         params.add("private.key=@"+ptgrCertVO.getKeyPath());
+        jenkinsUtils.jenkinsBuildWithParameter(params);
+    }
+
+    /**
+     * 빌드 서버 요청
+     */
+    private void callJenkinsForFileCopy (PortableVO ptgrVO, PortableImageVO imageVO) {
+
+        Path imgPath = Paths.get(imageVO.getUrl());
+        int nCount = imgPath.getNameCount();
+        String parentPath = imgPath.getName(nCount - 2).toString();
+
+        ArrayList<String> params = new ArrayList<>();
+        params.add("ImageId="+ptgrVO.getImageId());
+        params.add("CertId="+ptgrVO.getCertId());
+        params.add("ServerUrl="+serverAPI);
+        params.add("CheckSum="+parentPath);
         jenkinsUtils.jenkinsBuildWithParameter(params);
     }
 
