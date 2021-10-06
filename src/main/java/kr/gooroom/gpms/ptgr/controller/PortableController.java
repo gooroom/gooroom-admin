@@ -98,8 +98,11 @@ public class PortableController {
                         //빌드 전달 상태 변경
                         portableVO.setBuildStatus(PortableConstants.STATUS_BUILD_REQUEST);
                         portableService.updatePortableData(portableVO);
-                        //빌드 서버 요청
+                        //인증서 전달 시간
                         PortableCertVO portableCertVO = (PortableCertVO)certRet.getData()[0];
+                        portableCertVO.setTransferDt(new Date());
+                        portableCertService.updateCertData(portableCertVO);
+                        //빌드 서버 요청
                         callJenkins(portableVO, portableCertVO);
                         logger.debug("portable approve success : {}", statusVO.getMessage());
                     } else {
@@ -148,7 +151,7 @@ public class PortableController {
         {
             HashMap<String, Object> options = new HashMap<String, Object>();
             options.put("userId", ids);
-            resultVO = userService.isNoExistInUserIdList(options);
+            resultVO = portableService.isNoExistInUserIdList(options);
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
@@ -184,8 +187,16 @@ public class PortableController {
                 StatusVO statusVO = null;
                 //사용자 등록
                 UserVO userVO;
-                resultVO = userService.readUserData(vo.getUserId());
-                if (resultVO.getData().length == 0) {
+                resultVO = portableService.readPortableUserById(vo.getUserId());
+                if (resultVO.getData() == null || resultVO.getData().length == 0) {
+
+                    statusVO = portableService.createPortableUser(vo.getUserId());
+                    if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
+                        resultVO.setStatus(statusVO);
+                        logger.debug("not create user: {}", vo.getUserId());
+                        return resultVO;
+                    }
+
                     userVO = new UserVO();
                     userVO.setUserId(vo.getUserId());
                     userVO.setUserPasswd(vo.getUserPw());
@@ -201,6 +212,7 @@ public class PortableController {
                     }
                 }
                 else {
+                    resultVO = userService.readUserData(vo.getUserId());
                     userVO = (UserVO)resultVO.getData()[0];
                 }
 
@@ -277,16 +289,22 @@ public class PortableController {
      */
     @PostMapping (value = "/readPortableDataList")
     @ResponseBody
-    public ResultVO getPortableDataList (@RequestParam(value = "adminId", required = false) String adminId) {
+    public ResultVO getPortableDataList (
+            @RequestParam(value = "adminId", required = false) String adminId,
+            @RequestParam(value = "userId", required = false) String userId) {
         ResultVO resultVO = new ResultVO();
         try
         {
-            if (adminId == null || adminId.isEmpty()) {
+            HashMap<String, Object> options = new HashMap<String, Object>();
+            if (adminId != null && !adminId.isEmpty())
+                options.put("adminId", adminId);
+            if (userId != null && !userId.isEmpty())
+                options.put("userId", userId);
+
+            if (options.size() == 0) {
                 resultVO = portableService.readPortableView();
             }
             else {
-                HashMap<String, Object> options = new HashMap<String, Object>();
-                options.put("adminId", adminId);
                 resultVO = portableService.readPortableDataById(options);
             }
         } catch (Exception e) {
@@ -326,6 +344,10 @@ public class PortableController {
             String adminId = req.getParameter("adminId");
             if (adminId != null && !adminId.isEmpty())
                 options.put("adminId", req.getParameter(adminId));
+
+            String userId= req.getParameter("userId");
+            if (userId!= null && !userId.isEmpty())
+                options.put("userId", req.getParameter(userId));
 
             options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
             options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
@@ -653,6 +675,9 @@ public class PortableController {
                 logger.debug("not create portable table: {}", ptgrId);
                 return statusVO;
             }
+
+            portableApprove(ptgrVO);
+
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
@@ -829,6 +854,10 @@ public class PortableController {
         //빌드 전달 상태 변경
         vo.setBuildStatus(PortableConstants.STATUS_BUILD_REQUEST);
         portableService.updatePortableData(vo);
+        //인증서 전달 시간
+        ptgrCertVO.setTransferDt(new Date());
+        portableCertService.updateCertData(ptgrCertVO);
+
         //빌드 서버 요청
         callJenkins(vo, ptgrCertVO);
         logger.debug("portable approve success : {}", statusVO.getMessage());

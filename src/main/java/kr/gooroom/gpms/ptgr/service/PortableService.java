@@ -17,6 +17,15 @@ public interface PortableService {
     StatusVO createPortableData(PortableVO portableVO) throws Exception;
 
     /**
+     * 휴대형구름 사용자아이디 등록
+     *
+     * @param userID
+     * @return StatusVO
+     * @throws Exception
+     */
+    StatusVO createPortableUser(String userID) throws Exception;
+
+    /**
      * 휴대형구름 등록 정보 조회
      *
      * @return ResultVO
@@ -69,6 +78,23 @@ public interface PortableService {
     ResultVO readPortableArroveState (HashMap<String, Object> adminId) throws Exception;
 
     /**
+     * 휴대형구름 사용자 아아디 조회
+     *
+     * @return ResultVO
+     * @throws Exception
+     */
+    ResultVO readPortableUser() throws Exception;
+
+    /**
+     * 휴대형구름 사용자 아아디 조회
+     *
+     * @param userID
+     * @return ResultVO
+     * @throws Exception
+     */
+    ResultVO readPortableUserById(String userID) throws Exception;
+
+    /**
      * 휴대형구름 발급 상태 업데이트
      *
      * @param portableVO
@@ -102,6 +128,24 @@ public interface PortableService {
      * @throws Exception
      */
     StatusVO  deleteAllPortableData() throws Exception;
+
+    /**
+     * 휴대형구름 사용자 아이디 삭제
+     *
+     * @param userID
+     * @return StatusVO
+     * @throws Exception
+     */
+    StatusVO  deletePortableUser(String userID) throws Exception;
+
+    /**
+     * check duplicate user id list
+     *
+     * @param ids list of user id
+     * @return ResultVO result data bean
+     * @throws Exception
+     */
+    ResultVO isNoExistInUserIdList(HashMap<String, Object> ids) throws Exception;
 
     int readNextPortableDataIndex() throws Exception;
 

@@ -1,11 +1,15 @@
 package kr.gooroom.gpms.login;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import kr.gooroom.gpms.ptgr.service.impl.PortableDAO;
+import kr.gooroom.gpms.user.service.UserVO;
+import kr.gooroom.gpms.user.service.impl.UserDAO;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,12 @@ public class UserLoginService implements UserDetailsService {
 
 	@Resource(name = "adminUserDAO")
 	private AdminUserDAO adminUserDao;
+
+	@Resource(name = "userDAO")
+	private UserDAO userDao;
+
+	@Resource(name = "portableDAO")
+	private PortableDAO portableDAO;
 
 	@Override
 	public User loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -70,8 +80,28 @@ public class UserLoginService implements UserDetailsService {
 			}
 		}
 
-		User user = new User(vo);
-		user.setAuthorities(roles);
+		User user = null;
+		if (vo == null) {
+			try {
+				List<String> userList = portableDAO.selectPortableUserById(username);
+				if (userList != null && userList.size() != 0) {
+					UserVO userVO;
+					userVO = userDao.readUserData(username);
+				 	if (userVO != null) {
+				 		user = new User(userVO);
+				 		roles.add (new Role("ROLE_USER"));
+				 		user.setAuthorities(roles);
+				 	}
+				}
+			} catch (SQLException throwables) {
+				throwables.printStackTrace();
+			}
+		}
+
+		if (user == null) {
+			user = new User(vo);
+			user.setAuthorities(roles);
+		}
 
 		return user;
 	}

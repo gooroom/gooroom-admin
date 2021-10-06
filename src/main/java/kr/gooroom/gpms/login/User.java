@@ -3,6 +3,7 @@ package kr.gooroom.gpms.login;
 import java.util.Collection;
 import java.util.List;
 
+import kr.gooroom.gpms.user.service.UserVO;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -12,10 +13,15 @@ import kr.gooroom.gpms.user.service.AdminUserVO;
 public class User implements UserDetails {
 
 	private AdminUserVO adminUserVO;
+	private UserVO userVO;
 	private List<Role> authorities;
 
 	public User(AdminUserVO adminUserVO) {
 		this.adminUserVO = adminUserVO;
+	}
+
+	public User(UserVO userVO) {
+		this.userVO = userVO;
 	}
 
 	@Override
@@ -32,6 +38,9 @@ public class User implements UserDetails {
 		if (adminUserVO != null) {
 			return adminUserVO.getAdminPw();
 		}
+		if (userVO != null) {
+			return userVO.getUserPasswd();
+		}
 		return null;
 	}
 
@@ -39,6 +48,9 @@ public class User implements UserDetails {
 	public String getUsername() {
 		if (adminUserVO != null) {
 			return adminUserVO.getAdminId();
+		}
+		if (userVO != null) {
+			return userVO.getUserId();
 		}
 		return null;
 	}
@@ -82,6 +94,10 @@ public class User implements UserDetails {
 			return adminUserVO.getConnectIp();
 		}
 		return null;
+	}
+
+	public boolean isUserAccount() {
+		return (userVO != null);
 	}
 
 }

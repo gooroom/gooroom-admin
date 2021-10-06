@@ -122,6 +122,30 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
+    public StatusVO createPortableUser(String userID) throws Exception {
+
+        StatusVO statusVO = new StatusVO();
+
+        try {
+            long resultCnt = portableDAO.createPortableUser(userID);
+            if (0 == resultCnt) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERT,
+                        MessageSourceHelper.getMessage("portable.result.noinsert"));
+            } else {
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
+                        MessageSourceHelper.getMessage("portable.result.insert"));
+            }
+        }
+        catch (Exception e) {
+            logger.error("error in createPortableData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
+        }
+
+        return statusVO;
+    }
+
+    @Override
     public ResultVO readPortableView() throws Exception {
 
         ResultVO resultVO = new ResultVO();
@@ -274,6 +298,55 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
+    public ResultVO readPortableUser() throws Exception {
+
+        ResultVO resultVO = new ResultVO();
+
+        try {
+            List<String> list = portableDAO.selectPortableUserList();
+            if (list == null || list.size() == 0) {
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.noselectdata")));
+            } else {
+                resultVO.setData(list.toArray());
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.selectdata")));
+            }
+        }
+        catch (Exception e) {
+            logger.error("error in readPortableView: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
+        }
+
+        return resultVO;
+    }
+
+    @Override
+    public ResultVO readPortableUserById(String userID) throws Exception {
+        ResultVO resultVO = new ResultVO();
+
+        try {
+            List<String> list = portableDAO.selectPortableUserById(userID);
+            if (list == null || list.size() == 0) {
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.noselectdata")));
+            } else {
+                resultVO.setData(list.toArray());
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+                        MessageSourceHelper.getMessage("system.common.selectdata")));
+            }
+        }
+        catch (Exception e) {
+            logger.error("error in readPortableDataById: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
+        }
+
+        return resultVO;
+    }
+
+    @Override
     public StatusVO updatePortableData(PortableVO portableVO) throws Exception {
         StatusVO statusVO = new StatusVO();
 
@@ -359,6 +432,63 @@ public class PortableServiceImpl implements PortableService {
         }
 
         return statusVO;
+    }
+
+    @Override
+    public StatusVO deletePortableUser(String userID) throws Exception {
+        StatusVO statusVO = new StatusVO();
+
+        try {
+            long resultCnt = portableDAO.deletePortableUserById(userID);
+            if (0 == resultCnt) {
+                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.nodelete"));
+            } else {
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.delete"));
+            }
+        }
+        catch (Exception e) {
+            logger.error("error in deleteAllPortableData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
+            throw e;
+        }
+
+        return statusVO;
+    }
+
+    /**
+     * check duplicate user id list
+     *
+     * @param ids list of user id
+     * @return ResultVO result data bean
+     * @throws Exception
+     */
+    @Override
+    public ResultVO isNoExistInUserIdList(HashMap<String, Object> ids) throws Exception {
+
+        ResultVO resultVO = new ResultVO();
+
+        try {
+            List<String> idList = portableDAO.selectPortableUserListForDuplicateUserId(ids);
+            if (idList.size() == 0) {
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_NODUPLICATE,
+                        MessageSourceHelper.getMessage("user.result.noduplicate")));
+            } else {
+                resultVO.setData(idList.toArray());
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DUPLICATE,
+                        MessageSourceHelper.getMessage("user.result.duplicate")));
+            }
+        } catch (Exception ex) {
+            logger.error("error in duplicate id : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+            if (resultVO != null) {
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+            }
+        }
+
+        return resultVO;
     }
 
     @Override

@@ -56,7 +56,7 @@ public class HomeController {
 			} else if (grantedAuthority.getAuthority().equals("ROLE_PART")) {
 				return "main/part";
 			} else if (grantedAuthority.getAuthority().equals("ROLE_USER")) {
-				return "/";
+				return "main/user";
 			}
 		}
 		return "redirect:/login";

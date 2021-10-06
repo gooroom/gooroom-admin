@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import kr.gooroom.gpms.common.service.ExcelCommonService;
 import kr.gooroom.gpms.common.utils.CommonUtils;
+import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.dept.service.DeptService;
 import kr.gooroom.gpms.dept.service.DeptVO;
 import kr.gooroom.gpms.user.service.UserReqService;
@@ -1034,6 +1035,26 @@ public class UserController {
 			  StatusVO status = userReqService.revokeUsbPermissionFromAdmin(reqSeq);
 			  resultVO.setStatus(status);
 		} catch (Exception ex) {
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+		}
+		return resultVO;
+	}
+
+	/**
+	 * current user data
+	 *
+	 * @return ResultVO
+	 */
+	@PostMapping(value = "/readCurrentUserData")
+	public @ResponseBody ResultVO readCurrentUserData(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+
+		ResultVO resultVO;
+
+		try {
+			resultVO = userService.readUserData(LoginInfoHelper.getUserId());
+		} catch (Exception ex) {
+			resultVO = new ResultVO();
 			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
