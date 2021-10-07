@@ -90,7 +90,8 @@ public class UserLoginService implements UserDetailsService {
 				 	if (userVO != null) {
 				 		user = new User(userVO);
 				 		roles.add (new Role("ROLE_USER"));
-				 		user.setAuthorities(roles);
+						roles.add (new Role("ROLE_PORTABLE_USER"));
+						user.setAuthorities(roles);
 				 	}
 				}
 			} catch (SQLException throwables) {

@@ -106,7 +106,26 @@ public class HomeController {
 		
 		return "main/part";
 	}
-	
+
+	/**
+	 * Simply selects the home view to render by returning its name.
+	 *
+	 * @author HNC
+	 * @version 1.0
+	 * @param model Spring framework UI Model Object
+	 * @return String
+	 */
+	@GetMapping(value = "/user")
+	public String userPage(Model model) {
+
+		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		for (GrantedAuthority grantedAuthority : authorities) {
+			model.addAttribute(grantedAuthority.getAuthority(), "1");
+		}
+
+		return "main/user";
+	}
+
 	/**
 	 * error view to render by returning its name with error code.
 	 * 
