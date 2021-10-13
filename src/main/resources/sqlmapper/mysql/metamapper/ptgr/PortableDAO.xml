@@ -133,14 +133,6 @@
             #{buildStatus}, #{approveStatus}, #{bulk}, #{statusCd});
     </insert>
 
-    <!-- 포터블 사용자 아이디 추가 -->
-    <insert id="insertPortableUser" parameterType="java.lang.String">
-        INSERT INTO PTGR_USER
-            (USER_ID)
-        VALUES
-            (#{userId})
-    </insert>
-
     <select id="selectPortableViewList"  resultMap="portableView">
         SELECT P.PTGR_ID, P.USER_ID, P.ADMIN_ID, P.CERT_ID, P.REG_DT, P.BEGIN_DT, P.EXPIRED_DT, P.BUILD_STATUS,
         P.APPROVE_STATUS, C.CERT_STATUS, I.IMAGE_NAME, I.IMAGE_URL, S.IMAGE_STATUS FROM PTGR_MSTR as P
@@ -226,31 +218,6 @@
         </if>
     </select>
 
-    <select id="selectPortableUserList" resultType="java.lang.String">
-        SELECT *
-        FROM PTGR_USER
-    </select>
-
-    <select id="selectPortableUserById" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT *
-        FROM PTGR_USER
-        <where>
-            <if test="userId!= null">
-                USER_ID=#{userId}
-            </if>
-        </where>
-    </select>
-
-    <!-- 중복된 사용자 ID 리스트
-    <select id="selectPortableUserListForDuplicateUserId" parameterType="hashmap" resultType="java.lang.String">
-        SELECT USER_ID
-        FROM PTGR_USER
-        WHERE USER_ID IN
-        <foreach collection="userId" item="userId" open="(" separator="," close=")">
-            ${userId}
-        </foreach>
-    </select>
-    -->
     <select id="selectPortableUserListForDuplicateUserId" parameterType="hashmap" resultType="java.lang.String">
         SELECT ID
         FROM
@@ -260,12 +227,13 @@
                    ${userId}
                  </foreach>) AS ADMIN
         UNION ALL
-            (SELECT USER_ID AS ID FROM PTGR_USER
+            (SELECT USER_ID AS ID FROM USER_MSTR
             WHERE USER_ID IN
                   <foreach collection="userId" item="userId" open="(" separator="," close=")">
                   ${userId}
                 </foreach>)
     </select>
+
     <update id="updatePortableData" parameterType="portableVO">
         UPDATE PTGR_MSTR
         SET ADMIN_ID = #{adminId},
@@ -311,11 +279,6 @@
 
     <delete id="deleteAllPortableData">
         DELETE FROM PTGR_MSTR;
-    </delete>
-
-    <delete id="deletePortableUserById" parameterType="java.lang.String">
-        DELETE FROM PTGR_MSTR
-        WHERE USER_ID= #{userId}
     </delete>
 
     <!-- History -->

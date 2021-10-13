@@ -122,30 +122,6 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public StatusVO createPortableUser(String userID) throws Exception {
-
-        StatusVO statusVO = new StatusVO();
-
-        try {
-            long resultCnt = portableDAO.createPortableUser(userID);
-            if (0 == resultCnt) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERT,
-                        MessageSourceHelper.getMessage("portable.result.noinsert"));
-            } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
-                        MessageSourceHelper.getMessage("portable.result.insert"));
-            }
-        }
-        catch (Exception e) {
-            logger.error("error in createPortableData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
-            throw e;
-        }
-
-        return statusVO;
-    }
-
-    @Override
     public ResultVO readPortableView() throws Exception {
 
         ResultVO resultVO = new ResultVO();
@@ -298,55 +274,6 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public ResultVO readPortableUser() throws Exception {
-
-        ResultVO resultVO = new ResultVO();
-
-        try {
-            List<String> list = portableDAO.selectPortableUserList();
-            if (list == null || list.size() == 0) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
-                        MessageSourceHelper.getMessage("system.common.noselectdata")));
-            } else {
-                resultVO.setData(list.toArray());
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-                        MessageSourceHelper.getMessage("system.common.selectdata")));
-            }
-        }
-        catch (Exception e) {
-            logger.error("error in readPortableView: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
-            throw e;
-        }
-
-        return resultVO;
-    }
-
-    @Override
-    public ResultVO readPortableUserById(String userID) throws Exception {
-        ResultVO resultVO = new ResultVO();
-
-        try {
-            List<String> list = portableDAO.selectPortableUserById(userID);
-            if (list == null || list.size() == 0) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
-                        MessageSourceHelper.getMessage("system.common.noselectdata")));
-            } else {
-                resultVO.setData(list.toArray());
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-                        MessageSourceHelper.getMessage("system.common.selectdata")));
-            }
-        }
-        catch (Exception e) {
-            logger.error("error in readPortableDataById: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
-            throw e;
-        }
-
-        return resultVO;
-    }
-
-    @Override
     public StatusVO updatePortableData(PortableVO portableVO) throws Exception {
         StatusVO statusVO = new StatusVO();
 
@@ -386,14 +313,29 @@ public class PortableServiceImpl implements PortableService {
                         MessageSourceHelper.getMessage("system.common.noselectdata"));
                 return statusVO;
             }
-            boolean ret = deletePortableDataAndRelationData(ptgrList);
-            if (ret) {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
-                        MessageSourceHelper.getMessage("portable.result.delete"));
-            } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
-                        MessageSourceHelper.getMessage("portable.result.nodelete"));
+
+            for (PortableVO vo : ptgrList) {
+                PortableCertVO certVO =  portableCertDAO.selectPortableCert(Integer.toString(vo.getCertId()));
+                if (certVO == null) {
+                    createLog(vo, GPMSConstants.CODE_SELECT, "portable.result.noselectcert");
+                }
+                else {
+                    //File remove
+                    String certPath = certVO.getCertPath();
+                    if (certPath != null && !certPath.isEmpty()) {
+                        Path path = Paths.get(certPath);
+                        FileUtils.delete(new File(path.getParent().toString()));
+                    }
+                }
+                long ret = portableDAO.deletePortableDataById(vo.getPtgrId());
+                if (ret == 0) {
+                    createLog(vo, GPMSConstants.CODE_DELETE, "portable.result.nodelete");
+                }
             }
+
+            statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
+                    MessageSourceHelper.getMessage("portable.result.delete"));
+
         }
         catch (Exception e) {
             logger.error("error in deletePortableData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -412,34 +354,7 @@ public class PortableServiceImpl implements PortableService {
         try {
             //인증서 삭제
             FileUtils.delete(new File(GPMSConstants.PORTABLE_CERTPATH));
-            portableCertDAO.deletePortableCertAll();
-            portableImageDAO.createPortableAllImageHist();
-            portableImageDAO.deletePortableImageAll();
-            portableDAO.createPortableDataAllHist();
             long resultCnt = portableDAO.deleteAllPortableData();
-            if (0 == resultCnt) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
-                        MessageSourceHelper.getMessage("portable.result.nodelete"));
-            } else {
-                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
-                        MessageSourceHelper.getMessage("portable.result.delete"));
-            }
-        }
-        catch (Exception e) {
-            logger.error("error in deleteAllPortableData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
-                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
-            throw e;
-        }
-
-        return statusVO;
-    }
-
-    @Override
-    public StatusVO deletePortableUser(String userID) throws Exception {
-        StatusVO statusVO = new StatusVO();
-
-        try {
-            long resultCnt = portableDAO.deletePortableUserById(userID);
             if (0 == resultCnt) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETE,
                         MessageSourceHelper.getMessage("portable.result.nodelete"));

@@ -6,7 +6,7 @@
 <body>
 <div id="root"></div>
 <script>
-  window.gpmsain = '10052017';
+  window.gpmsain = '10052018';
 
   window.roleClientAdmin = ${(empty ROLE_CLIENT_ADMIN) ? "0" : ROLE_CLIENT_ADMIN};
   window.roleUserAdmin = ${(empty ROLE_USER_ADMIN) ? "0" : ROLE_USER_ADMIN};

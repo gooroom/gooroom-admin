@@ -27,10 +27,6 @@ public class PortableDAO extends SqlSessionMetaDAO {
         return (long) sqlSessionMeta.insert("insertPortableData", vo);
     }
 
-    public long createPortableUser(String userID) throws SQLException {
-        return (long) sqlSessionMeta.insert("insertPortableUser", userID);
-    }
-
     public long createPortableDataHist(PortableVO vo) throws SQLException {
         return (long) sqlSessionMeta.insert("insertPortableDataHist", vo);
     }
@@ -67,18 +63,6 @@ public class PortableDAO extends SqlSessionMetaDAO {
         return (long) sqlSessionMeta.selectOne("selectPortableReapproveCount", options);
     }
 
-    public List<String> selectPortableUserList() throws SQLException {
-        List<String> res = null;
-        res = sqlSessionMeta.selectList("selectPortableUserList");
-        return res;
-    }
-
-    public List<String> selectPortableUserById(String userId) throws SQLException {
-        List<String> res = null;
-        res = sqlSessionMeta.selectList("selectPortableUserById", userId);
-        return res;
-    }
-
     public long updatePortableData(PortableVO vo) throws SQLException {
         return (long) sqlSessionMeta.update("updatePortableData", vo);
     }
@@ -97,10 +81,6 @@ public class PortableDAO extends SqlSessionMetaDAO {
 
     public long deleteAllPortableData () throws SQLException {
         return (long) sqlSessionMeta.delete("deleteAllPortableData");
-    }
-
-    public long deletePortableUserById (String userId) throws SQLException {
-        return (long) sqlSessionMeta.delete("deletePortableUserById", userId);
     }
 
     public int selectNextPortableNumber() throws SQLException {

@@ -83,16 +83,12 @@ public class UserLoginService implements UserDetailsService {
 		User user = null;
 		if (vo == null) {
 			try {
-				List<String> userList = portableDAO.selectPortableUserById(username);
-				if (userList != null && userList.size() != 0) {
-					UserVO userVO;
-					userVO = userDao.readUserData(username);
-				 	if (userVO != null) {
-				 		user = new User(userVO);
-				 		roles.add (new Role("ROLE_USER"));
-						roles.add (new Role("ROLE_PORTABLE_USER"));
-						user.setAuthorities(roles);
-				 	}
+				UserVO userVO = userDao.readUserData(username);
+				if (userVO != null) {
+					user = new User(userVO);
+					roles.add (new Role("ROLE_USER"));
+					roles.add (new Role("ROLE_PORTABLE_USER"));
+					user.setAuthorities(roles);
 				}
 			} catch (SQLException throwables) {
 				throwables.printStackTrace();

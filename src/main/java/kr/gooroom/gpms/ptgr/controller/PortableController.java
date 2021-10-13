@@ -4,6 +4,7 @@ import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.gkm.utils.CertificateUtils;
 import kr.gooroom.gpms.gkm.utils.CertificateVO;
@@ -187,15 +188,8 @@ public class PortableController {
                 StatusVO statusVO = null;
                 //사용자 등록
                 UserVO userVO;
-                resultVO = portableService.readPortableUserById(vo.getUserId());
+                resultVO = userService.readUserData(vo.getUserId());
                 if (resultVO.getData() == null || resultVO.getData().length == 0) {
-
-                    statusVO = portableService.createPortableUser(vo.getUserId());
-                    if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
-                        resultVO.setStatus(statusVO);
-                        logger.debug("not create user: {}", vo.getUserId());
-                        return resultVO;
-                    }
 
                     userVO = new UserVO();
                     userVO.setUserId(vo.getUserId());
@@ -212,7 +206,6 @@ public class PortableController {
                     }
                 }
                 else {
-                    resultVO = userService.readUserData(vo.getUserId());
                     userVO = (UserVO)resultVO.getData()[0];
                 }
 
@@ -345,9 +338,15 @@ public class PortableController {
             if (adminId != null && !adminId.isEmpty())
                 options.put("adminId", req.getParameter(adminId));
 
-            String userId= req.getParameter("userId");
-            if (userId!= null && !userId.isEmpty())
-                options.put("userId", req.getParameter(userId));
+            String isUser = req.getParameter("isUser");
+            if (isUser != null && isUser.equalsIgnoreCase("true")) {
+                ResultVO userResultVO = userService.readUserData(LoginInfoHelper.getUserId());
+                if (userResultVO != null && userResultVO.getData() != null) {
+                    UserVO userVO = (UserVO) userResultVO.getData()[0];
+                    String userId = userVO.getUserId();
+                    options.put("userId", userId);
+                }
+            }
 
             options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
             options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
@@ -675,8 +674,6 @@ public class PortableController {
                 logger.debug("not create portable table: {}", ptgrId);
                 return statusVO;
             }
-
-            portableApprove(ptgrVO);
 
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
