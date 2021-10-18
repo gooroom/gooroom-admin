@@ -64,7 +64,8 @@ public class PortableCertController {
      */
     @PostMapping (value="/removeCert")
     @ResponseBody
-    public ResultVO removeCert (@RequestParam(value= "certId") String certId) {
+    public ResultVO removeCert (@RequestParam(value= "certId") String certId,
+                                @RequestParam(value= "dataDelete") String dataDelete) {
 
         ResultVO resultVO = new ResultVO();
         try
@@ -83,6 +84,9 @@ public class PortableCertController {
 
                 Path path = Paths.get(certVO.getCertPath());
                 FileUtils.delete(new File(path.getParent().toString()));
+
+                if (dataDelete != null && dataDelete.equalsIgnoreCase("true"))
+                    portableCertService.deleteCertDataByCertId(Integer.parseInt(certId));
             }
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.MSG_SYSERROR,

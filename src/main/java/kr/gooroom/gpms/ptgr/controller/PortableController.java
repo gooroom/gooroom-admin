@@ -49,6 +49,7 @@ public class PortableController {
     private static final Logger logger = LoggerFactory.getLogger(PortableController.class);
 
     private final String serverAPI = GPMSConstants.PORTABLE_SERVER_API + "updateImageList";
+    private final String certDeleteAPI = GPMSConstants.PORTABLE_SERVER_API + "removeCert";
 
     private final ArrayList<String> list = new ArrayList<>();
     private final SynchronousQueue<String> queue = new SynchronousQueue<>();
@@ -734,6 +735,7 @@ public class PortableController {
         params.add("ImageId="+ptgrVO.getImageId());
         params.add("CertId="+ptgrVO.getCertId());
         params.add("ServerUrl="+serverAPI);
+        params.add("CertDeleteUrl="+certDeleteAPI);
         params.add("root.pem=@"+Paths.get(GPMSConstants.ROOT_CERTPATH,GPMSConstants.ROOT_CERTFILENAME));
         params.add("cert.pem=@"+ptgrCertVO.getCertPath());
         params.add("private.key=@"+ptgrCertVO.getKeyPath());
