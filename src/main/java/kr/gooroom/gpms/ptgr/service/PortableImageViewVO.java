@@ -6,7 +6,7 @@ import java.util.Date;
 public class PortableImageViewVO implements Serializable {
 
     int imageId;
-    int size;
+    long size;
     String userId;
     String name;
     String url;
@@ -22,11 +22,11 @@ public class PortableImageViewVO implements Serializable {
         this.imageId = imageId;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(long size) {
         this.size = size;
     }
 

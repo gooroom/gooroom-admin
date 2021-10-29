@@ -71,15 +71,17 @@
     </insert>
 
     <select id="selectPortableImageList" resultMap="portableImageView">
-        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, P.USER_ID, P.REG_DT FROM PTGR_IMAGE AS I
+        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, IFNULL(P.USER_ID, H.USER_ID) AS USER_ID, IFNULL(P.REG_DT, H.REG_DT) AS REG_DT FROM PTGR_IMAGE AS I
         LEFT JOIN (SELECT STATUS_ID, STATUS_KR AS STATUS FROM PTGR_IMAGE_STATUS) AS S ON I.STATUS = S.STATUS_ID
         LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS p ON I.IMAGE_ID = P.IMAGE_ID
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR_HIST) AS H ON I.IMAGE_ID = H.IMAGE_ID
         WHERE I.STATUS != 3;
     </select>
 
     <select id="selectPortableImageListByCondition" parameterType="hashmap" resultMap="portableImageView">
-        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, P.USER_ID, P.REG_DT FROM PTGR_IMAGE AS I
+        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, IFNULL(P.USER_ID, H.USER_ID) AS USER_ID, IFNULL(P.REG_DT, H.REG_DT) AS REG_DT FROM PTGR_IMAGE AS I
         LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS P ON I.IMAGE_ID = P.IMAGE_ID
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR_HIST) AS H ON I.IMAGE_ID = H.IMAGE_ID
         <choose>
             <when test="lang != null and lang == 'en'">
                 LEFT JOIN (SELECT STATUS_ID, STATUS_EN as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
@@ -98,10 +100,10 @@
             </if>
             <if test="searchKey != null and searchKey != ''">
                 <if test="searchType != null and searchType == 'ALL'">
-                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                    AND IFNULL(P.USER_ID, H.USER_ID) LIKE CONCAT('%', #{searchKey}, '%')
                 </if>
                <if test="searchType != null and searchType == 'USER_ID'">
-                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                    AND IFNULL(P.USER_ID, H.USER_ID) LIKE CONCAT('%', #{searchKey}, '%')
                 </if>
             </if>
         </where>
@@ -136,6 +138,12 @@
         WHERE IMAGE_ID = #{imageId};
     </update>
 
+    <!-- 이미지 예상 시간 업데이트 -->
+    <update id="updatePortableImageCreateDate" parameterType="hashMap">
+        UPDATE PTGR_IMAGE
+        SET CREATED_DT = #{createdDt}
+        WHERE IMAGE_ID = #{imageId};
+    </update>
     <!-- 이미지 삭제 -->
     <!--
         <delete id="deletePortableImage" parameterType="Integer">

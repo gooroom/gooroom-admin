@@ -8,7 +8,7 @@ import java.util.Date;
 public class PortableImageVO implements Serializable {
 
     int imageId;
-    int size;
+    long size;
     String name;
     String url;
     int status; //신청/생성/경로전송/완료/삭제
@@ -23,11 +23,11 @@ public class PortableImageVO implements Serializable {
         this.imageId = imageId;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(long size) {
         this.size = size;
     }
 

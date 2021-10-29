@@ -732,10 +732,14 @@ public class PortableController {
      */
     private void callJenkins (PortableVO ptgrVO, PortableCertVO ptgrCertVO) {
         ArrayList<String> params = new ArrayList<>();
-        params.add("ImageId="+ptgrVO.getImageId());
-        params.add("CertId="+ptgrVO.getCertId());
-        params.add("ServerUrl="+serverAPI);
-        params.add("CertDeleteUrl="+certDeleteAPI);
+        params.add("userId="+ptgrVO.getUserId());
+        params.add("userEmail="+ptgrVO.getNotiEmail());
+        params.add("userPassword="+ptgrVO.getUserPw());
+        params.add("isoPassword="+ptgrVO.getIsoPw());
+        params.add("imageId="+ptgrVO.getImageId());
+        params.add("certId="+ptgrVO.getCertId());
+        params.add("serverUrl="+serverAPI);
+        params.add("certDeleteUrl="+certDeleteAPI);
         params.add("root.pem=@"+Paths.get(GPMSConstants.ROOT_CERTPATH,GPMSConstants.ROOT_CERTFILENAME));
         params.add("cert.pem=@"+ptgrCertVO.getCertPath());
         params.add("private.key=@"+ptgrCertVO.getKeyPath());
@@ -752,10 +756,11 @@ public class PortableController {
         String parentPath = imgPath.getName(nCount - 2).toString();
 
         ArrayList<String> params = new ArrayList<>();
-        params.add("ImageId="+ptgrVO.getImageId());
-        params.add("CertId="+ptgrVO.getCertId());
-        params.add("ServerUrl="+serverAPI);
-        params.add("CheckSum="+parentPath);
+        params.add("imageId="+ptgrVO.getImageId());
+        params.add("certId="+ptgrVO.getCertId());
+        params.add("serverUrl="+serverAPI);
+        params.add("checkSum="+parentPath);
+        params.add("userEmail="+ptgrVO.getNotiEmail());
         jenkinsUtils.jenkinsBuildWithParameter(params);
     }
 
@@ -799,6 +804,9 @@ public class PortableController {
 
         UserVO userVO = (UserVO) userResultVO.getData()[0];
         String userPw = userVO.getUserPasswd();
+
+        vo.setUserPw(userPw);
+
         CertificateUtils certUtils = new CertificateUtils();
         CertificateVO certVO = certUtils.createGcspCertificate(userId, yearFromNow, new BigInteger(64, new SecureRandom()), userPw);
         //인증서 파일 저장
@@ -920,6 +928,9 @@ public class PortableController {
 
                 UserVO userVO = (UserVO)userResultVO.getData()[0];
                 String userPw = userVO.getUserPasswd();
+
+                vo.setUserPw(userPw);
+
                 CertificateUtils certUtils = new CertificateUtils();
                 CertificateVO certVO = certUtils.createGcspCertificate(userId, yearFromNow, new BigInteger(64, new SecureRandom()), userPw);
                 //인증서 파일 저장
