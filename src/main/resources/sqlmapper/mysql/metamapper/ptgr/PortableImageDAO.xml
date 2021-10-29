@@ -93,7 +93,7 @@
         <where>
             I.STATUS != 3
             <if test="searchType != null and searchType == 'REG_DT'">
-                AND REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+                AND IFNULL(P.REG_DT, H.REG_DT) BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
             </if>
             <if test="searchType != null and searchType == 'CREATED_DT'">
                 AND CREATED_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
