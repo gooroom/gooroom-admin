@@ -54,8 +54,14 @@ public class HomeController {
 			} else if (grantedAuthority.getAuthority().equals("ROLE_SUPER")) {
 				return "main/super";
 			} else if (grantedAuthority.getAuthority().equals("ROLE_PART")) {
+				for (GrantedAuthority subAuthority : authorities) {
+					model.addAttribute(subAuthority.getAuthority(), "1");
+				}
 				return "main/part";
 			} else if (grantedAuthority.getAuthority().equals("ROLE_USER")) {
+				for (GrantedAuthority subAuthority : authorities) {
+					model.addAttribute(subAuthority.getAuthority(), "1");
+				}
 				return "main/user";
 			}
 		}

@@ -1,5 +1,7 @@
 package kr.gooroom.gpms.ptgr.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
@@ -11,6 +13,7 @@ import kr.gooroom.gpms.gkm.utils.CertificateVO;
 import kr.gooroom.gpms.gkm.utils.FileUtils;
 import kr.gooroom.gpms.ptgr.PortableConstants;
 import kr.gooroom.gpms.ptgr.service.*;
+import kr.gooroom.gpms.ptgr.util.JenkinsJob;
 import kr.gooroom.gpms.ptgr.util.JenkinsUtils;
 import kr.gooroom.gpms.user.service.UserService;
 import kr.gooroom.gpms.user.service.UserVO;
@@ -50,6 +53,7 @@ public class PortableController {
 
     private final String serverAPI = GPMSConstants.PORTABLE_SERVER_API + "updateImageList";
     private final String certDeleteAPI = GPMSConstants.PORTABLE_SERVER_API + "removeCert";
+    private final String updateDataAPI = GPMSConstants.PORTABLE_SERVER_API + "updateData";
 
     private final ArrayList<String> list = new ArrayList<>();
     private final SynchronousQueue<String> queue = new SynchronousQueue<>();
@@ -71,6 +75,9 @@ public class PortableController {
 
     @Resource(name = "userService")
     private UserService userService;
+
+    @Resource(name = "portableJobService")
+    private PortableJobService portableJobService;
 
     public PortableController() {
         callback = new CompletionHandler<StatusVO, PortableVO>() {
@@ -437,6 +444,89 @@ public class PortableController {
     /**
      * 휴대형 구름 신청 정보 개별 승인
      *
+     * @param certId
+     * @return ResultVO
+     */
+    //@PostMapping(value = "/updatePortableDataForCertFileAndJobId")
+    @PostMapping(value = "/updateData")
+    @ResponseBody
+    public ResultVO updatePortableDataForRemoveCertFileAndUpdateDurationTime(
+            @RequestParam(value= "certId") String certId,
+            //@RequestParam(value= "imageId") String imageId,
+            @RequestParam(value= "dataDelete") String dataDelete,
+            @RequestParam(value= "buildNm") String buildNm) {
+
+        ResultVO resultVO = new ResultVO();
+        try
+        {
+            if (certId == null || certId.isEmpty() || buildNm == null || buildNm.isEmpty()) {
+                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                        MessageSourceHelper.getMessage("portable.result.errdata")));
+            }
+            else {
+                //Remove Cert Data
+                resultVO = portableCertService.readCertDataByCertId(certId);
+                if (resultVO.getData().length == 0) {
+                    resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
+                            MessageSourceHelper.getMessage("portable.result.nodatacert")));
+                }
+                PortableCertVO certVO = (PortableCertVO)resultVO.getData()[0];
+
+                Path path = Paths.get(certVO.getCertPath());
+                FileUtils.delete(new File(path.getParent().toString()));
+
+                if (dataDelete != null && dataDelete.equalsIgnoreCase("true"))
+                    portableCertService.deleteCertDataByCertId(Integer.parseInt(certId));
+
+                //Update JobId
+                /*
+                PortableJobVO jobVO = new PortableJobVO();
+                jobVO.setJobId(Integer.parseInt(jobId));
+                jobVO.setImageId(Integer.parseInt(imageId));
+                portableJobService.createJobData(jobVO);
+                */
+                HashMap<String, Object> options = new HashMap<String, Object>();
+                options.put("certId", certId);
+                ResultVO ptgrReusltVO = portableService.readPortableDataById(options);
+                if (ptgrReusltVO.getData().length != 0) {
+                    PortableVO ptgrVO = (PortableVO) ptgrReusltVO.getData()[0];
+
+                    PortableJobVO jobVO = new PortableJobVO();
+                    jobVO.setJobId(Integer.parseInt(buildNm));
+                    jobVO.setImageId(ptgrVO.getImageId());
+                    portableJobService.createJobData(jobVO);
+
+                    ResultVO ptgrImageResultVO = portableImageService.readImageDataById(ptgrVO.getImageId());
+                    if (ptgrImageResultVO.getData().length !=0) {
+                        PortableImageVO imageVO = (PortableImageVO) ptgrImageResultVO.getData()[0];
+
+                        String json = jenkinsUtils.jenkinsGetJobDuration(Integer.parseInt(buildNm));
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        try {
+                            JenkinsJob job = objectMapper.readValue(json, JenkinsJob.class);
+                            long time = job.getTimestamp();
+                            imageVO.setCreatedDt(new Date(time));
+                        } catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                        portableImageService.updateImageData(imageVO);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.MSG_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+
+            e.printStackTrace();
+        }
+
+            return resultVO;
+    }
+
+
+    /**
+     * 휴대형 구름 신청 정보 개별 승인
+     *
      * @param ptgrId
      * @return ResultVO
      */
@@ -739,7 +829,9 @@ public class PortableController {
         params.add("imageId="+ptgrVO.getImageId());
         params.add("certId="+ptgrVO.getCertId());
         params.add("serverUrl="+serverAPI);
-        params.add("certDeleteUrl="+certDeleteAPI);
+        //params.add("certDeleteUrl="+certDeleteAPI);
+        params.add("certDeleteUrl="+updateDataAPI);
+        //params.add("updateDataUrl="+updateDataAPI);
         params.add("root.pem=@"+Paths.get(GPMSConstants.ROOT_CERTPATH,GPMSConstants.ROOT_CERTFILENAME));
         params.add("cert.pem=@"+ptgrCertVO.getCertPath());
         params.add("private.key=@"+ptgrCertVO.getKeyPath());

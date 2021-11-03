@@ -1,13 +1,17 @@
 package kr.gooroom.gpms.ptgr.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.ptgr.PortableConstants;
 import kr.gooroom.gpms.ptgr.service.PortableImageService;
 import kr.gooroom.gpms.ptgr.service.PortableImageVO;
+import kr.gooroom.gpms.ptgr.service.PortableImageViewVO;
+import kr.gooroom.gpms.ptgr.util.JenkinsJob;
+import kr.gooroom.gpms.ptgr.util.JenkinsUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,6 +36,8 @@ public class PortableImageController {
 
     @Resource(name = "portableImageService")
     private PortableImageService portableImageService;
+
+    private final JenkinsUtils jenkinsUtils = new JenkinsUtils();
 
     /**
      * 휴대형 구름 이미지 정보
@@ -130,7 +137,46 @@ public class PortableImageController {
             resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
             resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
             resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+
+            for ( Object o : resultVO.getData()) {
+                PortableImageViewVO imgViewVO = (PortableImageViewVO) o;
+                if (imgViewVO == null)
+                    continue;
+
+                if (imgViewVO.getJobId() == 0)
+                    continue;
+
+                String json = jenkinsUtils.jenkinsGetJobDuration(imgViewVO.getJobId());
+                logger.debug("=====>>>Jenkins Data :\n" + json);
+                if (json == null || json.isEmpty())
+                    continue;
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    JenkinsJob job = objectMapper.readValue(json, JenkinsJob.class);
+                    if (job.isBuilding()) {
+                        imgViewVO.setDurationTime(job.getEstimatedDuration());
+                    }
+                    logger.debug("=====>>>Duration : " + job.getEstimatedDuration());
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            /*
+            String json = jenkinsUtils.jenkinsGetJobDuration(0);
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                JenkinsJob job = objectMapper.readValue(json, JenkinsJob.class);
+
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+             */
+
         } catch (Exception e) {
+            Object[] o = new Object[0];
+            resultVO.setData(o);
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
             e.printStackTrace();

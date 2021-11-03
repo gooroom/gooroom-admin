@@ -13,6 +13,9 @@ public class PortableImageViewVO implements Serializable {
     String status;
     Date regDt;
     Date createdDt;
+    long durationTime;
+
+    int jobId;
 
     public int getImageId() {
         return imageId;
@@ -76,5 +79,21 @@ public class PortableImageViewVO implements Serializable {
 
     public void setCreatedDt(Date createdDt) {
         this.createdDt = createdDt;
+    }
+
+    public int getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(int jobId) {
+        this.jobId = jobId;
+    }
+
+    public long getDurationTime() {
+        return durationTime;
+    }
+
+    public void setDurationTime(long durationTime) {
+        this.durationTime = durationTime;
     }
 }

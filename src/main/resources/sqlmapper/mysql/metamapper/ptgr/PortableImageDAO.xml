@@ -22,6 +22,7 @@
         <result property="status" column="STATUS" />
         <result property="userId" column="USER_ID" />
         <result property="regDt" column="REG_DT" />
+        <result property="jobId" column="JOB_ID" />
     </resultMap>
 
     <select id="selectNextImageNo" resultType="java.lang.Integer">
@@ -71,15 +72,17 @@
     </insert>
 
     <select id="selectPortableImageList" resultMap="portableImageView">
-        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, IFNULL(P.USER_ID, H.USER_ID) AS USER_ID, IFNULL(P.REG_DT, H.REG_DT) AS REG_DT FROM PTGR_IMAGE AS I
+        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, IFNULL(P.USER_ID, H.USER_ID) AS USER_ID, IFNULL(P.REG_DT, H.REG_DT) AS REG_DT, J.JOB_ID FROM PTGR_IMAGE AS I
         LEFT JOIN (SELECT STATUS_ID, STATUS_KR AS STATUS FROM PTGR_IMAGE_STATUS) AS S ON I.STATUS = S.STATUS_ID
-        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS p ON I.IMAGE_ID = P.IMAGE_ID
+        LEFT JOIN (SELECT JOB_ID, IMAGE_ID FROM PTGR_JOB) AS J ON I.IMAGE_ID = J.IMAGE_ID
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS P ON I.IMAGE_ID = P.IMAGE_ID
         LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR_HIST) AS H ON I.IMAGE_ID = H.IMAGE_ID
         WHERE I.STATUS != 3;
     </select>
 
     <select id="selectPortableImageListByCondition" parameterType="hashmap" resultMap="portableImageView">
-        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, IFNULL(P.USER_ID, H.USER_ID) AS USER_ID, IFNULL(P.REG_DT, H.REG_DT) AS REG_DT FROM PTGR_IMAGE AS I
+        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, IFNULL(P.USER_ID, H.USER_ID) AS USER_ID, IFNULL(P.REG_DT, H.REG_DT) AS REG_DT, J.JOB_ID FROM PTGR_IMAGE AS I
+        LEFT JOIN (SELECT JOB_ID, IMAGE_ID FROM PTGR_JOB) AS J ON I.IMAGE_ID = J.IMAGE_ID
         LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS P ON I.IMAGE_ID = P.IMAGE_ID
         LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR_HIST) AS H ON I.IMAGE_ID = H.IMAGE_ID
         <choose>

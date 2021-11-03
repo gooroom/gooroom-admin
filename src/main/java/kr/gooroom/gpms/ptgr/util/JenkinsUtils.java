@@ -1,10 +1,14 @@
 package kr.gooroom.gpms.ptgr.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.gooroom.gpms.common.GPMSConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -18,12 +22,18 @@ public class JenkinsUtils {
     }
 
     public void jenkinsBuild() {
+        String res;
         String jenkinsUrl =  getJenkinsURL("build");
-
         try {
             ProcessBuilder bProcessBuilder = new ProcessBuilder();
             bProcessBuilder.command("curl", "-X", "POST", jenkinsUrl);
             Process bProcess = bProcessBuilder.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(bProcess.getInputStream()));
+            while ((res = reader.readLine()) != null) {
+                logger.debug("===================================>>>>>> Test [ "+ res + " ]");
+                System.out.println("=====>>>>" + res);
+            }
             bProcess.waitFor(1, TimeUnit.MINUTES);
             bProcess.destroy();
         } catch (IOException e) {
@@ -32,6 +42,7 @@ public class JenkinsUtils {
             e.printStackTrace();
         }
     }
+
     public void jenkinsBuildWithParameter (ArrayList<String> params) {
         String jenkinsUrl =  getJenkinsURL("buildWithParameters");
         logger.debug(jenkinsUrl);
@@ -48,7 +59,17 @@ public class JenkinsUtils {
             });
             ProcessBuilder bProcessBuilder = new ProcessBuilder();
             bProcessBuilder.command(commadList);
+            logger.debug(bProcessBuilder.toString());
             Process bProcess = bProcessBuilder.start();
+
+            String res = "";
+            BufferedReader reader = new BufferedReader(new InputStreamReader(bProcess.getInputStream()));
+            while ((res = reader.readLine()) != null) {
+                logger.debug("===================================>>>>>> Test1 [ "+ res + " ]");
+                System.out.println("=====>>>>" + res);
+            }
+            logger.debug("===================================>>>>>> Test2 [ "+ res + " ]");
+
             bProcess.waitFor(1, TimeUnit.MINUTES);
             bProcess.destroy();
         } catch (IOException e) {
@@ -56,5 +77,44 @@ public class JenkinsUtils {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+    public String jenkinsGetJobDuration(int jobNo) {
+        String res = "";
+        String jenkinsUrl =  getJenkinsURL(jobNo + "/api/json");
+
+        try {
+            ProcessBuilder bProcessBuilder = new ProcessBuilder();
+            bProcessBuilder.command("curl", "-X", "POST", jenkinsUrl);
+            Process bProcess = bProcessBuilder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(bProcess.getInputStream()));
+
+            res = reader.readLine();
+            /*
+            while ((res = reader.readLine()) != null) {
+                logger.debug(res);
+            }
+            */
+            bProcess.waitFor(1, TimeUnit.MINUTES);
+            bProcess.destroy();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    public void jenkinsGetJobDurationTest () {
+
+        String json = "{\"_class\":\"hudson.model.FreeStyleBuild\",\"actions\":[{\"_class\":\"hudson.model.ParametersAction\",\"parameters\":[{\"_class\":\"hudson.model.PasswordParameterValue\",\"name\":\"isoPassword\"},{\"_class\":\"hudson.model.FileParameterValue\",\"name\":\"root.pem\"},{\"_class\":\"hudson.model.FileParameterValue\",\"name\":\"cert.pem\"},{\"_class\":\"hudson.model.FileParameterValue\",\"name\":\"private.key\"},{\"_class\":\"hudson.model.StringParameterValue\",\"name\":\"serverUrl\",\"value\":\"https://ptgr-gpms.gooroom.kr/gpms/portable/updateImageList\"},{\"_class\":\"hudson.model.StringParameterValue\",\"name\":\"imageId\",\"value\":\"270\"},{\"_class\":\"hudson.model.StringParameterValue\",\"name\":\"certId\",\"value\":\"270\"},{\"_class\":\"hudson.model.StringParameterValue\",\"name\":\"checkSum\",\"value\":\"\"},{\"_class\":\"hudson.model.StringParameterValue\",\"name\":\"certDeleteUrl\",\"value\":\"https://ptgr-gpms.gooroom.kr/gpms/portable/removeCert\"},{\"_class\":\"hudson.model.StringParameterValue\",\"name\":\"userId\",\"value\":\"ddoya\"},{\"_class\":\"hudson.model.PasswordParameterValue\",\"name\":\"userPassword\"}]},{\"_class\":\"hudson.model.CauseAction\",\"causes\":[{\"_class\":\"hudson.model.Cause$UserIdCause\",\"shortDescription\":\"Started by user Jenkins Debian Glue\",\"userId\":\"jenkins-debian-glue\",\"userName\":\"Jenkins Debian Glue\"}]},{},{\"_class\":\"org.jenkinsci.plugins.displayurlapi.actions.RunDisplayAction\"}],\"artifacts\":[],\"building\":false,\"description\":null,\"displayName\":\"#96\",\"duration\":49099,\"estimatedDuration\":49805,\"executor\":null,\"fullDisplayName\":\"portable-iso-builder #96\",\"id\":\"96\",\"keepLog\":false,\"number\":96,\"queueId\":873,\"result\":\"SUCCESS\",\"timestamp\":1635838560228,\"url\":\"http://gooroom.dscloud.me:8132/job/portable-iso-builder/96/\",\"builtOn\":\"\",\"changeSet\":{\"_class\":\"hudson.scm.EmptyChangeLogSet\",\"items\":[],\"kind\":null},\"culprits\":[]}";
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JenkinsJob job = objectMapper.readValue(json, JenkinsJob.class);
+            System.out.println(job.getEstimatedDuration());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
     }
 }
