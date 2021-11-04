@@ -452,7 +452,7 @@ public class PortableController {
     @ResponseBody
     public ResultVO updatePortableDataForRemoveCertFileAndUpdateDurationTime(
             @RequestParam(value= "certId") String certId,
-            //@RequestParam(value= "imageId") String imageId,
+            @RequestParam(value= "imageId") String imageId,
             @RequestParam(value= "dataDelete") String dataDelete,
             @RequestParam(value= "buildNm") String buildNm) {
 
@@ -485,12 +485,34 @@ public class PortableController {
                 jobVO.setImageId(Integer.parseInt(imageId));
                 portableJobService.createJobData(jobVO);
                 */
+
+                logger.debug(">>> certID [" +  certId  + "] imageId [ " + imageId + " ]");
+                PortableJobVO jobVO = new PortableJobVO();
+                jobVO.setJobId(Integer.parseInt(buildNm));
+                jobVO.setImageId(Integer.parseInt(imageId));
+                portableJobService.createJobData(jobVO);
+
+                ResultVO ptgrImageResultVO = portableImageService.readImageDataById(Integer.parseInt(imageId));
+                if (ptgrImageResultVO.getData().length !=0) {
+                    PortableImageVO imageVO = (PortableImageVO) ptgrImageResultVO.getData()[0];
+                    String json = jenkinsUtils.jenkinsGetJobDuration(Integer.parseInt(buildNm));
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    try {
+                        JenkinsJob job = objectMapper.readValue(json, JenkinsJob.class);
+                        long time = job.getTimestamp();
+                        imageVO.setCreatedDt(new Date(time));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    portableImageService.updateImageData(imageVO);
+                }
+                /*
                 HashMap<String, Object> options = new HashMap<String, Object>();
                 options.put("certId", certId);
                 ResultVO ptgrReusltVO = portableService.readPortableDataById(options);
                 if (ptgrReusltVO.getData().length != 0) {
                     PortableVO ptgrVO = (PortableVO) ptgrReusltVO.getData()[0];
-
+                    logger.debug(">>> certID [" +  certId  + "] ptgrID [ " + ptgrVO.getPtgrId() + "] imageId [ " + ptgrVO.getImageId() + " ]");
                     PortableJobVO jobVO = new PortableJobVO();
                     jobVO.setJobId(Integer.parseInt(buildNm));
                     jobVO.setImageId(ptgrVO.getImageId());
@@ -512,6 +534,7 @@ public class PortableController {
                         portableImageService.updateImageData(imageVO);
                     }
                 }
+                */
             }
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.MSG_SYSERROR,

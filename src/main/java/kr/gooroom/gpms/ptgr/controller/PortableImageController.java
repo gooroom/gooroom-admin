@@ -69,6 +69,7 @@ public class PortableImageController {
     public ResultPagingVO getImageListPaged(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
         ResultPagingVO resultVO = new ResultPagingVO();
+
         try
         {
             HashMap<String, Object> options = new HashMap<String, Object>();
@@ -157,23 +158,10 @@ public class PortableImageController {
                     if (job.isBuilding()) {
                         imgViewVO.setDurationTime(job.getEstimatedDuration());
                     }
-                    logger.debug("=====>>>Duration : " + job.getEstimatedDuration());
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
             }
-
-            /*
-            String json = jenkinsUtils.jenkinsGetJobDuration(0);
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                JenkinsJob job = objectMapper.readValue(json, JenkinsJob.class);
-
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-             */
-
         } catch (Exception e) {
             Object[] o = new Object[0];
             resultVO.setData(o);

@@ -167,6 +167,26 @@ class JenkinsCulprits {
         this._class = _class;
     }
 }
+class JenkinsExecutor {
+    String _class;
+    String executor;
+
+    public String get_class() {
+        return _class;
+    }
+
+    public void set_class(String _class) {
+        this._class = _class;
+    }
+
+    public String getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(String executor) {
+        this.executor = executor;
+    }
+}
 
 public class JenkinsJob {
 
@@ -185,7 +205,6 @@ public class JenkinsJob {
     String url;
     String result;
     String builtOn;
-    String executor;
     String description;
     String displayName;
     String fullDisplayName;
@@ -194,6 +213,7 @@ public class JenkinsJob {
     List<JenkinsArtifacts> artifacts;
     List<JenkinsCulprits> culprits;
     JenkinsChangeSet changeSet;
+    JenkinsExecutor executor;
 
     public boolean isKeepLog() {
         return keepLog;
@@ -291,14 +311,6 @@ public class JenkinsJob {
         this.builtOn = builtOn;
     }
 
-    public String getExecutor() {
-        return executor;
-    }
-
-    public void setExecutor(String executor) {
-        this.executor = executor;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -345,6 +357,14 @@ public class JenkinsJob {
 
     public void setChangeSet(JenkinsChangeSet changeSet) {
         this.changeSet = changeSet;
+    }
+
+    public JenkinsExecutor getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(JenkinsExecutor executor) {
+        this.executor = executor;
     }
 
     public List<JenkinsCulprits> getCulprits() {

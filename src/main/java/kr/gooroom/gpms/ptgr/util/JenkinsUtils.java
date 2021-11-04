@@ -28,12 +28,13 @@ public class JenkinsUtils {
             ProcessBuilder bProcessBuilder = new ProcessBuilder();
             bProcessBuilder.command("curl", "-X", "POST", jenkinsUrl);
             Process bProcess = bProcessBuilder.start();
-
+/*
             BufferedReader reader = new BufferedReader(new InputStreamReader(bProcess.getInputStream()));
             while ((res = reader.readLine()) != null) {
                 logger.debug("===================================>>>>>> Test [ "+ res + " ]");
                 System.out.println("=====>>>>" + res);
             }
+ */
             bProcess.waitFor(1, TimeUnit.MINUTES);
             bProcess.destroy();
         } catch (IOException e) {
@@ -61,15 +62,6 @@ public class JenkinsUtils {
             bProcessBuilder.command(commadList);
             logger.debug(bProcessBuilder.toString());
             Process bProcess = bProcessBuilder.start();
-
-            String res = "";
-            BufferedReader reader = new BufferedReader(new InputStreamReader(bProcess.getInputStream()));
-            while ((res = reader.readLine()) != null) {
-                logger.debug("===================================>>>>>> Test1 [ "+ res + " ]");
-                System.out.println("=====>>>>" + res);
-            }
-            logger.debug("===================================>>>>>> Test2 [ "+ res + " ]");
-
             bProcess.waitFor(1, TimeUnit.MINUTES);
             bProcess.destroy();
         } catch (IOException e) {
@@ -86,14 +78,10 @@ public class JenkinsUtils {
             ProcessBuilder bProcessBuilder = new ProcessBuilder();
             bProcessBuilder.command("curl", "-X", "POST", jenkinsUrl);
             Process bProcess = bProcessBuilder.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(bProcess.getInputStream()));
 
+            BufferedReader reader = new BufferedReader(new InputStreamReader(bProcess.getInputStream()));
             res = reader.readLine();
-            /*
-            while ((res = reader.readLine()) != null) {
-                logger.debug(res);
-            }
-            */
+
             bProcess.waitFor(1, TimeUnit.MINUTES);
             bProcess.destroy();
         } catch (IOException e) {
