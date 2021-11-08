@@ -111,7 +111,7 @@
             </if>
         </where>
         <if test="paramOrderColumn != null">
-            ORDER BY ${paramOrderColumn} ${paramOrderDir}, IMAGE_ID asc
+            ORDER BY ${paramOrderColumn} ${paramOrderDir}, IMAGE_ID desc
         </if>
         LIMIT #{paramStart}, #{paramLength}
     </select>

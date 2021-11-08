@@ -242,7 +242,8 @@ public class PortableImageController {
     @ResponseBody
     public StatusVO deleteImageList (HttpServletRequest req, HttpServletResponse res)  {
 
-        String[] ids = req.getParameter("ids").split(",");
+        String id = req.getParameter("ids");
+        String[] ids = id.split(",");
         StatusVO statusVO = new StatusVO();
         try
         {
@@ -253,6 +254,7 @@ public class PortableImageController {
                 HashMap<String, Object> options = new HashMap<String, Object>();
                 options.put("imageIds", ids);
                 statusVO = portableImageService.removeImageDataByImageIds(options);
+                jenkinsUtils.jenkinsRemoveFile(id);
             }
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,

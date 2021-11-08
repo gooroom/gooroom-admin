@@ -16,14 +16,14 @@ public class JenkinsUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JenkinsUtils.class);
 
-    private String getJenkinsURL (String buildState) {
-        String jobUrl = String.format("%s/job/%s/%s", GPMSConstants.PORTABLE_JENKINS_URL, GPMSConstants.PORTABLE_JENKINS_JOBNAME, buildState);
+    private String getJenkinsURL (String jobName, String buildState) {
+        String jobUrl = String.format("%s/job/%s/%s", GPMSConstants.PORTABLE_JENKINS_URL, jobName, buildState);
         return String.format("http://%s:%s@%s", GPMSConstants.PORTABLE_JENKINS_USER, GPMSConstants.PORTABLE_JENKINS_TOKEN, jobUrl);
     }
 
     public void jenkinsBuild() {
         String res;
-        String jenkinsUrl =  getJenkinsURL("build");
+        String jenkinsUrl =  getJenkinsURL(GPMSConstants.PORTABLE_JENKINS_JOBNAME, "build");
         try {
             ProcessBuilder bProcessBuilder = new ProcessBuilder();
             bProcessBuilder.command("curl", "-X", "POST", jenkinsUrl);
@@ -45,7 +45,7 @@ public class JenkinsUtils {
     }
 
     public void jenkinsBuildWithParameter (ArrayList<String> params) {
-        String jenkinsUrl =  getJenkinsURL("buildWithParameters");
+        String jenkinsUrl =  getJenkinsURL(GPMSConstants.PORTABLE_JENKINS_JOBNAME, "buildWithParameters");
         logger.debug(jenkinsUrl);
 
         try {
@@ -72,11 +72,40 @@ public class JenkinsUtils {
     }
     public String jenkinsGetJobDuration(int jobNo) {
         String res = "";
-        String jenkinsUrl =  getJenkinsURL(jobNo + "/api/json");
+        String jenkinsUrl =  getJenkinsURL(GPMSConstants.PORTABLE_JENKINS_JOBNAME, jobNo + "/api/json");
 
         try {
             ProcessBuilder bProcessBuilder = new ProcessBuilder();
             bProcessBuilder.command("curl", "-X", "POST", jenkinsUrl);
+            Process bProcess = bProcessBuilder.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(bProcess.getInputStream()));
+            res = reader.readLine();
+
+            bProcess.waitFor(1, TimeUnit.MINUTES);
+            bProcess.destroy();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    public String jenkinsRemoveFile (String id) {
+        String res = "";
+        String jenkinsUrl =  getJenkinsURL(GPMSConstants.PORTABLE_JENKINS_REMOVE_JOBNAME, "buildWithParameters");
+        try {
+            ArrayList<String> commadList = new ArrayList<>();
+            commadList.add("curl");
+            commadList.add("-X");
+            commadList.add("POST");
+            commadList.add(jenkinsUrl);
+            commadList.add("-F");
+            commadList.add("imageIds="+id);
+
+            ProcessBuilder bProcessBuilder = new ProcessBuilder();
+            bProcessBuilder.command(commadList);
             Process bProcess = bProcessBuilder.start();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(bProcess.getInputStream()));
