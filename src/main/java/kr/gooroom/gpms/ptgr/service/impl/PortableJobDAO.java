@@ -16,7 +16,21 @@ public class PortableJobDAO extends SqlSessionMetaDAO {
         return (long) sqlSessionMeta.insert("insertPortableJob", vo);
     }
 
+    public long deletePortableJobByImageId (int imageId) throws SQLException {
+        return (long) sqlSessionMeta.delete("deletePortableJobByImageId");
+    }
+
     public long deleteAllPortableJob () throws SQLException {
         return (long) sqlSessionMeta.delete("deleteAllPortableJob");
+    }
+
+    public PortableJobVO selectPortableJobByImageId (int imageId)  {
+        PortableJobVO res = null;
+        res = sqlSessionMeta.selectOne("selectPortableJobByImageId", imageId);
+        return res;
+    }
+
+    public long updatePortableJob (PortableJobVO jobVO)  {
+       return (long) sqlSessionMeta.update ("updatePortableJob", jobVO);
     }
 }

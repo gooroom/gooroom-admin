@@ -17,6 +17,7 @@ public class PortableConstants {
     public static final int STATUS_IMAGE_DELETE = 3; //"DELETE";
     public static final int STATUS_IMAGE_FAILED = 4; //"FAILED";
     public static final int STATUS_IMAGE_COPIED_FAIL =  5; //"FAILED";
+    public static final int STATUS_IMAGE_ABORTED =  6; //ABORTED
 
     public static final String STATUS_CERT_DEFAULT = "REQUEST";
     public static final String STATUS_CERT_CREATE = "CREATE";

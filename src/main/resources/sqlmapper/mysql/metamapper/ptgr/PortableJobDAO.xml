@@ -17,8 +17,23 @@
             (#{jobId}, #{imageId});
     </insert>
 
+    <delete id="deletePortableJobByImageId" parameterType="Integer">
+        DELETE FROM PTGR_JOB WHERE IMAGE_ID = #{imageId};
+    </delete>
+
     <delete id="deleteAllPortableJob">
         DELETE FROM PTGR_JOB
     </delete>
 
+    <select id="selectPortableJobByImageId" resultMap="portableJob" parameterType="Integer">
+        SELECT JOB_ID, IMAGE_ID FROM PTGR_JOB
+        WHERE IMAGE_ID = #{imageId};
+    </select>
+
+    <update id="updatePortableJob" parameterType="portableJobVO">
+        UPDATE PTGR_JOB
+        SET JOB_ID = #{jobId},
+            IMAGE_ID = #{imageId}
+        WHERE IMAGE_ID = #{imageId};
+    </update>
 </mapper>

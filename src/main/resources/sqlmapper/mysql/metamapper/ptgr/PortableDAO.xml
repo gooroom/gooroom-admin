@@ -179,7 +179,7 @@
             </if>
         </where>
         <if test="paramOrderColumn != null">
-            ORDER BY ${paramOrderColumn} ${paramOrderDir}, PTGR_ID ${paramOrderDir}
+            ORDER BY ${paramOrderColumn} ${paramOrderDir}
         </if>
         LIMIT #{paramStart}, #{paramLength}
     </select>
@@ -278,7 +278,9 @@
     </delete>
 
     <delete id="deleteAllPortableData">
-        DELETE FROM PTGR_MSTR;
+        DELETE P1 FROM PTGR_MSTR AS P1
+        JOIN PTGR_IMAGE ON PTGR_IMAGE.IMAGE_ID = P1.IMAGE_ID
+        WHERE PTGR_IMAGE.STATUS != 1;
     </delete>
 
     <!-- History -->

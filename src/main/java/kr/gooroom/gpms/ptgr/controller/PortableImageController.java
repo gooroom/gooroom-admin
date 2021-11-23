@@ -7,9 +7,11 @@ import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
+import kr.gooroom.gpms.ptgr.PortableConstants;
 import kr.gooroom.gpms.ptgr.service.PortableImageService;
 import kr.gooroom.gpms.ptgr.service.PortableImageVO;
 import kr.gooroom.gpms.ptgr.service.PortableImageViewVO;
+import kr.gooroom.gpms.ptgr.service.PortableJobService;
 import kr.gooroom.gpms.ptgr.util.JenkinsJob;
 import kr.gooroom.gpms.ptgr.util.JenkinsUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -144,9 +146,11 @@ public class PortableImageController {
                 if (imgViewVO == null)
                     continue;
 
+                logger.debug("=====>>>JobID: [" + imgViewVO.getJobId() +"]");
                 if (imgViewVO.getJobId() == 0)
                     continue;
 
+                logger.debug("=====>>>Jenkins Get Duration Job");
                 String json = jenkinsUtils.jenkinsGetJobDuration(imgViewVO.getJobId());
                 logger.debug("=====>>>Jenkins Data :\n" + json);
                 if (json == null || json.isEmpty())
@@ -158,8 +162,42 @@ public class PortableImageController {
                     if (job.isBuilding()) {
                         imgViewVO.setDurationTime(job.getEstimatedDuration());
                     }
+                    if (job.getResult() == null)  {
+                        logger.debug("=====>>>Jenkins Result is null");
+                        continue;
+                    }
+
+                    if (job.getResult().equalsIgnoreCase("aborted")) {
+                        ResultVO rVO = portableImageService.readImageDataById(imgViewVO.getImageId());
+                        if (rVO.getData() != null) {
+                            PortableImageVO iVO = (PortableImageVO)rVO.getData()[0];
+                            iVO.setStatus(PortableConstants.STATUS_IMAGE_ABORTED);
+                            portableImageService.updateImageData(iVO);
+                            if (paramLang.equals("ko")) {
+                                imgViewVO.setStatus("중단");
+                            }
+                            else {
+                                imgViewVO.setStatus("ABORTED");
+                            }
+                        }
+                    }
+                    else if (job.getResult().equalsIgnoreCase("failure")) {
+                        ResultVO rVO = portableImageService.readImageDataById(imgViewVO.getImageId());
+                        if (rVO.getData() != null) {
+                            PortableImageVO iVO = (PortableImageVO)rVO.getData()[0];
+                            iVO.setStatus(PortableConstants.STATUS_IMAGE_FAILED);
+                            portableImageService.updateImageData(iVO);
+                            if (paramLang.equals("ko")) {
+                                imgViewVO.setStatus("실패");
+                            }
+                            else {
+                                imgViewVO.setStatus("FAILED");
+                            }
+                        }
+                    }
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
+                    logger.debug(e.getMessage());
                 }
             }
         } catch (Exception e) {
@@ -168,6 +206,7 @@ public class PortableImageController {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
             e.printStackTrace();
+            logger.debug(e.getMessage());
         }
         return resultVO;
     }
@@ -254,8 +293,8 @@ public class PortableImageController {
                 HashMap<String, Object> options = new HashMap<String, Object>();
                 options.put("imageIds", ids);
                 statusVO = portableImageService.removeImageDataByImageIds(options);
-                jenkinsUtils.jenkinsRemoveFile(id);
             }
+            jenkinsUtils.jenkinsRemoveFile(id);
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));

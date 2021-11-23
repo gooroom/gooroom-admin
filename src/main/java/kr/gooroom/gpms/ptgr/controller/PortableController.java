@@ -100,6 +100,8 @@ public class PortableController {
                             return;
                         }
                         PortableImageVO portableImageVO = (PortableImageVO)imageRet.getData()[0];
+                        //기존 JOB 정보 제거
+                        portableJobService.deleteJobDataByImageId(portableImageVO.getImageId());
                         portableImageVO.setStatus(PortableConstants.STATUS_IMAGE_CREATE);
                         portableImageService.updateImageData(portableImageVO);
                         //승인 상태 변경
@@ -205,7 +207,8 @@ public class PortableController {
                     userVO.setDeptCd("DEPTDEFAULT");
                     userVO.setUserNm(vo.getUserNm());
                     userVO.setUserEmail(vo.getNotiEmail());
-                    statusVO = userService.createUserData(userVO);
+                    userVO.setPasswordStatus(GPMSConstants.STS_NORMAL_USER);
+                    statusVO = userService.createUserData(userVO, true);
 
                     if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
                         resultVO.setStatus(statusVO);
@@ -447,7 +450,6 @@ public class PortableController {
      * @param certId
      * @return ResultVO
      */
-    //@PostMapping(value = "/updatePortableDataForCertFileAndJobId")
     @PostMapping(value = "/updateData")
     @ResponseBody
     public ResultVO updatePortableDataForRemoveCertFileAndUpdateDurationTime(
@@ -466,34 +468,37 @@ public class PortableController {
             else {
                 //Remove Cert Data
                 resultVO = portableCertService.readCertDataByCertId(certId);
-                if (resultVO.getData().length == 0) {
+                if (resultVO.getData() == null || resultVO.getData().length == 0) {
                     resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECT,
                             MessageSourceHelper.getMessage("portable.result.nodatacert")));
                 }
-                PortableCertVO certVO = (PortableCertVO)resultVO.getData()[0];
+                else {
+                    PortableCertVO certVO = (PortableCertVO)resultVO.getData()[0];
+                    Path path = Paths.get(certVO.getCertPath());
+                    FileUtils.delete(new File(path.getParent().toString()));
 
-                Path path = Paths.get(certVO.getCertPath());
-                FileUtils.delete(new File(path.getParent().toString()));
-
-                if (dataDelete != null && dataDelete.equalsIgnoreCase("true"))
-                    portableCertService.deleteCertDataByCertId(Integer.parseInt(certId));
-
+                    if (dataDelete != null && dataDelete.equalsIgnoreCase("true"))
+                        portableCertService.deleteCertDataByCertId(Integer.parseInt(certId));
+                }
                 //Update JobId
-                /*
-                PortableJobVO jobVO = new PortableJobVO();
-                jobVO.setJobId(Integer.parseInt(jobId));
-                jobVO.setImageId(Integer.parseInt(imageId));
-                portableJobService.createJobData(jobVO);
-                */
-
                 logger.debug(">>> certID [" +  certId  + "] imageId [ " + imageId + " ]");
-                PortableJobVO jobVO = new PortableJobVO();
-                jobVO.setJobId(Integer.parseInt(buildNm));
-                jobVO.setImageId(Integer.parseInt(imageId));
-                portableJobService.createJobData(jobVO);
+                ResultVO ptgrJobResultVO = portableJobService.readJobDataByImageId(Integer.parseInt(imageId));
+                if (ptgrJobResultVO.getData() != null && ptgrJobResultVO.getData().length != 0) {
+                   PortableJobVO jobVO = (PortableJobVO) ptgrJobResultVO.getData()[0];
+                   jobVO.setJobId(Integer.parseInt(buildNm));
+                   portableJobService.updateJobData(jobVO);
+                   logger.debug(">>> Update Job [" + buildNm + "]");
+                }
+                else {
+                    PortableJobVO jobVO = new PortableJobVO();
+                    jobVO.setJobId(Integer.parseInt(buildNm));
+                    jobVO.setImageId(Integer.parseInt(imageId));
+                    portableJobService.createJobData(jobVO);
+                    logger.debug(">>> Create Job [" + buildNm + "]");
+                }
 
                 ResultVO ptgrImageResultVO = portableImageService.readImageDataById(Integer.parseInt(imageId));
-                if (ptgrImageResultVO.getData().length !=0) {
+                if (ptgrImageResultVO.getData() != null && ptgrImageResultVO.getData().length != 0) {
                     PortableImageVO imageVO = (PortableImageVO) ptgrImageResultVO.getData()[0];
                     String json = jenkinsUtils.jenkinsGetJobDuration(Integer.parseInt(buildNm));
                     ObjectMapper objectMapper = new ObjectMapper();
@@ -506,46 +511,14 @@ public class PortableController {
                     }
                     portableImageService.updateImageData(imageVO);
                 }
-                /*
-                HashMap<String, Object> options = new HashMap<String, Object>();
-                options.put("certId", certId);
-                ResultVO ptgrReusltVO = portableService.readPortableDataById(options);
-                if (ptgrReusltVO.getData().length != 0) {
-                    PortableVO ptgrVO = (PortableVO) ptgrReusltVO.getData()[0];
-                    logger.debug(">>> certID [" +  certId  + "] ptgrID [ " + ptgrVO.getPtgrId() + "] imageId [ " + ptgrVO.getImageId() + " ]");
-                    PortableJobVO jobVO = new PortableJobVO();
-                    jobVO.setJobId(Integer.parseInt(buildNm));
-                    jobVO.setImageId(ptgrVO.getImageId());
-                    portableJobService.createJobData(jobVO);
-
-                    ResultVO ptgrImageResultVO = portableImageService.readImageDataById(ptgrVO.getImageId());
-                    if (ptgrImageResultVO.getData().length !=0) {
-                        PortableImageVO imageVO = (PortableImageVO) ptgrImageResultVO.getData()[0];
-
-                        String json = jenkinsUtils.jenkinsGetJobDuration(Integer.parseInt(buildNm));
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        try {
-                            JenkinsJob job = objectMapper.readValue(json, JenkinsJob.class);
-                            long time = job.getTimestamp();
-                            imageVO.setCreatedDt(new Date(time));
-                        } catch (JsonProcessingException e) {
-                            e.printStackTrace();
-                        }
-                        portableImageService.updateImageData(imageVO);
-                    }
-                }
-                */
             }
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.MSG_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-
             e.printStackTrace();
         }
-
-            return resultVO;
+        return resultVO;
     }
-
 
     /**
      * 휴대형 구름 신청 정보 개별 승인
@@ -585,11 +558,11 @@ public class PortableController {
         }
 
         PortableVO ptgrVO = (PortableVO) resultVO.getData()[0];
-        //TODO 이미지 발급 상태 정보가 실패의 경우 젠킨스 빌드만 다시 호출함
         if (ptgrVO.getApproveStatus().equals(PortableConstants.STATUS_APPROVE_REAPPROVE)) {
             try {
                 ResultVO imageResultVO = portableImageService.readImageDataById(ptgrVO.getImageId());
                 if (imageResultVO != null || imageResultVO.getData().length != 0) {
+                    logger.debug("portable copied ");
                     PortableImageVO imageVO = (PortableImageVO) imageResultVO.getData()[0];
                     if (imageVO.getStatus() == PortableConstants.STATUS_IMAGE_COPIED_FAIL) {
 
@@ -612,6 +585,7 @@ public class PortableController {
         }
 
         try {
+            logger.debug("portable approve");
             statusVO = portableApprove(ptgrVO);
             if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
                 String msg = "updatePortableDataApprove : failed " + statusVO.getMessage();
@@ -667,7 +641,6 @@ public class PortableController {
             for (Object obj: objs) {
                 PortableVO vo = (PortableVO)obj;
 
-                //TODO 이미지 발급 상태 정보가 실패의 경우 젠킨스 빌드만 다시 호출함
                 if (vo.getApproveStatus().equals(PortableConstants.STATUS_APPROVE_REAPPROVE)){
                     try {
                         ResultVO imageResultVO = portableImageService.readImageDataById(vo.getImageId());
@@ -794,7 +767,6 @@ public class PortableController {
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
             e.printStackTrace();
         }
-
         return statusVO;
     };
 
@@ -819,7 +791,6 @@ public class PortableController {
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
             e.printStackTrace();
         }
-
         return resultVO;
     };
 
@@ -913,8 +884,8 @@ public class PortableController {
         }
 
         Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.YEAR, 1);
+        cal.setTime(vo.getExpiredDt());
+        cal.add(Calendar.DATE, 1); //유효기간 현재 시간 정보를 입력하지 않기 때문에 1day를 추가
         Date yearFromNow = cal.getTime();
 
         UserVO userVO = (UserVO) userResultVO.getData()[0];
@@ -969,6 +940,8 @@ public class PortableController {
             return statusVO;
         }
         PortableImageVO portableImageVO = (PortableImageVO) ret.getData()[0];
+        //기존 JOB 정보 제거
+        portableJobService.deleteJobDataByImageId(portableImageVO.getImageId());
         portableImageVO.setStatus(PortableConstants.STATUS_IMAGE_CREATE);
         portableImageService.updateImageData(portableImageVO);
         //승인 상태 변경
@@ -1037,8 +1010,8 @@ public class PortableController {
                 }
 
                 Calendar cal = Calendar.getInstance();
-                cal.setTime(new Date());
-                cal.add(Calendar.YEAR, 1);
+                cal.setTime(vo.getExpiredDt());
+                cal.add(Calendar.DATE, 1); //유효기간 현재 시간 정보를 입력하지 않기 때문에 1day를 추가
                 Date yearFromNow = cal.getTime();
 
                 UserVO userVO = (UserVO)userResultVO.getData()[0];
@@ -1093,7 +1066,6 @@ public class PortableController {
                 e.printStackTrace();
             }
         };
-
         executor.execute(addJob);
         executor.submit(processJob);
     }
