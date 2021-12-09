@@ -39,6 +39,9 @@ public class PortableImageController {
     @Resource(name = "portableImageService")
     private PortableImageService portableImageService;
 
+    @Resource(name = "portableJobService")
+    private PortableJobService portableJobService;
+
     private final JenkinsUtils jenkinsUtils = new JenkinsUtils();
 
     /**
@@ -230,6 +233,9 @@ public class PortableImageController {
         try
         {
             statusVO = portableImageService.updateImageData(imageVO);
+            if (imageVO.getStatus() >= 2) {
+                portableJobService.deleteJobDataByImageId(imageVO.getImageId());
+            }
         } catch (Exception e) {
             statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));

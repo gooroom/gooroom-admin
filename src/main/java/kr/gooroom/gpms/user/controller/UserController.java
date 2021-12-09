@@ -279,7 +279,7 @@ public class UserController {
 			// check duplicate USERID
 			StatusVO dupStatus = userService.isNoExistUserId(userVO.getUserId());
 			if (GPMSConstants.MSG_SUCCESS.equalsIgnoreCase(dupStatus.getResult())) {
-				StatusVO status = userService.createUserDataWithRule(userVO);
+				StatusVO status = userService.createUserDataWithRule(userVO, false);
 				resultVO.setStatus(status);
 			} else {
 				// DUPLICATE USER ID - NO CREATE

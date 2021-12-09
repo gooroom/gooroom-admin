@@ -126,7 +126,10 @@ public class CertificateUtils {
 	 * @throws Exception
 	 */
 	public CertificateVO createGcspCertificate(String cn, Date validToDate, BigInteger newSerialNo) throws Exception {
-		return createGcspCertificate(cn, validToDate, newSerialNo, "");
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, -1);
+		java.util.Date notBefore = cal.getTime();
+		return createGcspCertificate(cn, notBefore, validToDate, newSerialNo, "");
 	}
 
 	/**
@@ -138,7 +141,7 @@ public class CertificateUtils {
 	 * @return CertificateVO result certificate bean.
 	 * @throws Exception
 	 */
-	public CertificateVO createGcspCertificate(String cn, Date validToDate, BigInteger newSerialNo, String pw) throws Exception {
+	public CertificateVO createGcspCertificate(String cn, Date beginToDate, Date validToDate, BigInteger newSerialNo, String pw) throws Exception {
 
 		CertificateVO vo = new CertificateVO();
 
@@ -168,17 +171,13 @@ public class CertificateUtils {
 		// 1.
 		X500Name issuer = new X500Name(rootCert.getSubjectX500Principal().getName());
 		// 2.
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DATE, -1);
-		java.util.Date notBefore = cal.getTime();
-		// 3.
 		Locale dateLocale = new Locale.Builder().setLanguage("ko").setRegion("KO").build();
-		// 4.
+		// 3.
 		X500Name subject = new X500Name("cn=" + cn);
-		// 5.
+		// 4.
 		SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(pubKey.getEncoded());
 
-		X509v3CertificateBuilder builder = new X509v3CertificateBuilder(issuer, newSerialNo, notBefore, validToDate,
+		X509v3CertificateBuilder builder = new X509v3CertificateBuilder(issuer, newSerialNo, beginToDate, validToDate,
 				dateLocale, subject, publicKeyInfo);
 
 		// sign to builder

@@ -330,4 +330,7 @@ public class GPMSConstants {
 	public static final String PORTABLE_JENKINS_USER = prop.getProperty("gooroom.config.portable.jenkins.user");
 	public static final String PORTABLE_JENKINS_TOKEN = prop.getProperty("gooroom.config.portable.jenkins.token");
 	public static final String PORTABLE_SERVER_API = prop.getProperty("gooroom.config.portable.server");
+	public static final String PORTABLE_GROUP= prop.getProperty("gooroom.config.portable.group");
+	public static final String PORTABLE_DESKTOP = prop.getProperty("gooroom.config.portable.desktop");
+	public static final String PORTABLE_CTRL= prop.getProperty("gooroom.config.portable.ctrl");
 }

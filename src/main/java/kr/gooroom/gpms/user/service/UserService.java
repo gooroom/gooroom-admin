@@ -86,7 +86,7 @@ public interface UserService {
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
-	StatusVO createUserDataWithRule(UserVO userVO) throws Exception;
+	StatusVO createUserDataWithRule(UserVO userVO, boolean isPortable) throws Exception;
 
 	/**
 	 * response user information data

@@ -204,11 +204,13 @@ public class PortableController {
                     userVO = new UserVO();
                     userVO.setUserId(vo.getUserId());
                     userVO.setUserPasswd(vo.getUserPw());
-                    userVO.setDeptCd("DEPTDEFAULT");
+                    userVO.setDeptCd(GPMSConstants.PORTABLE_GROUP);
                     userVO.setUserNm(vo.getUserNm());
                     userVO.setUserEmail(vo.getNotiEmail());
                     userVO.setPasswordStatus(GPMSConstants.STS_NORMAL_USER);
-                    statusVO = userService.createUserData(userVO, true);
+                    userVO.setDesktopConfId(GPMSConstants.PORTABLE_DESKTOP);
+                    userVO.setCtrlCenterItemRuleId(GPMSConstants.PORTABLE_CTRL);
+                    statusVO = userService.createUserDataWithRule(userVO, true);
 
                     if (statusVO.getResult() != GPMSConstants.MSG_SUCCESS) {
                         resultVO.setStatus(statusVO);
@@ -883,10 +885,16 @@ public class PortableController {
             return statusVO;
         }
 
-        Calendar cal = Calendar.getInstance();
+        Locale dateLocale = new Locale.Builder().setLanguage("ko").setRegion("KO").build();
+        Calendar cal = Calendar.getInstance(TimeZone.getDefault(), dateLocale);
         cal.setTime(vo.getExpiredDt());
-        cal.add(Calendar.DATE, 1); //유효기간 현재 시간 정보를 입력하지 않기 때문에 1day를 추가
+        cal.add(Calendar.DATE, 1);
+        cal.add(Calendar.HOUR, 9);
         Date yearFromNow = cal.getTime();
+
+        cal.setTime(vo.getBeginDt());
+        cal.add(Calendar.HOUR, 9);
+        Date beginDate = cal.getTime();
 
         UserVO userVO = (UserVO) userResultVO.getData()[0];
         String userPw = userVO.getUserPasswd();
@@ -894,7 +902,7 @@ public class PortableController {
         vo.setUserPw(userPw);
 
         CertificateUtils certUtils = new CertificateUtils();
-        CertificateVO certVO = certUtils.createGcspCertificate(userId, yearFromNow, new BigInteger(64, new SecureRandom()), userPw);
+        CertificateVO certVO = certUtils.createGcspCertificate(userId, beginDate, yearFromNow, new BigInteger(64, new SecureRandom()), userPw);
         //인증서 파일 저장
         Path certPath = Paths.get(GPMSConstants.PORTABLE_CERTPATH, userId, Integer.toString(vo.getCertId()), GPMSConstants.PORTABLE_CERTFILENAME);
 
@@ -1009,10 +1017,16 @@ public class PortableController {
                     return;
                 }
 
-                Calendar cal = Calendar.getInstance();
+                Locale dateLocale = new Locale.Builder().setLanguage("ko").setRegion("KO").build();
+                Calendar cal = Calendar.getInstance(TimeZone.getDefault(), dateLocale);
                 cal.setTime(vo.getExpiredDt());
-                cal.add(Calendar.DATE, 1); //유효기간 현재 시간 정보를 입력하지 않기 때문에 1day를 추가
+                cal.add(Calendar.DATE, 1);
+                cal.add(Calendar.HOUR, 9);
                 Date yearFromNow = cal.getTime();
+
+                cal.setTime(vo.getBeginDt());
+                cal.add(Calendar.HOUR, 9);
+                Date beginDate = cal.getTime();
 
                 UserVO userVO = (UserVO)userResultVO.getData()[0];
                 String userPw = userVO.getUserPasswd();
@@ -1020,7 +1034,7 @@ public class PortableController {
                 vo.setUserPw(userPw);
 
                 CertificateUtils certUtils = new CertificateUtils();
-                CertificateVO certVO = certUtils.createGcspCertificate(userId, yearFromNow, new BigInteger(64, new SecureRandom()), userPw);
+                CertificateVO certVO = certUtils.createGcspCertificate(userId, beginDate, yearFromNow, new BigInteger(64, new SecureRandom()), userPw);
                 //인증서 파일 저장
                 Path certPath = Paths.get(GPMSConstants.PORTABLE_CERTPATH, userId, Integer.toString(vo.getCertId()), GPMSConstants.PORTABLE_CERTFILENAME);
 

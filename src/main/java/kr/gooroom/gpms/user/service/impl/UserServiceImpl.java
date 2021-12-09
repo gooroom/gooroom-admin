@@ -517,16 +517,19 @@ public class UserServiceImpl implements UserService {
 	 * @throws Exception
 	 */
 	@Override
-	public StatusVO createUserDataWithRule(UserVO userVO) throws Exception {
+	public StatusVO createUserDataWithRule(UserVO userVO, boolean isPortable) throws Exception {
 
 		StatusVO statusVO = new StatusVO();
 
 		try {
-
 			userVO.setModUserId(LoginInfoHelper.getUserId());
 			userVO.setRegUserId(LoginInfoHelper.getUserId());
 			userVO.setStatus(GPMSConstants.STS_NORMAL_USER);
-			userVO.setPasswordStatus(GPMSConstants.STS_TEMP_PASSWORD);
+
+			if (isPortable)
+				userVO.setPasswordStatus(GPMSConstants.STS_NORMAL_USER);
+			else
+				userVO.setPasswordStatus(GPMSConstants.STS_TEMP_PASSWORD);
 
 			long resultCnt = userDao.createUser(userVO);
 			if (resultCnt > 0) {
