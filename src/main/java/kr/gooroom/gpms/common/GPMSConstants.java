@@ -267,7 +267,7 @@ public class GPMSConstants {
 	public static final String JOB_ACCOUNT_RULE_CHANGE = "get_account_config";
 
 	// JOB NAME - clean mode allow job
-	public static final String JOB_CLEANMODE_RULE_CHANGE = "get_cleanmode_config";
+	public static final String JOB_CLEANMODE_RULE_CHANGE = "set_cleanmode_config";
 
 	// JOB NAME - client configuration
 	public static final String JOB_CLIENTCONF_AGENTPOLLING_CHANGE = "set_serverjob_dispatch_time_config";

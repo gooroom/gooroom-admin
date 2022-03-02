@@ -604,9 +604,9 @@ public class ClientConfController {
 						// clean mode allow job
 						HashMap<String, String> mapCleanModeAllow = new HashMap<>();
 						if("true".equalsIgnoreCase(cleanModeAllow)) {
-							mapCleanModeAllow.put("cleanmode_use", "allow");
+							mapCleanModeAllow.put("cleanmode_use", "enable");
 						} else {
-							mapCleanModeAllow.put("cleanmode_use", "disallow");
+							mapCleanModeAllow.put("cleanmode_use", "disable");
 						}
 						jobMaker.createJobForClientSetupWithClients(GPMSConstants.JOB_CLEANMODE_RULE_CHANGE, mapCleanModeAllow,
 								clientIds);
@@ -796,9 +796,9 @@ public class ClientConfController {
 				// clean mode allow job
 				HashMap<String, String> mapCleanModeAllow = new HashMap<>();
 				if("true".equalsIgnoreCase(cleanModeAllow)) {
-					mapCleanModeAllow.put("cleanmode_use", "allow");
+					mapCleanModeAllow.put("cleanmode_use", "enable");
 				} else {
-					mapCleanModeAllow.put("cleanmode_use", "disallow");
+					mapCleanModeAllow.put("cleanmode_use", "disable");
 				}
 				jobMaker.createJobForClientConf(objId, GPMSConstants.TYPE_CLIENTCONF,
 						GPMSConstants.JOB_CLEANMODE_RULE_CHANGE, mapCleanModeAllow);

@@ -861,9 +861,9 @@ public class CustomJobMaker {
 					// clean mode allow job
 					HashMap<String, String> mapCleanModeAllow = new HashMap<>();
 					if("true".equalsIgnoreCase(cleanModeAllow)) {
-						mapCleanModeAllow.put("cleanmode_use", "allow");
+						mapCleanModeAllow.put("cleanmode_use", "enable");
 					} else {
-						mapCleanModeAllow.put("cleanmode_use", "disallow");
+						mapCleanModeAllow.put("cleanmode_use", "disable");
 					}
 					createJobForClientSetupWithClients(GPMSConstants.JOB_CLEANMODE_RULE_CHANGE, mapCleanModeAllow,
 							clientIds);
@@ -951,6 +951,7 @@ public class CustomJobMaker {
 				String homeReset = "";
 				String rootAllow = "";
 				String sudoAllow = "";
+				String cleanModeAllow = "";
 				if (props != null && props.size() > 0) {
 					for (CtrlPropVO prop : props) {
 						if (GPMSConstants.CTRL_ITEM_USEHOMERESET.equalsIgnoreCase(prop.getPropNm())) {
@@ -961,6 +962,9 @@ public class CustomJobMaker {
 						}
 						else if (GPMSConstants.CTRL_ITEM_USEHOMERESET.equalsIgnoreCase(prop.getPropNm())) {
 							sudoAllow = prop.getPropValue();
+						}
+						else if (GPMSConstants.CTRL_ITEM_CLEANMODEALLOW.equalsIgnoreCase(prop.getPropNm())) {
+							cleanModeAllow = prop.getPropValue();
 						}
 					}
 				}
@@ -987,6 +991,15 @@ public class CustomJobMaker {
 					mapAccountAllow.put("sudo_use", "disallow");
 				}
 				createJobForClientSetupWithClients(GPMSConstants.JOB_ACCOUNT_RULE_CHANGE, mapAccountAllow, clientIds);
+
+				// clean mode allow job
+				HashMap<String, String> mapCleanModeAllow = new HashMap<>();
+				if("true".equalsIgnoreCase(cleanModeAllow)) {
+					mapCleanModeAllow.put("cleanmode_use", "enable");
+				} else {
+					mapCleanModeAllow.put("cleanmode_use", "disable");
+				}
+				createJobForClientSetupWithClients(GPMSConstants.JOB_CLEANMODE_RULE_CHANGE, mapCleanModeAllow, clientIds);
 
 				// use log config change job
 				createJobForClientSetupWithClients(GPMSConstants.JOB_CLIENTCONF_LOGCONFIG_CHANGE, null, clientIds);
