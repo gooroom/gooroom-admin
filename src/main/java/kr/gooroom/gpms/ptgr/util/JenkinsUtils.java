@@ -28,13 +28,6 @@ public class JenkinsUtils {
             ProcessBuilder bProcessBuilder = new ProcessBuilder();
             bProcessBuilder.command("curl", "-X", "POST", jenkinsUrl);
             Process bProcess = bProcessBuilder.start();
-/*
-            BufferedReader reader = new BufferedReader(new InputStreamReader(bProcess.getInputStream()));
-            while ((res = reader.readLine()) != null) {
-                logger.debug("===================================>>>>>> Test [ "+ res + " ]");
-                System.out.println("=====>>>>" + res);
-            }
- */
             bProcess.waitFor(1, TimeUnit.MINUTES);
             bProcess.destroy();
         } catch (IOException e) {

@@ -321,16 +321,17 @@ public class GPMSConstants {
 	public static final String ACTION_WAITING = "waiting";
 
 	// Portable
-	public static final String PORTABLE_CERTPATH = prop.getProperty("gooroom.user.portable.certificate.path");
-	public static final String PORTABLE_CERTFILENAME = prop.getProperty("gooroom.user.portable.certificate.filename");
-	public static final String PORTABLE_KEYFILENAME = prop.getProperty("gooroom.user.portable.privatekey.filename");
-	public static final String PORTABLE_JENKINS_JOBNAME = prop.getProperty("gooroom.config.portable.jenkins.jobname");
-	public static final String PORTABLE_JENKINS_REMOVE_JOBNAME = prop.getProperty("gooroom.config.portable.jenkins.remove.jobname");
-	public static final String PORTABLE_JENKINS_URL = prop.getProperty("gooroom.config.portable.jenkins.url");
-	public static final String PORTABLE_JENKINS_USER = prop.getProperty("gooroom.config.portable.jenkins.user");
-	public static final String PORTABLE_JENKINS_TOKEN = prop.getProperty("gooroom.config.portable.jenkins.token");
-	public static final String PORTABLE_SERVER_API = prop.getProperty("gooroom.config.portable.server");
-	public static final String PORTABLE_GROUP= prop.getProperty("gooroom.config.portable.group");
-	public static final String PORTABLE_DESKTOP = prop.getProperty("gooroom.config.portable.desktop");
-	public static final String PORTABLE_CTRL= prop.getProperty("gooroom.config.portable.ctrl");
+	public static final String USE_PORTABLE = prop.getProperty("gooroom.config.portable", "false");
+	public static final String PORTABLE_CERTPATH = prop.getProperty("gooroom.user.portable.certificate.path", "/var/tmp/portable/");
+	public static final String PORTABLE_CERTFILENAME = prop.getProperty("gooroom.user.portable.certificate.filename", "cert.pem");
+	public static final String PORTABLE_KEYFILENAME = prop.getProperty("gooroom.user.portable.privatekey.filename","private.key");
+	public static final String PORTABLE_JENKINS_JOBNAME = prop.getProperty("gooroom.config.portable.jenkins.jobname","portable-iso-builder");
+	public static final String PORTABLE_JENKINS_REMOVE_JOBNAME = prop.getProperty("gooroom.config.portable.jenkins.remove.jobname","portable-iso-delete");
+	public static final String PORTABLE_JENKINS_URL = prop.getProperty("gooroom.config.portable.jenkins.url","gooroom.sample.com");
+	public static final String PORTABLE_JENKINS_USER = prop.getProperty("gooroom.config.portable.jenkins.user","gooroom");
+	public static final String PORTABLE_JENKINS_TOKEN = prop.getProperty("gooroom.config.portable.jenkins.token","gooroom");
+	public static final String PORTABLE_SERVER_API = prop.getProperty("gooroom.config.portable.server","gooroom.sample.com");
+	public static final String PORTABLE_GROUP= prop.getProperty("gooroom.config.portable.group","DEPTDEFAULT");
+	public static final String PORTABLE_DESKTOP = prop.getProperty("gooroom.config.portable.desktop","DECOPORTABLE");
+	public static final String PORTABLE_CTRL= prop.getProperty("gooroom.config.portable.ctrl","CTCIPORTABLE");
 }

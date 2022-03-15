@@ -53,6 +53,13 @@ public class PortableImageController {
     @ResponseBody
     public ResultVO getImageList() {
         ResultVO resultVO = new ResultVO();
+
+        if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("false")) {
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                    MessageSourceHelper.getMessage("portable.result.errparam")));
+            return resultVO;
+        }
+
         try
         {
             resultVO = portableImageService.readImageData(null);
@@ -74,6 +81,12 @@ public class PortableImageController {
     public ResultPagingVO getImageListPaged(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
         ResultPagingVO resultVO = new ResultPagingVO();
+
+        if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("false")) {
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                    MessageSourceHelper.getMessage("portable.result.errparam")));
+            return resultVO;
+        }
 
         try
         {
@@ -149,13 +162,12 @@ public class PortableImageController {
                 if (imgViewVO == null)
                     continue;
 
-                logger.debug("=====>>>JobID: [" + imgViewVO.getJobId() +"]");
+                logger.debug("JobID: [" + imgViewVO.getJobId() +"]");
                 if (imgViewVO.getJobId() == 0)
                     continue;
 
-                logger.debug("=====>>>Jenkins Get Duration Job");
                 String json = jenkinsUtils.jenkinsGetJobDuration(imgViewVO.getJobId());
-                logger.debug("=====>>>Jenkins Data :\n" + json);
+                logger.debug("Jenkins Data :\n" + json);
                 if (json == null || json.isEmpty())
                     continue;
 
@@ -166,7 +178,7 @@ public class PortableImageController {
                         imgViewVO.setDurationTime(job.getEstimatedDuration());
                     }
                     if (job.getResult() == null)  {
-                        logger.debug("=====>>>Jenkins Result is null");
+                        logger.debug("Jenkins Result is null");
                         continue;
                     }
 
@@ -309,6 +321,4 @@ public class PortableImageController {
 
         return statusVO;
     }
-
-
 }

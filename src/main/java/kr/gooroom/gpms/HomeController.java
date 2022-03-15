@@ -78,6 +78,12 @@ public class HomeController {
 	 */
 	@GetMapping(value = "/super")
 	public String superPage(Model model) {
+
+		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		for (GrantedAuthority grantedAuthority : authorities) {
+			model.addAttribute(grantedAuthority.getAuthority(), "1");
+		}
+
 		return "main/super";
 	}
 
@@ -91,6 +97,12 @@ public class HomeController {
 	 */
 	@GetMapping(value = "/home")
 	public String homePage(Model model) {
+
+		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		for (GrantedAuthority grantedAuthority : authorities) {
+			model.addAttribute(grantedAuthority.getAuthority(), "1");
+		}
+
 		return "main/home";
 	}
 

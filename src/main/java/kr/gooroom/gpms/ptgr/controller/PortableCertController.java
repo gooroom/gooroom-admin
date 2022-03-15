@@ -37,6 +37,13 @@ public class PortableCertController {
     public ResultVO getCert (@RequestParam(value= "certId") String certId) {
 
         ResultVO resultVO = new ResultVO();
+
+        if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("false")) {
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
+                    MessageSourceHelper.getMessage("portable.result.errparam")));
+            return resultVO;
+        }
+
         try
         {
             if (certId == null || certId.isEmpty()) {

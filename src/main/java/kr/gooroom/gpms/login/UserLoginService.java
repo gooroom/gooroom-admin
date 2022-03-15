@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.ptgr.service.impl.PortableDAO;
 import kr.gooroom.gpms.user.service.UserVO;
 import kr.gooroom.gpms.user.service.impl.UserDAO;
@@ -60,9 +61,17 @@ public class UserLoginService implements UserDetailsService {
 			switch (vo.getAdminTp()) {
 			case "S":
 				roles.add(new Role("ROLE_SUPER"));
+				//Check Portable
+				if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("true")) {
+					roles.add(new Role("ROLE_PORTABLE"));
+				}
 				break;
 			case "A":
 				roles.add(new Role("ROLE_ADMIN"));
+				//Check Portable
+				if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("true")) {
+					roles.add(new Role("ROLE_PORTABLE"));
+				}
 				break;
 			case "P":
 				roles.add(new Role("ROLE_PART"));
@@ -72,8 +81,14 @@ public class UserLoginService implements UserDetailsService {
 				if("1".equals(vo.getIsUserAdmin())) { roles.add(new Role("ROLE_USER_ADMIN")); }
 				if("1".equals(vo.getIsNoticeAdmin())) { roles.add(new Role("ROLE_NOTICE_ADMIN")); }
 				if("1".equals(vo.getIsDesktopAdmin())) { roles.add(new Role("ROLE_DESKTOP_ADMIN")); }
-				if("1".equals(vo.getIsPortableAdmin())) { roles.add(new Role("ROLE_PORTABLE_ADMIN")); }
 
+				//Check Portable
+				if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("true")) {
+					if ("1".equals(vo.getIsPortableAdmin())) {
+						roles.add(new Role("ROLE_PORTABLE"));
+						roles.add(new Role("ROLE_PORTABLE_ADMIN"));
+					}
+				}
 				break;
 			default:
 				break;
@@ -81,17 +96,20 @@ public class UserLoginService implements UserDetailsService {
 		}
 
 		User user = null;
-		if (vo == null) {
-			try {
-				UserVO userVO = userDao.readUserData(username);
-				if (userVO != null) {
-					user = new User(userVO);
-					roles.add (new Role("ROLE_USER"));
-					roles.add (new Role("ROLE_PORTABLE_USER"));
-					user.setAuthorities(roles);
+		//Check Portable
+		if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("true")) {
+			if (vo == null) {
+				try {
+					UserVO userVO = userDao.readUserData(username);
+					if (userVO != null) {
+						user = new User(userVO);
+						roles.add (new Role("ROLE_USER"));
+						roles.add (new Role("ROLE_PORTABLE_USER"));
+						user.setAuthorities(roles);
+					}
+				} catch (SQLException throwables) {
+					throwables.printStackTrace();
 				}
-			} catch (SQLException throwables) {
-				throwables.printStackTrace();
 			}
 		}
 
