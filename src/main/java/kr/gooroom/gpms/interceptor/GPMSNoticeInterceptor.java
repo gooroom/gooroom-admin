@@ -27,8 +27,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.WebUtils;
 
 import kr.gooroom.gpms.client.service.ClientService;
@@ -48,7 +49,7 @@ import kr.gooroom.gpms.user.service.UserTokenVO;
  * 
  */
 
-public class GPMSNoticeInterceptor extends HandlerInterceptorAdapter {
+public class GPMSNoticeInterceptor implements HandlerInterceptor {
 
 	private static final Logger logger = LoggerFactory.getLogger(GPMSNoticeInterceptor.class);
 
@@ -96,11 +97,11 @@ public class GPMSNoticeInterceptor extends HandlerInterceptorAdapter {
 		}
 
 		String userId = null;
-		if (!StringUtils.isEmpty(sessionId)) {
+		if (!ObjectUtils.isEmpty(sessionId)) {
 			try {
 				UserTokenVO userTokenVO = userTokenService.selectTokenByTokenId(clientId, sessionId,
 						GPMSConstants.TOKEN_LOGIN_STATUS_CODE_VALID);
-				if (userTokenVO == null || StringUtils.isEmpty(userTokenVO.getUserId())) {
+				if (userTokenVO == null || ObjectUtils.isEmpty(userTokenVO.getUserId())) {
 					throw new UnauthorizedException();
 				}
 				userId = userTokenVO.getUserId();

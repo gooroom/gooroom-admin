@@ -12,6 +12,7 @@
   window.roleUserAdmin = ${(empty ROLE_USER_ADMIN) ? "0" : ROLE_USER_ADMIN};
   window.roleDesktopAdmin = ${(empty ROLE_DESKTOP_ADMIN) ? "0" : ROLE_DESKTOP_ADMIN};
   window.roleNoticeAdmin = ${(empty ROLE_NOTICE_ADMIN) ? "0" : ROLE_NOTICE_ADMIN};
+  window.rolePortableAdmin = ${(empty ROLE_PORTABLE_ADMIN) ? "0" : ROLE_PORTABLE_ADMIN};
 
 </script>
 <script type="text/javascript" src="index.bundle.js"></script>

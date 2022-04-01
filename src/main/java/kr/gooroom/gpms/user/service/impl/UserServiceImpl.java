@@ -435,14 +435,48 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
+	 * check duplicate user id list
+	 *
+	 * @param ids list of user id
+	 * @return ResultVO result data bean
+	 * @throws Exception
+	 */
+	@Override
+	public ResultVO isNoExistInUserIdList(HashMap<String, Object> ids) throws Exception {
+
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			List<String> idList = userDao.selectUserListForDuplicateUserId(ids);
+			if (idList.size() == 0) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_NODUPLICATE,
+						MessageSourceHelper.getMessage("user.result.noduplicate")));
+			} else {
+				resultVO.setData(idList.toArray());
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DUPLICATE,
+						MessageSourceHelper.getMessage("user.result.duplicate")));
+			}
+		} catch (Exception ex) {
+			logger.error("error in duplicate id : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
 	 * create new user data
-	 * 
+	 *
 	 * @param vo UserVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
 	@Override
-	public StatusVO createUserData(UserVO vo) throws Exception {
+	public StatusVO createUserData(UserVO vo, boolean isPortable) throws Exception {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -451,7 +485,8 @@ public class UserServiceImpl implements UserService {
 			vo.setModUserId(LoginInfoHelper.getUserId());
 			vo.setRegUserId(LoginInfoHelper.getUserId());
 			vo.setStatus(GPMSConstants.STS_NORMAL_USER);
-			vo.setPasswordStatus(GPMSConstants.STS_TEMP_PASSWORD);
+			if (!isPortable)
+				vo.setPasswordStatus(GPMSConstants.STS_TEMP_PASSWORD);
 
 			long resultCnt = userDao.createUser(vo);
 			if (resultCnt > 0) {
@@ -482,16 +517,19 @@ public class UserServiceImpl implements UserService {
 	 * @throws Exception
 	 */
 	@Override
-	public StatusVO createUserDataWithRule(UserVO userVO) throws Exception {
+	public StatusVO createUserDataWithRule(UserVO userVO, boolean isPortable) throws Exception {
 
 		StatusVO statusVO = new StatusVO();
 
 		try {
-
 			userVO.setModUserId(LoginInfoHelper.getUserId());
 			userVO.setRegUserId(LoginInfoHelper.getUserId());
 			userVO.setStatus(GPMSConstants.STS_NORMAL_USER);
-			userVO.setPasswordStatus(GPMSConstants.STS_TEMP_PASSWORD);
+
+			if (isPortable)
+				userVO.setPasswordStatus(GPMSConstants.STS_NORMAL_USER);
+			else
+				userVO.setPasswordStatus(GPMSConstants.STS_TEMP_PASSWORD);
 
 			long resultCnt = userDao.createUser(userVO);
 			if (resultCnt > 0) {

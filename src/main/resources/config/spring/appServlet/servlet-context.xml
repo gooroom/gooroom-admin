@@ -53,6 +53,8 @@
 			<exclude-mapping path="/vendor/**"/>
 			<exclude-mapping path="/notice/**"/>
 			<exclude-mapping path="/apis/notices/**"/>
+			<exclude-mapping path="/portable/updateData/**"/>
+			<exclude-mapping path="/portable/updateImageList/**"/>
 			<beans:bean
 				class="kr.gooroom.gpms.interceptor.GPMSInterceptor"></beans:bean>
 		</interceptor>

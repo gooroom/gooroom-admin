@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PotableDAO">
+
+    <resultMap type="portableVO" id="portable">
+
+        <result property="ptgrId" column="PTGR_ID" />
+        <result property="adminId" column="ADMIN_ID" />
+        <result property="userId" column="USER_ID" />
+        <result property="certId" column="CERT_ID" />
+        <result property="imageId" column="IMAGE_ID" />
+        <result property="logId" column="LOG_ID" />
+        <result property="isoPw" column="ISO_PW" />
+        <result property="regDt" column="REG_DT" />
+        <result property="beginDt" column="BEGIN_DT" />
+        <result property="expiredDt" column="EXPIRED_DT" />
+        <result property="notiType" column="NOTI_TYPE" />
+        <result property="notiEmail" column="NOTI_EMAIL" />
+        <result property="buildStatus" column="BUILD_STATUS" />
+        <result property="approveStatus" column="APPROVE_STATUS" />
+        <result property="bulk" column="BULK" />
+        <result property="statusCd" column="STATUS_CD" />
+
+    </resultMap>
+
+    <resultMap type="portableViewVO" id="portableView">
+
+        <result property="ptgrId" column="PTGR_ID" />
+        <result property="userId" column="USER_ID" />
+        <result property="certId" column="CERT_ID" />
+        <result property="regDt" column="REG_DT" />
+        <result property="beginDt" column="BEGIN_DT" />
+        <result property="expiredDt" column="EXPIRED_DT" />
+        <result property="buildStatus" column="BUILD_STATUS" />
+        <result property="approveStatus" column="APPROVE_STATUS" />
+        <result property="certStatus" column="CERT_STATUS" />
+        <result property="imageName" column="IMAGE_NAME" />
+        <result property="imageUrl" column="IMAGE_URL" />
+        <result property="imageStatus" column="IMAGE_STATUS" />
+
+    </resultMap>
+
+    <select id="checkId" parameterType="hashmap" resultType="java.lang.String">
+        SELECT CERT_ID
+        FROM PTGR_MSTR
+        WHERE CERT_ID IN
+        <foreach collection="certId" item="certId" open="(" separator="," close=")">
+            ${certId}
+        </foreach>
+    </select>
+
+    <select id="selectPortableTotalCount"  parameterType="hashmap" resultType="java.lang.Long">
+        SELECT COUNT(PTGR_ID) CNT
+        FROM PTGR_MSTR
+        <where>
+            <if test="adminID != null">
+                ADMIN_ID=#{adminId}
+            </if>
+        </where>
+    </select>
+    <select id="selectPortableFilteredCountEx" parameterType="hashmap" resultType="java.lang.Long">
+        SELECT COUNT(PTGR_ID) AS CNT
+        FROM PTGR_MSTR
+        <where>
+            <if test="searchKey != null and searchKey != ''">
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'USER_ID'">
+                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'IMAGE_STATUS'">
+                    AND IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectPortableFilteredCount" parameterType="hashmap" resultType="java.lang.Long">
+        SELECT COUNT(P.PTGR_ID) AS CNT FROM PTGR_MSTR as P
+        LEFT JOIN (SELECT IMAGE_ID, NAME as IMAGE_NAME, URL as IMAGE_URL, STATUS FROM PTGR_IMAGE) as I ON P.IMAGE_ID = I.IMAGE_ID
+        <choose>
+            <when test="lang != null and lang == 'en'">
+                LEFT JOIN (SELECT STATUS_ID, STATUS_EN as IMAGE_STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </when>
+            <otherwise>
+                LEFT JOIN (SELECT STATUS_ID, STATUS_KR as IMAGE_STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </otherwise>
+        </choose>
+        <where>
+            P.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            <if test="adminId != null">
+                AND P.ADMIN_ID = #{adminId}
+            </if>
+            <if test="ptgrId != null">
+                AND P.PTGR_ID = #{ptgrId}
+            </if>
+            <if test="userId != null">
+                AND P.USER_ID = #{userId}
+            </if>
+            <if test="searchKey != null and searchKey != ''">
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND P.USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR S.IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'USER_ID'">
+                    AND P.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'IMAGE_STATUS'">
+                    AND S.IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectNextPortableNo" resultType="java.lang.Integer">
+        SELECT GRNEXTVAL('PTGRMSTR_SEQ') AS PTGR_ID FROM DUAL;
+    </select>
+
+    <!-- 포터블구름 정보 생성 -->
+    <insert id="insertPortableData" parameterType="portableVO">
+        INSERT INTO PTGR_MSTR
+            (PTGR_ID, ADMIN_ID, USER_ID,
+            CERT_ID, IMAGE_ID, LOG_ID, ISO_PW,
+            REG_DT, BEGIN_DT, EXPIRED_DT,
+            NOTI_TYPE, NOTI_EMAIL,
+            BUILD_STATUS, APPROVE_STATUS, BULK, STATUS_CD)
+        VALUES
+            (#{ptgrId}, #{adminId}, #{userId},
+            #{certId}, #{imageId}, #{logId}, #{isoPw},
+            now(), #{beginDt}, #{expiredDt},
+            #{notiType}, #{notiEmail},
+            #{buildStatus}, #{approveStatus}, #{bulk}, #{statusCd});
+    </insert>
+
+    <select id="selectPortableViewList"  resultMap="portableView">
+        SELECT P.PTGR_ID, P.USER_ID, P.ADMIN_ID, P.CERT_ID, P.REG_DT, P.BEGIN_DT, P.EXPIRED_DT, P.BUILD_STATUS,
+        P.APPROVE_STATUS, C.CERT_STATUS, I.IMAGE_NAME, I.IMAGE_URL, S.IMAGE_STATUS FROM PTGR_MSTR as P
+        LEFT JOIN (SELECT PUBLISH as CERT_STATUS, CERT_ID FROM PTGR_CERT) as C ON P.CERT_ID = C.CERT_ID
+        LEFT JOIN (SELECT IMAGE_ID, NAME as IMAGE_NAME, URL as IMAGE_URL, STATUS FROM PTGR_IMAGE) as I ON P.IMAGE_ID = I.IMAGE_ID
+        LEFT JOIN (SELECT STATUS_ID, STATUS_KR as IMAGE_STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+    </select>
+
+    <select id="selectPortableViewListPaged" parameterType="hashMap" resultMap="portableView">
+        SELECT P.PTGR_ID, P.USER_ID, P.ADMIN_ID, P.CERT_ID, P.REG_DT, P.BEGIN_DT, P.EXPIRED_DT, P.BUILD_STATUS,
+               P.APPROVE_STATUS, C.CERT_STATUS, I.IMAGE_NAME, I.IMAGE_URL, S.IMAGE_STATUS FROM PTGR_MSTR as P
+            LEFT JOIN (SELECT PUBLISH as CERT_STATUS, CERT_ID FROM PTGR_CERT) as C ON P.CERT_ID = C.CERT_ID
+            LEFT JOIN (SELECT IMAGE_ID, NAME as IMAGE_NAME, URL as IMAGE_URL, STATUS FROM PTGR_IMAGE) as I ON P.IMAGE_ID = I.IMAGE_ID
+            <choose>
+                <when test="lang != null and lang == 'en'">
+                    LEFT JOIN (SELECT STATUS_ID, STATUS_EN as IMAGE_STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+                </when>
+                <otherwise>
+                    LEFT JOIN (SELECT STATUS_ID, STATUS_KR as IMAGE_STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+                </otherwise>
+            </choose>
+
+        <where>
+            REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            <if test="adminId != null">
+                AND ADMIN_ID = #{adminId}
+            </if>
+            <if test="ptgrId != null">
+                AND PTGR_ID = #{ptgrId}
+            </if>
+            <if test="userId != null">
+                AND USER_ID = #{userId}
+            </if>
+            <if test="searchKey != null and searchKey != ''">
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%') OR IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'USER_ID'">
+                    AND USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'IMAGE_STATUS'">
+                    AND IMAGE_STATUS LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+            </if>
+        </where>
+        <if test="paramOrderColumn != null">
+            ORDER BY ${paramOrderColumn} ${paramOrderDir}
+        </if>
+        LIMIT #{paramStart}, #{paramLength}
+    </select>
+
+    <select id="selectPortableDataList" parameterType="hashMap" resultMap="portable">
+        SELECT *
+        FROM PTGR_MSTR
+        <if test="adminId != null">
+            WHERE ADMIN_ID = #{adminId}
+        </if>
+        <if test="ptgrId != null">
+            WHERE PTGR_ID = #{ptgrId}
+        </if>
+        <if test="ptgrIds != null">
+            WHERE PTGR_ID IN
+            <foreach collection="ptgrIds" item="item" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectPortableDataListByAdminIdAndApprove" parameterType="hashMap" resultMap="portable">
+        SELECT *
+        FROM PTGR_MSTR
+        <if test="adminId != null">
+            WHERE ADMIN_ID = #{adminId} AND APPROVE_STATUS = #{approveStatus}
+        </if>
+    </select>
+
+    <select id="selectPortableReapproveCount" parameterType="hashMap" resultType="java.lang.Long">
+        SELECT COUNT(PTGR_ID) AS CNT
+        FROM PTGR_MSTR
+        WHERE APPROVE_STATUS = 'REAPPROVE'
+        <if test="adminId != null">
+            AND ADMIN_ID = #{adminId}
+        </if>
+    </select>
+
+    <select id="selectPortableUserListForDuplicateUserId" parameterType="hashmap" resultType="java.lang.String">
+        SELECT ID
+        FROM
+             (SELECT ADMIN_ID AS ID FROM ADMIN_MSTR
+             WHERE ADMIN_ID IN
+                   <foreach collection="userId" item="userId" open="(" separator="," close=")">
+                   ${userId}
+                 </foreach>) AS ADMIN
+        UNION ALL
+            (SELECT USER_ID AS ID FROM USER_MSTR
+            WHERE USER_ID IN
+                  <foreach collection="userId" item="userId" open="(" separator="," close=")">
+                  ${userId}
+                </foreach>)
+    </select>
+
+    <update id="updatePortableData" parameterType="portableVO">
+        UPDATE PTGR_MSTR
+        SET ADMIN_ID = #{adminId},
+            USER_ID = #{userId},
+            CERT_ID = #{certId},
+            IMAGE_ID = #{imageId},
+            LOG_ID = #[logId},
+            ISO_PW = #{isoPw},
+            REG_DT = #{regDt},
+            BEGIN_DT = #{beginDt},
+            EXPIRED_DT = #{expiredDt},
+            NOTI_TYPE = #{notiType},
+            NOTI_EMAIL = #{notiEmail},
+            BUILD_STATUS = #{buildStatus},
+            APPROVE_STATUS = #{approveStatus},
+            BULK = #{bulk},
+            STATUS_CD = #{statusCd}
+        WHERE PTGR_ID = #{ptgrId};
+    </update>
+
+    <update id="updateAllPortableApprove" parameterType="java.lang.Integer">
+        UPDATE PTGR_MSTR
+        SET STATUS_CD = 'APPROVE'
+        WHERE PTGR_ID IN
+            <foreach collection="adminId" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+    </update>
+
+    <!-- 삭제 -->
+    <delete id="deletePortableData" parameterType="hashmap">
+        DELETE FROM PTGR_MSTR
+        WHERE PTGR_ID IN
+            <foreach collection="ptgrIds" item="ptgrId" open="(" separator="," close=")">
+                #{ptgrId}
+            </foreach>
+    </delete>
+
+    <delete id="deletePortableDataById" parameterType="java.lang.Integer">
+        DELETE FROM PTGR_MSTR
+        WHERE PTGR_ID = #{ptgrId}
+    </delete>
+
+    <delete id="deleteAllPortableData">
+        DELETE P1 FROM PTGR_MSTR AS P1
+        JOIN PTGR_IMAGE ON PTGR_IMAGE.IMAGE_ID = P1.IMAGE_ID
+        WHERE PTGR_IMAGE.STATUS != 1;
+    </delete>
+
+    <!-- History -->
+    <insert id="insertPortableDataHist" parameterType="portableVO">
+        INSERT INTO PTGR_MSTR_HIST
+        (HIST_ID, PTGR_ID, ADMIN_ID, USER_ID,
+         CERT_ID, IMAGE_ID, LOG_ID, ISO_PW,
+         REG_DT, BEGIN_DT, EXPIRED_DT,
+         NOTI_TYPE, NOTI_EMAIL,
+         BUILD_STATUS, APPROVE_STATUS, BULK, STATUS_CD,
+         HIST_REG_DT)
+        VALUES (
+         (SELECT GRNEXTVAL('PTGRHIST_SEQ')),
+         #{ptgrId}, #{adminId}, #{userId},
+         #{certId}, #{imageId}, #{logId}, #{isoPw},
+         #{regDt}, #{beginDt}, #{expiredDt},
+         #{notiType}, #{notiEmail},
+         #{buildStatus}, #{approveStatus}, #{bulk}, #{statusCd}, now(6));
+    </insert>
+
+    <insert id="insertPortableDataAllHist">
+        INSERT INTO PTGR_MSTR_HIST
+        (HIST_ID, PTGR_ID, ADMIN_ID, USER_ID,
+         CERT_ID, IMAGE_ID, LOG_ID, ISO_PW,
+         REG_DT, BEGIN_DT, EXPIRED_DT,
+         NOTI_TYPE, NOTI_EMAIL,
+         BUILD_STATUS, APPROVE_STATUS, BULK, STATUS_CD,
+         HIST_REG_DT)
+         SELECT (SELECT GRNEXTVAL('PTGRHIST_SEQ')),
+                PTGR_ID, ADMIN_ID, USER_ID,
+                CERT_ID, IMAGE_ID, LOG_ID, ISO_PW,
+                REG_DT, BEGIN_DT, EXPIRED_DT,
+                NOTI_TYPE, NOTI_EMAIL,
+                BUILD_STATUS, APPROVE_STATUS, BULK, STATUS_CD,
+                now(6) FROM PTGR_MSTR;
+    </insert>
+</mapper>

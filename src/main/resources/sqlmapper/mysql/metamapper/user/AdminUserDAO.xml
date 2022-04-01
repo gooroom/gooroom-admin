@@ -27,7 +27,8 @@
 		<result property="isUserAdmin" column="ISUSERADMIN"/>
 		<result property="isDesktopAdmin" column="ISDESKTOPADMIN"/>
 		<result property="isNoticeAdmin" column="ISNOTICEADMIN"/>
-		
+		<result property="isPortableAdmin" column="ISPORTABLEADMIN"/>
+
 		<collection property="connIps" column="ADMIN_ID" javaType="java.util.ArrayList" ofType="String" select="selectConnIps" />
 		<collection property="grpInfoList" column="{adminId=admin_id}" javaType="java.util.ArrayList" ofType="GpmsCommonDAO.simpleDataInfo" select="ClientGroupDAO.selectClientGroupSimpleData" />
 		<collection property="deptInfoList" column="{adminId=admin_id}" javaType="java.util.ArrayList" ofType="GpmsCommonDAO.simpleDataInfo" select="DeptDAO.selectDeptSimpleData" />
@@ -77,16 +78,18 @@
 		       IFNULL(AR.CLIENT_ADMIN, 0) ISCLIENTADMIN,
 		       IFNULL(AR.USER_ADMIN, 0) ISUSERADMIN,
 		       IFNULL(AR.DESKTOP_ADMIN, 0) ISDESKTOPADMIN,
-		       IFNULL(AR.NOTICE_ADMIN, 0) ISNOTICEADMIN
-		       
+		       IFNULL(AR.NOTICE_ADMIN, 0) ISNOTICEADMIN,
+			   IFNULL(AR.PORTABLE_ADMIN, 0) ISPORTABLEADMIN
+
 		FROM ADMIN_MSTR AM
 		     LEFT JOIN
 		     (SELECT ADMIN_ID,
 		             COALESCE(SUM(CASE WHEN RULE_NAME = "client_admin" THEN HAS_RULE END),0) AS CLIENT_ADMIN,
 		             COALESCE(SUM(CASE WHEN RULE_NAME = "user_admin" THEN HAS_RULE END),0) AS USER_ADMIN,
 		             COALESCE(SUM(CASE WHEN RULE_NAME = "desktop_admin" THEN HAS_RULE END),0) AS DESKTOP_ADMIN,
-		             COALESCE(SUM(CASE WHEN RULE_NAME = "notice_admin" THEN HAS_RULE END),0) AS NOTICE_ADMIN
-		      FROM ADMIN_RULES
+		             COALESCE(SUM(CASE WHEN RULE_NAME = "notice_admin" THEN HAS_RULE END),0) AS NOTICE_ADMIN,
+					 COALESCE(SUM(CASE WHEN RULE_NAME = "portable_admin" THEN HAS_RULE END),0) AS PORTABLE_ADMIN
+		FROM ADMIN_RULES
 		      GROUP BY ADMIN_ID) AR
 		        ON AM.ADMIN_ID = AR.ADMIN_ID
 		<where>
@@ -157,16 +160,18 @@
 		    IFNULL(AR.CLIENT_ADMIN, 0) ISCLIENTADMIN,
 		    IFNULL(AR.USER_ADMIN, 0) ISUSERADMIN,
 		    IFNULL(AR.DESKTOP_ADMIN, 0) ISDESKTOPADMIN,
-		    IFNULL(AR.NOTICE_ADMIN, 0) ISNOTICEADMIN
-		    
+		    IFNULL(AR.NOTICE_ADMIN, 0) ISNOTICEADMIN,
+			IFNULL(AR.PORTABLE_ADMIN, 0) ISPORTABLEADMIN
+
 		FROM ADMIN_MSTR AM
 		    LEFT JOIN
 		    (SELECT ADMIN_ID,
 		            COALESCE(SUM(CASE WHEN RULE_NAME = "client_admin" THEN HAS_RULE END),0) AS CLIENT_ADMIN,
 		            COALESCE(SUM(CASE WHEN RULE_NAME = "user_admin" THEN HAS_RULE END),0) AS USER_ADMIN,
 		            COALESCE(SUM(CASE WHEN RULE_NAME = "desktop_admin" THEN HAS_RULE END),0) AS DESKTOP_ADMIN,
-		            COALESCE(SUM(CASE WHEN RULE_NAME = "notice_admin" THEN HAS_RULE END),0) AS NOTICE_ADMIN
-		    FROM ADMIN_RULES
+		            COALESCE(SUM(CASE WHEN RULE_NAME = "notice_admin" THEN HAS_RULE END),0) AS NOTICE_ADMIN,
+					COALESCE(SUM(CASE WHEN RULE_NAME = "portable_admin" THEN HAS_RULE END),0) AS PORTABLE_ADMIN
+		FROM ADMIN_RULES
 		    GROUP BY ADMIN_ID) AR
 		    ON AM.ADMIN_ID = AR.ADMIN_ID
 		    LEFT JOIN ADMIN_PRESENT AP

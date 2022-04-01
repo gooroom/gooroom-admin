@@ -48,6 +48,10 @@ public class MgServerConfVO implements Serializable {
 	private String passwordRule;
 	private String enableDuplicateLogin;
 
+	private String maxMediaCnt;
+	private String registerReq;
+	private String deleteReq;
+
 	private Date modDate;
 	private String modUserId;
 
@@ -153,6 +157,30 @@ public class MgServerConfVO implements Serializable {
 
 	public void setEnableDuplicateLogin(String enableDuplicateLogin) {
 		this.enableDuplicateLogin = enableDuplicateLogin;
+	}
+
+	public String getMaxMediaCnt() {
+		return maxMediaCnt;
+	}
+
+	public void setMaxMediaCnt(String maxMediaCnt) {
+		this.maxMediaCnt = maxMediaCnt;
+	}
+
+	public String getRegisterReq() {
+		return registerReq;
+	}
+
+	public void setRegisterReq(String registerReq) {
+		this.registerReq = registerReq;
+	}
+
+	public String getDeleteReq() {
+		return deleteReq;
+	}
+
+	public void setDeleteReq(String deleteReq) {
+		this.deleteReq = deleteReq;
 	}
 
 	public Date getModDate() {

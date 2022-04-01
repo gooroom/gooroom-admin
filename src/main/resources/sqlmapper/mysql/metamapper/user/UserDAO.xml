@@ -220,13 +220,13 @@
 	<!-- 사용자 정보 조회 -->
 	<select id="selectUserData" parameterType="String" resultMap="userInfo">
 	
-		SELECT UM.USER_ID, UM.USER_NM, UM.USER_EMAIL, UM.DEPT_CD,
+		SELECT UM.USER_ID, UM.USER_NM, UM.USER_PASSWD, UM.USER_EMAIL, UM.DEPT_CD,
 			UM.PASSWD_EXPIRE_DT, IF(UM.PASSWD_EXPIRE_DT &lt; CURDATE(), '1', '0') AS IS_PASSWORDEXPIRED, 
 			UM.EXPIRE_DT, 
 			IF(DM.EXPIRE_DT &lt; CURDATE(), '1', IF(UM.EXPIRE_DT &lt; CURDATE(), '1', '0')) AS IS_EXPIRED,
 			IF(ISNULL(UM.PASSWD_EXPIRE_DT), "0", "1") AS IS_USEPASSWORDEXPIRE,
 			IF(ISNULL(UM.EXPIRE_DT), "0", "1") AS IS_USEEXPIRE,
-			UM.LOGIN_TRIAL
+			UM.LOGIN_TRIAL, UM.USER_PASSWD
 		FROM USER_MSTR UM LEFT JOIN DEPT_MSTR DM ON UM.DEPT_CD = DM.DEPT_CD 
 		WHERE UM.USER_ID = #{userId}
 
@@ -396,7 +396,8 @@
 		  DATEDIFF(UM.EXPIRE_DT, now()) AS USEREXPIREREMAINDATE,
 		  DATEDIFF(UM.PASSWD_EXPIRE_DT, now()) AS PWDEXPIREREMAINDATE,
 		  UM.LOGIN_TRIAL
-		FROM USER_MSTR UM LEFT JOIN DEPT_MSTR DM ON UM.DEPT_CD = DM.DEPT_CD
+		FROM USER_MSTR UM
+            LEFT JOIN DEPT_MSTR DM ON UM.DEPT_CD = DM.DEPT_CD
 		<where>
 			<choose>
     			<when test='deptCd != null and deptCd != ""'>
@@ -601,6 +602,15 @@
 	<select id="selectUserALLCount" resultType="long">
 		SELECT COUNT(USER_ID) FROM USER_MSTR
 	</select>
-	
-	
+
+	<!-- 중복된 사용자 ID 리스트 -->
+	<select id="selectUserListForDuplicateUserId" parameterType="hashmap" resultType="java.lang.String">
+		SELECT USER_ID
+		FROM USER_MSTR
+		WHERE USER_ID IN
+		<foreach collection="userId" item="userId" open="(" separator="," close=")">
+			${userId}
+		</foreach>
+	</select>
+
 </mapper>

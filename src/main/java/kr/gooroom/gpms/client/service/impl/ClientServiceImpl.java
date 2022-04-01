@@ -50,6 +50,7 @@ import kr.gooroom.gpms.config.service.CtrlMstService;
 import kr.gooroom.gpms.job.custom.OnlineClientAndUserVO;
 import kr.gooroom.gpms.user.service.AdminUserVO;
 import kr.gooroom.gpms.user.service.impl.AdminUserDAO;
+import kr.gooroom.gpms.user.service.impl.UserReqDAO;
 
 /**
  * Client management service implement class
@@ -72,6 +73,9 @@ public class ClientServiceImpl implements ClientService {
 	
 	@Resource(name = "adminUserDAO")
 	private AdminUserDAO adminUserDao;
+
+	@Resource(name = "userReqDAO")
+	private UserReqDAO userReqDao;
 
 	/**
 	 * modify client information
@@ -629,6 +633,45 @@ public class ClientServiceImpl implements ClientService {
 
 		} catch (Exception ex) {
 			logger.error("error in getOnlineClientIdsInClientConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
+	 * generate online client data list include client id
+	 *
+	 * @param clientId string client id
+	 * @return ResultVO result object
+	 * @throws Exception
+	 */
+	@Override
+	public ResultVO getOnlineClientIdByClientId(String clientId) throws Exception {
+
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			List<ClientVO> re = clientDao.selectOnlineClientIdInClientId(clientId);
+
+			if (re != null && re.size() > 0) {
+				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				resultVO.setData(row);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("system.common.selectdata")));
+			} else {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.noselectdata")));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in getOnlineClientIdByClientId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 			if (resultVO != null) {
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,

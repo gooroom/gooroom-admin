@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserReqDAO">
+
+	<resultMap type="userReqVO" id="userReqInfo">
+		<result property="reqSeq" column="REQ_SEQ"/>
+		<result property="userId" column="USER_ID"/>
+		<result property="clientId" column="CLIENT_ID"/>
+		<result property="regDt" column="REG_DT"/>
+		<result property="actionType" column="ACTION_TYPE"/>
+		<result property="adminCheck" column="ADMIN_CHECK"/>
+		<result property="modDt" column="MOD_DT"/>
+		<result property="modUserId" column="MOD_USER_ID"/>
+		<result property="usbName" column="USB_NAME"/>
+		<result property="usbSerialNo" column="USB_SERIAL_NO"/>
+		<result property="usbProduct" column="USB_PRODUCT"/>
+		<result property="usbVendor" column="USB_VENDOR"/>
+		<result property="usbModel" column="USB_MODEL"/>
+		<result property="status" column="STATUS"/>
+	</resultMap>
+
+	<select id="selectUserReqList" parameterType="String" resultMap="userReqInfo">
+		SELECT URM.REQ_SEQ, URM.USER_ID, URM.ACTION_TYPE, URM.CLIENT_ID,
+		URM.REG_DT, URP.USB_NAME, URP.STATUS,
+		URP.USB_SERIAL_NO, URP.USB_PRODUCT, URP.USB_VENDOR, URP.USB_MODEL,
+		URM.MOD_DT, URM.MOD_USER_ID, URM.ADMIN_CHECK
+		FROM USER_REQ_MSTR URM
+			LEFT JOIN USER_REQ_PROP URP ON URM.REQ_SEQ = URP.REQ_SEQ
+		WHERE URM.USER_ID = #{userId} and URM.ADMIN_CHECK = 'register-approval'
+	</select>
+
+	<select id="selectUserReqListPaged" parameterType="String" resultMap="userReqInfo">
+		SELECT URM.REQ_SEQ, URM.USER_ID, URM.ACTION_TYPE, URM.CLIENT_ID, URM.REG_DT,
+		URP.USB_NAME, URP.USB_SERIAL_NO, URP.USB_PRODUCT, URP.USB_VENDOR, URP.USB_MODEL,
+		URP.STATUS, URM.MOD_DT, URM.MOD_USER_ID, URM.ADMIN_CHECK
+		FROM USER_REQ_MSTR URM
+		    LEFT JOIN USER_REQ_PROP URP ON URM.REQ_SEQ = URP.REQ_SEQ
+		<where>
+			<if test="searchKey != null and searchKey != ''">
+				URM.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                    OR URP.USB_NAME LIKE CONCAT('%', #{searchKey}, '%')
+                    OR URP.USB_SERIAL_NO LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectUserReqListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(REQ_SEQ) AS CNT
+		FROM USER_REQ_MSTR
+	</select>
+
+	<select id="selectUserReqListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(URM.REQ_SEQ) AS CNT
+        FROM USER_REQ_MSTR URM
+            LEFT JOIN USER_REQ_PROP URP ON URM.REQ_SEQ = URP.REQ_SEQ
+		<where>
+            <if test="searchKey != null and searchKey != ''">
+                URM.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                OR URP.USB_NAME LIKE CONCAT('%', #{searchKey}, '%')
+                OR URP.USB_SERIAL_NO LIKE CONCAT('%', #{searchKey}, '%')
+            </if>
+		</where>
+	</select>
+
+	<!-- 사용자 요청 관리 로그 -->
+	<select id="selectUserReqActListPaged" parameterType="hashmap" resultMap="userReqInfo">
+		SELECT REQ_SEQ, USER_ID, CLIENT_ID, ACTION_TYPE, ADMIN_CHECK, REG_USER_ID, REG_DT
+		FROM USER_REQ_HIST
+		WHERE REG_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
+			AND USER_ID = #{userId} AND USB_SERIAL_NO = #{usbSerialNo}
+		<if test="searchKey != null and searchKey != ''">
+			AND (CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR ADMIN_CHECK LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectUserReqActListTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(URH.REQ_SEQ) AS CNT
+		FROM USER_REQ_HIST URH
+		WHERE URH.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+			AND USER_ID = #{userId} AND USB_SERIAL_NO = #{usbSerialNo}
+	</select>
+
+	<select id="selectUserReqActListFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(URH.REQ_SEQ) AS CNT
+		FROM USER_REQ_HIST URH
+		WHERE URH.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+			AND USER_ID = #{userId} AND USB_SERIAL_NO = #{usbSerialNo}
+		<if test="searchKey != null and searchKey != ''">
+			AND (URH.CLIENT_ID LIKE CONCAT('%', #{searchKey}, '%') OR URH.ADMIN_CHECK LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+	</select>
+	<!-- 사용자 요청 관리 로그 끝-->
+
+	<select id="selectUserReq" parameterType="String" resultMap="userReqInfo">
+		SELECT URM.REQ_SEQ,
+		       URM.USER_ID,
+		       URM.ACTION_TYPE,
+		       URM.CLIENT_ID,
+		       URM.REG_DT,
+		       URP.USB_NAME,
+		       URP.USB_SERIAL_NO,
+		       URP.USB_PRODUCT,
+		       URP.USB_VENDOR, URP.USB_MODEL,
+		       URM.MOD_DT,
+		       URM.MOD_USER_ID,
+		       URM.ADMIN_CHECK,
+		       URP.STATUS
+		FROM USER_REQ_MSTR URM
+		     LEFT JOIN
+		     USER_REQ_PROP URP
+		ON URM.REQ_SEQ = URP.REQ_SEQ
+		WHERE URM.REQ_SEQ = #{reqSeq}
+	</select>
+
+	<update id="updateUserReq" parameterType="userReqVO">
+		UPDATE USER_REQ_MSTR SET
+		       ADMIN_CHECK = #{adminCheck},
+		       MOD_DT = now(),
+		       MOD_USER_ID = #{modUserId}
+		WHERE
+		       REQ_SEQ = #{reqSeq}
+	</update>
+
+	<update id="updateUserReqStatus" parameterType="userReqVO">
+		UPDATE USER_REQ_PROP SET
+		STATUS = #{status}
+		WHERE
+		REQ_SEQ = #{reqSeq}
+	</update>
+
+	<select id="selectUserReqData" parameterType="hashmap" resultMap="userReqInfo">
+		SELECT URM.USER_ID, URM.REQ_SEQ, URM.CLIENT_ID, URM.REG_DT, URM.ACTION_TYPE, URM.ADMIN_CHECK,
+		URM.MOD_DT, URM.MOD_USER_ID,
+		URP.USB_NAME, URP.USB_SERIAL_NO, URP.USB_PRODUCT, URP.USB_VENDOR, URP.USB_MODEL, URP.STATUS
+		FROM USER_REQ_MSTR URM
+			LEFT JOIN USER_REQ_PROP URP ON URM.REQ_SEQ = URP.REQ_SEQ
+		WHERE URM.REQ_SEQ = #{reqSeq}
+	</select>
+
+	<insert id="insertUserReqMstr" parameterType="map">
+		INSERT INTO USER_REQ_MSTR (req_seq, user_id, client_id, reg_dt, action_type, admin_check, mod_dt, mod_user_id)
+		VALUES ((SELECT GRNEXTVAL('USERREQUESTMSTR_SEQ')), #{userId}, #{clientId},#{regDt},#{actionType},#{adminCheck},now(), #{modUserId})
+	</insert>
+
+	<insert id="insertUserReqProp" parameterType="map">
+		INSERT INTO USER_REQ_PROP (req_seq, status, user_id, usb_name, usb_serial_no, usb_product, usb_vendor, usb_model)
+		VALUES (#{reqSeq},#{status},#{userId},#{usbName},#{usbSerialNo},#{usbProduct},#{usbVendor},#{usbModel})
+	</insert>
+
+	<select id="selectUserReqSeq" resultType="String" parameterType="String">
+		SELECT req_seq FROM user_req_mstr WHERE user_id=#{userId} AND client_id=#{clientId} AND mod_dt=#{modDt} AND action_type=#{actionType}
+	</select>
+
+	<!-- HISTORY  -->
+	<insert id="insertUserReqHist" parameterType="hashmap">
+		INSERT INTO USER_REQ_HIST (REQ_SEQ, USER_ID, USB_SERIAL_NO, CLIENT_ID, ACTION_TYPE, ADMIN_CHECK, REG_USER_ID, REG_DT)
+		VALUES ((SELECT GRNEXTVAL('USERREQUESTHIST_SEQ')), #{userId}, #{usbSerialNo}, #{clientId}, #{actionType}, #{adminCheck}, #{regUserId}, now())
+	</insert>
+
+	<select id="selectDenyReqList" parameterType="String" resultMap="userReqInfo">
+		SELECT URM.REQ_SEQ,
+		URM.USER_ID,
+		URM.ACTION_TYPE,
+		URM.CLIENT_ID,
+		URM.REG_DT,
+		URP.USB_NAME,
+		URP.USB_SERIAL_NO,
+		URP.USB_PRODUCT,
+		URP.USB_SIZE,
+		URP.USB_VENDOR, URP.USB_MODEL,
+		URM.MOD_DT,
+		URM.MOD_USER_ID,
+		URM.ADMIN_CHECK,
+		URP.STATUS
+		FROM USER_REQ_MSTR URM
+		LEFT JOIN
+		USER_REQ_PROP URP
+		ON URM.REQ_SEQ = URP.REQ_SEQ
+		WHERE URM.USER_ID = #{userId} AND URP.USB_SERIAL_NO = #{usbSerialNo} AND URM.ACTION_TYPE = "registering" AND URM.ADMIN_CHECK = "register-deny"
+	</select>
+</mapper>
+
+

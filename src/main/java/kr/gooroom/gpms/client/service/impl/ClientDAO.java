@@ -34,6 +34,7 @@ import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.job.custom.OnlineClientAndUserVO;
 
+
 /**
  * data access object class for client management process.
  * <p>
@@ -658,6 +659,24 @@ public class ClientDAO extends SqlSessionMetaDAO {
 			logger.error("error in selectOnlineClientIdsForNoticeInstantNotice : {}, {}, {}",
 					GPMSConstants.CODE_SYSERROR, MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR),
 					ex.toString());
+		}
+		return re;
+	}
+
+	/**
+	 *
+	 * @param ClientId
+	 * @return UserReqVO list
+	 * @throws SQLException
+	 */
+	public List<ClientVO> selectOnlineClientIdInClientId(String ClientId) throws SQLException {
+		List<ClientVO> re = null;
+		try {
+			re = sqlSessionMeta.selectList("selectOnlineClientIdInClientId", ClientId);
+		} catch (Exception ex) {
+			re = null;
+			logger.error("error in selectOnlineClientIdInClientId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
 		return re;
 	}

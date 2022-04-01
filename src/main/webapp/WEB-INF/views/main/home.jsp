@@ -6,7 +6,8 @@
 <body>
 <div id="root"></div>
 <script>
-  window.gpmsain = '09052008';
+    window.usePortable = ${(empty ROLE_PORTABLE) ? "0" : "1"};
+    window.gpmsain = '09052008';
 </script>
 <script type="text/javascript" src="index.bundle.js"></script>
 </body>

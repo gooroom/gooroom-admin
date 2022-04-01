@@ -149,7 +149,7 @@
 <body>
   <div class="main">
     <p class="sign" align="center">GPMS</p>
-    <p class="version" align="center">v2.0</p>
+<%--    <p class="version" align="center">v2.0</p>--%>
     <p class="sysmsg" align="center">${msg}</p>
     <form name='f' action="login" method='POST' onSubmit="gr_encoding()">
 		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

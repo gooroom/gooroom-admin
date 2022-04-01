@@ -62,13 +62,22 @@ public interface UserService {
 	StatusVO isNoExistUserId(String userId) throws Exception;
 
 	/**
+	 * check duplicate user id list
+	 *
+	 * @param ids list of user id
+	 * @return ResultVO result data bean
+	 * @throws Exception
+	 */
+	ResultVO isNoExistInUserIdList(HashMap<String, Object> ids) throws Exception;
+
+	/**
 	 * create new user data
 	 * 
 	 * @param userVO UserVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
-	StatusVO createUserData(UserVO userVO) throws Exception;
+	StatusVO createUserData(UserVO userVO, boolean isPortable) throws Exception;
 
 	/**
 	 * create new user data with rule
@@ -77,7 +86,7 @@ public interface UserService {
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
-	StatusVO createUserDataWithRule(UserVO userVO) throws Exception;
+	StatusVO createUserDataWithRule(UserVO userVO, boolean isPortable) throws Exception;
 
 	/**
 	 * response user information data

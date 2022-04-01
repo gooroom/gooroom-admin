@@ -81,6 +81,10 @@ public class UserVO implements Serializable {
 	private String grade;
 	private String sortOrder;
 
+	private String maxMediaCnt;
+	private String userReqCnt;
+	private String userReqData;
+
 	public UserVO() {
 		this.userId = "";
 	}

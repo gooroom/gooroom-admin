@@ -1,16 +1,19 @@
 package kr.gooroom.gpms.common.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 
-import javax.security.cert.CertificateException;
-import javax.security.cert.X509Certificate;
+import java.security.cert.CertificateException;
 
 import org.bouncycastle.openssl.PEMParser;
 
@@ -61,8 +64,9 @@ public final class PemUtil {
 
 	public static PublicKey getPublicKey(String certificatePem) {
 		try {
-			return X509Certificate.getInstance(certificatePem.getBytes()).getPublicKey();
-		} catch (CertificateException e) {
+			X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(certificatePem.getBytes("UTF-8")));
+			return  cert.getPublicKey();
+		} catch (CertificateException | UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		return null;

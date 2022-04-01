@@ -46,6 +46,7 @@ import java.util.UUID;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -56,13 +57,17 @@ import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
@@ -113,7 +118,7 @@ public class CertificateUtils {
 
 	/**
 	 * check csp certificate from cn string.
-	 * 
+	 *
 	 * @param cn          string common name for certificate.
 	 * @param validToDate Date validate to date.
 	 * @param newSerialNo BigInteger certificate's serial no.
@@ -121,6 +126,22 @@ public class CertificateUtils {
 	 * @throws Exception
 	 */
 	public CertificateVO createGcspCertificate(String cn, Date validToDate, BigInteger newSerialNo) throws Exception {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, -1);
+		java.util.Date notBefore = cal.getTime();
+		return createGcspCertificate(cn, notBefore, validToDate, newSerialNo, "");
+	}
+
+	/**
+	 * check csp certificate from cn string.
+	 * 
+	 * @param cn          string common name for certificate.
+	 * @param validToDate Date validate to date.
+	 * @param newSerialNo BigInteger certificate's serial no.
+	 * @return CertificateVO result certificate bean.
+	 * @throws Exception
+	 */
+	public CertificateVO createGcspCertificate(String cn, Date beginToDate, Date validToDate, BigInteger newSerialNo, String pw) throws Exception {
 
 		CertificateVO vo = new CertificateVO();
 
@@ -150,17 +171,13 @@ public class CertificateUtils {
 		// 1.
 		X500Name issuer = new X500Name(rootCert.getSubjectX500Principal().getName());
 		// 2.
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DATE, -1);
-		java.util.Date notBefore = cal.getTime();
-		// 3.
 		Locale dateLocale = new Locale.Builder().setLanguage("ko").setRegion("KO").build();
-		// 4.
+		// 3.
 		X500Name subject = new X500Name("cn=" + cn);
-		// 5.
+		// 4.
 		SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(pubKey.getEncoded());
 
-		X509v3CertificateBuilder builder = new X509v3CertificateBuilder(issuer, newSerialNo, notBefore, validToDate,
+		X509v3CertificateBuilder builder = new X509v3CertificateBuilder(issuer, newSerialNo, beginToDate, validToDate,
 				dateLocale, subject, publicKeyInfo);
 
 		// sign to builder
@@ -182,7 +199,18 @@ public class CertificateUtils {
 		}
 		vo.setCertificatePem(certBs.toString("UTF-8"));
 
-		PemObject priPemObject = new PemObject("RSA PRIVATE KEY", pair.getPrivate().getEncoded());
+		PemObject priPemObject;
+		if (pw == null || pw.length() == 0)
+		{
+			priPemObject = new PemObject("RSA PRIVATE KEY", pair.getPrivate().getEncoded());
+		} else {
+			// AES256 개인키 암호화
+			OutputEncryptor encryptor = new JcePKCSPBEOutputEncryptorBuilder(CMSAlgorithm.AES256_CBC)
+					.setProvider("BC").build(pw.toCharArray());
+			PKCS8Generator encryt = new PKCS8Generator(PrivateKeyInfo.getInstance(pair.getPrivate().getEncoded()), encryptor);
+			priPemObject = encryt.generate();
+		}
+
 		ByteArrayOutputStream priBs = new ByteArrayOutputStream();
 		PemWriter priPemWriter = new PemWriter(new OutputStreamWriter(priBs, "UTF-8"));
 		priBs.close();

@@ -97,7 +97,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 				// e.printStackTrace();
 				isOk = false;
 			}
-			if (!isOk) {
+			if (!isOk && !user.isUserAccount()) {
 				throw new BadAccessIpException(GPMSConstants.ERR_LOGIN_DENIED);
 			}
 

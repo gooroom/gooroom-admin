@@ -31,6 +31,7 @@
 		<typeAlias type="kr.gooroom.gpms.user.service.AdminUserVO" alias="adminUserVO" />
 		<typeAlias type="kr.gooroom.gpms.user.service.UserRoleVO" alias="userRoleVO" />
 		<typeAlias type="kr.gooroom.gpms.user.service.UserVO" alias="userVO" />
+		<typeAlias type="kr.gooroom.gpms.user.service.UserReqVO" alias="userReqVO" />
 		<typeAlias type="kr.gooroom.gpms.user.service.UserAndRoleVO" alias="userAndRoleVO" />
 		<typeAlias type="kr.gooroom.gpms.user.service.UserAndClientVO" alias="userAndClientVO" />
 		<typeAlias type="kr.gooroom.gpms.user.service.UserTokenVO" alias="userTokenVO"/>
@@ -81,7 +82,16 @@
 		<typeAlias type="kr.gooroom.gpms.notice.service.UserOpenedNoticeVO" alias="userOpenedNoticeVO" />
 		<typeAlias type="kr.gooroom.gpms.notice.service.NoticePublishTargetVO" alias="noticePublishTargetVO" />
 		<typeAlias type="kr.gooroom.gpms.notice.service.TargetNoticeVO" alias="targetNoticeVO" />
-		
+
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableVO" alias="portableVO" />
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableCertVO" alias="portableCertVO" />
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableImageVO" alias="portableImageVO" />
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableLogVO" alias="portableLogVO" />
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableJobVO" alias="portableJobVO" />
+
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableViewVO" alias="portableViewVO" />
+		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableImageViewVO" alias="portableImageViewVO" />
+
 	</typeAliases>
 	
 </configuration>

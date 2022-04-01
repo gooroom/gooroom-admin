@@ -147,6 +147,7 @@ public class ClientConfServiceImpl implements ClientConfService {
 
 			long oldPollingTime = clientConfDao.selectSitePollingTime("");
 			long oldTrialCount = clientConfDao.selectSiteLoginTrialCount("");
+			long oldMaxMediaCnt = clientConfDao.selectSiteMaxMediaCnt("");
 
 			// update polling time and trial count and passwordRule
 			SiteConfVO confVo = new SiteConfVO();
@@ -155,6 +156,9 @@ public class ClientConfServiceImpl implements ClientConfService {
 			confVo.setLockTime(vo.getLockTime());
 			confVo.setPasswordRule(vo.getPasswordRule());
 			confVo.setEnableDuplicateLogin(vo.getEnableDuplicateLogin());
+			confVo.setMaxMediaCnt(vo.getMaxMediaCnt());
+			confVo.setRegisterReq(vo.getRegisterReq());
+			confVo.setDeleteReq(vo.getDeleteReq());
 			
 			long updateCnt = clientConfDao.updateSiteConf(confVo);
 			if (updateCnt > 0) {
@@ -180,6 +184,12 @@ public class ClientConfServiceImpl implements ClientConfService {
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put("trialCount", vo.getTrialCount());
 					clientConfDao.updateLoginTrialInUser(map);
+				}
+
+				if (Long.parseLong(vo.getMaxMediaCnt()) != oldMaxMediaCnt) {
+					// create client job for change max media count
+					HashMap<String, String> map = new HashMap<String, String>();
+					jobMaker.createJobForAllClient(GPMSConstants.JOB_CLIENTCONF_MAXMEDIACNT_CHANGE, map);
 				}
 			}
 
@@ -248,6 +258,9 @@ public class ClientConfServiceImpl implements ClientConfService {
 			long lockTime = clientConfDao.selectSiteLoginLockTime("");
 			long enableDuplicateLogin = clientConfDao.selectSiteLoginDuplicateEnable("");
 			String passwordRule = clientConfDao.selectSitePasswordRule("");
+			long maxMediaCnt =clientConfDao.selectSiteMaxMediaCnt("");
+			long registerReq =clientConfDao.selectSiteRegisterReq("");
+			long deleteReq =clientConfDao.selectSiteDeleteReq("");
 
 			if (vo != null) {
 
@@ -256,6 +269,9 @@ public class ClientConfServiceImpl implements ClientConfService {
 				vo.setLockTime(String.valueOf(lockTime));
 				vo.setPasswordRule(passwordRule);
 				vo.setEnableDuplicateLogin(String.valueOf(enableDuplicateLogin));
+				vo.setMaxMediaCnt(String.valueOf(maxMediaCnt));
+				vo.setRegisterReq(String.valueOf(registerReq));
+				vo.setDeleteReq(String.valueOf(deleteReq));
 
 				MgServerConfVO[] row = new MgServerConfVO[1];
 				row[0] = vo;

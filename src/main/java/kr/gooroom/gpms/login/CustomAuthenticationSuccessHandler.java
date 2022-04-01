@@ -94,7 +94,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 		} else if (isPartAdmin) {
 			return "/part";
 		} else if (isUser) {
-			return "/";
+			return "/user";
 		} else {
 			throw new IllegalStateException();
 		}

@@ -149,6 +149,15 @@ public interface ClientService {
 	ResultVO getOnlineClientIdsInClientConf(String confId, String confTp) throws Exception;
 
 	/**
+	 * generate online client data list include client id
+	 *
+	 * @param clientId string client id
+	 * @return ResultVO result object
+	 * @throws Exception
+	 */
+	ResultVO getOnlineClientIdByClientId(String clientId) throws Exception;
+
+	/**
 	 * generate client list that attacked protector rule
 	 * 
 	 * @param options HashMap<String, Object> option data

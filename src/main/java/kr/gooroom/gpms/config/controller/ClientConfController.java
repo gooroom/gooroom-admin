@@ -329,6 +329,8 @@ public class ClientConfController {
 		String[] whiteIps = req.getParameterValues(GPMSConstants.CTRL_ITEM_WHITEIPS + "[]");
 		String policykitUser = req.getParameter("policykit_user");
 
+		String cleanModeAllow = req.getParameter(GPMSConstants.CTRL_ITEM_CLEANMODEALLOW);
+
 		String isDeleteLog = req.getParameter("isDeleteLog");
 		String logMaxSize = req.getParameter("logMaxSize");
 		String logMaxCount = req.getParameter("logMaxCount");
@@ -376,6 +378,8 @@ public class ClientConfController {
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_ROOTALLOW, rootAllow,
 					"", modUserId));
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_SUDOALLOW, sudoAllow,
+					"", modUserId));
+			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_CLEANMODEALLOW, cleanModeAllow,
 					"", modUserId));
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_WHITEIPALL, whiteIpAll,
 					"", modUserId));
@@ -554,6 +558,7 @@ public class ClientConfController {
 						String homeReset = "";
 						String rootAllow = "";
 						String sudoAllow = "";
+						String cleanModeAllow = "";
 						if (props != null && props.size() > 0) {
 							for (CtrlPropVO prop : props) {
 								if (GPMSConstants.CTRL_ITEM_USEHOMERESET.equalsIgnoreCase(prop.getPropNm())) {
@@ -564,6 +569,9 @@ public class ClientConfController {
 								}
 								if (GPMSConstants.CTRL_ITEM_SUDOALLOW.equalsIgnoreCase(prop.getPropNm())) {
 									sudoAllow = prop.getPropValue();
+								}
+								if (GPMSConstants.CTRL_ITEM_CLEANMODEALLOW.equalsIgnoreCase(prop.getPropNm())) {
+									cleanModeAllow = prop.getPropValue();
 								}
 							}
 						}
@@ -591,6 +599,16 @@ public class ClientConfController {
 							mapAccountAllow.put("sudo_use", "disallow");
 						}
 						jobMaker.createJobForClientSetupWithClients(GPMSConstants.JOB_ACCOUNT_RULE_CHANGE, mapAccountAllow,
+								clientIds);
+
+						// clean mode allow job
+						HashMap<String, String> mapCleanModeAllow = new HashMap<>();
+						if("true".equalsIgnoreCase(cleanModeAllow)) {
+							mapCleanModeAllow.put("cleanmode_use", "enable");
+						} else {
+							mapCleanModeAllow.put("cleanmode_use", "disable");
+						}
+						jobMaker.createJobForClientSetupWithClients(GPMSConstants.JOB_CLEANMODE_RULE_CHANGE, mapCleanModeAllow,
 								clientIds);
 
 						// use log config change job
@@ -637,6 +655,8 @@ public class ClientConfController {
 		String whiteIpAll = req.getParameter(GPMSConstants.CTRL_ITEM_WHITEIPALL);
 		String[] whiteIps = req.getParameterValues(GPMSConstants.CTRL_ITEM_WHITEIPS + "[]");
 		String policykitUser = req.getParameter("policykit_user");
+
+		String cleanModeAllow = req.getParameter(GPMSConstants.CTRL_ITEM_CLEANMODEALLOW);
 		
 		String isDeleteLog = req.getParameter("isDeleteLog");
 		String logMaxSize = req.getParameter("logMaxSize");
@@ -685,6 +705,8 @@ public class ClientConfController {
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_ROOTALLOW, rootAllow,
 					"", modUserId));
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_SUDOALLOW, sudoAllow,
+					"", modUserId));
+			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_CLEANMODEALLOW, cleanModeAllow,
 					"", modUserId));
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_WHITEIPALL, whiteIpAll,
 					"", modUserId));
@@ -770,6 +792,16 @@ public class ClientConfController {
 					jobMaker.createJobForClientConf(objId, GPMSConstants.TYPE_CLIENTCONF,
 							GPMSConstants.JOB_CLIENTCONF_POLICYKITUSER_CHANGE, map);
 				}
+
+				// clean mode allow job
+				HashMap<String, String> mapCleanModeAllow = new HashMap<>();
+				if("true".equalsIgnoreCase(cleanModeAllow)) {
+					mapCleanModeAllow.put("cleanmode_use", "enable");
+				} else {
+					mapCleanModeAllow.put("cleanmode_use", "disable");
+				}
+				jobMaker.createJobForClientConf(objId, GPMSConstants.TYPE_CLIENTCONF,
+						GPMSConstants.JOB_CLEANMODE_RULE_CHANGE, mapCleanModeAllow);
 
 				// use log config change job
 				jobMaker.createJobForClientConf(objId, GPMSConstants.TYPE_CLIENTCONF,

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PortableImageDAO">
+
+    <resultMap type="portableImageVO" id="portableImage">
+
+        <result property="imageId" column="IMAGE_ID" />
+        <result property="name" column="NAME" />
+        <result property="url" column="URL" />
+        <result property="size" column="SIZE" />
+        <result property="createdDt" column="CREATED_DT" />
+        <result property="status" column="STATUS" />
+
+    </resultMap>
+
+    <resultMap type="portableImageViewVO" id="portableImageView">
+        <result property="imageId" column="IMAGE_ID" />
+        <result property="name" column="NAME" />
+        <result property="createdDt" column="CREATED_DT" />
+        <result property="size" column="SIZE" />
+        <result property="status" column="STATUS" />
+        <result property="userId" column="USER_ID" />
+        <result property="regDt" column="REG_DT" />
+        <result property="jobId" column="JOB_ID" />
+    </resultMap>
+
+    <select id="selectNextImageNo" resultType="java.lang.Integer">
+        SELECT GRNEXTVAL('PTGRIMAGE_SEQ') AS IMAGE_ID FROM DUAL;
+    </select>
+
+    <select id="selectPortableImageTotalCount" parameterType="hashmap" resultType="java.lang.Long">
+        SELECT COUNT(IMAGE_ID) CNT
+        FROM PTGR_IMAGE
+    </select>
+
+    <select id="selectPortableImageFilteredCount" parameterType="hashmap" resultType="java.lang.Long">
+        SELECT COUNT(I.IMAGE_ID) AS CNT FROM PTGR_IMAGE AS I
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS U ON I.IMAGE_ID = U.IMAGE_ID
+        LEFT JOIN (SELECT JOB_ID, IMAGE_ID FROM PTGR_JOB) AS J ON I.IMAGE_ID = J.IMAGE_ID
+        <choose>
+            <when test="lang != null and lang == 'en'">
+                LEFT JOIN (SELECT STATUS_ID, STATUS_EN as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </when>
+            <otherwise>
+                LEFT JOIN (SELECT STATUS_ID, STATUS_KR as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </otherwise>
+        </choose>
+        <where>
+            I.STATUS != 3
+            <if test="searchType != null and searchType == 'REG_DT'">
+                AND U.REG_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            </if>
+            <if test="searchType != null and searchType == 'CREATED_DT'">
+                AND I.CREATED_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            </if>
+            <if test="searchKey != null and searchKey != ''">
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND U.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'USER_ID'">
+                    AND U.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+            </if>
+        </where>
+    </select>
+    <!-- 포터블 이미지 정보 생성 -->
+    <insert id="insertPortableImage" parameterType="portableImageVO">
+        INSERT INTO PTGR_IMAGE
+            (IMAGE_ID, NAME, CREATED_DT, URL, SIZE, STATUS)
+        VALUES
+            (#{imageId}, #{name}, #{createdDt}, #{url}, #{size}, #{status});
+    </insert>
+
+    <select id="selectPortableImageList" resultMap="portableImageView">
+        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, IFNULL(P.USER_ID, H.USER_ID) AS USER_ID, IFNULL(P.REG_DT, H.REG_DT) AS REG_DT, J.JOB_ID FROM PTGR_IMAGE AS I
+        LEFT JOIN (SELECT STATUS_ID, STATUS_KR AS STATUS FROM PTGR_IMAGE_STATUS) AS S ON I.STATUS = S.STATUS_ID
+        LEFT JOIN (SELECT JOB_ID, IMAGE_ID FROM PTGR_JOB) AS J ON I.IMAGE_ID = J.IMAGE_ID
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS P ON I.IMAGE_ID = P.IMAGE_ID
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR_HIST) AS H ON I.IMAGE_ID = H.IMAGE_ID
+        WHERE I.STATUS != 3;
+    </select>
+    <!--
+    <select id="selectPortableImageListByCondition" parameterType="hashmap" resultMap="portableImageView">
+        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, IFNULL(P.USER_ID, H.USER_ID) AS USER_ID, IFNULL(P.REG_DT, H.REG_DT) AS REG_DT FROM PTGR_IMAGE AS I
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS P ON I.IMAGE_ID = P.IMAGE_ID
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR_HIST) AS H ON I.IMAGE_ID = H.IMAGE_ID
+        <choose>
+            <when test="lang != null and lang == 'en'">
+                LEFT JOIN (SELECT STATUS_ID, STATUS_EN as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </when>
+            <otherwise>
+                LEFT JOIN (SELECT STATUS_ID, STATUS_KR as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </otherwise>
+        </choose>
+        <where>
+            I.STATUS != 3
+            <if test="searchType != null and searchType == 'REG_DT'">
+                AND IFNULL(P.REG_DT, H.REG_DT) BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            </if>
+            <if test="searchType != null and searchType == 'CREATED_DT'">
+                AND CREATED_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            </if>
+            <if test="searchKey != null and searchKey != ''">
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND IFNULL(P.USER_ID, H.USER_ID) LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+                <if test="searchType != null and searchType == 'USER_ID'">
+                    AND IFNULL(P.USER_ID, H.USER_ID) LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+            </if>
+        </where>
+        <if test="paramOrderColumn != null">
+            ORDER BY ${paramOrderColumn} ${paramOrderDir}
+        </if>
+        LIMIT #{paramStart}, #{paramLength}
+    </select>
+    -->
+    <select id="selectPortableImageListByCondition" parameterType="hashmap" resultMap="portableImageView">
+        SELECT I.IMAGE_ID, I.NAME, I.CREATED_DT, I.SIZE, S.STATUS, IFNULL(P.USER_ID, H.USER_ID) AS USER_ID, IFNULL(P.REG_DT, H.REG_DT) AS REG_DT,  IFNULL(J.JOB_ID, 0) AS JOB_ID FROM PTGR_IMAGE AS I
+        LEFT JOIN (SELECT JOB_ID, IMAGE_ID FROM PTGR_JOB) AS J ON I.IMAGE_ID = J.IMAGE_ID
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR) AS P ON I.IMAGE_ID = P.IMAGE_ID
+        LEFT JOIN (SELECT USER_ID, REG_DT, IMAGE_ID FROM PTGR_MSTR_HIST) AS H ON I.IMAGE_ID = H.IMAGE_ID
+        <choose>
+            <when test="lang != null and lang == 'en'">
+                LEFT JOIN (SELECT STATUS_ID, STATUS_EN as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </when>
+            <otherwise>
+                LEFT JOIN (SELECT STATUS_ID, STATUS_KR as STATUS FROM PTGR_IMAGE_STATUS) as S on I.STATUS = S.STATUS_ID
+            </otherwise>
+        </choose>
+        <where>
+            I.STATUS != 3
+            <if test="searchType != null and searchType == 'REG_DT'">
+                AND IFNULL(P.REG_DT, H.REG_DT) BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            </if>
+            <if test="searchType != null and searchType == 'CREATED_DT'">
+                AND CREATED_DT BETWEEN CONCAT(#{fromDate}, ' 00:00:00') AND CONCAT(#{toDate}, ' 23:59:59')
+            </if>
+            <if test="searchKey != null and searchKey != ''">
+                <if test="searchType != null and searchType == 'ALL'">
+                    AND IFNULL(P.USER_ID, H.USER_ID) LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+               <if test="searchType != null and searchType == 'USER_ID'">
+                    AND IFNULL(P.USER_ID, H.USER_ID) LIKE CONCAT('%', #{searchKey}, '%')
+                </if>
+            </if>
+        </where>
+        <if test="paramOrderColumn != null">
+            ORDER BY ${paramOrderColumn} ${paramOrderDir}
+        </if>
+        LIMIT #{paramStart}, #{paramLength}
+    </select>
+
+    <select id="selectPortableImageByImageId" parameterType="java.lang.Integer" resultMap="portableImage">
+        SELECT *
+        FROM PTGR_IMAGE
+        WHERE IMAGE_ID = #{imageId};
+    </select>
+
+    <!-- 이미지 파일 정보 업데이트 -->
+    <update id="updatePortableImage" parameterType="portableImageVO">
+        UPDATE PTGR_IMAGE
+        SET
+        <if test="name!= null">NAME = #{name},</if>
+        <if test="url!= null">URL = #{url},</if>
+        <if test="size!= null">SIZE = #{size},</if>
+        <if test="status!= null">STATUS = #{status},</if>
+        CREATED_DT = now(6)
+        WHERE IMAGE_ID = #{imageId};
+    </update>
+
+    <!-- 이미지 상태 업데이트 (또는 상태 변경으로 삭제) -->
+    <update id="updatePortableImageStatus" parameterType="hashMap">
+        UPDATE PTGR_IMAGE
+        SET STATUS = #{status}
+        WHERE IMAGE_ID = #{imageId};
+    </update>
+
+    <!-- 이미지 예상 시간 업데이트 -->
+    <update id="updatePortableImageCreateDate" parameterType="hashMap">
+        UPDATE PTGR_IMAGE
+        SET CREATED_DT = #{createdDt}
+        WHERE IMAGE_ID = #{imageId};
+    </update>
+    <!-- 이미지 삭제 -->
+    <!--
+        <delete id="deletePortableImage" parameterType="Integer">
+            DELETE FROM PTGR_IMAGE
+            WHERE IMAGE_ID = #{imageId};
+        </delete>
+        <delete id="deletePortableImage" parameterType="hashMap">
+            DELETE FROM PTGR_IMAGE IN
+            <foreach item="item" index="index" collection="imageIds" open="(" separator="," close=")">
+                ${item}
+            </foreach>
+        </delete>
+    -->
+    <delete id="removePortableImage" parameterType="java.lang.Integer">
+        UPDATE PTGR_IMAGE
+        SET STATUS = 3
+        WHERE IMAGE_ID = ${imageId}
+    </delete>
+
+    <delete id="removePortableImages" parameterType="hashmap">
+        UPDATE PTGR_IMAGE
+        SET STATUS = 3
+        WHERE IMAGE_ID IN
+        <foreach collection="imageIds" item="imageIds"  open="(" separator="," close=")">
+            ${imageIds}
+        </foreach>
+    </delete>
+
+    <delete id="removeAllPortableImage">
+        UPDATE PTGR_IMAGE
+        SET STATUS = 3
+        WHERE PTGR_IMAGE.STATUS != 1
+    </delete>
+
+    <delete id="deletePortableImageById" parameterType="java.lang.Integer">
+        DELETE FROM PTGR_IMAGE
+        WHERE IMAGE_ID = #{imageId}
+    </delete>
+
+    <delete id="deletePortableImageAll">
+        DELETE FROM PTGR_IMAGE WHERE PTGR_IMAGE.STATUS != 1
+    </delete>
+
+    <insert id="insertPortableImageHist" parameterType="portableImageVO">
+        INSERT INTO PTGR_IMAGE_HIST
+            (HIST_ID, IMAGE_ID, NAME, URL, SIZE, CREATED_DT, STATUS, HIST_REG_DT)
+        VALUES (
+            (SELECT GRNEXTVAL('PTGRIMAGEHIST_SEQ')),
+            #{imageId}, #{name}, #{url}, #{size},  #{createdDt}, #{status}, now(6));
+    </insert>
+
+    <insert id="insertPortableAllImageHist">
+        INSERT INTO PTGR_IMAGE_HIST
+            (HIST_ID, IMAGE_ID, NAME, URL, SIZE, CREATED_DT, STATUS, HIST_REG_DT)
+        SELECT(SELECT GRNEXTVAL('PTGRIMAGEHIST_SEQ')) AS HIST_ID, IMAGE_ID, NAME, URL, SIZE, CREATED_DT, STATUS, now(6) FROM PTGR_IMAGE;
+    </insert>
+</mapper>

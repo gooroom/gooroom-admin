@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PortableCertDAO">
+
+    <resultMap type="portableCertVO" id="portableCert">
+
+        <result property="certId" column="CERT_ID" />
+        <result property="publish" column="PUBLISH" />
+        <result property="createdDt" column="CREATED_DT" />
+        <result property="transferDt" column="TRANSFER_DT" />
+        <result property="certPem" column="CERT_PEM" />
+        <result property="certPath" column="CERT_PATH" />
+        <result property="keyPath" column="KEY_PATH" />
+
+    </resultMap>
+
+    <select id="selectCertCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(*) CNT
+        FROM PTGR_CERT
+        WHERE CERT_ID = #{certId};
+    </select>
+
+    <select id="selectNextCertNo" resultType="java.lang.Integer">
+        SELECT GRNEXTVAL('PTGRCERT_SEQ') AS CERT_ID FROM DUAL;
+    </select>
+
+    <!-- 인증서 정보 생성 -->
+    <insert id="insertPortableCert" parameterType="portableCertVO">
+        INSERT INTO PTGR_CERT
+            (CERT_ID, PUBLISH, CREATED_DT, TRANSFER_DT, CERT_PEM, CERT_PATH, KEY_PATH)
+        VALUES
+            (#{certId}, #{publish}, #{createdDt}, #{transferDt}, #{certPem}, #{certPath}, #{keyPath});
+    </insert>
+
+    <select id="selectPortableCert" parameterType="java.lang.String" resultMap="portableCert">
+        SELECT *
+        FROM PTGR_CERT
+        WHERE CERT_ID = #{certId};
+    </select>
+
+    <update id="updatePortableCert" parameterType="portableCertVO">
+        UPDATE PTGR_CERT
+        SET CERT_ID = #{certId},
+            PUBLISH = #{publish},
+            CREATED_DT = #{createdDt},
+            TRANSFER_DT = #{transferDt},
+            CERT_PEM = #{certPem},
+            CERT_PATH= #{certPath},
+            KEY_PATH = #{keyPath}
+        WHERE CERT_ID = #{certId};
+    </update>
+
+    <delete id="deletePortableCert" parameterType="java.lang.Integer">
+        DELETE FROM PTGR_CERT
+        WHERE CERT_ID = #{certId};
+    </delete>
+
+    <delete id="deletePortableCertAll">
+        DELETE FROM PTGR_CERT
+    </delete>
+</mapper>

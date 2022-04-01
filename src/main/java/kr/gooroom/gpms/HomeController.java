@@ -54,9 +54,15 @@ public class HomeController {
 			} else if (grantedAuthority.getAuthority().equals("ROLE_SUPER")) {
 				return "main/super";
 			} else if (grantedAuthority.getAuthority().equals("ROLE_PART")) {
+				for (GrantedAuthority subAuthority : authorities) {
+					model.addAttribute(subAuthority.getAuthority(), "1");
+				}
 				return "main/part";
 			} else if (grantedAuthority.getAuthority().equals("ROLE_USER")) {
-				return "/";
+				for (GrantedAuthority subAuthority : authorities) {
+					model.addAttribute(subAuthority.getAuthority(), "1");
+				}
+				return "main/user";
 			}
 		}
 		return "redirect:/login";
@@ -72,6 +78,12 @@ public class HomeController {
 	 */
 	@GetMapping(value = "/super")
 	public String superPage(Model model) {
+
+		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		for (GrantedAuthority grantedAuthority : authorities) {
+			model.addAttribute(grantedAuthority.getAuthority(), "1");
+		}
+
 		return "main/super";
 	}
 
@@ -85,6 +97,12 @@ public class HomeController {
 	 */
 	@GetMapping(value = "/home")
 	public String homePage(Model model) {
+
+		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		for (GrantedAuthority grantedAuthority : authorities) {
+			model.addAttribute(grantedAuthority.getAuthority(), "1");
+		}
+
 		return "main/home";
 	}
 
@@ -106,7 +124,26 @@ public class HomeController {
 		
 		return "main/part";
 	}
-	
+
+	/**
+	 * Simply selects the home view to render by returning its name.
+	 *
+	 * @author HNC
+	 * @version 1.0
+	 * @param model Spring framework UI Model Object
+	 * @return String
+	 */
+	@GetMapping(value = "/user")
+	public String userPage(Model model) {
+
+		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		for (GrantedAuthority grantedAuthority : authorities) {
+			model.addAttribute(grantedAuthority.getAuthority(), "1");
+		}
+
+		return "main/user";
+	}
+
 	/**
 	 * error view to render by returning its name with error code.
 	 * 

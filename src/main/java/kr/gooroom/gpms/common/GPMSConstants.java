@@ -97,6 +97,11 @@ public class GPMSConstants {
 	public static final String STS_REVOKED = "STAT021";
 	public static final String STS_EXPIRE = "STAT022";
 
+	public static final String REQ_STS_USABLE = "usable";
+	public static final String REQ_STS_UNUSABLE = "unusable";
+	public static final String REQ_STS_EXPIRE = "expire";
+	public static final String REQ_STS_REVOKE = "revoke";
+
 	public static final String STS_VIEW_REVOKE = "RVK";
 	public static final String STS_VIEW_OFFLINE = "OFF";
 	public static final String STS_VIEW_VIOLATED = "VLT";
@@ -241,6 +246,7 @@ public class GPMSConstants {
 	public static final String CTRL_ITEM_USEHOMERESET = "USEHOMERESET";
 	public static final String CTRL_ITEM_ROOTALLOW = "ROOTALLOW";
 	public static final String CTRL_ITEM_SUDOALLOW = "SUDOALLOW";
+	public static final String CTRL_ITEM_CLEANMODEALLOW = "CLEANMODEALLOW";
 
 	// JOB NAME - media rule
 	public static final String JOB_MEDIA_RULE_CHANGE = "get_media_config";
@@ -260,12 +266,16 @@ public class GPMSConstants {
 	// JOB NAME - root / sudo aloow job
 	public static final String JOB_ACCOUNT_RULE_CHANGE = "get_account_config";
 
+	// JOB NAME - clean mode allow job
+	public static final String JOB_CLEANMODE_RULE_CHANGE = "set_cleanmode_config";
+
 	// JOB NAME - client configuration
 	public static final String JOB_CLIENTCONF_AGENTPOLLING_CHANGE = "set_serverjob_dispatch_time_config";
 	public static final String JOB_CLIENTCONF_HOSTS_CHANGE = "append_contents_etc_hosts";
 	public static final String JOB_CLIENTCONF_HOMERESET_CHANGE = "set_homefolder_operation";
 	public static final String JOB_CLIENTCONF_LOGCONFIG_CHANGE = "get_log_config";
 	public static final String JOB_CLIENTCONF_POLICYKITUSER_CHANGE = "get_polkit_admin_config";
+	public static final String JOB_CLIENTCONF_MAXMEDIACNT_CHANGE = "get_usb_whitelist_max";
 
 	// LOGGING CODE
 	public static final String CODE_SYSERROR = "ERR9999";
@@ -297,4 +307,31 @@ public class GPMSConstants {
 	// statistics.
 	public static final String DEFAULT_VIOLATED_LOGTYPE = "취약";
 
+	// user Request
+	public static final String ACTION_REGISTERING = "registering";
+	public static final String ACTION_REGISTERING_CANCEL = "registering-cancel";
+	public static final String ACTION_REGISTER_APPROVAL_CANCEL = "register-approval-cancel";
+	public static final String ACTION_UNREGISTERING = "unregistering";
+	public static final String ACTION_REGISTER_APPROVAL = "register-approval";
+	public static final String ACTION_REGISTER_DENY = "register-deny";
+	public static final String ACTION_UNREGISTER_APPROVAL = "unregister-approval";
+	public static final String ACTION_UNREGISTER_DENY = "unregister-deny";
+	public static final String ACTION_APPROVAL = "approval";
+	public static final String ACTION_DENY = "deny";
+	public static final String ACTION_WAITING = "waiting";
+
+	// Portable
+	public static final String USE_PORTABLE = prop.getProperty("gooroom.config.portable", "false");
+	public static final String PORTABLE_CERTPATH = prop.getProperty("gooroom.user.portable.certificate.path", "/var/tmp/portable/");
+	public static final String PORTABLE_CERTFILENAME = prop.getProperty("gooroom.user.portable.certificate.filename", "cert.pem");
+	public static final String PORTABLE_KEYFILENAME = prop.getProperty("gooroom.user.portable.privatekey.filename","private.key");
+	public static final String PORTABLE_JENKINS_JOBNAME = prop.getProperty("gooroom.config.portable.jenkins.jobname","portable-iso-builder");
+	public static final String PORTABLE_JENKINS_REMOVE_JOBNAME = prop.getProperty("gooroom.config.portable.jenkins.remove.jobname","portable-iso-delete");
+	public static final String PORTABLE_JENKINS_URL = prop.getProperty("gooroom.config.portable.jenkins.url","gooroom.sample.com");
+	public static final String PORTABLE_JENKINS_USER = prop.getProperty("gooroom.config.portable.jenkins.user","gooroom");
+	public static final String PORTABLE_JENKINS_TOKEN = prop.getProperty("gooroom.config.portable.jenkins.token","gooroom");
+	public static final String PORTABLE_SERVER_API = prop.getProperty("gooroom.config.portable.server","gooroom.sample.com");
+	public static final String PORTABLE_GROUP= prop.getProperty("gooroom.config.portable.group","DEPTDEFAULT");
+	public static final String PORTABLE_DESKTOP = prop.getProperty("gooroom.config.portable.desktop","DECOPORTABLE");
+	public static final String PORTABLE_CTRL= prop.getProperty("gooroom.config.portable.ctrl","CTCIPORTABLE");
 }

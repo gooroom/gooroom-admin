@@ -59,7 +59,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
 	private String[][] RULEINFOS = { { "client_admin", "client_admin", "isClientAdmin" },
 			{ "user_admin", "user_admin", "isUserAdmin" }, { "desktop_admin", "desktop_admin", "isDesktopAdmin" }, 
-			{ "notice_admin", "notice_admin", "isNoticeAdmin" } };
+			{ "notice_admin", "notice_admin", "isNoticeAdmin" },{ "portable_admin", "portable_admin", "isPortableAdmin" }};
 	
 	/**
 	 * modify administrator user information data with divided rules.

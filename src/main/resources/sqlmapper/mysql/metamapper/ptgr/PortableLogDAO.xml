@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PortableLogDAO">
+
+    <resultMap type="portableLogVO" id="portableLog">
+
+        <result property="logId" column="LOG_ID" />
+        <result property="ptgrId" column="PTGR_ID" />
+        <result property="userId" column="USER_ID" />
+        <result property="adminId" column="ADMIN_ID" />
+        <result property="errorStatus" column="ERROR_STATUS" />
+        <result property="logDt" column="LOG_DT" />
+        <result property="logLevel" column="LOG_LEVEL" />
+        <result property="logValue" column="LOG_VALUE" />
+
+    </resultMap>
+
+    <select id="selectLogCount"  resultType="java.lang.Integer">
+        SELECT COUNT(*) CNT
+        FROM PTGR_LOG
+    </select>
+
+    <select id="selectNextLogNo" resultType="java.lang.Integer">
+        SELECT GRNEXTVAL('PTGRLOG_SEQ') AS IMAGE_ID FROM DUAL;
+    </select>
+
+    <insert id="insertPortableLog" parameterType="portableLogVO">
+        INSERT INTO PTGR_LOG
+            (LOG_ID, PTGR_ID, USER_ID, ADMIN_ID, ERROR_STATUS, LOG_DT, LOG_LEVEL, LOG_VALUE)
+        VALUES
+            ((SELECT GRNEXTVAL('PTGRLOG_SEQ')), #{ptgrId}, #{userId}, #{adminId}, #{errorStatus}, now(6), #{logLevel}, #{logValue});
+    </insert>
+
+    <select id="selectPortableLogList" resultMap="portableLog">
+        SELECT *
+        FROM PTGR_LOG
+    </select>
+
+    <select id="selectPortableLogListByCondition" parameterType="hashmap" resultMap="portableLog">
+        SELECT *
+        FROM PTGR_LOG
+        <if test="ptgrId!= null">
+            WHERE PTGR_ID = #{ptgrId}
+        </if>
+        <if test="adminId!= null">
+            WHERE ADMIN_ID = #{adminId}
+        </if>
+        <if test="logLevel!= null">
+            WHERE LOG_LEVEL = #{logLevel}
+        </if>
+    </select>
+
+    <delete id="deleteAllPortableLog">
+        DELETE FROM PTGR_LOG
+    </delete>
+
+</mapper>

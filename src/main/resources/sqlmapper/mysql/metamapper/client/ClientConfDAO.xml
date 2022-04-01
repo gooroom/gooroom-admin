@@ -125,12 +125,27 @@
 	<select id="selectSiteLoginDuplicateEnable" parameterType="hashMap" resultType="long">
 		SELECT IFNULL(ENABLE_DUPLOGIN, 0) FROM SITE_MSTR
 	</select>
+
+	<!--사용자 매체제어 요청 설정-->
+	<select id="selectSiteMaxMediaCnt" parameterType="hashMap" resultType="long">
+		SELECT IFNULL(MAX_MEDIA_CNT, 0) FROM SITE_MSTR
+	</select>
+
+	<select id="selectSiteRegisterReq" parameterType="hashMap" resultType="long">
+		SELECT IFNULL(REGISTER_REQ, 0) FROM SITE_MSTR
+	</select>
+
+	<select id="selectSiteDeleteReq" parameterType="hashMap" resultType="long">
+		SELECT IFNULL(DELETE_REQ, 0) FROM SITE_MSTR
+	</select>
 	
 	<!-- 이력생성  -->
 	<insert id="insertSiteConfHistory" parameterType="siteConfVO">
 		INSERT INTO SITE_MSTR_HIST
-			(SITE_ID, SITE_NAME, COMMENT, POLLING_CYCLE, SERVER_VERSION, ROOTDEPT_CD, STATUS, ROOTGRP_ID, MOD_USER, MOD_DT, TRIAL_COUNT, LOCK_TIME, PASSWORD_RULE, ENABLE_DUPLOGIN)
-		SELECT SITE_ID, SITE_NAME, COMMENT, POLLING_CYCLE, SERVER_VERSION, ROOTDEPT_CD, STATUS, ROOTGRP_ID, MOD_USER, MOD_DT, TRIAL_COUNT, LOCK_TIME, PASSWORD_RULE, ENABLE_DUPLOGIN FROM SITE_MSTR LIMIT 1
+			(SITE_ID, SITE_NAME, COMMENT, POLLING_CYCLE, SERVER_VERSION, ROOTDEPT_CD, STATUS, ROOTGRP_ID,
+			MOD_USER, MOD_DT, TRIAL_COUNT, LOCK_TIME, PASSWORD_RULE, ENABLE_DUPLOGIN, MAX_MEDIA_CNT, REGISTER_REQ, DELETE_REQ)
+		SELECT SITE_ID, SITE_NAME, COMMENT, POLLING_CYCLE, SERVER_VERSION, ROOTDEPT_CD, STATUS, ROOTGRP_ID,
+			MOD_USER, MOD_DT, TRIAL_COUNT, LOCK_TIME, PASSWORD_RULE, ENABLE_DUPLOGIN, MAX_MEDIA_CNT, REGISTER_REQ, DELETE_REQ FROM SITE_MSTR LIMIT 1
 	</insert>
 	
 	<!-- 수정 -->
@@ -141,6 +156,9 @@
 			LOCK_TIME = #{lockTime},
 			PASSWORD_RULE = #{passwordRule},
 			ENABLE_DUPLOGIN = #{enableDuplicateLogin},
+			MAX_MEDIA_CNT = #{maxMediaCnt},
+			REGISTER_REQ = #{registerReq},
+			DELETE_REQ = #{deleteReq},
 			MOD_USER = #{modUserId},
 			MOD_DT = now()
 	</update>
