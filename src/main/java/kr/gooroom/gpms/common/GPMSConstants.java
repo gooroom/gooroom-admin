@@ -73,11 +73,14 @@ public class GPMSConstants {
 	public static final String TYPE_CTRLCENTERITEMRULE = "CTRLCENTERITEMRULE";
 	public static final String TYPE_POLICYKITRULE = "POLICYKITRULE";
 
+	// client register based code
+	public static final String SITE_REG_CODE = prop.getProperty("gooroom.site.register.code");
+
 	public static final String ROOT_CERTPATH = prop.getProperty("gooroom.root.certificate.path");
 	public static final String ROOT_CERTFILENAME = prop.getProperty("gooroom.root.certificate.filename");
 	public static final String ROOT_KEYPATH = prop.getProperty("gooroom.root.privatekey.path");
 	public static final String ROOT_KEYFILENAME = prop.getProperty("gooroom.root.privatekey.filename");
-	
+
 	// Mail
 	public static final String CFG_MAIL_HOST = prop.getProperty("gooroom.mail.host");
 	public static final String CFG_MAIL_PORT = prop.getProperty("gooroom.mail.port");
@@ -155,7 +158,7 @@ public class GPMSConstants {
 	// desktop configuration
 	public static final String CFG_DESKTOP_SETUP = "DESKTOP_CONF";
 	public static final String CFG_DESKTOP_SETUP_ABBR = "DECO";
-	
+
 	// client group
 	public static final String CTRL_CLIENT_GROUP = "CLIENT_GROUP";
 	public static final String CTRL_CLIENT_GROUP_ABBR = "CGRP";
@@ -168,7 +171,7 @@ public class GPMSConstants {
 	// gooroom consrolcenter items
 	public static final String CTRL_ITEM_CTRLCENTERITEM_RULE = "CTRLCENTERITEM_RULE";
 	public static final String CTRL_ITEM_CTRLCENTERITEM_RULE_ABBR = "CTCI";
-	
+
 	// gooroom policy kit
 	public static final String CTRL_ITEM_POLICYKIT_RULE = "POLICYKIT_RULE";
 	public static final String CTRL_ITEM_POLICYKIT_RULE_ABBR = "POKI";

@@ -207,4 +207,36 @@ public class ClientLogServiceImpl implements ClientLogService {
 		return resultVO;
 	}
 
+	/**
+	 * delete user client use hist
+	 *
+	 * @param options HashMap<String, Object> option data
+	 * @return ResultPagingVO result object
+	 * @throws Exception
+	 */
+	public StatusVO deleteUserClientUseHist(HashMap<String, Object> options) throws Exception {
+		StatusVO statusVO = new StatusVO();
+
+		try {
+
+			long re = clientLogDAO.deleteUserClientUseHist(options);
+			if(re >= 0) {
+				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("common.result.delete"));
+			} else {
+				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.nodelete"));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in deleteUserClientUseHist : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (statusVO != null) {
+				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+			}
+		}
+
+		return statusVO;
+	}
 }

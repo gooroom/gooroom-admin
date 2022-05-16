@@ -162,7 +162,14 @@
 		</if>
 	</select>
 
-
+	<delete id="deleteUserClientUseHist" parameterType="hashmap">
+		DELETE FROM USER_CLIENT_USE_HIST
+		WHERE
+			USER_ID = #{userId} AND USE_CLIENT_ID IN
+			<foreach item="item" index="index" collection="clientIds" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+	</delete>
 
 </mapper>
 

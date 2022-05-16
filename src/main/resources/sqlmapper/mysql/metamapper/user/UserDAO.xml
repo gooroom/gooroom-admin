@@ -4,64 +4,66 @@
 <mapper namespace="UserDAO">
 
 	<resultMap type="userVO" id="userInfo">
-	
+
 		<result property="userId" column="USER_ID" />
 		<result property="userNm" column="USER_NM"/>
 		<result property="userEmail" column="USER_EMAIL"/>
+		<result property="userType" column="USER_TYPE"/>
 
 		<result property="deptCd" column="DEPT_CD" />
 		<result property="deptNm" column="DEPT_NM" />
 		<result property="deptExpireDate" column="DEPT_EXPIRE_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
-		
+
 		<result property="userPasswd" column="USER_PASSWD"/>
 		<result property="passwordExpireDate" column="PASSWD_EXPIRE_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 		<result property="isPasswordExpired" column="IS_PASSWORDEXPIRED"/>
-		
+
 		<result property="loginId" column="LOGIN_ID"/>
 		<result property="status" column="STATUS"/>
 		<result property="statusCd" column="STATUS_CD"/>
 
 		<result property="clientId" column="CLIENT_ID"/>
+		<result property="useClientCnt" column="USE_CLIENT_CNT"/>
 
 		<result property="firstLoginDt" column="FIRST_LOGIN_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 		<result property="lastLoginDt" column="LAST_LOGIN_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 
 		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 		<result property="modUserId" column="MOD_USER_ID"/>
-	
+
 		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 		<result property="regUserId" column="REG_USER_ID"/>
-		
+
 		<result property="expireDate" column="EXPIRE_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 		<result property="expireDateStr" column="EXPIRE_DT_STR"/>
-		
+
 		<result property="isExpired" column="IS_EXPIRED"/>
 		<result property="loginTrial" column="LOGIN_TRIAL"/>
-		
+
 		<result property="isUseExpire" column="IS_USEEXPIRE"/>
 		<result property="isUsePasswordExpire" column="IS_USEPASSWORDEXPIRE"/>
-		
+
 		<result property="pwdExpireRemainDate" column="PWDEXPIREREMAINDATE"/>
 		<result property="userExpireRemainDate" column="USEREXPIREREMAINDATE"/>
-		
-	
+
+
 	</resultMap>
 
 	<resultMap type="userAndRoleVO" id="userAndRoleInfo">
-	
+
 		<result property="userId" column="USER_ID" />
 		<result property="userNm" column="USER_NM"/>
 
 		<result property="roleId" column="ROLE_ID" />
 		<result property="roleNm" column="ROLE_NM" />
-		
+
 		<result property="status" column="STATUS"/>
-	
+
 		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 		<result property="regUserId" column="REG_USER_ID"/>
-	
+
 	</resultMap>
-	
+
 	<resultMap type="userRoleVO" id="userRoleInfo">
 		<result property="roleId" column="ROLE_ID" />
 		<result property="roleNm" column="ROLE_NM" />
@@ -82,32 +84,32 @@
 
 		<result property="comment" column="COMMENT"/>
 		<result property="userCount" column="USER_COUNT"/>
-		
+
 	</resultMap>
 
 	<resultMap type="userAndClientVO" id="userAndClientInfo">
-	
+
 		<result property="userId" column="USER_ID" />
 		<result property="userNm" column="USER_NM"/>
-		
+
 		<result property="lastLoginDt" column="LAST_LOGIN_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 
 		<result property="clientId" column="CLIENT_ID" />
 		<result property="clientNm" column="CLIENT_NM" />
-	
+
 	</resultMap>
 
 	<!-- 사용자리스트조회 -->
 	<select id="selectUserList" parameterType="String" resultMap="userInfo">
 
 		SELECT
-			UM.USER_ID, UM.USER_NM, UM.USER_PASSWD, UM.PASSWD_EXPIRE_DT, 
-			UM.USER_EMAIL, 
-			UM.LOGIN_ID, UM.STATUS, 
+			UM.USER_ID, UM.USER_NM, UM.USER_PASSWD, UM.PASSWD_EXPIRE_DT,
+			UM.USER_EMAIL, UM.USER_TYPE,
+			UM.LOGIN_ID, UM.STATUS,
 			UM.FIRST_LOGIN_DT, UM.LAST_LOGIN_DT,
 			UM.MOD_USER_ID, UM.MOD_DT,
 			UM.REG_USER_ID, UM.REG_DT,
-			UM.EXPIRE_DT, 
+			UM.EXPIRE_DT,
 			IF(DM.EXPIRE_DT &lt; CURDATE(), '1', IF(UM.EXPIRE_DT &lt; CURDATE(), '1', '0')) AS IS_EXPIRED,
 			UM.LOGIN_TRIAL,
       		DM.DEPT_CD, DM.DEPT_NM
@@ -120,7 +122,7 @@
 
 		SELECT
 			UM.USER_ID, UM.USER_NM, UM.USER_PASSWD, UM.PASSWD_EXPIRE_DT,
-			UM.USER_EMAIL,
+			UM.USER_EMAIL, UM.USER_TYPE,
 			UM.LOGIN_ID, UM.STATUS,
 			UM.FIRST_LOGIN_DT, UM.LAST_LOGIN_DT,
 			UM.MOD_USER_ID, UM.MOD_DT,
@@ -143,17 +145,17 @@
 	<!-- 사용자리스트조회 (Paged) -->
 	<select id="selectUserListPaged" parameterType="hashMap" resultMap="userInfo">
 
-		SELECT 
+		SELECT
 		  UM.USER_ID, UM.USER_NM, '' AS USER_PASSWD, UM.PASSWD_EXPIRE_DT,
-		  UM.USER_EMAIL, 
-		  UM.LOGIN_ID, UM.STATUS, UM.CLIENT_ID,  
+		  UM.USER_EMAIL, UM.USER_TYPE,
+		  UM.LOGIN_ID, UM.STATUS, UM.CLIENT_ID,
 		  '' AS DEPT_CD, '' AS DEPT_NM,
-		  UM.FIRST_LOGIN_DT, UM.LAST_LOGIN_DT, 
-		  UM.MOD_USER_ID, UM.MOD_DT, 
+		  UM.FIRST_LOGIN_DT, UM.LAST_LOGIN_DT,
+		  UM.MOD_USER_ID, UM.MOD_DT,
 		  UM.REG_USER_ID, UM.REG_DT,
-		  UM.EXPIRE_DT, 
+		  UM.EXPIRE_DT,
 		  IF(DM.EXPIRE_DT &lt; CURDATE(), '1', IF(UM.EXPIRE_DT &lt; CURDATE(), '1', '0')) AS IS_EXPIRED,
-		  UM.LOGIN_TRIAL 
+		  UM.LOGIN_TRIAL
 		FROM USER_MSTR UM LEFT JOIN DEPT_MSTR DM ON UM.DEPT_CD = DM.DEPT_CD
 		<where>
 			<if test="searchKey != null and searchKey != ''">
@@ -169,13 +171,13 @@
 	</select>
 
 	<select id="selectUserListTotalCount" parameterType="hashMap" resultType="long">
-		SELECT COUNT(UM.USER_ID) AS CNT 
+		SELECT COUNT(UM.USER_ID) AS CNT
 		FROM USER_MSTR UM
 	</select>
 
 	<select id="selectUserListFilteredCount" parameterType="hashMap" resultType="long">
-		SELECT COUNT(UM.USER_ID) AS CNT 
-		FROM USER_MSTR UM 
+		SELECT COUNT(UM.USER_ID) AS CNT
+		FROM USER_MSTR UM
 		<where>
 			<if test="searchKey != null and searchKey != ''">
 				UM.USER_NM LIKE CONCAT('%', #{searchKey}, '%') OR UM.USER_ID LIKE CONCAT('%', #{searchKey}, '%')
@@ -188,7 +190,7 @@
 
 	<!-- 사용자 아이디 중복 확인 -->
 	<select id="isExistUserId" parameterType="String" resultType="boolean">
-	
+
 		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END ISEXIST FROM USER_MSTR WHERE USER_ID = #{userId}
 
 	</select>
@@ -196,18 +198,19 @@
 	<!-- 사용자 신규 생성 -->
 	<insert id="insertUser" parameterType="userVO">
 		INSERT INTO USER_MSTR
-			(USER_ID, USER_NM, LOGIN_ID, STATUS, USER_PASSWD, PASSWD_EXPIRE_DT, USER_EMAIL, 
-			MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT, 
-			USER_PASSWD_STATUS, DEPT_CD, LAST_PASSWD_CH_DT, EXPIRE_DT, LOGIN_TRIAL) 
-		VALUES 
+			(USER_ID, USER_NM, LOGIN_ID, STATUS, USER_PASSWD, PASSWD_EXPIRE_DT, USER_EMAIL, USER_TYPE,
+			MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT,
+			USER_PASSWD_STATUS, DEPT_CD, LAST_PASSWD_CH_DT, EXPIRE_DT, LOGIN_TRIAL)
+		VALUES
 			(
-			#{userId}, 
-			#{userNm}, 
+			#{userId},
+			#{userNm},
 			#{userId},
 			#{status},
 			SHA2(#{userPasswd}, 256),
 			#{passwordExpireDate},
-			#{userEmail}, 
+			#{userEmail},
+			#{userType},
 			#{modUserId}, now(),
 			#{regUserId}, now(),
 			#{passwordStatus},
@@ -219,15 +222,15 @@
 
 	<!-- 사용자 정보 조회 -->
 	<select id="selectUserData" parameterType="String" resultMap="userInfo">
-	
-		SELECT UM.USER_ID, UM.USER_NM, UM.USER_PASSWD, UM.USER_EMAIL, UM.DEPT_CD,
-			UM.PASSWD_EXPIRE_DT, IF(UM.PASSWD_EXPIRE_DT &lt; CURDATE(), '1', '0') AS IS_PASSWORDEXPIRED, 
-			UM.EXPIRE_DT, 
+
+		SELECT UM.USER_ID, UM.USER_NM, UM.USER_PASSWD, UM.USER_EMAIL, UM.USER_TYPE, UM.DEPT_CD,
+			UM.PASSWD_EXPIRE_DT, IF(UM.PASSWD_EXPIRE_DT &lt; CURDATE(), '1', '0') AS IS_PASSWORDEXPIRED,
+			UM.EXPIRE_DT,
 			IF(DM.EXPIRE_DT &lt; CURDATE(), '1', IF(UM.EXPIRE_DT &lt; CURDATE(), '1', '0')) AS IS_EXPIRED,
 			IF(ISNULL(UM.PASSWD_EXPIRE_DT), "0", "1") AS IS_USEPASSWORDEXPIRE,
 			IF(ISNULL(UM.EXPIRE_DT), "0", "1") AS IS_USEEXPIRE,
 			UM.LOGIN_TRIAL, UM.USER_PASSWD
-		FROM USER_MSTR UM LEFT JOIN DEPT_MSTR DM ON UM.DEPT_CD = DM.DEPT_CD 
+		FROM USER_MSTR UM LEFT JOIN DEPT_MSTR DM ON UM.DEPT_CD = DM.DEPT_CD
 		WHERE UM.USER_ID = #{userId}
 
 	</select>
@@ -243,7 +246,8 @@
     		USER_PASSWD = SHA2(#{userPasswd}, 256),
     		USER_PASSWD_STATUS = #{passwordStatus},
   			</if>
-  			USER_EMAIL = #{userEmail}, 
+  			USER_EMAIL = #{userEmail},
+			USER_TYPE = #{userType},
 			<if test="loginTrial != null and loginTrial != ''">
 			LOGIN_TRIAL = #{loginTrial},
 			</if>
@@ -275,7 +279,7 @@
 			DEPT_CD = '',
 			MOD_USER_ID = #{modUserId},
 			MOD_DT = now()
-		WHERE DEPT_CD IN 
+		WHERE DEPT_CD IN
 		<foreach item="item" index="index" collection="deptCds" open="(" separator="," close=")">
 			#{item}
 		</foreach>
@@ -293,19 +297,19 @@
 
 	<insert id="insertOrUpdateConfigWithUser" parameterType="hashmap">
 		INSERT INTO GR_USER_RULE_CONF
-			(USER_ID, CONF_ID, CONF_TP, REG_DT, REG_USER_ID) 
+			(USER_ID, CONF_ID, CONF_TP, REG_DT, REG_USER_ID)
 		VALUES (#{userId}, #{configId}, #{configTp}, now(), #{regUserId})
 		ON DUPLICATE KEY UPDATE CONF_ID=#{configId}
 	</insert>
-	
+
 	<delete id="deleteConfigWithUser" parameterType="String">
 		DELETE FROM GR_USER_RULE_CONF WHERE USER_ID=#{userId} AND CONF_TP=#{configTp};
 	</delete>
-	
+
 	<!-- 사용자의 로그인 시도횟수 초기화 -->
 	<update id="updateUserLoginTrialCount" parameterType="userVO">
-		UPDATE USER_MSTR SET LOGIN_TRIAL=(SELECT TRIAL_COUNT FROM SITE_MSTR LIMIT 1), 
-		MOD_USER_ID=#{modUserId}, MOD_DT=now() 
+		UPDATE USER_MSTR SET LOGIN_TRIAL=(SELECT TRIAL_COUNT FROM SITE_MSTR LIMIT 1),
+		MOD_USER_ID=#{modUserId}, MOD_DT=now()
 		WHERE USER_ID=#{userId}
 	</update>
 
@@ -318,7 +322,7 @@
 	<update id="deleteUserDataById" parameterType="hashmap">
 		UPDATE USER_MSTR SET STATUS=#{status}, MOD_USER_ID=#{modUserId}, MOD_DT=now() WHERE USER_ID=#{userId}
 	</update>
-	
+
 	<delete id="deleteUserFromRule" parameterType="String">
 		DELETE FROM GR_USER_RULE_CONF WHERE USER_ID = #{userId};
 	</delete>
@@ -326,16 +330,16 @@
 	<delete id="deleteUserForNoti" parameterType="String">
 		DELETE FROM NOTICE_PUBLISH_TARGET WHERE TARGET_TYPE = '0' AND TARGET_ID = #{userId};
 	</delete>
-	
+
 	<!-- HISTORY  -->
 	<insert id="insertUserHist" parameterType="hashmap">
 		INSERT INTO USER_MSTR_HIST
-			(HIST_SEQ, CHG_TP, USER_ID, USER_NM, USER_PASSWD, LOGIN_ID, STATUS, FIRST_LOGIN_DT, LAST_LOGIN_DT, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT, 
-			NFC_SECRET_DATA, LAST_PASSWD_CH_DT, USER_PASSWD_STATUS, GRADE, SORT_SORD, DEPT_CD, CLIENT_ID, PASSWD_EXPIRE_DT, EXPIRE_DT, 
-			LOGIN_TRIAL, USER_EMAIL, HIST_REG_DT, HIST_USER_ID)
-		SELECT (SELECT GRNEXTVAL('USERMSTRHIST_SEQ')),  #{chgTp} AS 'CHG_TP', USER_ID, USER_NM, USER_PASSWD, LOGIN_ID, STATUS, FIRST_LOGIN_DT, LAST_LOGIN_DT, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT, 
-			NFC_SECRET_DATA, LAST_PASSWD_CH_DT, USER_PASSWD_STATUS, GRADE, SORT_SORD, DEPT_CD, CLIENT_ID, PASSWD_EXPIRE_DT, EXPIRE_DT, 
-			LOGIN_TRIAL, USER_EMAIL, now(), #{regUserId} AS HIST_USER_ID 
+			(HIST_SEQ, CHG_TP, USER_ID, USER_NM, USER_PASSWD, LOGIN_ID, STATUS, FIRST_LOGIN_DT, LAST_LOGIN_DT, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT,
+			NFC_SECRET_DATA, LAST_PASSWD_CH_DT, USER_PASSWD_STATUS, GRADE, SORT_SORD, DEPT_CD, CLIENT_ID, PASSWD_EXPIRE_DT, EXPIRE_DT,
+			LOGIN_TRIAL, USER_EMAIL, USER_TYPE, HIST_REG_DT, HIST_USER_ID)
+		SELECT (SELECT GRNEXTVAL('USERMSTRHIST_SEQ')),  #{chgTp} AS 'CHG_TP', USER_ID, USER_NM, USER_PASSWD, LOGIN_ID, STATUS, FIRST_LOGIN_DT, LAST_LOGIN_DT, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT,
+			NFC_SECRET_DATA, LAST_PASSWD_CH_DT, USER_PASSWD_STATUS, GRADE, SORT_SORD, DEPT_CD, CLIENT_ID, PASSWD_EXPIRE_DT, EXPIRE_DT,
+			LOGIN_TRIAL, USER_EMAIL, now(), #{regUserId} AS HIST_USER_ID
 		FROM USER_MSTR WHERE USER_ID=#{userId};
 	</insert>
 
@@ -360,20 +364,20 @@
 	</select>
 
 	<select id="selectUserListInDept" parameterType="hashmap" resultMap="userInfo">
-		SELECT 
-		  UM.USER_ID, UM.USER_NM, UM.USER_PASSWD, UM.USER_EMAIL,
-		  UM.LOGIN_ID, UM.STATUS, 
-		  UM.FIRST_LOGIN_DT, UM.LAST_LOGIN_DT, 
-		  UM.MOD_USER_ID, UM.MOD_DT, 
+		SELECT
+		  UM.USER_ID, UM.USER_NM, UM.USER_PASSWD, UM.USER_EMAIL, UM.USER_TYPE,
+		  UM.LOGIN_ID, UM.STATUS,
+		  UM.FIRST_LOGIN_DT, UM.LAST_LOGIN_DT,
+		  UM.MOD_USER_ID, UM.MOD_DT,
 		  UM.REG_USER_ID, UM.REG_DT,
-		  UM.PASSWD_EXPIRE_DT, IF(UM.PASSWD_EXPIRE_DT &lt; CURDATE(), '1', '0') AS IS_PASSWORDEXPIRED, 
-		  UM.EXPIRE_DT, 
+		  UM.PASSWD_EXPIRE_DT, IF(UM.PASSWD_EXPIRE_DT &lt; CURDATE(), '1', '0') AS IS_PASSWORDEXPIRED,
+		  UM.EXPIRE_DT,
 		  IF(DM.EXPIRE_DT &lt; CURDATE(), '1', IF(UM.EXPIRE_DT &lt; CURDATE(), '1', '0')) AS IS_EXPIRED,
 		  IF(ISNULL(UM.PASSWD_EXPIRE_DT), "0", "1") AS IS_USEPASSWORDEXPIRE,
 		  IF(ISNULL(UM.EXPIRE_DT), "0", "1") AS IS_USEEXPIRE,
 		  UM.LOGIN_TRIAL
 		FROM USER_MSTR UM LEFT JOIN DEPT_MSTR DM ON UM.DEPT_CD = DM.DEPT_CD
-		WHERE UM.DEPT_CD IN 
+		WHERE UM.DEPT_CD IN
 		<foreach item="item" index="index" collection="deptCds" open="(" separator="," close=")">
 			#{item}
 		</foreach>
@@ -381,27 +385,28 @@
 
 	<!-- 조직 내에 사용자리스트 조회 (Paged) -->
 	<select id="selectUserListPagedInDept" parameterType="hashMap" resultMap="userInfo">
-		SELECT 
-		  UM.USER_ID, UM.USER_NM, '' AS USER_PASSWD, UM.USER_EMAIL,
+		SELECT
+		  UM.USER_ID, UM.USER_NM, '' AS USER_PASSWD, UM.USER_EMAIL, UM.USER_TYPE,
 		  UM.LOGIN_ID, UM.STATUS, UM.STATUS AS STATUS_CD, UM.CLIENT_ID,
-		  DM.DEPT_CD, DM.DEPT_NM, 
-		  UM.FIRST_LOGIN_DT, UM.LAST_LOGIN_DT, 
-		  UM.MOD_USER_ID, UM.MOD_DT, 
+		  DM.DEPT_CD, DM.DEPT_NM,
+		  UM.FIRST_LOGIN_DT, UM.LAST_LOGIN_DT,
+		  UM.MOD_USER_ID, UM.MOD_DT,
 		  UM.REG_USER_ID, UM.REG_DT,
 		  UM.PASSWD_EXPIRE_DT, IF(UM.PASSWD_EXPIRE_DT &lt; CURDATE(), '1', '0') AS IS_PASSWORDEXPIRED,
-		  UM.EXPIRE_DT, 
+		  UM.EXPIRE_DT,
 		  IF(DM.EXPIRE_DT &lt; CURDATE(), '1', IF(UM.EXPIRE_DT &lt; CURDATE(), '1', '0')) AS IS_EXPIRED,
 		  IF(ISNULL(UM.PASSWD_EXPIRE_DT), "0", "1") AS IS_USEPASSWORDEXPIRE,
 		  IF(ISNULL(UM.EXPIRE_DT), "0", "1") AS IS_USEEXPIRE,
 		  DATEDIFF(UM.EXPIRE_DT, now()) AS USEREXPIREREMAINDATE,
 		  DATEDIFF(UM.PASSWD_EXPIRE_DT, now()) AS PWDEXPIREREMAINDATE,
+		  (SELECT COUNT(UCUH.USE_CLIENT_ID) FROM USER_CLIENT_USE_HIST UCUH WHERE UM.USER_ID = UCUH.user_id) AS USE_CLIENT_CNT,
 		  UM.LOGIN_TRIAL
 		FROM USER_MSTR UM
             LEFT JOIN DEPT_MSTR DM ON UM.DEPT_CD = DM.DEPT_CD
 		<where>
 			<choose>
     			<when test='deptCd != null and deptCd != ""'>
-					UM.DEPT_CD IN 
+					UM.DEPT_CD IN
 					<foreach item="item" index="index" collection="deptCd" open="(" separator="," close=")">
 	    				#{item}
 	    			</foreach>
@@ -434,12 +439,12 @@
 	</select>
 
 	<select id="selectUserListInDeptTotalCount" parameterType="hashMap" resultType="long">
-		SELECT COUNT(UM.USER_ID) AS CNT 
+		SELECT COUNT(UM.USER_ID) AS CNT
 		FROM USER_MSTR UM
 		<where>
 			<choose>
     			<when test='deptCd != null and deptCd != ""'>
-					UM.DEPT_CD IN 
+					UM.DEPT_CD IN
 					<foreach item="item" index="index" collection="deptCd" open="(" separator="," close=")">
 	    				#{item}
 	    			</foreach>
@@ -464,12 +469,12 @@
 	</select>
 
 	<select id="selectUserListInDeptFilteredCount" parameterType="hashMap" resultType="long">
-		SELECT COUNT(UM.USER_ID) AS CNT 
+		SELECT COUNT(UM.USER_ID) AS CNT
 		FROM USER_MSTR UM
 		<where>
 			<choose>
     			<when test='deptCd != null and deptCd != ""'>
-					UM.DEPT_CD IN 
+					UM.DEPT_CD IN
 					<foreach item="item" index="index" collection="deptCd" open="(" separator="," close=")">
 	    				#{item}
 	    			</foreach>
@@ -498,7 +503,7 @@
 			</if>
 		</where>
 	</select>
-	
+
 	<select id="selectUserListInOnline" resultMap="userAndClientInfo">
 		SELECT CA.ON_USER_ID AS USER_ID, UM.USER_NM, UM.USER_EMAIL, UM.LAST_LOGIN_DT, CM.CLIENT_ID, CM.CLIENT_NM
 		FROM CLIENT_MSTR CM
@@ -507,76 +512,76 @@
 		WHERE     CM.STATUS_CD = 'STAT010'
 			AND CAST(COALESCE(TIMESTAMPDIFF(SECOND,CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; CA.POLLING_TIME+10
 			AND CA.ON_USER_ID IS NOT NULL
-			AND CA.ON_USER_ID != '-'	
-			AND LEFT(CA.ON_USER_ID, 1) != '+'	
+			AND CA.ON_USER_ID != '-'
+			AND LEFT(CA.ON_USER_ID, 1) != '+'
 	</select>
-	
-	
-	
+
+
+
 	<!-- 사용자 아이디를 이용한 사용자롤 아이디, 정책 아이디 정보 -->
 	<select id="selectUserConfIdByUserId" parameterType="String" resultMap="userRoleInfo">
 		SELECT USER_ID,
-		  GROUP_CONCAT(IF(CONF_TP = 'BROWSERRULE', CONF_ID, NULL)) AS BROWSER_RULE_ID, 
-		  GROUP_CONCAT(IF(CONF_TP = 'SECURITYRULE', CONF_ID, NULL)) AS SECURITY_RULE_ID, 
-		  GROUP_CONCAT(IF(CONF_TP = 'FILTEREDSWRULE', CONF_ID, NULL)) AS FILTEREDSOFTWARE_RULE_ID,
-		  GROUP_CONCAT(IF(CONF_TP = 'CTRLCENTERITEMRULE', CONF_ID, NULL)) AS CTRLCENTERITEM_RULE_ID, 
-		  GROUP_CONCAT(IF(CONF_TP = 'POLICYKITRULE', CONF_ID, NULL)) AS POLICYKIT_RULE_ID, 
-		  GROUP_CONCAT(IF(CONF_TP = 'MEDIARULE', CONF_ID, NULL)) AS MEDIA_RULE_ID 
-		FROM GR_USER_RULE_CONF WHERE USER_ID=#{userId}
-	</select>
-	
-	<!-- 사용자의 부서코드를 이용한 사용자롤 아이디, 정책 아이디 정보 -->
-	<select id="selectUserConfIdByDeptCdFromUserId" parameterType="String" resultMap="userRoleInfo">
-		SELECT DEPT_CD,
-		  GROUP_CONCAT(IF(CONF_TP = 'BROWSERRULE', CONF_ID, NULL)) AS BROWSER_RULE_ID, 
+		  GROUP_CONCAT(IF(CONF_TP = 'BROWSERRULE', CONF_ID, NULL)) AS BROWSER_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'SECURITYRULE', CONF_ID, NULL)) AS SECURITY_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'FILTEREDSWRULE', CONF_ID, NULL)) AS FILTEREDSOFTWARE_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'CTRLCENTERITEMRULE', CONF_ID, NULL)) AS CTRLCENTERITEM_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'POLICYKITRULE', CONF_ID, NULL)) AS POLICYKIT_RULE_ID,
-		  GROUP_CONCAT(IF(CONF_TP = 'MEDIARULE', CONF_ID, NULL)) AS MEDIA_RULE_ID 
+		  GROUP_CONCAT(IF(CONF_TP = 'MEDIARULE', CONF_ID, NULL)) AS MEDIA_RULE_ID
+		FROM GR_USER_RULE_CONF WHERE USER_ID=#{userId}
+	</select>
+
+	<!-- 사용자의 부서코드를 이용한 사용자롤 아이디, 정책 아이디 정보 -->
+	<select id="selectUserConfIdByDeptCdFromUserId" parameterType="String" resultMap="userRoleInfo">
+		SELECT DEPT_CD,
+		  GROUP_CONCAT(IF(CONF_TP = 'BROWSERRULE', CONF_ID, NULL)) AS BROWSER_RULE_ID,
+		  GROUP_CONCAT(IF(CONF_TP = 'SECURITYRULE', CONF_ID, NULL)) AS SECURITY_RULE_ID,
+		  GROUP_CONCAT(IF(CONF_TP = 'FILTEREDSWRULE', CONF_ID, NULL)) AS FILTEREDSOFTWARE_RULE_ID,
+		  GROUP_CONCAT(IF(CONF_TP = 'CTRLCENTERITEMRULE', CONF_ID, NULL)) AS CTRLCENTERITEM_RULE_ID,
+		  GROUP_CONCAT(IF(CONF_TP = 'POLICYKITRULE', CONF_ID, NULL)) AS POLICYKIT_RULE_ID,
+		  GROUP_CONCAT(IF(CONF_TP = 'MEDIARULE', CONF_ID, NULL)) AS MEDIA_RULE_ID
 		FROM GR_DEPT_RULE_CONF WHERE DEPT_CD=(SELECT DEPT_CD FROM USER_MSTR WHERE USER_ID=#{userId})
 	</select>
 
 	<!-- 부서코드를 이용한 사용자롤 아이디, 정책 아이디 정보 -->
 	<select id="selectUserConfIdByDeptCd" parameterType="String" resultMap="userRoleInfo">
 		SELECT DEPT_CD,
-		  GROUP_CONCAT(IF(CONF_TP = 'BROWSERRULE', CONF_ID, NULL)) AS BROWSER_RULE_ID, 
+		  GROUP_CONCAT(IF(CONF_TP = 'BROWSERRULE', CONF_ID, NULL)) AS BROWSER_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'SECURITYRULE', CONF_ID, NULL)) AS SECURITY_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'FILTEREDSWRULE', CONF_ID, NULL)) AS FILTEREDSOFTWARE_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'CTRLCENTERITEMRULE', CONF_ID, NULL)) AS CTRLCENTERITEM_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'POLICYKITRULE', CONF_ID, NULL)) AS POLICYKIT_RULE_ID,
-		  GROUP_CONCAT(IF(CONF_TP = 'MEDIARULE', CONF_ID, NULL)) AS MEDIA_RULE_ID 
+		  GROUP_CONCAT(IF(CONF_TP = 'MEDIARULE', CONF_ID, NULL)) AS MEDIA_RULE_ID
 		FROM GR_DEPT_RULE_CONF WHERE DEPT_CD=#{deptCd}
 	</select>
 
 	<!-- 단말 그룹 아이디를 이용한 사용자롤 아이디, 정책 아이디 정보 -->
 	<select id="selectUserConfIdByGroupId" parameterType="String" resultMap="userRoleInfo">
 		SELECT GRP_ID,
-		  GROUP_CONCAT(IF(CONF_TP = 'BROWSERRULE', CONF_ID, NULL)) AS BROWSER_RULE_ID, 
+		  GROUP_CONCAT(IF(CONF_TP = 'BROWSERRULE', CONF_ID, NULL)) AS BROWSER_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'SECURITYRULE', CONF_ID, NULL)) AS SECURITY_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'FILTEREDSWRULE', CONF_ID, NULL)) AS FILTEREDSOFTWARE_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'CTRLCENTERITEMRULE', CONF_ID, NULL)) AS CTRLCENTERITEM_RULE_ID,
 		  GROUP_CONCAT(IF(CONF_TP = 'POLICYKITRULE', CONF_ID, NULL)) AS POLICYKIT_RULE_ID,
-		  GROUP_CONCAT(IF(CONF_TP = 'MEDIARULE', CONF_ID, NULL)) AS MEDIA_RULE_ID 
+		  GROUP_CONCAT(IF(CONF_TP = 'MEDIARULE', CONF_ID, NULL)) AS MEDIA_RULE_ID
 		FROM GR_GROUP_RULE_CONF WHERE GRP_ID=#{groupId}
 	</select>
 
 	<update id="updateUserWithDept" parameterType="hashmap">
 		UPDATE USER_MSTR SET
-			DEPT_CD = #{deptCd}, 
-			MOD_USER_ID = #{regUserId}, 
-			MOD_DT = now() 
+			DEPT_CD = #{deptCd},
+			MOD_USER_ID = #{regUserId},
+			MOD_DT = now()
 		WHERE USER_ID = #{userId}
 	</update>
-	
+
 	<!-- 파일로 작업 -->
-	
+
 	<insert id="insertUserRawData" parameterType="userVO">
 		INSERT INTO USER_MSTR
-			(USER_ID, USER_NM, USER_PASSWD, LOGIN_ID, STATUS, 
-			MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT, 
-			USER_PASSWD_STATUS, GRADE, SORT_SORD, 
-			DEPT_CD, EXPIRE_DT, PASSWD_EXPIRE_DT, LOGIN_TRIAL, USER_EMAIL)
+			(USER_ID, USER_NM, USER_PASSWD, LOGIN_ID, STATUS,
+			MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT,
+			USER_PASSWD_STATUS, GRADE, SORT_SORD,
+			DEPT_CD, EXPIRE_DT, PASSWD_EXPIRE_DT, LOGIN_TRIAL, USER_EMAIL, USER_TYPE)
 		VALUES (#{userId}, #{userNm},
 		<choose>
 			<when test='userPasswd != null and userPasswd != "" and userPasswd != "1"'>
@@ -586,12 +591,12 @@
 				SHA2(SHA2(CONCAT(#{userId}, SHA2(#{userPasswd}, 256)), 256), 256),
 			</otherwise>
 		</choose>
-			#{loginId}, #{status}, 
-			#{regUserId}, now(), #{regUserId}, now(), 
-			#{passwordStatus}, #{grade}, #{sortOrder}, 
+			#{loginId}, #{status},
+			#{regUserId}, now(), #{regUserId}, now(),
+			#{passwordStatus}, #{grade}, #{sortOrder},
 			#{deptCd},
 			#{expireDate}, #{passwordExpireDate},
-			#{loginTrial}, #{userEmail})
+			#{loginTrial}, #{userEmail}, #{userType})
 	</insert>
 
 	<!-- 사용자 정보 전체 삭제 -->

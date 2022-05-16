@@ -6,6 +6,7 @@
 	<resultMap type="clientVO" id="clientInfo">
 	
 		<result property="clientId" column="CLIENT_ID" />
+		<result property="simpleClientId" column="SIMPLE_CLIENT_ID" />
 		<result property="clientName" column="CLIENT_NM"/>
 		
 		<result property="keyInfo" column="CERT_INFO"/>
@@ -29,6 +30,8 @@
 		<result property="totalCnt" column="TOTAL_CNT"/>
 		<result property="updateTargetCnt" column="UPDATE_TARGET_CNT"/>
 		<result property="updateMainOsCnt" column="UPDATE_MAINOS_CNT"/>
+
+		<result property="userId" column="USER_ID" />
 
 		<result property="isOn" column="ISON"/>
 		<result property="loginId" column="LOGIN_ID"/>
@@ -182,7 +185,7 @@
 
 	<select id="selectClientList" parameterType="hashMap" resultMap="clientInfo">
 		SELECT 
-			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT, T.REG_USER_ID, T.MOD_USER_ID, STR_TO_DATE(T.expiration_ymd, '%Y%m%d') EXPIRATION_YMD, 
+			T.CLIENT_ID, T.SIMPLE_CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT, T.REG_USER_ID, T.MOD_USER_ID, STR_TO_DATE(T.expiration_ymd, '%Y%m%d') EXPIRATION_YMD,
 			TX.IP AS CLIENT_IP, TX.STRG_SIZE AS STRG_SIZE, TX.STRG_USE AS STRG_USE, IFNULL(TX.SAFE_SCORE, 0) AS SAFE_SCORE,
 			CGM.GRP_ID AS GROUP_ID, CGM.GRP_NM AS GROUP_NAME, 
 			IFNULL(CPS.TOTAL_CNT, 0) AS TOTAL_CNT, 
@@ -207,7 +210,15 @@
 				WHEN CA.ON_USER_ID = '-' THEN SUBSTRING(CA.LOCAL_USER_ID, 2)
         		ELSE CA.ON_USER_ID
       		END AS LOGIN_ID,
-			CA.ON_CHECK_DT LAST_LOGIN_TIME
+			UCUH.USER_ID,
+			<choose>
+				<when test='userId != null and userId != ""'>
+					UCUH.ON_LAST_CHECK_DT LAST_LOGIN_TIME
+				</when>
+				<otherwise>
+					CA.ON_CHECK_DT LAST_LOGIN_TIME
+				</otherwise>
+			</choose>
 		FROM CLIENT_MSTR T 
 			LEFT JOIN CLIENT_EXT TX ON T.CLIENT_ID = TX.CLIENT_ID
 			LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
@@ -215,6 +226,7 @@
 			LEFT JOIN CLIENT_PACKAGE_STATE CPS ON T.CLIENT_ID = CPS.CLIENT_ID
 			LEFT JOIN CLIENT_SECURITY_STATE CSS ON T.CLIENT_ID = CSS.CLIENT_ID
 			LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+		    LEFT JOIN USER_CLIENT_USE_HIST UCUH ON T.CLIENT_ID = UCUH.USE_CLIENT_ID
 			LEFT JOIN GR_GROUP_RULE_CONF GGRC ON GGRC.GRP_ID=CGM.GRP_ID AND GGRC.CONF_TP='CLIENTCONF'
 			LEFT JOIN CTRL_ITEM_PROP CIP2 ON CIP2.OBJ_ID=IFNULL(GGRC.CONF_ID, 'CLCFDEFAULT') AND CIP2.PROP_NM='USEHOMERESET'
 			LEFT JOIN CTRL_ITEM_PROP CIP3 ON CIP3.OBJ_ID=IFNULL(GGRC.CONF_ID, 'CLCFDEFAULT') AND CIP3.PROP_NM='ROOTALLOW'
@@ -277,6 +289,9 @@
       				AND (CSS.BOOT_PROTECTOR_CNT = 0 AND CSS.EXE_PROTECTOR_CNT = 0 AND CSS.OS_PROTECTOR_CNT = 0 AND CSS.MEDIA_PROTECTOR_CNT = 0)
     			</when>
 			</choose>
+			<if test='userId != null and userId != ""'>
+				AND UCUH.USER_ID = #{userId}
+			</if>
 		</where>
 		ORDER BY ${paramOrderColumn} ${paramOrderDir}
 		LIMIT #{paramStart}, #{paramLength} 
@@ -306,6 +321,7 @@
 			LEFT JOIN CLIENT_GRP_MSTR CGM ON T.GRP_ID = CGM.GRP_ID
 			LEFT JOIN CLIENT_SECURITY_STATE CSS ON T.CLIENT_ID = CSS.CLIENT_ID
 			LEFT JOIN CLIENT_ACCESS CA ON T.CLIENT_ID = CA.CLIENT_ID
+			LEFT JOIN USER_CLIENT_USE_HIST UCUH ON T.CLIENT_ID = UCUH.USE_CLIENT_ID
 		<where>
 			<if test="isOnline != null and isOnline != ''">
 				CAST(COALESCE(TIMESTAMPDIFF(SECOND, CA.CHECK_DT,NOW()), '360') AS UNSIGNED) &lt; (CA.POLLING_TIME+10) AND CA.CLIENT_ID IS NOT NULL
@@ -363,6 +379,9 @@
       				AND (CSS.BOOT_PROTECTOR_CNT = 0 AND CSS.EXE_PROTECTOR_CNT = 0 AND CSS.OS_PROTECTOR_CNT = 0 AND CSS.MEDIA_PROTECTOR_CNT = 0)
     			</when>
 			</choose>
+			<if test='userId != null and userId != ""'>
+				AND UCUH.USER_ID = #{userId}
+			</if>
 		</where>
 
 	</select>
@@ -372,7 +391,7 @@
 	<select id="selectClientListForGroups" parameterType="hashMap" resultMap="clientInfo">
 	
 		SELECT 
-			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT,
+			T.CLIENT_ID, T.SIMPLE_CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT,
 			CGM.GRP_NM AS GROUP_NAME,
 			CGM.GRP_ID AS GROUP_ID,
 			IFNULL(CPS.TOTAL_CNT, 0) AS TOTAL_CNT,
@@ -401,7 +420,7 @@
 	<select id="selectClientListForAddingGroup" parameterType="String" resultMap="clientInfo">
 	
 		SELECT 
-			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT, 
+			T.CLIENT_ID, T.SIMPLE_CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT,
 			T.REG_USER_ID, T.MOD_USER_ID, 
 			TX.IP AS CLIENT_IP, T.GRP_ID
 		FROM CLIENT_MSTR T 
@@ -412,7 +431,7 @@
 
 	<select id="selectClientInfo" parameterType="String" resultMap="clientInfo">
 
-		SELECT T.CLIENT_ID, T.CLIENT_NM, T.CERT_INFO, T.EXPIRATION_YMD, 
+		SELECT T.CLIENT_ID, T.SIMPLE_CLIENT_ID, T.CLIENT_NM, T.CERT_INFO, T.EXPIRATION_YMD,
 			T.STATUS_CD, T.REG_DT, T.MOD_DT, T.REG_USER_ID, T.MOD_USER_ID, IFNULL(T.COMMENT, '') COMMENT,
 			TX.PROD_NO,
 			TX.IP AS CLIENT_IP,
@@ -658,7 +677,7 @@
 	<select id="clientListAll" resultMap="clientInfo">
 	
 	    SELECT 
-			T.CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT, 
+			T.CLIENT_ID, T.SIMPLE_CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT,
 			T.REG_USER_ID, T.MOD_USER_ID,
 			STR_TO_DATE(T.expiration_ymd, '%Y%m%d') EXPIRATION_YMD 
 		FROM CLIENT_MSTR T 

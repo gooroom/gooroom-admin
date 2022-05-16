@@ -116,10 +116,10 @@ public class SiteMngDAO extends SqlSessionMetaDAO {
 	 * @return SiteMngVO List
 	 * @throws SQLException
 	 */
-	public SiteMngVO selectSiteMngData(String siteId) throws SQLException {
+	public SiteMngVO selectSiteMngData() throws SQLException {
 		SiteMngVO re = null;
 		try {
-			re = sqlSessionMeta.selectOne("selectSiteMngData", siteId);
+			re = sqlSessionMeta.selectOne("selectSiteMngData");
 		} catch (Exception ex) {
 			logger.error("error in selectSiteMngData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());

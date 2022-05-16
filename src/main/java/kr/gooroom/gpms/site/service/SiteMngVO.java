@@ -30,6 +30,7 @@ public class SiteMngVO implements Serializable {
 
 	private String siteId;
 	private String siteNm;
+	private String siteRegCd;
 
 	private String comment;
 	private String status;
@@ -59,6 +60,14 @@ public class SiteMngVO implements Serializable {
 
 	public void setSiteNm(String siteNm) {
 		this.siteNm = siteNm;
+	}
+
+	public String getSiteRegCd() {
+		return siteRegCd;
+	}
+
+	public void setSiteRegCd(String siteRegCd) {
+		this.siteRegCd = siteRegCd;
 	}
 
 	public String getComment() {

@@ -33,6 +33,7 @@ public class UserVO implements Serializable {
 	private String userId;
 	private String userNm;
 	private String userEmail;
+	private String userType;
 
 	private String userPasswd;
 	private String isChangePasswd;
@@ -56,6 +57,7 @@ public class UserVO implements Serializable {
 	private String desktopConfId;
 
 	private String clientId;
+	private String useClientCnt;
 
 	private Date modDate;
 	private String modUserId;
@@ -136,6 +138,14 @@ public class UserVO implements Serializable {
 
 	public void setUserEmail(String userEmail) {
 		this.userEmail = userEmail;
+	}
+
+	public String getUserType() {
+		return userType;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
 	}
 
 	public String getUserPasswd() {
@@ -272,6 +282,14 @@ public class UserVO implements Serializable {
 
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
+	}
+
+	public String getUseClientCnt() {
+		return useClientCnt;
+	}
+
+	public void setUseClientCnt(String useClientCnt) {
+		this.useClientCnt = useClientCnt;
 	}
 
 	public Date getModDate() {
