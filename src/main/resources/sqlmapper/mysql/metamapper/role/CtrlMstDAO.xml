@@ -57,6 +57,13 @@
 	
 	</resultMap>
 
+	<resultMap type="ActivateGroupViewVO" id="activateGroupViewInfo">
+		<result property="gubun" column="GUBUN" />
+		<result property="deptCd" column="DEPT_CD"/>
+		<result property="deptNm" column="DEPT_NM"/>
+		<result property="regDt" column="REG_DT"/>
+	</resultMap>
+
 	<resultMap type="clientGroupVO" id="clientGroupInfo">
 		<result property="grpId" column="GRP_ID" />
 		<result property="grpNm" column="GRP_NM" />
@@ -664,6 +671,30 @@
 		        ON PP.OBJ_ID = SS.CONF_ID
 	</select>
 
+	<select id="selectActivateGroupListPaged" parameterType="hashMap" resultMap="activateGroupViewInfo">
+		SELECT GUBUN, DEPT_CD, DEPT_NM, REG_DT
+		FROM ACTIVATE_GROUP_VIEW
+		WHERE CONF_ID = #{confId}
+		<if test="searchKey != null and searchKey != ''">
+			AND (GUBUN LIKE CONCAT('%', #{searchKey}, '%') OR DEPT_CD LIKE CONCAT('%', #{searchKey}, '%')
+			OR DEPT_NM LIKE CONCAT('%', #{searchKey}, '%') OR REG_DT LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
 
+	<select id="selectActivateGroupListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(CONF_ID) AS CNT
+		FROM ACTIVATE_GROUP_VIEW
+		WHERE CONF_ID = #{confId}
+	</select>
 
+	<select id="selectActivateGroupListFilterCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(CONF_ID) AS CNT
+		FROM ACTIVATE_GROUP_VIEW
+		WHERE CONF_ID = #{confId}
+		<if test="searchKey != null and searchKey != ''">
+			AND (GUBUN LIKE CONCAT('%', #{searchKey}, '%') OR DEPT_CD LIKE CONCAT('%', #{searchKey}, '%')
+			OR DEPT_NM LIKE CONCAT('%', #{searchKey}, '%') OR REG_DT LIKE CONCAT('%', #{searchKey}, '%'))
+		</if>
+	</select>
 </mapper>

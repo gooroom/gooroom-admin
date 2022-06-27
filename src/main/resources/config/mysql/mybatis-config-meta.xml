@@ -42,6 +42,8 @@
 		<typeAlias type="kr.gooroom.gpms.config.service.DesktopItemVO" alias="desktopItemVO" />
 		<typeAlias type="kr.gooroom.gpms.config.service.DesktopApplicationInfoVO" alias="desktopApplicationInfoVO" />
 		<typeAlias type="kr.gooroom.gpms.config.service.DesktopMountInfoVO" alias="desktopMountInfoVO" />
+
+		<typeAlias type="kr.gooroom.gpms.config.service.ActivateGroupViewVO" alias="activateGroupViewVO" />
 				
 		<typeAlias type="kr.gooroom.gpms.config.service.ClientConfDataVO" alias="clientConfDataVO" />
 		<typeAlias type="kr.gooroom.gpms.config.service.MgServerConfVO" alias="mgServerConfVO" />

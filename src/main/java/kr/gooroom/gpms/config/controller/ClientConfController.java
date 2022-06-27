@@ -4551,4 +4551,44 @@ public class ClientConfController {
 		return hm;
 	}
 
+	/**
+	 * 정책 - 적용 그룹 리스트
+	 */
+	@PostMapping(value = "/readActivateGroupList")
+	public @ResponseBody ResultPagingVO readActivateGroupList(HttpServletRequest req, HttpServletResponse res,
+																	ModelMap model) {
+		ResultPagingVO resultVO = new ResultPagingVO();
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		//object ID
+		String confId = req.getParameter("objectId");
+		options.put("confId", confId);
+		//search keyword
+		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
+		options.put("searchKey", searchKey);
+
+		//paging
+		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
+		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramDraw = req.getParameter("draw");
+		options.put("paramStart", Integer.parseInt(paramStart));
+		options.put("paramLength", Integer.parseInt(paramLength));
+
+		try {
+			resultVO = ctrlMstService.readActivateGroupListPaged(options);
+			resultVO.setDraw(String.valueOf(req.getParameter("page")));
+			resultVO.setRowLength(paramLength);
+			resultVO.setDraw(paramDraw);
+
+		} catch (Exception ex) {
+			logger.error("error in readDesktopConfList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
 }
