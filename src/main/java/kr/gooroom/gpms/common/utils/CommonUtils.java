@@ -230,4 +230,37 @@ public class CommonUtils {
 			 return Boolean.FALSE;
 		 }
 	 }
+
+	/**
+	 * get ctrl item type(software)
+	 * @param propValue String
+	 * @return Boolean : String
+	 */
+	public static String getCtrlItemType(String propValue) {
+		switch(propValue) {
+			case GPMSConstants.CHROMIUM_WEB_BROWSER : return GPMSConstants.CTRL_ITEM_NETWORK;
+			case GPMSConstants.GOOROOM_WEB_BROWSER : return GPMSConstants.CTRL_ITEM_NETWORK;
+			case GPMSConstants.GNOME_CONTROL_CENTER : return GPMSConstants.CTRL_ITEM_SYSTEM;
+			case GPMSConstants.GRAC_EDITOR : return GPMSConstants.CTRL_ITEM_SYSTEM;
+			case GPMSConstants.SOFTWARE : return GPMSConstants.CTRL_ITEM_SYSTEM;
+			case GPMSConstants.TERMINAL : return GPMSConstants.CTRL_ITEM_SYSTEM;
+			case GPMSConstants.CALCULATOR : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.GOOROOM_MANAGEMENT_SETTINGS : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.GOOROOM_SECURITY_STATUS_VIEW : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.GOOROOM_TOOLKIT : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.HANCOM_OFFICE_HWP_2014_VIEWER : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.ARCHIVE_MANAGER : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.FILES : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.SCRATCH_3_0 : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.SYNAPTIC_PACKAGE_MANAGER : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.SCREENSHOT : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.VEYON_MASTER : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.BLUETOOTH_MANAGER : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.MOUSEPAD : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.GOOROOM_GUIDE : return GPMSConstants.CTRL_ITEM_UTILITY;
+			case GPMSConstants.IMAGE_VIEWER : return GPMSConstants.CTRL_ITEM_GRAPHICS;
+			case GPMSConstants.VIDEOS : return GPMSConstants.CTRL_ITEM_AUDIO_VIDEO;
+			default : return "";
+		}
+	}
 }

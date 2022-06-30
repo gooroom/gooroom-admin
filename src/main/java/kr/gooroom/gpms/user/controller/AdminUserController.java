@@ -607,7 +607,7 @@ public class AdminUserController {
 			if (adminAddresses != null && adminAddresses.size() > 0) {
 				for (String address : adminAddresses) {
 					propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "address", address, "",
-							LoginInfoHelper.getUserId()));
+							LoginInfoHelper.getUserId(), ""));
 				}
 			}
 
@@ -641,7 +641,7 @@ public class AdminUserController {
 	/**
 	 * clear administrator login trial info
 	 * 
-	 * @param paramVO AdminUserVO data bean
+	 * @param  AdminUserVO data bean
 	 * @return ResultVO result data bean
 	 * 
 	 */

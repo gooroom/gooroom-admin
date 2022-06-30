@@ -337,4 +337,39 @@ public class GPMSConstants {
 	public static final String PORTABLE_GROUP= prop.getProperty("gooroom.config.portable.group","DEPTDEFAULT");
 	public static final String PORTABLE_DESKTOP = prop.getProperty("gooroom.config.portable.desktop","DECOPORTABLE");
 	public static final String PORTABLE_CTRL= prop.getProperty("gooroom.config.portable.ctrl","CTCIPORTABLE");
+
+	//ctrl item prop(software)
+	public static final String CHROMIUM_WEB_BROWSER = "chromium.desktop";
+	public static final String CALCULATOR = "org.gnome.Calculator.desktop";
+	public static final String GOOROOM_WEB_BROWSER = "gooroom-browser.desktop";
+	public static final String GNOME_CONTROL_CENTER = "gooroom-control-center.desktop,,,gnome-control-center.desktop";
+	public static final String GOOROOM_MANAGEMENT_SETTINGS = "gooroom-security-status-settings.desktop";
+	public static final String GOOROOM_SECURITY_STATUS_VIEW = "gooroom-security-status-view.desktop";
+	public static final String GOOROOM_TOOLKIT = "gooroom-toolkit.desktop";
+	public static final String GRAC_EDITOR = "grac-editor.desktop";
+	public static final String HANCOM_OFFICE_HWP_2014_VIEWER = "hwpviewer.desktop";
+	public static final String ARCHIVE_MANAGER = "org.gnome.FileRoller.desktop";
+	public static final String FILES = "org.gnome.Nautilus.desktop,,,nemo.desktop";
+	public static final String VIDEOS = "org.gnome.Totem.desktop,,,io.github.GnomeMpv.desktop";
+	public static final String SCRATCH_3_0 = "scratch.desktop";
+	public static final String SYNAPTIC_PACKAGE_MANAGER = "synaptic.desktop";
+	public static final String SCREENSHOT = "xfce4-screenshooter.desktop,,,org.gnome.Screenshot.desktop";
+	public static final String TERMINAL = "xfce4-terminal.desktop,,,org.gnome.Terminal.desktop";
+	public static final String VEYON_MASTER = "veyon-master.desktop";
+	public static final String IMAGE_VIEWER = "eog.desktop";
+	public static final String BLUETOOTH_MANAGER = "blueman-manager.desktop";
+	public static final String MOUSEPAD= "org.gnome.gedit.desktop";
+	public static final String GOOROOM_GUIDE = "gooroom-guide.desktop";
+	public static final String SOFTWARE = "kr.gooroom.Software.desktop";
+
+	//ctrl itme type
+	public static final String CTRL_ITEM_NETWORK = "network";
+	public static final String CTRL_ITEM_UTILITY = "utility";
+	public static final String CTRL_ITEM_SYSTEM = "system";
+	public static final String CTRL_ITEM_AUDIO_VIDEO = "audio&video";
+	public static final String CTRL_ITEM_GRAPHICS = "graphics";
+
+
+
+
 }

@@ -37,6 +37,7 @@ public class CtrlPropVO implements Serializable {
 	private String propId;
 	private String propNm;
 	private String propValue;
+	private String propType;
 
 	private String link;
 
@@ -50,13 +51,14 @@ public class CtrlPropVO implements Serializable {
 
 	}
 
-	public CtrlPropVO(String objId, String propId, String propNm, String propValue, String link, String modUserId) {
+	public CtrlPropVO(String objId, String propId, String propNm, String propValue, String link, String modUserId, String propType) {
 		this.setObjId(objId);
 		this.setPropId(propId);
 		this.setPropNm(propNm);
 		this.setPropValue(propValue);
 		this.setLink(link);
 		this.setModUserId(modUserId);
+		this.setPropType(propType);
 	}
 
 	public String getObjId() {
@@ -130,6 +132,12 @@ public class CtrlPropVO implements Serializable {
 	public void setLink(String link) {
 		this.link = link;
 	}
+
+	public String getPropType() {
+		return propType;
+	}
+
+	public void setPropType(String propType) { this.propType = propType; }
 
 	public Date getRegDate() {
 		return regDate;
