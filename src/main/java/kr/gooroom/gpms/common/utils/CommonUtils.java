@@ -244,6 +244,7 @@ public class CommonUtils {
 			case GPMSConstants.GRAC_EDITOR : return GPMSConstants.CTRL_ITEM_SYSTEM;
 			case GPMSConstants.SOFTWARE : return GPMSConstants.CTRL_ITEM_SYSTEM;
 			case GPMSConstants.TERMINAL : return GPMSConstants.CTRL_ITEM_SYSTEM;
+			case GPMSConstants.SYNAPTIC_PACKAGE_MANAGER : return GPMSConstants.CTRL_ITEM_SYSTEM;
 			case GPMSConstants.CALCULATOR : return GPMSConstants.CTRL_ITEM_UTILITY;
 			case GPMSConstants.GOOROOM_MANAGEMENT_SETTINGS : return GPMSConstants.CTRL_ITEM_UTILITY;
 			case GPMSConstants.GOOROOM_SECURITY_STATUS_VIEW : return GPMSConstants.CTRL_ITEM_UTILITY;
@@ -252,7 +253,6 @@ public class CommonUtils {
 			case GPMSConstants.ARCHIVE_MANAGER : return GPMSConstants.CTRL_ITEM_UTILITY;
 			case GPMSConstants.FILES : return GPMSConstants.CTRL_ITEM_UTILITY;
 			case GPMSConstants.SCRATCH_3_0 : return GPMSConstants.CTRL_ITEM_UTILITY;
-			case GPMSConstants.SYNAPTIC_PACKAGE_MANAGER : return GPMSConstants.CTRL_ITEM_UTILITY;
 			case GPMSConstants.SCREENSHOT : return GPMSConstants.CTRL_ITEM_UTILITY;
 			case GPMSConstants.VEYON_MASTER : return GPMSConstants.CTRL_ITEM_UTILITY;
 			case GPMSConstants.BLUETOOTH_MANAGER : return GPMSConstants.CTRL_ITEM_UTILITY;
