@@ -4560,12 +4560,21 @@ public class ClientConfController {
 		ResultPagingVO resultVO = new ResultPagingVO();
 		HashMap<String, Object> options = new HashMap<String, Object>();
 
-		//object ID
+		//gubun
+		String gubun = req.getParameter("gubun"); //user, group, date
+		// object id
 		String confId = req.getParameter("objectId");
-		options.put("confId", confId);
 		//search keyword
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
+		//date
+		String fromDate = StringUtils.defaultString(req.getParameter("fromDate"));
+		String toDate = StringUtils.defaultString(req.getParameter("toDate"));
+
+		options.put("gubun", gubun);
+		options.put("confId", confId);
 		options.put("searchKey", searchKey);
+		options.put("fromDate", fromDate);
+		options.put("toDate", toDate);
 
 		//paging
 		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");

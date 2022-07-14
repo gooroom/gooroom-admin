@@ -675,9 +675,17 @@
 		SELECT GUBUN, DEPT_CD, DEPT_NM, REG_DT
 		FROM ACTIVATE_GROUP_VIEW
 		WHERE CONF_ID = #{confId}
+		<if test="gubun != null and gubun !='' and gubun == 'user'">
+			AND GUBUN = "사용자"
+		</if>
+		<if test="gubun != null and gubun !='' and gubun == 'group'">
+			AND GUBUN = "그룹"
+		</if>
+		<if test="gubun != null and gubun !='' and gubun == 'date'">
+			AND REG_DT BETWEEN #{fromDate} AND #{toDate}
+		</if>
 		<if test="searchKey != null and searchKey != ''">
-			AND (GUBUN LIKE CONCAT('%', #{searchKey}, '%') OR DEPT_CD LIKE CONCAT('%', #{searchKey}, '%')
-			OR DEPT_NM LIKE CONCAT('%', #{searchKey}, '%') OR REG_DT LIKE CONCAT('%', #{searchKey}, '%'))
+			AND (DEPT_CD LIKE CONCAT('%', #{searchKey}, '%') OR DEPT_NM LIKE CONCAT('%', #{searchKey}, '%'))
 		</if>
 		LIMIT #{paramStart}, #{paramLength}
 	</select>
