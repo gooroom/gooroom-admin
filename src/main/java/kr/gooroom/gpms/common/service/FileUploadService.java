@@ -44,10 +44,20 @@ public interface FileUploadService {
 	 * save file physically to specified location.
 	 * 
 	 * @param file MultipartFile file request body
+	 * @param themeId String
 	 * @return FileVO saved file data
 	 *
 	 */
 	FileVO store(MultipartFile file);
+
+	/**
+	 * save file physically to specified location.
+	 *
+	 * @param vo Basic theme icon file
+	 * @return FileVO saved file data
+	 *
+	 */
+	FileVO store(FileVO vo);
 
 	/**
 	 * read all file data from disk.

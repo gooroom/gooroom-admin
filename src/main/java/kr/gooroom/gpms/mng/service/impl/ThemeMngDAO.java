@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
+import kr.gooroom.gpms.common.service.FileVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -130,7 +131,7 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	/**
 	 * get theme information data.
 	 * 
-	 * @param themeId String theme id
+	 * @param options HashMap<String, Object> options for select
 	 * @return ThemeVO selected data
 	 * @throws SQLException
 	 */
@@ -140,6 +141,29 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 		try {
 
 			re = sqlSessionMeta.selectOne("selectThemeData", options);
+
+		} catch (Exception ex) {
+			logger.error("error in selectThemeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			re = null;
+		}
+
+		return re;
+	}
+
+	/**
+	 * get theme information data.
+	 *
+	 * @param themeId String themeId
+	 * @return ThemeVO selected data
+	 * @throws SQLException
+	 */
+	public ThemeVO selectThemeData(String themeId) throws SQLException {
+
+		ThemeVO re = null;
+		try {
+
+			re = sqlSessionMeta.selectOne("selectThemeData", themeId);
 
 		} catch (Exception ex) {
 			logger.error("error in selectThemeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -215,4 +239,67 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 
 	}
 
+	/**
+	 * modify file no sequence
+	 *
+	 * @return long data update result count.
+	 * @throws SQLException
+	 */
+	public long updateFileSeqToReset() throws SQLException {
+
+		return (long) sqlSessionMeta.update("updateFileSeqToReset");
+
+	}
+
+	/**
+	 * update wallpaper & icon file information data.
+	 *
+	 * @param vo FileVO File information object
+	 * @return long query result count
+	 * @throws SQLException
+	 */
+	public long updateThemeFileInfo(FileVO vo) throws SQLException {
+
+		return (long) sqlSessionMeta.update("updateThemeFileInfo", vo);
+
+	}
+
+	/**
+	 * insert wallpaper file information data.
+	 *
+	 * @param vo FileVO File information object
+	 * @return long query result count
+	 * @throws SQLException
+	 */
+	public long insertWallpaperFileInfo(FileVO vo) throws SQLException {
+
+		return (long) sqlSessionMeta.insert("insertWallpaperFileInfo", vo);
+
+	}
+
+	/**
+	 * insert file information data.
+	 *
+	 * @param vo FileVO File information object
+	 * @return long query result count
+	 * @throws SQLException
+	 */
+	public long insertIconFileInfo(FileVO vo) throws SQLException {
+
+		return (long) sqlSessionMeta.insert("insertIconFileInfo", vo);
+
+	}
+
+	/**
+	 * delete file information data.
+	 *
+	 * @param themeId String - delete target themeId
+	 * @return long query result count
+	 * @throws SQLException
+	 */
+	public long deleteThemeFileInfo(String themeId) throws SQLException {
+
+		return (long) sqlSessionMeta.delete("deleteThemeFileInfo", themeId);
+
+	}
 }

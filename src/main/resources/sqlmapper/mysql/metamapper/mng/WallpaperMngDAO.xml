@@ -31,17 +31,13 @@
 	</select>
 
 	<insert id="insertWallpaperData" parameterType="wallpaperVO">
-		<selectKey keyProperty="wallpaperId" resultType="string" order="BEFORE">
-			SELECT GRNEXTVAL('WALLPAPERID_SEQ')
-		</selectKey>
 		INSERT INTO WALLPAPER_MSTR
 			(WALLPAPER_ID, WALLPAPER_NM, FILE_NO, MOD_USER_ID, MOD_DT) 
-		VALUES (#{wallpaperId}, #{wallpaperNm}, #{fileNo}, #{modUserId}, now())
+		VALUES (#{wallpaperId}, (SELECT CONCAT('바탕화면',#{wallpaperId})), #{fileNo}, #{modUserId}, now())
 	</insert>
 
 	<update id="updateWallpaperData" parameterType="wallpaperVO">
 		UPDATE WALLPAPER_MSTR SET
-			WALLPAPER_NM = #{wallpaperNm},
 			<if test="fileNo != null">FILE_NO=#{fileNo},</if>
 			MOD_USER_ID = #{modUserId},
 			MOD_DT = now()
@@ -49,10 +45,10 @@
 			WALLPAPER_ID = #{wallpaperId}
 	</update>
 
-	<update id="deleteWallpaperData" parameterType="string">
+	<delete id="deleteWallpaperData" parameterType="string">
 		DELETE FROM WALLPAPER_MSTR 
 		WHERE WALLPAPER_ID = #{wallpaperId}
-	</update>
+	</delete>
 
 </mapper>
 

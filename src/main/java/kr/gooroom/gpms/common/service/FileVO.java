@@ -42,6 +42,9 @@ public class FileVO implements Serializable {
 	private Date regDate;
 	private String regUserId;
 
+	private Date modDate;
+	private String modUserId;
+
 	private String fileEtcInfo;
 	private String imgUrl;
 
@@ -123,6 +126,22 @@ public class FileVO implements Serializable {
 
 	public void setRegUserId(String regUserId) {
 		this.regUserId = regUserId;
+	}
+
+	public Date getModDate() {
+		return modDate;
+	}
+
+	public void setModDate(Date modDate) {
+		this.modDate = modDate;
+	}
+
+	public String getModUserId() {
+		return modUserId;
+	}
+
+	public void setModUserId(String modUserId) {
+		this.modUserId = modUserId;
 	}
 
 	public String getFileEtcInfo() {

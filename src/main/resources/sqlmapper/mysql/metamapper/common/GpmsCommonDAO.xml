@@ -37,6 +37,8 @@
 		<result property="deleteYn" column="DELETE_YN" />
 		<result property="regUserId" column="REG_USER_ID" />
 		<result property="regDate" column="REG_DT" />
+		<result property="modUserId" column="MOD_USER_ID" />
+		<result property="modDate" column="MOD_DT" />
 	
 	</resultMap>
 
@@ -77,10 +79,17 @@
 
 	<insert id="insertFileInfo" parameterType="fileVO">
 		<selectKey keyProperty="fileNo" resultType="string" order="BEFORE">
-			SELECT GRNEXTVAL('FILENO_SEQ')
+			<choose>
+				<when test="fileType != null and fileType == 'wallpaper'">
+					SELECT GRNEXTVAL('THEMEID_SEQ')
+				</when>
+				<otherwise>
+					SELECT CONCAT(#{fileNo}, LPAD((SELECT GRNEXTVAL('FILENO_SEQ')), 2, 0))
+				</otherwise>
+			</choose>
 		</selectKey>
 		INSERT INTO FILE_MSTR
-			(FILE_NO, FILE_NM, FILE_TP, FILE_PATH, FILE_SIZE, FILE_ORG_NM, DELETE_YN, REG_DT, REG_USER_ID) 
+			(FILE_NO, FILE_NM, FILE_TP, FILE_PATH, FILE_SIZE, FILE_ORG_NM, DELETE_YN, REG_DT, REG_USER_ID, MOD_DT, MOD_USER_ID)
 		VALUES (
 			#{fileNo},
 			#{fileName},
@@ -90,7 +99,16 @@
 			#{fileOriginalName},
 			#{deleteYn},
 			now(),
-			#{regUserId})
+			#{regUserId},
+			now(),
+			#{modUserId})
+		ON DUPLICATE KEY UPDATE FILE_ORG_NM=#{fileOriginalName}, REG_DT=now()
 	</insert>
+
+	<select id="selectFileInfo" parameterType="String" resultMap="FileInfo">
+		SELECT FILE_NO, FILE_NM, FILE_TP, FILE_PATH , FILE_SIZE, FILE_ORG_NM, DELETE_YN, REG_DT, REG_USER_ID
+		FROM FILE_MSTR
+		WHERE FILE_NO = #{fileNo}
+	</select>
 
 </mapper>

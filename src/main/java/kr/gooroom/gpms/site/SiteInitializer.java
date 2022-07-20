@@ -1,7 +1,6 @@
 package kr.gooroom.gpms.site;
 
 import kr.gooroom.gpms.common.GPMSConstants;
-import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.site.service.SiteMngVO;
 import kr.gooroom.gpms.site.service.impl.SiteMngDAO;

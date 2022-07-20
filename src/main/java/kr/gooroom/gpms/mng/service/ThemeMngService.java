@@ -18,9 +18,12 @@ package kr.gooroom.gpms.mng.service;
 
 import java.util.HashMap;
 
+import kr.gooroom.gpms.common.service.FileVO;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 /**
  * Theme management service interface
@@ -39,7 +42,7 @@ public interface ThemeMngService {
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
-	StatusVO createThemeData(ThemeVO themeVO) throws Exception;
+	StatusVO createThemeData(ThemeVO themeVO, MultipartHttpServletRequest multipartHttpServletRequest) throws Exception;
 
 	/**
 	 * delete theme data.
@@ -57,7 +60,7 @@ public interface ThemeMngService {
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
-	StatusVO editThemeData(ThemeVO themeVO) throws Exception;
+	StatusVO editThemeData(ThemeVO themeVO, MultipartHttpServletRequest multipartHttpServletRequest) throws Exception;
 
 	/**
 	 * response theme list data for paging
@@ -77,11 +80,47 @@ public interface ThemeMngService {
 
 	/**
 	 * response theme information data by theme id
-	 * 
-	 * @param themeId String theme id
-	 * @return ResultVO result object
+	 * @param options themeId and iconAddress
+	 * @return
 	 * @throws Exception
 	 */
 	ResultVO getThemeData(HashMap<String, Object> options) throws Exception;
+
+	/**
+	 * restore file physically to specified location.
+	 * @param newFileObj new File Object
+	 * @param newFile new FileVO
+	 * @param originFile origin FileVO
+	 * @return
+	 */
+	FileVO restoreThemeFile(MultipartFile newFileObj, FileVO newFile, FileVO originFile);
+
+	/**
+	 * save file physically to specified location.
+	 *
+	 * @param file MultipartFile file request body
+	 * @param themeId String
+	 * @return FileVO saved file data
+	 *
+	 */
+	FileVO storeIcons(MultipartFile file, String themeId);
+
+	/**
+	 * save file physically to specified location.
+	 *
+	 * @param fileVO FileVO
+	 * @return FileVO saved file data
+	 *
+	 */
+	FileVO storeIcons(FileVO fileVO);
+
+	/**
+	 * save file physically to specified location.
+	 *
+	 * @param file MultipartFile file request body
+	 * @return FileVO saved file data
+	 *
+	 */
+	FileVO storeWallpaper(MultipartFile fileType, FileVO voType);
 
 }

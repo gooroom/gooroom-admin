@@ -280,6 +280,9 @@ public class GPMSConstants {
 	public static final String JOB_CLIENTCONF_POLICYKITUSER_CHANGE = "get_polkit_admin_config";
 	public static final String JOB_CLIENTCONF_MAXMEDIACNT_CHANGE = "get_usb_whitelist_max";
 
+	// JOB NAME - user custom themes
+	public static final String JOB_CLIENTSETTING_THEME_CHANGE = "get_theme_info";
+
 	// LOGGING CODE
 	public static final String CODE_SYSERROR = "ERR9999";
 	public static final String MSG_SYSERROR = "system.common.error";
