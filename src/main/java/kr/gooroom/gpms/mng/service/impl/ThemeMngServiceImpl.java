@@ -102,8 +102,8 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 
 		try {
 
-			//get basic theme info themeId = 1
-			List<FileVO> theme1Icons = themeMngDAO.selectThemeData("1").getThemeIcons();
+			//get basic theme info themeId = 4
+			List<FileVO> theme4Icons = themeMngDAO.selectThemeData("4").getThemeIcons();
 
 			String themeId = "";
 			while(iterator.hasNext()) {
@@ -150,8 +150,8 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 				FileVO vo = null;
 				if (multipartFile != null && !multipartFile.isEmpty()) {
 					vo = storeIcons(multipartFile, themeId);
-				} else { //파일 없을때 - 테마 1번으로
-					vo = theme1Icons.stream().filter(s -> s.getFileName().equals("1_" + fileName + ".svg")).findFirst().get();
+				} else { //파일 없을때 - 테마 4번으로
+					vo = theme4Icons.stream().filter(s -> s.getFileName().equals("4_" + fileName + ".svg")).findFirst().get();
 					vo.setFileEtcInfo(fileName);
 					vo.setFileNo(themeId);
 					vo.setFileType("icon");
@@ -308,7 +308,7 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 		try {
 
 			//get basic theme info themeId = 1
-			List<FileVO> theme1Icons = themeMngDAO.selectThemeData("1").getThemeIcons();
+			List<FileVO> theme4Icons = themeMngDAO.selectThemeData("4").getThemeIcons();
 
 			ThemeVO originThemeVO = themeMngDAO.selectThemeData(themeVO.getThemeId());
 			if(originThemeVO == null) {
@@ -349,8 +349,8 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 				if (multipartFile != null && !multipartFile.isEmpty()) {
 					vo = restoreThemeFile(multipartFile, null, originThemeVO.getThemeIcons().stream().filter(n -> n.getFileEtcInfo().equals(fileName)).findFirst().orElse(null));
 				} else {
-					//파일 없을때 - 테마 1번으로
-					vo = theme1Icons.stream().filter(s -> s.getFileName().equals("1_" + fileName + ".svg")).findFirst().get();
+					//파일 없을때 - 테마 4번으로
+					vo = theme4Icons.stream().filter(s -> s.getFileName().equals("4_" + fileName + ".svg")).findFirst().get();
 					vo.setFileEtcInfo(fileName);
 					vo.setFileNo(originThemeVO.getThemeIcons().stream().filter(n -> n.getFileEtcInfo().equals(fileName)).findFirst().orElse(null).getFileNo());
 					vo.setFileType("icon");
