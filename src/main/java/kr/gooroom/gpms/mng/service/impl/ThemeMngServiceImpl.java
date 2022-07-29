@@ -167,8 +167,6 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 
 			//  wallpaper 등록한 id로 theme_mstr 등록
 			themeVO.setThemeId(themeId);
-			themeVO.setThemeNm("테마" + themeId);
-			themeVO.setThemeCmt(themeVO.getThemeCmt());
 			themeVO.setWallpaper(themeId);
 			themeVO.setThemeIcons(files);
 
