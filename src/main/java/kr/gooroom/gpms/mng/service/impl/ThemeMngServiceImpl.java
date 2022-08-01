@@ -116,7 +116,7 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 					if(multipartFile != null && !multipartFile.isEmpty()) {
 						vo = storeWallpaper(multipartFile, null);
 					} else {
-						vo = storeWallpaper(null, gpmsCommonDAO.selectFileInfo("1"));
+						vo = storeWallpaper(null, gpmsCommonDAO.selectFileInfo("4"));
 					}
 
 					if (vo != null) {
@@ -328,7 +328,7 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 						restoreThemeFile(multipartFile, null, gpmsCommonDAO.selectFileInfo(originThemeVO.getWallpaper()));
 					} else {
 						// 테마 배경화면 파일 없을때
-						restoreThemeFile(null, gpmsCommonDAO.selectFileInfo("1"), gpmsCommonDAO.selectFileInfo(originThemeVO.getWallpaper()));
+						restoreThemeFile(null, gpmsCommonDAO.selectFileInfo("4"), gpmsCommonDAO.selectFileInfo(originThemeVO.getWallpaper()));
 					}
 					break;
 				}
