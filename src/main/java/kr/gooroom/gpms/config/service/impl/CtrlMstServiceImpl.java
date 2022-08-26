@@ -1164,7 +1164,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		try {
 			List<ActivateGroupViewVO> re = ctrlMstDao.selectActivateGroupListPaged(options);
 			long totalCount = ctrlMstDao.selectActivateGroupListTotalCount(options);
-			long filteredCount = ctrlMstDao.selectActivateGroupListFilterCount(options);
+			long filteredCount = ctrlMstDao.selectActivateGroupListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
 				ActivateGroupViewVO[] row = re.stream().toArray(ActivateGroupViewVO[]::new);

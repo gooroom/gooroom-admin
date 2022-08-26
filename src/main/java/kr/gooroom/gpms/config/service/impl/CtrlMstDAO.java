@@ -627,7 +627,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @return long filtered count number.
 	 * @throws SQLException
 	 */
-	public long selectActivateGroupListFilterCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("CtrlMstDAO.selectActivateGroupListFilterCount", options);
+	public long selectActivateGroupListFilteredCount(HashMap<String, Object> options) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("CtrlMstDAO.selectActivateGroupListFilteredCount", options);
 	}
 }
