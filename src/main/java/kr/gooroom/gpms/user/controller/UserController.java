@@ -530,6 +530,8 @@ public class UserController {
 			options.put("paramOrderColumn", "UM.CLIENT_ID");
 		} else if ("chDeptNm".equalsIgnoreCase(paramOrderColumn)) {
 			options.put("paramOrderColumn", "DM.DEPT_NM");
+		} else if ("chUserType".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "UM.USER_TYPE");
 		} else {
 			options.put("paramOrderColumn", "UM.USER_NM");
 		}
