@@ -69,7 +69,11 @@ public class NoticePublishTargetController {
         String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
 
         options.put("paramOrderColumn", "TARGET_TYPE");
-        options.put("paramOrderDir", paramOrderDir);
+        if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+            options.put("paramOrderDir", "DESC");
+        } else {
+            options.put("paramOrderDir", "ASC");
+        }
         options.put("paramStart", Integer.parseInt(paramStart));
         options.put("paramLength", Integer.parseInt(paramLength));
 

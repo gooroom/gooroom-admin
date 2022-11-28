@@ -119,7 +119,11 @@ public class ClientPackageController {
 			options.put("paramOrderColumn", "PACKAGE_ID");
 		}
 
-		options.put("paramOrderDir", paramOrderDir);
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 			resultVO = clientPackageService.readTotalPackageListPaged(options);
@@ -180,7 +184,12 @@ public class ClientPackageController {
 		} else {
 			options.put("paramOrderColumn", "CP.PACKAGE_ID");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 			resultVO = clientPackageService.readPackageListPagedInClient(options);
@@ -631,7 +640,11 @@ public class ClientPackageController {
 			options.put("paramOrderColumn", "PACKAGE_VER");
 		}
 
-		options.put("paramOrderDir", paramOrderDir);
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 

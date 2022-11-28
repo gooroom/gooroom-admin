@@ -251,7 +251,12 @@ public class DesktopAppController {
 		} else {
 			options.put("paramOrderColumn", "DAI.APP_NM");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 			resultVO = desktopAppService.getDesktopAppListPaged(options);

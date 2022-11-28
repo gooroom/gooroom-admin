@@ -218,7 +218,11 @@ public class ClientController {
 
 		}
 
-		options.put("paramOrderDir", paramOrderDir);
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -332,7 +336,12 @@ public class ClientController {
 		} else {
 			options.put("paramOrderColumn", "CLIENT_ID");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 
@@ -461,7 +470,11 @@ public class ClientController {
 
 		}
 
-		options.put("paramOrderDir", paramOrderDir);
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -798,7 +811,11 @@ public class ClientController {
 				options.put("paramOrderColumn", "CLIENT_ID");
 			}
 
-			options.put("paramOrderDir", paramOrderDir);
+			if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+				options.put("paramOrderDir", "DESC");
+			} else {
+				options.put("paramOrderDir", "ASC");
+			}
 			options.put("paramStart", Integer.parseInt(paramStart));
 			options.put("paramLength", Integer.parseInt(paramLength));
 

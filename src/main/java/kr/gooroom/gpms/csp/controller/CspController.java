@@ -263,7 +263,13 @@ public class CspController {
 		} else {
 			options.put("paramOrderColumn", "GM.GCSP_ID");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
+
 		try {
 			resultVO = cspService.getGcspListPaged(options);
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));

@@ -138,7 +138,12 @@ public class ClientLogController {
 			} else {
 				options.put("paramOrderColumn", "LOG_SEQ");
 			}
-			options.put("paramOrderDir", paramOrderDir);
+
+			if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+				options.put("paramOrderDir", "DESC");
+			} else {
+				options.put("paramOrderDir", "ASC");
+			}
 
 			resultVO = clientLogService.getSecurityLogListPaged(options);
 
@@ -268,7 +273,12 @@ public class ClientLogController {
 			} else {
 				options.put("paramOrderColumn", "LOG_SEQ");
 			}
-			options.put("paramOrderDir", paramOrderDir);
+
+			if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+				options.put("paramOrderDir", "DESC");
+			} else {
+				options.put("paramOrderDir", "ASC");
+			}
 
 			resultVO = clientLogService.getGeneralLogListPaged(options);
 
