@@ -128,7 +128,12 @@ public class SiteMngController {
 		} else {
 			options.put("paramOrderColumn", "SITE_NM");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 			resultVO = siteMngService.getSiteMngListPaged(options);

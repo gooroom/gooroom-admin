@@ -184,7 +184,12 @@ public class UseStatsController {
 			} else {
 				options.put("paramOrderColumn", "ULH.HIST_SEQ");
 			}
-			options.put("paramOrderDir", paramOrderDir);
+
+			if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+				options.put("paramOrderDir", "DESC");
+			} else {
+				options.put("paramOrderDir", "ASC");
+			}
 
 			resultVO = useStatsService.getLoginListPaged(options);
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));
@@ -283,7 +288,12 @@ public class UseStatsController {
 			} else {
 				options.put("paramOrderColumn", "CMH.CLIENT_ID");
 			}
-			options.put("paramOrderDir", paramOrderDir);
+
+			if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+				options.put("paramOrderDir", "DESC");
+			} else {
+				options.put("paramOrderDir", "ASC");
+			}
 
 			resultVO = useStatsService.getClientMngListPaged(options);
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));

@@ -466,7 +466,12 @@ public class DeptController {
 		} else {
 			options.put("paramOrderColumn", "DEPT_NM");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 

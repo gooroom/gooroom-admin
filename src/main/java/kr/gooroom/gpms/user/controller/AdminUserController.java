@@ -144,7 +144,12 @@ public class AdminUserController {
 		} else {
 			options.put("paramOrderColumn", "AM.ADMIN_NM");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 			resultVO = adminUserService.getAdminUserListPaged(options);
@@ -448,6 +453,7 @@ public class AdminUserController {
 			// << options >>
 			String adminId = StringUtils.defaultString(req.getParameter("adminId"));
 			String fromDate = StringUtils.defaultString(req.getParameter("fromDate"));
+			String paramOrderDir = StringUtils.defaultString(req.getParameter("orderDir"));
 			String toDate = StringUtils.defaultString(req.getParameter("toDate"));
 			if ("".equals(fromDate) || "".equals(toDate)) {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -482,7 +488,12 @@ public class AdminUserController {
 
 			// << order >>
 			options.put("paramOrderColumn", "LOG_SEQ");
-			options.put("paramOrderDir", StringUtils.defaultString(req.getParameter("orderDir")));
+
+			if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+				options.put("paramOrderDir", "DESC");
+			} else {
+				options.put("paramOrderDir", "ASC");
+			}
 
 			resultVO = adminUserService.getAdminActListPaged(options);
 
@@ -551,7 +562,12 @@ public class AdminUserController {
 		} else {
 			options.put("paramOrderColumn", "LAA.LOG_SEQ");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 			resultVO = adminUserService.getAdminRecordListPaged(options);

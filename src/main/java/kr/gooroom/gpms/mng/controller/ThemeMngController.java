@@ -275,7 +275,12 @@ public class ThemeMngController {
 		} else {
 			options.put("paramOrderColumn", "TM.THEME_NM");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 			resultVO = themeMngService.getThemeListPaged(options);
