@@ -95,9 +95,9 @@ public class PortableDAO extends SqlSessionMetaDAO {
         return sqlSessionMeta.selectOne("selectPortableFilteredCount", options);
     }
 
-    public List<String> selectPortableUserListForDuplicateUserId (HashMap<String, Object> ids) throws SQLException {
-        List<String> res = null;
-        res = sqlSessionMeta.selectList("selectPortableUserListForDuplicateUserId", ids);
+    public String selectPortableUserListForDuplicateUserId (String id) throws SQLException {
+        String res = null;
+        res = sqlSessionMeta.selectOne("selectPortableUserListForDuplicateUserId", id);
         return res;
     }
 }

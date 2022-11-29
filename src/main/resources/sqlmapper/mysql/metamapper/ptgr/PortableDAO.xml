@@ -218,20 +218,14 @@
         </if>
     </select>
 
-    <select id="selectPortableUserListForDuplicateUserId" parameterType="hashmap" resultType="java.lang.String">
+    <select id="selectPortableUserListForDuplicateUserId" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT ID
         FROM
-             (SELECT ADMIN_ID AS ID FROM ADMIN_MSTR
-             WHERE ADMIN_ID IN
-                   <foreach collection="userId" item="userId" open="(" separator="," close=")">
-                   ${userId}
-                 </foreach>) AS ADMIN
+            (SELECT ADMIN_ID AS ID FROM ADMIN_MSTR
+            WHERE ADMIN_ID = #{userId}) AS ADMIN
         UNION ALL
             (SELECT USER_ID AS ID FROM USER_MSTR
-            WHERE USER_ID IN
-                  <foreach collection="userId" item="userId" open="(" separator="," close=")">
-                  ${userId}
-                </foreach>)
+        WHERE USER_ID = #{userId})
     </select>
 
     <update id="updatePortableData" parameterType="portableVO">
