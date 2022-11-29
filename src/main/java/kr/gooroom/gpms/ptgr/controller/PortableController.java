@@ -159,9 +159,7 @@ public class PortableController {
         ResultVO resultVO = new ResultVO();
         try
         {
-            HashMap<String, Object> options = new HashMap<String, Object>();
-            options.put("userId", ids);
-            resultVO = portableService.isNoExistInUserIdList(options);
+            resultVO = portableService.isNoExistInUserIdList(ids);
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));

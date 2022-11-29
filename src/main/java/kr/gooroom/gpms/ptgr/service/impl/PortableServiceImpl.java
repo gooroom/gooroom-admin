@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -380,12 +381,19 @@ public class PortableServiceImpl implements PortableService {
      * @throws Exception
      */
     @Override
-    public ResultVO isNoExistInUserIdList(HashMap<String, Object> ids) throws Exception {
+    public ResultVO isNoExistInUserIdList(String[] ids) throws Exception {
 
         ResultVO resultVO = new ResultVO();
 
         try {
-            List<String> idList = portableDAO.selectPortableUserListForDuplicateUserId(ids);
+            List<String> idList = new ArrayList<String>();
+
+            for (String s : ids) {
+                String id = portableDAO.selectPortableUserListForDuplicateUserId(s);
+                if (id != "" && id != null)
+                    idList.add(id);
+            }
+
             if (idList.size() == 0) {
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_NODUPLICATE,
                         MessageSourceHelper.getMessage("user.result.noduplicate")));
