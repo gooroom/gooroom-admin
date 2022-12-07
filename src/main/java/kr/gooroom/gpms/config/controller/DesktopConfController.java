@@ -147,7 +147,11 @@ public class DesktopConfController {
 			options.put("paramOrderColumn", "DCI.CONF_ID");
 		}
 
-		options.put("paramOrderDir", paramOrderDir);
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 		if ("desc".equalsIgnoreCase(paramOrderDir)) {
 			options.put("defaultOrderValue", "힣힣힣힣힣힣힣");
 			options.put("defaultOrderSecondValue", "힣힣힣힣힣힣힢");

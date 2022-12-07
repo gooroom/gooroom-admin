@@ -110,7 +110,7 @@ public interface PortableService {
      * @return ResultVO result data bean
      * @throws Exception
      */
-    ResultVO isNoExistInUserIdList(HashMap<String, Object> ids) throws Exception;
+    ResultVO isNoExistInUserIdList(String[] ids) throws Exception;
 
     int readNextPortableDataIndex() throws Exception;
 

@@ -162,7 +162,12 @@ public class ClientGroupController {
 		} else {
 			options.put("paramOrderColumn", "GM.GRP_NM");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 

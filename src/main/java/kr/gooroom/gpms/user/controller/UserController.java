@@ -178,7 +178,12 @@ public class UserController {
 		} else {
 			options.put("paramOrderColumn", "UM.USER_NM");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 			resultVO = userService.getUserListPaged(options);
@@ -533,7 +538,12 @@ public class UserController {
 		} else {
 			options.put("paramOrderColumn", "UM.USER_NM");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 			resultVO = userService.getUserListPagedInDept(options);
@@ -883,7 +893,11 @@ public class UserController {
 			options.put("paramOrderColumn", "MOD_DT");
 		}
 
-		options.put("paramOrderDir", paramOrderDir);
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 

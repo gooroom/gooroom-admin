@@ -186,7 +186,12 @@ public class JobController {
 		} else {
 			options.put("paramOrderColumn", "JOB_NO");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 
@@ -290,7 +295,12 @@ public class JobController {
 		} else {
 			options.put("paramOrderColumn", "CLIENT_ID");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 

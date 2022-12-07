@@ -133,7 +133,11 @@ public class ClientMngController {
 			options.put("paramOrderColumn", "REGKEY_NO");
 		}
 
-		options.put("paramOrderDir", paramOrderDir);
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -443,7 +447,11 @@ public class ClientMngController {
 			options.put("paramOrderColumn", "CPM.PROFILE_NO");
 		}
 
-		options.put("paramOrderDir", paramOrderDir);
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -505,7 +513,12 @@ public class ClientMngController {
 		} else {
 			options.put("paramOrderColumn", "CPD.PACKAGE_ID");
 		}
-		options.put("paramOrderDir", paramOrderDir);
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 
 		try {
 			resultVO = clientMngService.getProfilePackageListPaged(options);
@@ -719,7 +732,11 @@ public class ClientMngController {
 //	    options.put("paramOrderColumn", "REGKEY_NO");
 		}
 
-		options.put("paramOrderDir", paramOrderDir);
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 

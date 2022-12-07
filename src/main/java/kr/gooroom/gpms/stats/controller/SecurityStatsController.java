@@ -188,7 +188,12 @@ public class SecurityStatsController {
 			} else {
 				options.put("paramOrderColumn", "LOG_SEQ");
 			}
-			options.put("paramOrderDir", paramOrderDir);
+
+			if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+				options.put("paramOrderDir", "DESC");
+			} else {
+				options.put("paramOrderDir", "ASC");
+			}
 
 			resultVO = securityStatsService.getViolatedListPaged(options);
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));
