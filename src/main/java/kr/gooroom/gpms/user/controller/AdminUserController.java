@@ -205,7 +205,7 @@ public class AdminUserController {
 	 * 
 	 */
 	@PostMapping(value = "/createAdminUser")
-	public @ResponseBody ResultVO createAdminUser(HttpServletRequest req) {
+	public @ResponseBody ResultVO createAdminUser(HttpServletRequest req) throws Exception {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -226,6 +226,15 @@ public class AdminUserController {
 		String[] connIps = req.getParameterValues("connIps[]");
 		if (connIps != null && connIps.length > 0) {
 			paramVO.setConnIps(new ArrayList<>(Arrays.asList(connIps)));
+		}
+
+		// check super admin
+		String loginAdminId = LoginInfoHelper.getUserId();
+		if (req.getParameter("adminTp").equalsIgnoreCase("S")) {
+			resultVO = adminUserService.getAdminUserInfo(loginAdminId);
+			if(!GPMSConstants.MSG_SUCCESS.equals(resultVO.getStatus().getResult())) {
+				return resultVO;
+			}
 		}
 
 		// array : client group id

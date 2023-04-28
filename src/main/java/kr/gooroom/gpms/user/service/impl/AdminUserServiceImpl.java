@@ -37,7 +37,6 @@ import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.log.service.ClientLogVO;
 import kr.gooroom.gpms.user.service.AdminUserService;
 import kr.gooroom.gpms.user.service.AdminUserVO;
 
@@ -672,6 +671,50 @@ public class AdminUserServiceImpl implements AdminUserService {
 			}
 		}
 		return statusVO;
+	}
+
+	/**
+	 * get administrator user type.
+	 *
+	 * @param adminId string user id
+	 * @return ResultVO result data bean
+	 * @throws Exception
+	 */
+	@Override
+	public ResultVO getAdminUserInfo(String adminId) throws Exception {
+
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			AdminUserVO re = adminUserDao.selectAdminUserInfo(adminId);
+
+			if (re != null) {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				if (!re.getAdminTp().equalsIgnoreCase("S")) {
+					resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+							MessageSourceHelper.getMessage("admin.result.noinsert")));
+					return resultVO;
+				}
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("system.common.selectdata")));
+			} else {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.noselectdata")));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in selectAdminUserInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
 	}
 	
 }
