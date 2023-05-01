@@ -351,7 +351,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 	/**
 	 * create new administrator user data
 	 * 
-	 * @param vo AdminUserVO data bean
+	 * @param  AdminUserVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -707,6 +707,47 @@ public class AdminUserServiceImpl implements AdminUserService {
 
 		} catch (Exception ex) {
 			logger.error("error in selectAdminUserInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+
+	/**
+	 * get administrator user Authority.
+	 *
+	 * @param adminId string adminId
+	 * @param adminRule String adminRule
+	 * @return ResultVO result data bean
+	 * @throws Exception
+	 */
+	@Override
+	public ResultVO getAuthority(String adminId, String adminRule) throws Exception {
+
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			AdminUserVO re = adminUserDao.selectAdminUserAuthority(adminId, adminRule);
+
+			if (re != null) {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("system.common.selectdata")));
+			} else {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.noselectdata")));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in getAuthority : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 			if (resultVO != null) {
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,

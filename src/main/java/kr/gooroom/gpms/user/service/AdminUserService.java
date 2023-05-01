@@ -151,4 +151,14 @@ public interface AdminUserService {
 	 */
 	ResultVO getAdminUserInfo(String adminId) throws Exception;
 
+	/**
+	 * get administrator user Authority.
+	 *
+	 * @param adminId string adminId
+	 * @param adminRule String adminRule
+	 * @return ResultVO result data bean
+	 * @throws Exception
+	 */
+	ResultVO getAuthority(String adminId, String adminRule)  throws Exception;
+
 }

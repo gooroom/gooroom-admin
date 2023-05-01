@@ -24,6 +24,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.common.service.ResultVO;
+import kr.gooroom.gpms.user.service.AdminUserService;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -47,6 +50,9 @@ public class GPMSInterceptor implements HandlerInterceptor {
 
 	@Resource(name = "gpmsCommonService")
 	private GpmsCommonService gpmsCommonService;
+
+	@Resource(name = "adminUserService")
+	private AdminUserService adminUserService;
 
 	/**
 	 * pre handle method.
@@ -81,6 +87,94 @@ public class GPMSInterceptor implements HandlerInterceptor {
 			actType = "U";
 		}
 
+		//check Authority
+		String adminId = LoginInfoHelper.getUserId();
+		String adminRule = "";
+		if (actItem.equalsIgnoreCase("/readUserList")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/readUserListPaged")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/isExistUserId")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/createUser")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/createUserWithRule")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/updateUserData")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/updateUserLoginTrialCount")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/deleteUserData")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/readUserData")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/readUserListInDept")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/readUserListPagedInDept")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/readUserListInOnline")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/createUsersInDept")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/deleteUserInDept")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/deleteUsersInDept")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/createUserDataFromFile")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/createUserFileFromData")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/createUserSampleFileFromData")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/readUserReqList")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/readUserReqListPaged")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/approvalUserReq")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/readUserReqActListPaged")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/readCurrentUserData")) {
+			adminRule = "user_admin";
+		} else if (actItem.equalsIgnoreCase("/readViolatedClientCount")) {
+			adminRule = "client_admin";
+		} else if (actItem.equalsIgnoreCase("/createResetViolatedClient")) {
+			adminRule = "client_admin";
+		} else if (actItem.equalsIgnoreCase("/readUpdatePackageClientList")) {
+			adminRule = "client_admin";
+		} else if (actItem.equalsIgnoreCase("/createNotice")) {
+			adminRule = "notice_admin";
+		} else if (actItem.equalsIgnoreCase("/updateNotice")) {
+			adminRule = "notice_admin";
+		} else if (actItem.equalsIgnoreCase("/deleteNotice")) {
+			adminRule = "notice_admin";
+		} else if (actItem.equalsIgnoreCase("/readNoticeListPaged")) {
+			adminRule = "notice_admin";
+		} else if (actItem.equalsIgnoreCase("/registerPortableDataList")) {
+			adminRule = "portable_Admin";
+		} else if (actItem.equalsIgnoreCase("/readPortableDataList")) {
+			adminRule = "portable_Admin";
+		} else if (actItem.equalsIgnoreCase("/readPortableDataListPaged")) {
+			adminRule = "portable_Admin";
+		} else if (actItem.equalsIgnoreCase("/readReapproveStatus")) {
+			adminRule = "portable_Admin";
+		} else if (actItem.equalsIgnoreCase("/updateApprove")) {
+			adminRule = "portable_Admin";
+		} else if (actItem.equalsIgnoreCase("/deletePortableDataList")) {
+			adminRule = "portable_Admin";
+		} else if (actItem.equalsIgnoreCase("/registerPortableData")) {
+			adminRule = "portable_Admin";
+		} else if (actItem.equalsIgnoreCase("/readPortableData")) {
+			adminRule = "portable_Admin";
+		}
+
+		if (!adminRule.equalsIgnoreCase("")) {
+			ResultVO adminRuleRe = adminUserService.getAuthority(adminId, adminRule);
+			if (GPMSConstants.MSG_FAIL.equals(adminRuleRe.getStatus().getResult())) {
+				return false;
+			}
+		}
+
 		@SuppressWarnings("unchecked")
 		Map<String, Object> paramMap = (Map<String, Object>) req.getParameterMap();
 		String actData = "";
@@ -95,7 +189,7 @@ public class GPMSInterceptor implements HandlerInterceptor {
 
 		if (LoginInfoHelper.isAuthenticated()) {
 			gpmsCommonService.createUserActLogHistory(actType, actItem, actData, req.getRemoteAddr(),
-					LoginInfoHelper.getUserId());
+					adminId);
 		}
 
 		return true;
