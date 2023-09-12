@@ -342,7 +342,7 @@ public class GPMSConstants {
 	public static final String PORTABLE_CTRL= prop.getProperty("gooroom.config.portable.ctrl","CTCIPORTABLE");
 
 	//ctrl item prop(software)
-	public static final String CHROMIUM_WEB_BROWSER = "chromium.desktop";
+	public static final String CHROMIUM_WEB_BROWSER = "chromium.desktop,,,google-chrome.desktop";
 	public static final String CALCULATOR = "org.gnome.Calculator.desktop";
 	public static final String GOOROOM_WEB_BROWSER = "gooroom-browser.desktop";
 	public static final String GNOME_CONTROL_CENTER = "gooroom-control-center.desktop,,,gnome-control-center.desktop";
