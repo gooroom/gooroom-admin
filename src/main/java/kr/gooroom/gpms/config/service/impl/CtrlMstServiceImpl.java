@@ -837,16 +837,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 
 			// Desktop Conf
 			DesktopConfVO desktopConfVO = desktopConfDao.selectDesktopConfByGroupId(groupId);
-			ResultVO desktopResultVO = new ResultVO();
-			if (desktopConfVO != null) {
-				DesktopConfVO[] row = { desktopConfVO };
-				desktopResultVO.setData(row);
-				desktopResultVO.setExtend(new String[] { desktopConfVO.getConfGrade() });
-				desktopResultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
-
-				hm_total.put(GPMSConstants.TYPE_DESKTOPCONF, desktopResultVO);
-			}
+			setDesktopResult(hm_total, desktopConfVO);
 
 			// Rest rules.
 			List<CtrlPropVO> propRe = ctrlMstDao.selectCtrlPropListByGroupId(groupId);
@@ -897,21 +888,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 						break;
 					}
 
-					if (!"".equals(confType)) {
-						for (CtrlPropVO prop : props) {
-							if (confType.equals(prop.getMngObjTp())) {
-								item.getPropList().add(prop);
-							}
-						}
-					}
-
-					Object[] data = { item };
-					Object[] extend = { item.getExtValue() };
-					HashMap<String, Object> ruleMap = new HashMap<String, Object>();
-					ruleMap.put("data", data);
-					ruleMap.put("extend", extend);
-
-					hm_total.put(confType, ruleMap);
+					addCtrolProp(hm_total, props, item, confType);
 				}
 
 				Object[] t = { hm_total };
@@ -938,6 +915,24 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		return resultVO;
 	}
 
+	private void addCtrolProp(HashMap<String, Object> hm_total, CtrlPropVO[] props, CtrlItemVO item, String confType) {
+		if (!"".equals(confType)) {
+			for (CtrlPropVO prop : props) {
+				if (confType.equals(prop.getMngObjTp())) {
+					item.getPropList().add(prop);
+				}
+			}
+		}
+
+		Object[] data = { item };
+		Object[] extend = { item.getExtValue() };
+		HashMap<String, Object> ruleMap = new HashMap<String, Object>();
+		ruleMap.put("data", data);
+		ruleMap.put("extend", extend);
+
+		hm_total.put(confType, ruleMap);
+	}
+
 	/**
 	 * response control item data by dept cd
 	 * 
@@ -955,16 +950,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 
 			// Desktop Conf
 			DesktopConfVO desktopConfVO = desktopConfDao.selectDesktopConfByDeptCd(deptCd);
-			ResultVO desktopResultVO = new ResultVO();
-			if (desktopConfVO != null) {
-				DesktopConfVO[] row = { desktopConfVO };
-				desktopResultVO.setData(row);
-				desktopResultVO.setExtend(new String[] { desktopConfVO.getConfGrade() });
-				desktopResultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
-
-				hm_total.put(GPMSConstants.TYPE_DESKTOPCONF, desktopResultVO);
-			}
+			setDesktopResult(hm_total, desktopConfVO);
 
 			// Rest rules.
 			List<CtrlItemVO> itemRe = ctrlMstDao.selectCtrlItemByDeptCd(deptCd);
@@ -1005,21 +991,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 						break;
 					}
 
-					if (!"".equals(confType)) {
-						for (CtrlPropVO prop : props) {
-							if (confType.equals(prop.getMngObjTp())) {
-								item.getPropList().add(prop);
-							}
-						}
-					}
-
-					Object[] data = { item };
-					Object[] extend = { item.getExtValue() };
-					HashMap<String, Object> ruleMap = new HashMap<String, Object>();
-					ruleMap.put("data", data);
-					ruleMap.put("extend", extend);
-
-					hm_total.put(confType, ruleMap);
+					addCtrolProp(hm_total, props, item, confType);
 				}
 
 				Object[] t = { hm_total };
@@ -1046,6 +1018,19 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		return resultVO;
 	}
 
+	private void setDesktopResult(HashMap<String, Object> hm_total, DesktopConfVO desktopConfVO) {
+		ResultVO desktopResultVO = new ResultVO();
+		if (desktopConfVO != null) {
+			DesktopConfVO[] row = { desktopConfVO };
+			desktopResultVO.setData(row);
+			desktopResultVO.setExtend(new String[] { desktopConfVO.getConfGrade() });
+			desktopResultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+					MessageSourceHelper.getMessage("system.common.selectdata")));
+
+			hm_total.put(GPMSConstants.TYPE_DESKTOPCONF, desktopResultVO);
+		}
+	}
+
 	/**
 	 * response control item data by group id
 	 * 
@@ -1063,16 +1048,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 
 			// Desktop Conf
 			DesktopConfVO desktopConfVO = desktopConfDao.selectDesktopConfByUserId(userId);
-			ResultVO desktopResultVO = new ResultVO();
-			if (desktopConfVO != null) {
-				DesktopConfVO[] row = { desktopConfVO };
-				desktopResultVO.setData(row);
-				desktopResultVO.setExtend(new String[] { desktopConfVO.getConfGrade() });
-				desktopResultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
-
-				hm_total.put(GPMSConstants.TYPE_DESKTOPCONF, desktopResultVO);
-			}
+			setDesktopResult(hm_total, desktopConfVO);
 
 			// Rest rules.
 			List<CtrlItemVO> itemRe = ctrlMstDao.selectCtrlItemByUserId(userId);
@@ -1113,21 +1089,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 						break;
 					}
 
-					if (!"".equals(confType)) {
-						for (CtrlPropVO prop : props) {
-							if (confType.equals(prop.getMngObjTp())) {
-								item.getPropList().add(prop);
-							}
-						}
-					}
-
-					Object[] data = { item };
-					Object[] extend = { item.getExtValue() };
-					HashMap<String, Object> ruleMap = new HashMap<String, Object>();
-					ruleMap.put("data", data);
-					ruleMap.put("extend", extend);
-
-					hm_total.put(confType, ruleMap);
+					addCtrolProp(hm_total, props, item, confType);
 				}
 
 				Object[] t = { hm_total };

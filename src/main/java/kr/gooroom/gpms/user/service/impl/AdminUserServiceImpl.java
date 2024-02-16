@@ -59,7 +59,66 @@ public class AdminUserServiceImpl implements AdminUserService {
 	private String[][] RULEINFOS = { { "client_admin", "client_admin", "isClientAdmin" },
 			{ "user_admin", "user_admin", "isUserAdmin" }, { "desktop_admin", "desktop_admin", "isDesktopAdmin" }, 
 			{ "notice_admin", "notice_admin", "isNoticeAdmin" },{ "portable_admin", "portable_admin", "isPortableAdmin" }};
-	
+
+
+	private void saveClientConfiguration(AdminUserVO adminUserVO) throws SQLException {
+		long cnt = -1;
+		// save client configuration information
+		for (int i = 0; i < RULEINFOS.length; i++) {
+			String[] items = RULEINFOS[i];
+			cnt = adminUserDao.insertOrUpdateAdminRule(adminUserVO.getAdminId(), items[0], items[1],
+					adminUserVO.getValueByString(items[2]), LoginInfoHelper.getUserId());
+
+			if (cnt < 0) {
+				throw new SQLException();
+			}
+			cnt = -1;
+		}
+
+		// save conn ips
+		adminUserDao.deleteAdminUserConnIps(adminUserVO.getAdminId());
+		if (adminUserVO.getConnIps() != null && adminUserVO.getConnIps().size() > 0) {
+			cnt = -1;
+			for (int i = 0; i < adminUserVO.getConnIps().size(); i++) {
+				cnt = adminUserDao.insertAdminUserConnIp(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
+						(String) adminUserVO.getConnIps().get(i));
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+				cnt = -1;
+			}
+		}
+
+		// save admin's managed group ids
+		adminUserDao.deleteAdminUserGrpIds(adminUserVO.getAdminId());
+		if (adminUserVO.getGrpIds() != null && adminUserVO.getGrpIds().size() > 0) {
+			cnt = -1;
+			for (int i = 0; i < adminUserVO.getGrpIds().size(); i++) {
+				cnt = adminUserDao.insertAdminUserGrpId(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
+						(String) adminUserVO.getGrpIds().get(i));
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+				cnt = -1;
+			}
+		}
+
+		// save admin's managed dept cds
+		adminUserDao.deleteAdminUserDeptCds(adminUserVO.getAdminId());
+		if (adminUserVO.getDeptCds() != null && adminUserVO.getDeptCds().size() > 0) {
+			cnt = -1;
+			for (int i = 0; i < adminUserVO.getDeptCds().size(); i++) {
+				cnt = adminUserDao.insertAdminUserDeptCd(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
+						(String) adminUserVO.getDeptCds().get(i));
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+				cnt = -1;
+			}
+		}
+
+	}
+
 	/**
 	 * modify administrator user information data with divided rules.
 	 * 
@@ -76,61 +135,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 			adminUserVO.setRegUserId(LoginInfoHelper.getUserId());
 			long reCnt = adminUserDao.updateAdminUserData(adminUserVO);
 			if (reCnt > 0) {
-
-				// save client configuration information
-				long cnt = -1;
-				for (int i = 0; i < RULEINFOS.length; i++) {
-					String[] items = RULEINFOS[i];
-					cnt = adminUserDao.insertOrUpdateAdminRule(adminUserVO.getAdminId(), items[0], items[1],
-							adminUserVO.getValueByString(items[2]), LoginInfoHelper.getUserId());
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-					cnt = -1;
-				}
-
-				// save conn ips
-				adminUserDao.deleteAdminUserConnIps(adminUserVO.getAdminId());
-				if (adminUserVO.getConnIps() != null && adminUserVO.getConnIps().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getConnIps().size(); i++) {
-						cnt = adminUserDao.insertAdminUserConnIp(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getConnIps().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
-				// save admin's managed group ids
-				adminUserDao.deleteAdminUserGrpIds(adminUserVO.getAdminId());
-				if (adminUserVO.getGrpIds() != null && adminUserVO.getGrpIds().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getGrpIds().size(); i++) {
-						cnt = adminUserDao.insertAdminUserGrpId(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getGrpIds().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
-				// save admin's managed dept cds
-				adminUserDao.deleteAdminUserDeptCds(adminUserVO.getAdminId());
-				if (adminUserVO.getDeptCds() != null && adminUserVO.getDeptCds().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getDeptCds().size(); i++) {
-						cnt = adminUserDao.insertAdminUserDeptCd(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getDeptCds().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
+				saveClientConfiguration(adminUserVO);
 				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
 						MessageSourceHelper.getMessage("admin.result.update"));
 			} else {
@@ -367,61 +372,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
 			long reCnt = adminUserDao.createAdminUser(adminUserVO);
 			if (reCnt > 0) {
-
-				// save client configuration information
-				long cnt = -1;
-				for (int i = 0; i < RULEINFOS.length; i++) {
-					String[] items = RULEINFOS[i];
-					cnt = adminUserDao.insertOrUpdateAdminRule(adminUserVO.getAdminId(), items[0], items[1],
-							adminUserVO.getValueByString(items[2]), LoginInfoHelper.getUserId());
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-					cnt = -1;
-				}
-
-				// save conn ips
-				adminUserDao.deleteAdminUserConnIps(adminUserVO.getAdminId());
-				if (adminUserVO.getConnIps() != null && adminUserVO.getConnIps().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getConnIps().size(); i++) {
-						cnt = adminUserDao.insertAdminUserConnIp(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getConnIps().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
-				// save admin's managed group ids
-				adminUserDao.deleteAdminUserGrpIds(adminUserVO.getAdminId());
-				if (adminUserVO.getGrpIds() != null && adminUserVO.getGrpIds().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getGrpIds().size(); i++) {
-						cnt = adminUserDao.insertAdminUserGrpId(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getGrpIds().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
-				// save admin's managed dept cds
-				adminUserDao.deleteAdminUserDeptCds(adminUserVO.getAdminId());
-				if (adminUserVO.getDeptCds() != null && adminUserVO.getDeptCds().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getDeptCds().size(); i++) {
-						cnt = adminUserDao.insertAdminUserDeptCd(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getDeptCds().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
+				saveClientConfiguration(adminUserVO);
 				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
 						MessageSourceHelper.getMessage("admin.result.insert"));
 			} else {

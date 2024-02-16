@@ -114,14 +114,102 @@ public class ClientConfController {
 		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
 	}
 
-	/**
-	 * get common configuration list data with paging for client conf, hosts, update
-	 * server conf.
-	 * 
-	 * @param req HttpServletRequest
-	 * @return ResultPagingVO result data bean
-	 *
-	 */
+	private ArrayList<CtrlPropVO> createCtrlPropList(HttpServletRequest req, String modUserId) {
+
+		ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+		int propSeq = 1;
+
+		String homeReset = req.getParameter(GPMSConstants.CTRL_ITEM_USEHOMERESET);
+		String rootAllow = req.getParameter(GPMSConstants.CTRL_ITEM_ROOTALLOW);
+		String sudoAllow = req.getParameter(GPMSConstants.CTRL_ITEM_SUDOALLOW);
+		String whiteIpAll = req.getParameter(GPMSConstants.CTRL_ITEM_WHITEIPALL);
+		String[] whiteIps = req.getParameterValues(GPMSConstants.CTRL_ITEM_WHITEIPS + "[]");
+		String policykitUser = req.getParameter("policykit_user");
+
+		String cleanModeAllow = req.getParameter(GPMSConstants.CTRL_ITEM_CLEANMODEALLOW);
+
+		String isDeleteLog = req.getParameter("isDeleteLog");
+		String logMaxSize = req.getParameter("logMaxSize");
+		String logMaxCount = req.getParameter("logMaxCount");
+		String logRemainDate = req.getParameter("logRemainDate");
+		String systemKeepFree = req.getParameter("systemKeepFree");
+
+		String transmit_boot = req.getParameter("transmit_boot");
+		String transmit_exe = req.getParameter("transmit_exe");
+		String transmit_os = req.getParameter("transmit_os");
+		String transmit_media = req.getParameter("transmit_media");
+		String transmit_agent = req.getParameter("transmit_agent");
+
+		String notify_boot = req.getParameter("notify_boot");
+		String notify_exe = req.getParameter("notify_exe");
+		String notify_os = req.getParameter("notify_os");
+		String notify_media = req.getParameter("notify_media");
+		String notify_agent = req.getParameter("notify_agent");
+
+		String show_boot = req.getParameter("show_boot");
+		String show_exe = req.getParameter("show_exe");
+		String show_os = req.getParameter("show_os");
+		String show_media = req.getParameter("show_media");
+		String show_agent = req.getParameter("show_agent");
+
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_USEHOMERESET, homeReset,
+				"", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_ROOTALLOW, rootAllow,
+				"", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_SUDOALLOW, sudoAllow,
+				"", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_CLEANMODEALLOW, cleanModeAllow,
+				"", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_WHITEIPALL, whiteIpAll,
+				"", modUserId, ""));
+
+		if (whiteIps != null && whiteIps.length > 0) {
+			for (String whiteIp : whiteIps) {
+				propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_WHITEIPS,
+						whiteIp, "", modUserId, ""));
+			}
+		}
+
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "policykitUser", policykitUser, "", modUserId, ""));
+
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "isDeleteLog", isDeleteLog, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "logMaxSize", logMaxSize, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "logMaxCount", logMaxCount, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "logRemainDate", logRemainDate, "", modUserId, ""));
+		propList.add(
+				new CtrlPropVO("", String.valueOf(propSeq++), "systemKeepFree", systemKeepFree, "", modUserId, ""));
+
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "transmit_boot", transmit_boot, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "transmit_exe", transmit_exe, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "transmit_os", transmit_os, "", modUserId, ""));
+		propList.add(
+				new CtrlPropVO("", String.valueOf(propSeq++), "transmit_media", transmit_media, "", modUserId, ""));
+		propList.add(
+				new CtrlPropVO("", String.valueOf(propSeq++), "transmit_agent", transmit_agent, "", modUserId, ""));
+
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_boot", notify_boot, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_exe", notify_exe, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_os", notify_os, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_media", notify_media, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_agent", notify_agent, "", modUserId, ""));
+
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_boot", show_boot, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_exe", show_exe, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_os", show_os, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_media", show_media, "", modUserId, ""));
+		propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_agent", show_agent, "", modUserId, ""));
+
+		return propList;
+	}
+
+		/**
+         * get common configuration list data with paging for client conf, hosts, update
+         * server conf.
+         *
+         * @param req HttpServletRequest
+         * @return ResultPagingVO result data bean
+         *
+         */
 	private ResultPagingVO readCommonCtrlItemAndPropList(HttpServletRequest req, String objectType) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
@@ -324,41 +412,6 @@ public class ClientConfController {
 		String objComment = req.getParameter("objComment");
 		String adminType = req.getParameter("adminType");
 
-		// String pollingTime =
-		// req.getParameter(GPMSConstants.CTRL_ITEM_AGENTPOLLINGTIME);
-		String homeReset = req.getParameter(GPMSConstants.CTRL_ITEM_USEHOMERESET);
-		String rootAllow = req.getParameter(GPMSConstants.CTRL_ITEM_ROOTALLOW);
-		String sudoAllow = req.getParameter(GPMSConstants.CTRL_ITEM_SUDOALLOW);
-		String whiteIpAll = req.getParameter(GPMSConstants.CTRL_ITEM_WHITEIPALL);
-		String[] whiteIps = req.getParameterValues(GPMSConstants.CTRL_ITEM_WHITEIPS + "[]");
-		String policykitUser = req.getParameter("policykit_user");
-
-		String cleanModeAllow = req.getParameter(GPMSConstants.CTRL_ITEM_CLEANMODEALLOW);
-
-		String isDeleteLog = req.getParameter("isDeleteLog");
-		String logMaxSize = req.getParameter("logMaxSize");
-		String logMaxCount = req.getParameter("logMaxCount");
-		String logRemainDate = req.getParameter("logRemainDate");
-		String systemKeepFree = req.getParameter("systemKeepFree");
-
-		String transmit_boot = req.getParameter("transmit_boot");
-		String transmit_exe = req.getParameter("transmit_exe");
-		String transmit_os = req.getParameter("transmit_os");
-		String transmit_media = req.getParameter("transmit_media");
-		String transmit_agent = req.getParameter("transmit_agent");
-
-		String notify_boot = req.getParameter("notify_boot");
-		String notify_exe = req.getParameter("notify_exe");
-		String notify_os = req.getParameter("notify_os");
-		String notify_media = req.getParameter("notify_media");
-		String notify_agent = req.getParameter("notify_agent");
-
-		String show_boot = req.getParameter("show_boot");
-		String show_exe = req.getParameter("show_exe");
-		String show_os = req.getParameter("show_os");
-		String show_media = req.getParameter("show_media");
-		String show_agent = req.getParameter("show_agent");
-
 		ResultVO resultVO = new ResultVO();
 
 		try {
@@ -374,56 +427,7 @@ public class ClientConfController {
 				itemVo.setStandardObj(true);
 			}
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
-			int propSeq = 1;
-
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_USEHOMERESET, homeReset,
-					"", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_ROOTALLOW, rootAllow,
-					"", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_SUDOALLOW, sudoAllow,
-					"", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_CLEANMODEALLOW, cleanModeAllow,
-					"", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_WHITEIPALL, whiteIpAll,
-					"", modUserId, ""));
-
-			if (whiteIps != null && whiteIps.length > 0) {
-				for (String whiteIp : whiteIps) {
-					propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_WHITEIPS,
-							whiteIp, "", modUserId, ""));
-				}
-			}
-			
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "policykitUser", policykitUser, "", modUserId, ""));
-
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "isDeleteLog", isDeleteLog, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "logMaxSize", logMaxSize, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "logMaxCount", logMaxCount, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "logRemainDate", logRemainDate, "", modUserId, ""));
-			propList.add(
-					new CtrlPropVO("", String.valueOf(propSeq++), "systemKeepFree", systemKeepFree, "", modUserId, ""));
-
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "transmit_boot", transmit_boot, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "transmit_exe", transmit_exe, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "transmit_os", transmit_os, "", modUserId, ""));
-			propList.add(
-					new CtrlPropVO("", String.valueOf(propSeq++), "transmit_media", transmit_media, "", modUserId, ""));
-			propList.add(
-					new CtrlPropVO("", String.valueOf(propSeq++), "transmit_agent", transmit_agent, "", modUserId, ""));
-
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_boot", notify_boot, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_exe", notify_exe, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_os", notify_os, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_media", notify_media, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_agent", notify_agent, "", modUserId, ""));
-
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_boot", show_boot, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_exe", show_exe, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_os", show_os, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_media", show_media, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_agent", show_agent, "", modUserId, ""));
-
+			ArrayList<CtrlPropVO> propList = createCtrlPropList(req, modUserId);
 			CtrlPropVO[] props = new CtrlPropVO[propList.size()];
 			props = propList.toArray(props);
 
@@ -652,39 +656,6 @@ public class ClientConfController {
 		String confName = req.getParameter("objName");
 		String confComment = req.getParameter("objComment");
 
-		// String pollingTime =
-		String homeReset = req.getParameter(GPMSConstants.CTRL_ITEM_USEHOMERESET);
-		String rootAllow = req.getParameter(GPMSConstants.CTRL_ITEM_ROOTALLOW);
-		String sudoAllow = req.getParameter(GPMSConstants.CTRL_ITEM_SUDOALLOW);
-		String whiteIpAll = req.getParameter(GPMSConstants.CTRL_ITEM_WHITEIPALL);
-		String[] whiteIps = req.getParameterValues(GPMSConstants.CTRL_ITEM_WHITEIPS + "[]");
-		String policykitUser = req.getParameter("policykit_user");
-
-		String cleanModeAllow = req.getParameter(GPMSConstants.CTRL_ITEM_CLEANMODEALLOW);
-		
-		String isDeleteLog = req.getParameter("isDeleteLog");
-		String logMaxSize = req.getParameter("logMaxSize");
-		String logMaxCount = req.getParameter("logMaxCount");
-		String logRemainDate = req.getParameter("logRemainDate");
-		String systemKeepFree = req.getParameter("systemKeepFree");
-
-		String transmit_boot = req.getParameter("transmit_boot");
-		String transmit_exe = req.getParameter("transmit_exe");
-		String transmit_os = req.getParameter("transmit_os");
-		String transmit_media = req.getParameter("transmit_media");
-		String transmit_agent = req.getParameter("transmit_agent");
-
-		String notify_boot = req.getParameter("notify_boot");
-		String notify_exe = req.getParameter("notify_exe");
-		String notify_os = req.getParameter("notify_os");
-		String notify_media = req.getParameter("notify_media");
-		String notify_agent = req.getParameter("notify_agent");
-
-		String show_boot = req.getParameter("show_boot");
-		String show_exe = req.getParameter("show_exe");
-		String show_os = req.getParameter("show_os");
-		String show_media = req.getParameter("show_media");
-		String show_agent = req.getParameter("show_agent");
 
 		ResultVO resultVO = new ResultVO();
 
@@ -701,56 +672,7 @@ public class ClientConfController {
 			itemVo.setComment(confComment);
 			itemVo.setModUserId(modUserId);
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
-			int propSeq = 1;
-
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_USEHOMERESET, homeReset,
-					"", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_ROOTALLOW, rootAllow,
-					"", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_SUDOALLOW, sudoAllow,
-					"", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_CLEANMODEALLOW, cleanModeAllow,
-					"", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_WHITEIPALL, whiteIpAll,
-					"", modUserId, ""));
-
-			if (whiteIps != null && whiteIps.length > 0) {
-				for (String whiteIp : whiteIps) {
-					propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_WHITEIPS,
-							whiteIp, "", modUserId, ""));
-				}
-			}
-			
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "policykitUser", policykitUser, "", modUserId, ""));
-
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "isDeleteLog", isDeleteLog, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "logMaxSize", logMaxSize, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "logMaxCount", logMaxCount, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "logRemainDate", logRemainDate, "", modUserId, ""));
-			propList.add(
-					new CtrlPropVO("", String.valueOf(propSeq++), "systemKeepFree", systemKeepFree, "", modUserId, ""));
-
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "transmit_boot", transmit_boot, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "transmit_exe", transmit_exe, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "transmit_os", transmit_os, "", modUserId, ""));
-			propList.add(
-					new CtrlPropVO("", String.valueOf(propSeq++), "transmit_media", transmit_media, "", modUserId, ""));
-			propList.add(
-					new CtrlPropVO("", String.valueOf(propSeq++), "transmit_agent", transmit_agent, "", modUserId, ""));
-
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_boot", notify_boot, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_exe", notify_exe, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_os", notify_os, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_media", notify_media, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "notify_agent", notify_agent, "", modUserId, ""));
-
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_boot", show_boot, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_exe", show_exe, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_os", show_os, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_media", show_media, "", modUserId, ""));
-			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "show_agent", show_agent, "", modUserId, ""));
-
+			ArrayList<CtrlPropVO> propList = createCtrlPropList(req, modUserId);
 			CtrlPropVO[] props = new CtrlPropVO[propList.size()];
 			props = propList.toArray(props);
 
@@ -759,6 +681,11 @@ public class ClientConfController {
 
 			// [JOBCREATE]
 			if (GPMSConstants.MSG_SUCCESS.equals(status.getResult())) {
+				String homeReset = req.getParameter(GPMSConstants.CTRL_ITEM_USEHOMERESET);
+				String rootAllow = req.getParameter(GPMSConstants.CTRL_ITEM_ROOTALLOW);
+				String sudoAllow = req.getParameter(GPMSConstants.CTRL_ITEM_SUDOALLOW);
+				String policykitUser = req.getParameter("policykit_user");
+				String cleanModeAllow = req.getParameter(GPMSConstants.CTRL_ITEM_CLEANMODEALLOW);
 
 				// use home reset job
 				if (homeReset != null && !(homeReset.equals(getPropertyValue((CtrlItemVO) currentConfObj.getData()[0],
