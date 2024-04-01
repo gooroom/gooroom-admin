@@ -263,7 +263,10 @@ public class ClientController {
 		String clientType = req.getParameter("clientType");
 		String viewType = req.getParameter("viewType");
 		String groupId = req.getParameter("groupId");
+		String userId = req.getParameter("userId");
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
+
+		options.put("userId", StringUtils.isEmpty(userId) ? null : userId);
 
 		if ("REVOKED".equalsIgnoreCase(clientType)) {
 			// revoked client list

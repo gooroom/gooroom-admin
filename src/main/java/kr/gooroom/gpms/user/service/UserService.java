@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.user.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -258,5 +259,12 @@ public interface UserService {
 	 * 사용자 정보 업로드 샘플 다운로드
 	 */
 	XSSFWorkbook createUserSampleFileFromData() throws Exception;
+
+	/**
+	 * 여러 사용자 권한정보 일괄 수정
+	 */
+	public StatusVO updateRuleInfoToMultiUser(ArrayList<String>  deptCds, String browserRuleId, String mediaRuleId,
+											  String securityRuleId, String filteredSoftwareRuleId, String ctrlCenterItemRuleId, String policyKitRuleId,
+											  String desktopConfId) throws Exception;
 
 }

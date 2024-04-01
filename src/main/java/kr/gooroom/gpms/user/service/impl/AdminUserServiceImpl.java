@@ -37,7 +37,6 @@ import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.log.service.ClientLogVO;
 import kr.gooroom.gpms.user.service.AdminUserService;
 import kr.gooroom.gpms.user.service.AdminUserVO;
 
@@ -60,7 +59,66 @@ public class AdminUserServiceImpl implements AdminUserService {
 	private String[][] RULEINFOS = { { "client_admin", "client_admin", "isClientAdmin" },
 			{ "user_admin", "user_admin", "isUserAdmin" }, { "desktop_admin", "desktop_admin", "isDesktopAdmin" }, 
 			{ "notice_admin", "notice_admin", "isNoticeAdmin" },{ "portable_admin", "portable_admin", "isPortableAdmin" }};
-	
+
+
+	private void saveClientConfiguration(AdminUserVO adminUserVO) throws SQLException {
+		long cnt = -1;
+		// save client configuration information
+		for (int i = 0; i < RULEINFOS.length; i++) {
+			String[] items = RULEINFOS[i];
+			cnt = adminUserDao.insertOrUpdateAdminRule(adminUserVO.getAdminId(), items[0], items[1],
+					adminUserVO.getValueByString(items[2]), LoginInfoHelper.getUserId());
+
+			if (cnt < 0) {
+				throw new SQLException();
+			}
+			cnt = -1;
+		}
+
+		// save conn ips
+		adminUserDao.deleteAdminUserConnIps(adminUserVO.getAdminId());
+		if (adminUserVO.getConnIps() != null && adminUserVO.getConnIps().size() > 0) {
+			cnt = -1;
+			for (int i = 0; i < adminUserVO.getConnIps().size(); i++) {
+				cnt = adminUserDao.insertAdminUserConnIp(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
+						(String) adminUserVO.getConnIps().get(i));
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+				cnt = -1;
+			}
+		}
+
+		// save admin's managed group ids
+		adminUserDao.deleteAdminUserGrpIds(adminUserVO.getAdminId());
+		if (adminUserVO.getGrpIds() != null && adminUserVO.getGrpIds().size() > 0) {
+			cnt = -1;
+			for (int i = 0; i < adminUserVO.getGrpIds().size(); i++) {
+				cnt = adminUserDao.insertAdminUserGrpId(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
+						(String) adminUserVO.getGrpIds().get(i));
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+				cnt = -1;
+			}
+		}
+
+		// save admin's managed dept cds
+		adminUserDao.deleteAdminUserDeptCds(adminUserVO.getAdminId());
+		if (adminUserVO.getDeptCds() != null && adminUserVO.getDeptCds().size() > 0) {
+			cnt = -1;
+			for (int i = 0; i < adminUserVO.getDeptCds().size(); i++) {
+				cnt = adminUserDao.insertAdminUserDeptCd(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
+						(String) adminUserVO.getDeptCds().get(i));
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+				cnt = -1;
+			}
+		}
+
+	}
+
 	/**
 	 * modify administrator user information data with divided rules.
 	 * 
@@ -77,61 +135,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 			adminUserVO.setRegUserId(LoginInfoHelper.getUserId());
 			long reCnt = adminUserDao.updateAdminUserData(adminUserVO);
 			if (reCnt > 0) {
-
-				// save client configuration information
-				long cnt = -1;
-				for (int i = 0; i < RULEINFOS.length; i++) {
-					String[] items = RULEINFOS[i];
-					cnt = adminUserDao.insertOrUpdateAdminRule(adminUserVO.getAdminId(), items[0], items[1],
-							adminUserVO.getValueByString(items[2]), LoginInfoHelper.getUserId());
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-					cnt = -1;
-				}
-
-				// save conn ips
-				adminUserDao.deleteAdminUserConnIps(adminUserVO.getAdminId());
-				if (adminUserVO.getConnIps() != null && adminUserVO.getConnIps().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getConnIps().size(); i++) {
-						cnt = adminUserDao.insertAdminUserConnIp(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getConnIps().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
-				// save admin's managed group ids
-				adminUserDao.deleteAdminUserGrpIds(adminUserVO.getAdminId());
-				if (adminUserVO.getGrpIds() != null && adminUserVO.getGrpIds().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getGrpIds().size(); i++) {
-						cnt = adminUserDao.insertAdminUserGrpId(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getGrpIds().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
-				// save admin's managed dept cds
-				adminUserDao.deleteAdminUserDeptCds(adminUserVO.getAdminId());
-				if (adminUserVO.getDeptCds() != null && adminUserVO.getDeptCds().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getDeptCds().size(); i++) {
-						cnt = adminUserDao.insertAdminUserDeptCd(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getDeptCds().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
+				saveClientConfiguration(adminUserVO);
 				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
 						MessageSourceHelper.getMessage("admin.result.update"));
 			} else {
@@ -352,7 +356,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 	/**
 	 * create new administrator user data
 	 * 
-	 * @param vo AdminUserVO data bean
+	 * @param  AdminUserVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -368,61 +372,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
 			long reCnt = adminUserDao.createAdminUser(adminUserVO);
 			if (reCnt > 0) {
-
-				// save client configuration information
-				long cnt = -1;
-				for (int i = 0; i < RULEINFOS.length; i++) {
-					String[] items = RULEINFOS[i];
-					cnt = adminUserDao.insertOrUpdateAdminRule(adminUserVO.getAdminId(), items[0], items[1],
-							adminUserVO.getValueByString(items[2]), LoginInfoHelper.getUserId());
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-					cnt = -1;
-				}
-
-				// save conn ips
-				adminUserDao.deleteAdminUserConnIps(adminUserVO.getAdminId());
-				if (adminUserVO.getConnIps() != null && adminUserVO.getConnIps().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getConnIps().size(); i++) {
-						cnt = adminUserDao.insertAdminUserConnIp(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getConnIps().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
-				// save admin's managed group ids
-				adminUserDao.deleteAdminUserGrpIds(adminUserVO.getAdminId());
-				if (adminUserVO.getGrpIds() != null && adminUserVO.getGrpIds().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getGrpIds().size(); i++) {
-						cnt = adminUserDao.insertAdminUserGrpId(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getGrpIds().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
-				// save admin's managed dept cds
-				adminUserDao.deleteAdminUserDeptCds(adminUserVO.getAdminId());
-				if (adminUserVO.getDeptCds() != null && adminUserVO.getDeptCds().size() > 0) {
-					cnt = -1;
-					for (int i = 0; i < adminUserVO.getDeptCds().size(); i++) {
-						cnt = adminUserDao.insertAdminUserDeptCd(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-								(String) adminUserVO.getDeptCds().get(i));
-						if (cnt < 0) {
-							throw new SQLException();
-						}
-						cnt = -1;
-					}
-				}
-
+				saveClientConfiguration(adminUserVO);
 				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
 						MessageSourceHelper.getMessage("admin.result.insert"));
 			} else {
@@ -672,6 +622,91 @@ public class AdminUserServiceImpl implements AdminUserService {
 			}
 		}
 		return statusVO;
+	}
+
+	/**
+	 * get administrator user type.
+	 *
+	 * @param adminId string user id
+	 * @return ResultVO result data bean
+	 * @throws Exception
+	 */
+	@Override
+	public ResultVO getAdminUserInfo(String adminId) throws Exception {
+
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			AdminUserVO re = adminUserDao.selectAdminUserInfo(adminId);
+
+			if (re != null) {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				if (!re.getAdminTp().equalsIgnoreCase("S")) {
+					resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+							MessageSourceHelper.getMessage("admin.result.noinsert")));
+					return resultVO;
+				}
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("system.common.selectdata")));
+			} else {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.noselectdata")));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in selectAdminUserInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+
+	/**
+	 * get administrator user Authority.
+	 *
+	 * @param adminId string adminId
+	 * @param adminRule String adminRule
+	 * @return ResultVO result data bean
+	 * @throws Exception
+	 */
+	@Override
+	public ResultVO getAuthority(String adminId, String adminRule) throws Exception {
+
+		ResultVO resultVO = new ResultVO();
+
+		try {
+			AdminUserVO re = adminUserDao.selectAdminUserAuthority(adminId, adminRule);
+
+			if (re != null) {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("system.common.selectdata")));
+			} else {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.noselectdata")));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in getAuthority : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
 	}
 	
 }

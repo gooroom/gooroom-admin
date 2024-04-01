@@ -57,12 +57,11 @@ public interface SiteMngService {
 
 	/**
 	 * response site information data
-	 * 
-	 * @param siteId string site id
+	 *
 	 * @return ResultVO result data bean
 	 * @throws Exception
 	 */
-	ResultVO selectSiteMngData(String siteId) throws Exception;
+	ResultVO selectSiteMngData() throws Exception;
 
 	/**
 	 * modify site information data

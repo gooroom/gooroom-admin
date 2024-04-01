@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
+import kr.gooroom.gpms.mng.service.ThemeVO;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,6 +120,11 @@ public class FileUploadServiceImpl implements FileUploadService {
 			vo.setDeleteYn(GPMSConstants.GUBUN_NO);
 			vo.setRegUserId(LoginInfoHelper.getUserId());
 
+			if(file.getName().equals("wallpaperFile")) {
+				vo.setFileType("wallpaper");
+			} else {
+				vo.setFileType("icon");
+			}
 			gpmsCommonDAO.insertFileInfo(vo);
 
 			return vo;
@@ -128,6 +134,23 @@ public class FileUploadServiceImpl implements FileUploadService {
 		} catch (SQLException e) {
 			throw new GRFileHandleException("Failed to store file " + filename, e);
 		}
+	}
+
+	/**
+	 * save file physically to specified location.
+	 *
+	 * @param vo Basic theme icon file
+	 * @return FileVO saved file data
+	 *
+	 */
+	public FileVO store(FileVO vo) {
+		try {
+			gpmsCommonDAO.insertFileInfo(vo);
+		} catch (Exception e) {
+			throw new GRFileHandleException("Failed to store file " + vo.getFileName(), e);
+		}
+
+		return vo;
 	}
 
 	/**

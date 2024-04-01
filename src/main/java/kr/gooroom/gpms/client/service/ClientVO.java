@@ -34,6 +34,7 @@ public class ClientVO implements Serializable {
 	private String nullColumn = "";
 
 	private String clientId;
+	private String simpleClientId;
 	private String clientStatus;
 	private String viewStatus;
 
@@ -58,6 +59,9 @@ public class ClientVO implements Serializable {
 	private String keyDateFrom;
 	private String keyDateTo;
 	private String keySerialNO;
+
+	// for user_client_use_hist
+	private String userId;
 
 	private String isOn;
 	private String loginId;
@@ -153,6 +157,14 @@ public class ClientVO implements Serializable {
 		this.updateTargetCnt = updateTargetCnt;
 	}
 
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 	public String getIsOn() {
 		return isOn;
 	}
@@ -207,6 +219,14 @@ public class ClientVO implements Serializable {
 
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
+	}
+
+	public String getSimpleClientId() {
+		return simpleClientId;
+	}
+
+	public void setSimpleClientId(String simpleClientId) {
+		this.simpleClientId = simpleClientId;
 	}
 
 	public String getClientName() {

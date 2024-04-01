@@ -17,14 +17,13 @@
 package kr.gooroom.gpms.mng.controller;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 import javax.annotation.Resource;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import kr.gooroom.gpms.job.custom.CustomJobMaker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +74,10 @@ public class ThemeMngController {
 	@Resource(name = "fileUploadService")
 	private FileUploadService fileUploadService;
 
+	@Inject
+	private CustomJobMaker jobMaker;
+
+
 	/**
 	 * initialize binder for date format
 	 * <p>
@@ -105,32 +108,21 @@ public class ThemeMngController {
 			HttpServletRequest request) {
 
 		MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
-		Iterator<String> iterator = multipartHttpServletRequest.getFileNames();
-
-		ArrayList<FileVO> files = new ArrayList<FileVO>();
-
-		while (iterator.hasNext()) {
-
-			String fileName = (String) iterator.next();
-			MultipartFile multipartFile = multipartHttpServletRequest.getFile(fileName);
-
-			FileVO vo = null;
-			if (multipartFile != null) {
-				vo = fileUploadService.store(multipartFile);
-			}
-			if (vo != null) {
-				vo.setFileEtcInfo(multipartFile.getName());
-				files.add(vo);
-			}
-		}
-
-		themeVO.setThemeIcons(files);
 
 		ResultVO resultVO = new ResultVO();
+
 		try {
 
-			StatusVO status = themeMngService.createThemeData(themeVO);
+			StatusVO status = themeMngService.createThemeData(themeVO, multipartHttpServletRequest);
 			resultVO.setStatus(status);
+
+			if(status.getResult().equals(GPMSConstants.MSG_SUCCESS)) {
+				// job maker
+				HashMap<String, String> map = new HashMap<>();
+				map.put("theme_id", themeVO.getThemeId());
+				map.put("theme_action", "0");
+				jobMaker.createJobForCustomTheme(map);
+			}
 
 		} catch (Exception ex) {
 			logger.error("error in createThemeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -156,8 +148,15 @@ public class ThemeMngController {
 		ResultVO resultVO = new ResultVO();
 		try {
 			StatusVO status = themeMngService.deleteThemeData(themeId);
-
 			resultVO.setStatus(status);
+
+			if(status.getResult().equals(GPMSConstants.MSG_SUCCESS)) {
+				// job maker
+				HashMap<String, String> map = new HashMap<>();
+				map.put("theme_id", themeId);
+				map.put("theme_action", "2");
+				jobMaker.createJobForCustomTheme(map);
+			}
 
 		} catch (Exception ex) {
 			logger.error("error in deleteThemeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -185,32 +184,20 @@ public class ThemeMngController {
 			HttpServletRequest request, ModelMap model) {
 
 		MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
-		Iterator<String> iterator = multipartHttpServletRequest.getFileNames();
-
-		ArrayList<FileVO> files = new ArrayList<FileVO>();
-		while (iterator.hasNext()) {
-
-			String fileName = (String) iterator.next();
-			MultipartFile multipartFile = multipartHttpServletRequest.getFile(fileName);
-
-			FileVO vo = null;
-			if (multipartFile != null) {
-				vo = fileUploadService.store(multipartFile);
-			}
-			if (vo != null) {
-				vo.setFileEtcInfo(multipartFile.getName());
-				files.add(vo);
-			}
-		}
-
-		themeVO.setThemeIcons(files);
-
 		ResultVO resultVO = new ResultVO();
 
 		try {
 
-			StatusVO status = themeMngService.editThemeData(themeVO);
+			StatusVO status = themeMngService.editThemeData(themeVO, multipartHttpServletRequest);
 			resultVO.setStatus(status);
+
+			if(status.getResult().equals(GPMSConstants.MSG_SUCCESS)) {
+				// job maker
+				HashMap<String, String> map = new HashMap<>();
+				map.put("theme_id", themeVO.getThemeId());
+				map.put("theme_action", "1");
+				jobMaker.createJobForCustomTheme(map);
+			}
 
 		} catch (Exception ex) {
 			logger.error("error in updateThemeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -325,7 +312,7 @@ public class ThemeMngController {
 
 		ResultVO resultVO = new ResultVO();
 		
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 		options.put("ICON_ADDRESS", CommonUtils.createIconUrlPath());
 		options.put("themeId", themeId);
 		
@@ -347,7 +334,7 @@ public class ThemeMngController {
 	 * create(insert) new wallpaper information data.
 	 * <p>
 	 * use file uploader.
-	 * 
+	 *
 	 * @param wallpaperVO WallpaperVO wallpaper information data bean. @param
 	 *                    request HttpServletRequest @return ResultVO result data
 	 *                    bean. @throws
@@ -387,7 +374,7 @@ public class ThemeMngController {
 
 	/**
 	 * response wallpaper information list data.
-	 * 
+	 *
 	 * @return ResultVO result data bean. @throws
 	 */
 	@PostMapping(value = "/readWallpaperList")

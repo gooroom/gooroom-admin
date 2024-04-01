@@ -298,6 +298,20 @@
 		WHERE ADMIN_ID = #{adminId}
 	</update>
 
+	<!-- 관리자 정보 조회 -->
+	<select id="selectAdminUserInfo" parameterType="String" resultMap="adminUserInfo">
+		SELECT *
+		FROM ADMIN_MSTR
+		WHERE ADMIN_ID=#{adminId}
+	</select>
+
+	<!-- 관리자 정보 조회 -->
+	<select id="selectAdminUserAuthority" parameterType="String" resultMap="adminUserInfo">
+		SELECT *
+		FROM ADMIN_RULES
+		WHERE ADMIN_ID=#{adminId} AND RULE_TYPE=#{adminRule}
+	</select>
+
 </mapper>
 
 

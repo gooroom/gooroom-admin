@@ -47,8 +47,7 @@ public class GpmsCommonDAO extends SqlSessionMetaDAO {
 	 * response client list by options.
 	 * <p>
 	 * server ip, server url.
-	 * 
-	 * @param options HashMap<String, Object> options for select
+	 *
 	 * @return ServerAddrInfoVO server address information data bean
 	 * @throws SQLException
 	 */
@@ -138,6 +137,19 @@ public class GpmsCommonDAO extends SqlSessionMetaDAO {
 	public long insertFileInfo(FileVO vo) throws SQLException {
 
 		return (long) sqlSessionMeta.insert("insertFileInfo", vo);
+
+	}
+
+	/**
+	 * select file information data.
+	 *
+	 * @param fileNo String File No information object
+	 * @return long query result count
+	 * @throws SQLException
+	 */
+	public FileVO selectFileInfo(String fileNo) throws SQLException {
+
+		return sqlSessionMeta.selectOne("selectFileInfo", fileNo);
 
 	}
 

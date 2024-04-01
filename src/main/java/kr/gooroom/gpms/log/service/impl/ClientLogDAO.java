@@ -144,4 +144,15 @@ public class ClientLogDAO extends SqlSessionMetaDAO {
 		return (long) sqlSessionMeta.selectOne("selectSecurityLogFilteredCount", options);
 	}
 
+	/**
+	 * delete user client use hist
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return long filtered count number.
+	 * @throws SQLException
+	 */
+	public long deleteUserClientUseHist(HashMap<String, Object> options) throws SQLException {
+		return (long) sqlSessionMeta.delete("deleteUserClientUseHist", options);
+	}
+
 }

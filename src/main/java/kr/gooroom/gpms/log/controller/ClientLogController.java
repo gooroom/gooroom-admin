@@ -34,6 +34,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.gooroom.gpms.common.GPMSConstants;
@@ -305,6 +306,46 @@ public class ClientLogController {
 		}
 
 		return resultVO;
+	}
+
+	/**
+	 * delete user client use hist
+	 * <p>
+	 * multi clients.
+	 *
+	 * @return ResultVO
+	 *
+	 */
+	@PostMapping(value = "/deleteUserClientUseHist")
+	public @ResponseBody ResultVO deleteUserClientUseHist(@RequestParam(value = "userId", required = true) String userId,
+														  @RequestParam(value = "clientIds", required = true) String clientIds) throws Exception {
+		ResultVO resultVO = new ResultVO();
+
+		HashMap<String, Object> options = new HashMap<>();
+		options.put("userId", userId);
+		options.put("clientIds", clientIds.split(","));
+
+		try {
+			StatusVO status = clientLogService.deleteUserClientUseHist(options);
+			if (status.getResult().equals(GPMSConstants.MSG_SUCCESS)) {
+
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
+						MessageSourceHelper.getMessage("common.result.delete")));
+			} else {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETEERROR,
+						MessageSourceHelper.getMessage("common.result.nodelete")));
+			}
+		} catch (Exception ex) {
+			logger.error("error in deleteUserClientUseHist : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+
 	}
 
 }

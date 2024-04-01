@@ -32,6 +32,7 @@
 		<result property="propValue" column="PROP_VALUE"/>
 		
 		<result property="link" column="LINK"/>
+		<result property="propType" column="PROP_TYPE"/>
 
 		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 		<result property="modUserId" column="MOD_USER_ID"/>
@@ -52,9 +53,18 @@
 		<result property="modUserId" column="MOD_USER_ID"/>
 		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 		<result property="regUserId" column="REG_USER_ID"/>
+
+		<result property="propType" column="PROP_TYPE" />
 		
 		<collection property="propList" ofType="ctrlPropVO" resultMap="ctrlPropInfo" columnPrefix="PROP_"/>
-	
+
+	</resultMap>
+
+	<resultMap type="ActivateGroupViewVO" id="activateGroupViewInfo">
+		<result property="gubun" column="GUBUN" />
+		<result property="deptCd" column="DEPT_CD"/>
+		<result property="deptNm" column="DEPT_NM"/>
+		<result property="regDt" column="REG_DT"/>
 	</resultMap>
 
 	<resultMap type="clientGroupVO" id="clientGroupInfo">
@@ -80,7 +90,6 @@
 
 	<!-- 정책 - 제어대상 관련 항목 리스트 조회 + 속성 -->
 	<select id="selectCtrlItemAndPropList" parameterType="hashMap" resultMap="ctrlItemAndPropInfo">
-	
 		SELECT M1.OBJ_ID, M1.OBJ_NM, M1.COMMENT,
 		       M1.MOD_DT, M1.MOD_USER_ID, M1.REG_DT, M1.REG_USER_ID,
 		       M1.OBJ_ID PROP_OBJ_ID,
@@ -117,7 +126,8 @@
 		       M1.MOD_DT, M1.MOD_USER_ID, M1.REG_DT, M1.REG_USER_ID,
 		       M1.OBJ_ID PROP_OBJ_ID,
 		       P1.PROP_NM PROP_PROP_NM,
-		       P1.PROP_VALUE PROP_PROP_VALUE
+		       P1.PROP_VALUE PROP_PROP_VALUE,
+		       P1.PROP_TYPE PROP_PROP_TYPE
 		FROM (
 		      SELECT M.OBJ_ID,
 		             M.OBJ_NM,
@@ -217,7 +227,7 @@
 	<insert id="insertCtrlItem" parameterType="ctrlItemVO">
 		INSERT INTO CTRL_ITEM_MSTR
 			(OBJ_ID, OBJ_NM, MNG_OBJ_TP, COMMENT, 
-			MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID) 
+			MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID)
 		VALUES 
 			(#{objId}, #{objNm}, #{mngObjTp}, #{comment},
 			now(), #{modUserId}, now(), #{modUserId});
@@ -263,10 +273,10 @@
 	<!-- 정책 - 제어대상 관련 속성 등록 -->
 	<insert id="insertCtrlProp" parameterType="ctrlPropVO">
 		INSERT INTO CTRL_ITEM_PROP
-			(OBJ_ID, PROP_ID, PROP_NM, PROP_VALUE, LINK, MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID)
+			(OBJ_ID, PROP_ID, PROP_NM, PROP_VALUE, LINK, MOD_DT, MOD_USER_ID, REG_DT, REG_USER_ID, PROP_TYPE)
 		VALUES 
 			(#{objId}, #{propId}, #{propNm}, #{propValue}, #{link},
-			now(), #{modUserId}, now(), #{modUserId});
+			now(), #{modUserId}, now(), #{modUserId}, #{propType});
 	</insert>
 
 	<!-- 정책 - 제어대상 관련 속성 수정 -->
@@ -486,9 +496,6 @@
 		ON PP.OBJ_ID = SS.CONF_ID
 	</select>
 
-
-
-
 	<!-- 정책 - 제어대상 관련 항목 조회 - 조직 : DEPT -->
 	<select id="selectCtrlItemByDeptCd" parameterType="String" resultMap="ctrlItemInfo">
 		SELECT MM.OBJ_ID, FF.EXTVALUE, MM.OBJ_NM, MM.MNG_OBJ_TP, MM.COMMENT, MM.MOD_DT, MM.MOD_USER_ID, MM.REG_DT, MM.REG_USER_ID
@@ -664,6 +671,46 @@
 		        ON PP.OBJ_ID = SS.CONF_ID
 	</select>
 
+	<select id="selectActivateGroupListPaged" parameterType="hashMap" resultMap="activateGroupViewInfo">
+		SELECT GUBUN, DEPT_CD, DEPT_NM, REG_DT
+		FROM ACTIVATE_GROUP_VIEW
+		WHERE CONF_ID = #{confId}
+			<if test="gubun != null and gubun !='' and gubun == 'user'">
+				AND GUBUN = "사용자"
+			</if>
+			<if test="gubun != null and gubun !='' and gubun == 'group'">
+				AND GUBUN = "그룹"
+			</if>
+			<if test="gubun != null and gubun !='' and gubun == 'date'">
+				AND REG_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
+			</if>
+			<if test="searchKey != null and searchKey != ''">
+				AND (DEPT_CD LIKE CONCAT('%', #{searchKey}, '%') OR DEPT_NM LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
 
+	<select id="selectActivateGroupListTotalCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(CONF_ID) AS CNT
+		FROM ACTIVATE_GROUP_VIEW
+		WHERE CONF_ID = #{confId}
+	</select>
 
+	<select id="selectActivateGroupListFilteredCount" parameterType="hashMap" resultType="long">
+		SELECT COUNT(CONF_ID) AS CNT
+		FROM ACTIVATE_GROUP_VIEW
+		WHERE CONF_ID = #{confId}
+			<if test="gubun != null and gubun !='' and gubun == 'user'">
+				AND GUBUN = "사용자"
+			</if>
+			<if test="gubun != null and gubun !='' and gubun == 'group'">
+				AND GUBUN = "그룹"
+			</if>
+			<if test="gubun != null and gubun !='' and gubun == 'date'">
+				AND REG_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
+			</if>
+			<if test="searchKey != null and searchKey != ''">
+				AND (DEPT_CD LIKE CONCAT('%', #{searchKey}, '%') OR DEPT_NM LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+	</select>
 </mapper>

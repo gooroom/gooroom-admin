@@ -528,5 +528,57 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	public long updateLoginTrialData(String adminId) throws SQLException {
 		return (long) sqlSessionMeta.update("updateLoginTrialData", adminId);
 	}
+
+	/**
+	 * response administrator user Info
+	 * authority.
+	 *
+	 * @param adminId string administrator user id
+	 * @return AdminUserVO List
+	 * @throws SQLException
+	 */
+	public AdminUserVO selectAdminUserInfo(String adminId) throws SQLException {
+		AdminUserVO re = null;
+		try {
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put("adminId", adminId);
+
+			re = sqlSessionMeta.selectOne("selectAdminUserInfo", map);
+
+		} catch (Exception ex) {
+			logger.error("error in selectAdminUserInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			re = null;
+		}
+
+		return re;
+	}
+
+	/**
+	 * response administrator user Authority
+	 * authority.
+	 *
+	 * @param adminId string administrator user id
+	 * @param adminRule string administrator Rule
+	 * @return AdminUserVO List
+	 * @throws SQLException
+	 */
+	public AdminUserVO selectAdminUserAuthority(String adminId, String adminRule) throws SQLException {
+		AdminUserVO re = null;
+		try {
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put("adminId", adminId);
+			map.put("adminRule", adminRule);
+
+			re = sqlSessionMeta.selectOne("selectAdminUserAuthority", map);
+
+		} catch (Exception ex) {
+			logger.error("error in selectAdminUserAuthority : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			re = null;
+		}
+
+		return re;
+	}
 	
 }

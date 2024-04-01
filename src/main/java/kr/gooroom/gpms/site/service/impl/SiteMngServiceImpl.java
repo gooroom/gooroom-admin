@@ -175,16 +175,15 @@ public class SiteMngServiceImpl implements SiteMngService {
 
 	/**
 	 * response site information data
-	 * 
-	 * @param siteId string site id
+	 *
 	 * @return ResultVO result data bean
 	 * @throws Exception
 	 */
 	@Override
-	public ResultVO selectSiteMngData(String siteId) throws Exception {
+	public ResultVO selectSiteMngData() throws Exception {
 		ResultVO resultVO = new ResultVO();
 		try {
-			SiteMngVO re = siteMngDao.selectSiteMngData(siteId);
+			SiteMngVO re = siteMngDao.selectSiteMngData();
 			if (re != null) {
 				SiteMngVO[] row = new SiteMngVO[1];
 				row[0] = re;

@@ -20,6 +20,7 @@ import java.util.HashMap;
 
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
+import kr.gooroom.gpms.common.service.StatusVO;
 
 /**
  * GPMS logging management service interface
@@ -59,5 +60,14 @@ public interface ClientLogService {
 	 * @throws Exception
 	 */
 	public ResultPagingVO getSecurityLogListPaged(HashMap<String, Object> options) throws Exception;
+
+	/**
+	 * delete user client use hist
+	 *
+	 * @param options HashMap<String, Object> option data
+	 * @return ResultPagingVO result object
+	 * @throws Exception
+	 */
+	public StatusVO deleteUserClientUseHist(HashMap<String, Object> options) throws Exception;
 
 }

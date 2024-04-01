@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import kr.gooroom.gpms.config.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -38,11 +39,6 @@ import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.config.service.CtrlItemVO;
-import kr.gooroom.gpms.config.service.CtrlMstService;
-import kr.gooroom.gpms.config.service.CtrlPropVO;
-import kr.gooroom.gpms.config.service.DesktopConfVO;
-import kr.gooroom.gpms.config.service.RuleIdsVO;
 
 /**
  * gooroom rule and configuration management service implements class
@@ -841,16 +837,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 
 			// Desktop Conf
 			DesktopConfVO desktopConfVO = desktopConfDao.selectDesktopConfByGroupId(groupId);
-			ResultVO desktopResultVO = new ResultVO();
-			if (desktopConfVO != null) {
-				DesktopConfVO[] row = { desktopConfVO };
-				desktopResultVO.setData(row);
-				desktopResultVO.setExtend(new String[] { desktopConfVO.getConfGrade() });
-				desktopResultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
-
-				hm_total.put(GPMSConstants.TYPE_DESKTOPCONF, desktopResultVO);
-			}
+			setDesktopResult(hm_total, desktopConfVO);
 
 			// Rest rules.
 			List<CtrlPropVO> propRe = ctrlMstDao.selectCtrlPropListByGroupId(groupId);
@@ -901,21 +888,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 						break;
 					}
 
-					if (!"".equals(confType)) {
-						for (CtrlPropVO prop : props) {
-							if (confType.equals(prop.getMngObjTp())) {
-								item.getPropList().add(prop);
-							}
-						}
-					}
-
-					Object[] data = { item };
-					Object[] extend = { item.getExtValue() };
-					HashMap<String, Object> ruleMap = new HashMap<String, Object>();
-					ruleMap.put("data", data);
-					ruleMap.put("extend", extend);
-
-					hm_total.put(confType, ruleMap);
+					addCtrolProp(hm_total, props, item, confType);
 				}
 
 				Object[] t = { hm_total };
@@ -942,6 +915,24 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		return resultVO;
 	}
 
+	private void addCtrolProp(HashMap<String, Object> hm_total, CtrlPropVO[] props, CtrlItemVO item, String confType) {
+		if (!"".equals(confType)) {
+			for (CtrlPropVO prop : props) {
+				if (confType.equals(prop.getMngObjTp())) {
+					item.getPropList().add(prop);
+				}
+			}
+		}
+
+		Object[] data = { item };
+		Object[] extend = { item.getExtValue() };
+		HashMap<String, Object> ruleMap = new HashMap<String, Object>();
+		ruleMap.put("data", data);
+		ruleMap.put("extend", extend);
+
+		hm_total.put(confType, ruleMap);
+	}
+
 	/**
 	 * response control item data by dept cd
 	 * 
@@ -959,16 +950,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 
 			// Desktop Conf
 			DesktopConfVO desktopConfVO = desktopConfDao.selectDesktopConfByDeptCd(deptCd);
-			ResultVO desktopResultVO = new ResultVO();
-			if (desktopConfVO != null) {
-				DesktopConfVO[] row = { desktopConfVO };
-				desktopResultVO.setData(row);
-				desktopResultVO.setExtend(new String[] { desktopConfVO.getConfGrade() });
-				desktopResultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
-
-				hm_total.put(GPMSConstants.TYPE_DESKTOPCONF, desktopResultVO);
-			}
+			setDesktopResult(hm_total, desktopConfVO);
 
 			// Rest rules.
 			List<CtrlItemVO> itemRe = ctrlMstDao.selectCtrlItemByDeptCd(deptCd);
@@ -1009,21 +991,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 						break;
 					}
 
-					if (!"".equals(confType)) {
-						for (CtrlPropVO prop : props) {
-							if (confType.equals(prop.getMngObjTp())) {
-								item.getPropList().add(prop);
-							}
-						}
-					}
-
-					Object[] data = { item };
-					Object[] extend = { item.getExtValue() };
-					HashMap<String, Object> ruleMap = new HashMap<String, Object>();
-					ruleMap.put("data", data);
-					ruleMap.put("extend", extend);
-
-					hm_total.put(confType, ruleMap);
+					addCtrolProp(hm_total, props, item, confType);
 				}
 
 				Object[] t = { hm_total };
@@ -1050,6 +1018,19 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		return resultVO;
 	}
 
+	private void setDesktopResult(HashMap<String, Object> hm_total, DesktopConfVO desktopConfVO) {
+		ResultVO desktopResultVO = new ResultVO();
+		if (desktopConfVO != null) {
+			DesktopConfVO[] row = { desktopConfVO };
+			desktopResultVO.setData(row);
+			desktopResultVO.setExtend(new String[] { desktopConfVO.getConfGrade() });
+			desktopResultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+					MessageSourceHelper.getMessage("system.common.selectdata")));
+
+			hm_total.put(GPMSConstants.TYPE_DESKTOPCONF, desktopResultVO);
+		}
+	}
+
 	/**
 	 * response control item data by group id
 	 * 
@@ -1067,16 +1048,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 
 			// Desktop Conf
 			DesktopConfVO desktopConfVO = desktopConfDao.selectDesktopConfByUserId(userId);
-			ResultVO desktopResultVO = new ResultVO();
-			if (desktopConfVO != null) {
-				DesktopConfVO[] row = { desktopConfVO };
-				desktopResultVO.setData(row);
-				desktopResultVO.setExtend(new String[] { desktopConfVO.getConfGrade() });
-				desktopResultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
-
-				hm_total.put(GPMSConstants.TYPE_DESKTOPCONF, desktopResultVO);
-			}
+			setDesktopResult(hm_total, desktopConfVO);
 
 			// Rest rules.
 			List<CtrlItemVO> itemRe = ctrlMstDao.selectCtrlItemByUserId(userId);
@@ -1117,21 +1089,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 						break;
 					}
 
-					if (!"".equals(confType)) {
-						for (CtrlPropVO prop : props) {
-							if (confType.equals(prop.getMngObjTp())) {
-								item.getPropList().add(prop);
-							}
-						}
-					}
-
-					Object[] data = { item };
-					Object[] extend = { item.getExtValue() };
-					HashMap<String, Object> ruleMap = new HashMap<String, Object>();
-					ruleMap.put("data", data);
-					ruleMap.put("extend", extend);
-
-					hm_total.put(confType, ruleMap);
+					addCtrolProp(hm_total, props, item, confType);
 				}
 
 				Object[] t = { hm_total };
@@ -1148,6 +1106,46 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 
 		} catch (Exception ex) {
 			logger.error("error in readCtrlItemByUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
+	 * 정책 - 적용 그룹 리스트
+	 */
+	@Override
+	public ResultPagingVO readActivateGroupListPaged(HashMap<String, Object> options) throws Exception {
+		ResultPagingVO resultVO = new ResultPagingVO();
+
+		try {
+			List<ActivateGroupViewVO> re = ctrlMstDao.selectActivateGroupListPaged(options);
+			long totalCount = ctrlMstDao.selectActivateGroupListTotalCount(options);
+			long filteredCount = ctrlMstDao.selectActivateGroupListFilteredCount(options);
+
+			if (re != null && re.size() > 0) {
+				ActivateGroupViewVO[] row = re.stream().toArray(ActivateGroupViewVO[]::new);
+				resultVO.setData(row);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("system.common.selectdata")));
+
+				resultVO.setRecordsTotal(String.valueOf(totalCount));
+				resultVO.setRecordsFiltered(String.valueOf(filteredCount));
+
+			} else {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.noselectdata")));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in readActivateGroupListPaged( : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 			if (resultVO != null) {
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,

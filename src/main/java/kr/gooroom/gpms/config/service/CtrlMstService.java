@@ -192,4 +192,9 @@ public interface CtrlMstService {
 	 */
 	ResultVO readCtrlItemByUserId(String userId) throws Exception;
 
+	/**
+	 * 정책 - 적용 그룹 리스트
+	 */
+	ResultPagingVO readActivateGroupListPaged(HashMap<String, Object> options) throws Exception;
+
 }

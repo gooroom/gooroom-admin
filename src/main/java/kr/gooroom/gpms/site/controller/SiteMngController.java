@@ -262,7 +262,7 @@ public class SiteMngController {
 	public @ResponseBody ResultVO readSiteMngData(@RequestParam(value = "siteId", required = true) String siteId) {
 		ResultVO resultVO = new ResultVO();
 		try {
-			resultVO = siteMngService.selectSiteMngData(siteId);
+			resultVO = siteMngService.selectSiteMngData();
 		} catch (Exception ex) {
 			logger.error("error in readSiteMngData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());

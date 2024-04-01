@@ -36,12 +36,14 @@
 		<result property="deleteYn" column="DELETE_YN" />
 		<result property="regUserId" column="REG_USER_ID" />
 		<result property="regDate" column="REG_DT" />
+		<result property="modUserId" column="MOD_USER_ID" />
+		<result property="modDate" column="MOD_DT" />
 	
 	</resultMap>
 
 	<select id="selectThemeData" parameterType="hashmap" resultMap="themeInfo">
 		SELECT 
-			TM.THEME_ID, TM.THEME_NM, TM.THEME_CMT, TM.WALLPAPER, WM.WALLPAPER_NM, FM.FILE_NM AS WALLPAPERFILENAME, 
+			TM.THEME_ID, TM.THEME_NM, TM.THEME_CMT, TM.WALLPAPER, WM.WALLPAPER_NM, FM.FILE_NM AS WALLPAPERFILENAME,
 			TM.MOD_USER_ID, TM.MOD_DT, TM.REG_USER_ID, TM.REG_DT, #{ICON_ADDRESS} AS ICON_ADDRESS
 		FROM THEME_MSTR TM 
 			LEFT JOIN WALLPAPER_MSTR WM ON TM.WALLPAPER=WM.WALLPAPER_ID
@@ -92,23 +94,18 @@
 
 	<select id="selectIconFileListById" resultMap="fileInfo">
 		SELECT FM.FILE_NO, FM.FILE_NM, TI.APP_NM AS ETC_INFO, FM.FILE_TP, FM.FILE_PATH, FM.FILE_SIZE, 
-			FM.FILE_ORG_NM, FM.DELETE_YN, FM.REG_DT, FM.REG_USER_ID, #{iconAddress} AS IMG_URL
-		FROM THEME_ICON TI JOIN FILE_MSTR FM
-		ON TI.FILE_NO = FM.FILE_NO
-		WHERE TI.THEME_ID=#{themeId} AND FM.DELETE_YN='N';
+			FM.FILE_ORG_NM, FM.DELETE_YN, FM.REG_DT, FM.REG_USER_ID, FM.MOD_DT, FM.MOD_USER_ID, (SELECT CONCAT(#{iconAddress}, FM.FILE_ORG_NM)) AS IMG_URL
+		FROM THEME_ICON TI JOIN FILE_MSTR FM ON TI.FILE_NO = FM.FILE_NO
+		WHERE TI.THEME_ID=#{themeId};
 	</select>
 
 	<insert id="insertThemeData" parameterType="themeVO">
-		<selectKey keyProperty="themeId" resultType="string" order="BEFORE">
-			SELECT GRNEXTVAL('THEMEID_SEQ')
-		</selectKey>
 		INSERT INTO THEME_MSTR
 			(THEME_ID, THEME_NM, THEME_CMT, WALLPAPER, MOD_USER_ID, MOD_DT, REG_USER_ID, REG_DT) 
 		VALUES (#{themeId}, #{themeNm}, #{themeCmt}, #{wallpaper}, #{modUserId}, now(), #{regUserId}, now())
 	</insert>
 
 	<insert id="insertThemeIconData" parameterType="hashmap">
-	
 		INSERT INTO THEME_ICON
 			(THEME_ID, APP_NM, FILE_NO, REG_USER_ID, REG_DT) 
 		VALUES (#{themeId}, #{appNm}, #{fileNo}, #{regUserId}, now())
@@ -135,8 +132,69 @@
 		DELETE FROM THEME_ICON 
 		WHERE THEME_ID = #{themeId}
 	</update>
-	
-	
+
+	<update id="updateFileSeqToReset">
+		UPDATE SEQUENCES SET CURRVAL = 0 WHERE NAME = 'FILENO_SEQ'
+	</update>
+
+	<insert id="insertWallpaperFileInfo" parameterType="fileVO">
+		<selectKey keyProperty="fileNo" resultType="string" order="BEFORE">
+			SELECT GRNEXTVAL('THEMEID_SEQ')
+		</selectKey>
+		INSERT INTO FILE_MSTR
+			(FILE_NO, FILE_NM, FILE_TP, FILE_PATH, FILE_SIZE, FILE_ORG_NM, DELETE_YN, REG_DT, REG_USER_ID, MOD_DT, MOD_USER_ID)
+		VALUES (
+			#{fileNo},
+			#{fileName},
+			#{fileType},
+			#{filePath},
+			#{fileSize},
+			#{fileOriginalName},
+			#{deleteYn},
+			now(),
+			#{regUserId},
+			now(),
+			#{modUserId})
+		ON DUPLICATE KEY UPDATE FILE_ORG_NM=#{fileOriginalName}, REG_DT=now()
+	</insert>
+
+	<update id="updateThemeFileInfo" parameterType="fileVO">
+		UPDATE FILE_MSTR
+		SET FILE_NM = #{fileName},
+		    FILE_PATH = #{filePath},
+			FILE_SIZE = #{fileSize},
+			FILE_ORG_NM = #{fileOriginalName},
+		    DELETE_YN = #{deleteYn},
+			MOD_DT = now(),
+			MOD_USER_ID = #{modUserId}
+		WHERE FILE_NO = #{fileNo}
+	</update>
+
+	<insert id="insertIconFileInfo" parameterType="fileVO">
+		<selectKey keyProperty="fileNo" resultType="string" order="BEFORE">
+			SELECT CONCAT(#{fileNo}, LPAD((SELECT GRNEXTVAL('FILENO_SEQ')), 2, 0))
+		</selectKey>
+		INSERT INTO FILE_MSTR
+			(FILE_NO, FILE_NM, FILE_TP, FILE_PATH, FILE_SIZE, FILE_ORG_NM, DELETE_YN, REG_DT, REG_USER_ID, MOD_DT, MOD_USER_ID)
+		VALUES (
+			#{fileNo},
+			#{fileName},
+			#{fileType},
+			#{filePath},
+			#{fileSize},
+			#{fileOriginalName},
+			#{deleteYn},
+			now(),
+			#{regUserId},
+			now(),
+			#{modUserId})
+		ON DUPLICATE KEY UPDATE FILE_NM = #{fileName}, FILE_PATH = #{filePath}, FILE_SIZE = #{fileSize},
+		    FILE_ORG_NM=#{fileOriginalName}, REG_DT=now()
+	</insert>
+
+	<delete id="deleteThemeFileInfo" parameterType="String">
+		DELETE FROM FILE_MSTR WHERE FILE_NO LIKE CONCAT(#{themeId}, '%')
+	</delete>
 </mapper>
 
 

@@ -76,6 +76,110 @@ public class UserServiceImpl implements UserService {
 	@Resource(name = "excelCommonService")
 	private ExcelCommonService excelCommonService;
 
+	private void updateUserConf(UserVO userVO) {
+		StatusVO statusVO = new StatusVO();
+		try {
+			long cnt = -1;
+			String cfgId = userVO.getBrowserRuleId();
+
+			// 브라우져설정
+			if (cfgId != null && cfgId.length() > 0) {
+				cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
+						GPMSConstants.TYPE_BROWSERRULE);
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+			} else {
+				cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_BROWSERRULE);
+			}
+
+			cnt = -1;
+			cfgId = userVO.getMediaRuleId();
+			// 매체제어설정
+			if (cfgId != null && cfgId.length() > 0) {
+				cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
+						GPMSConstants.TYPE_MEDIARULE);
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+			} else {
+				cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_MEDIARULE);
+			}
+
+			cnt = -1;
+			cfgId = userVO.getSecurityRuleId();
+			// 단말보안설정
+			if (cfgId != null && cfgId.length() > 0) {
+				cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
+						GPMSConstants.TYPE_SECURITYRULE);
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+			} else {
+				cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_SECURITYRULE);
+			}
+
+			cnt = -1;
+			cfgId = userVO.getFilteredSoftwareRuleId();
+			// filtered software rule
+			if (cfgId != null && cfgId.length() > 0) {
+				cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
+						GPMSConstants.TYPE_FILTEREDSOFTWARE);
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+			} else {
+				cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_FILTEREDSOFTWARE);
+			}
+
+			cnt = -1;
+			cfgId = userVO.getCtrlCenterItemRuleId();
+			// control center item rule
+			if (cfgId != null && cfgId.length() > 0) {
+				cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
+						GPMSConstants.TYPE_CTRLCENTERITEMRULE);
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+			} else {
+				cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_CTRLCENTERITEMRULE);
+			}
+
+			cnt = -1;
+			cfgId = userVO.getPolicyKitRuleId();
+			// policy kit rule
+			if (cfgId != null && cfgId.length() > 0) {
+				cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
+						GPMSConstants.TYPE_POLICYKITRULE);
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+			} else {
+				cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_POLICYKITRULE);
+			}
+
+			cnt = -1;
+			cfgId = userVO.getDesktopConfId();
+			// 데스크톱설정
+			if (cfgId != null && cfgId.length() > 0) {
+				cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
+						GPMSConstants.TYPE_DESKTOPCONF);
+				if (cnt < 0) {
+					throw new SQLException();
+				}
+			} else {
+				cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_DESKTOPCONF);
+			}
+		} catch (Exception ex) {
+			logger.error("error in updateUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (statusVO != null) {
+				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+			}
+		}
+	}
+
 	/**
 	 * modify user information data
 	 * 
@@ -96,100 +200,7 @@ public class UserServiceImpl implements UserService {
 
 			long reCnt = userDao.updateUserData(userVO);
 			if (reCnt > 0) {
-				long cnt = -1;
-				String cfgId = userVO.getBrowserRuleId();
-
-				// 브라우져설정
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_BROWSERRULE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_BROWSERRULE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getMediaRuleId();
-				// 매체제어설정
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_MEDIARULE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_MEDIARULE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getSecurityRuleId();
-				// 단말보안설정
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_SECURITYRULE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_SECURITYRULE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getFilteredSoftwareRuleId();
-				// filtered software rule
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_FILTEREDSOFTWARE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_FILTEREDSOFTWARE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getCtrlCenterItemRuleId();
-				// control center item rule
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_CTRLCENTERITEMRULE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_CTRLCENTERITEMRULE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getPolicyKitRuleId();
-				// policy kit rule
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_POLICYKITRULE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_POLICYKITRULE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getDesktopConfId();
-				// 데스크톱설정
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_DESKTOPCONF);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_DESKTOPCONF);
-				}
-
-				// long reConfCnt = userDao.insertOrUpdateDesktopConfWithUser(userVO);
-
+				updateUserConf(userVO);
 				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
 						MessageSourceHelper.getMessage("user.result.update"));
 			} else {
@@ -533,100 +544,7 @@ public class UserServiceImpl implements UserService {
 
 			long resultCnt = userDao.createUser(userVO);
 			if (resultCnt > 0) {
-
-				long cnt = -1;
-				String cfgId = userVO.getBrowserRuleId();
-
-				// 브라우져설정
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_BROWSERRULE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_BROWSERRULE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getMediaRuleId();
-				// 매체제어설정
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_MEDIARULE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_MEDIARULE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getSecurityRuleId();
-				// 단말보안설정
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_SECURITYRULE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_SECURITYRULE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getFilteredSoftwareRuleId();
-				// filtered software rule
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_FILTEREDSOFTWARE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_FILTEREDSOFTWARE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getCtrlCenterItemRuleId();
-				// control center item rule
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_CTRLCENTERITEMRULE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_CTRLCENTERITEMRULE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getPolicyKitRuleId();
-				// policy kit rule
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_POLICYKITRULE);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_POLICYKITRULE);
-				}
-
-				cnt = -1;
-				cfgId = userVO.getDesktopConfId();
-				// 데스크톱정보
-				if (cfgId != null && cfgId.length() > 0) {
-					cnt = userDao.insertOrUpdateConfigWithUser(userVO.getUserId(), userVO.getModUserId(), cfgId,
-							GPMSConstants.TYPE_DESKTOPCONF);
-					if (cnt < 0) {
-						throw new SQLException();
-					}
-				} else {
-					cnt = userDao.deleteConfigWithUser(userVO.getUserId(), GPMSConstants.TYPE_DESKTOPCONF);
-				}
-
-				// long reConfCnt = userDao.insertOrUpdateDesktopConfWithUser(userVO);
+				updateUserConf(userVO);
 				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
 						MessageSourceHelper.getMessage("user.result.insert"));
 			} else {
@@ -1443,5 +1361,58 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return new XSSFWorkbook();
+	}
+
+	/**
+	 * 여러사용자 권한정보 일괄 수정
+	 */
+	public StatusVO updateRuleInfoToMultiUser(ArrayList<String> users, String browserRuleId, String mediaRuleId,
+											  String securityRuleId, String filteredSoftwareRuleId, String ctrlCenterItemRuleId, String policyKitRuleId,
+											  String desktopConfId) throws Exception {
+		StatusVO statusVO = new StatusVO();
+
+		try {
+			if (users != null && users.size() > 0) {
+				String modUserId = LoginInfoHelper.getUserId();
+				// 사용자 정책이 적용 되어 있으면 삭제(사용자 정책이 없을 경우 조직의 정책을 따라감)
+				for (int i=0; i < users.size(); i++) {
+					long cnt = -1;
+					// 브라우져설정
+					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_BROWSERRULE);
+
+					// 매체제어설정
+					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_MEDIARULE);
+
+					// 단말보안설정
+					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_SECURITYRULE);
+
+					// filtered software rule
+					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_FILTEREDSOFTWARE);
+
+					// control center item
+					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_CTRLCENTERITEMRULE);
+
+					// policy kit
+					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_POLICYKITRULE);
+
+					// 데스크톱설정
+					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_DESKTOPCONF);
+
+					statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+							MessageSourceHelper.getMessage("user.result.update"));
+				}
+			} else {
+				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+						MessageSourceHelper.getMessage("user.result.update"));
+			}
+		} catch (Exception ex) {
+			logger.error("error in updateRuleInfoToMultiUser : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (statusVO != null) {
+				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+			}
+		}
+		return  statusVO;
 	}
 }

@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
+import kr.gooroom.gpms.config.service.ActivateGroupViewVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -588,5 +589,45 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 			re = null;
 		}
 		return re;
+	}
+
+	/**
+	 * 정책 - 적용 그룹 리스트
+	 * @param options HashMap<String, Object> options for select
+	 * @return List<ActivateGroupViewVO> ActivateGroupList
+	 * @throws SQLException
+	 */
+	public List<ActivateGroupViewVO> selectActivateGroupListPaged(HashMap<String, Object> options) throws SQLException {
+		List<ActivateGroupViewVO> re = null;
+		try {
+			re = sqlSessionMeta.selectList("CtrlMstDAO.selectActivateGroupListPaged", options);
+		} catch (Exception ex) {
+			logger.error("error in selectActivateGroupListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			re = null;
+		}
+		return re;
+	}
+
+	/**
+	 * response Total control item and property list data by options.
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return long filtered count number.
+	 * @throws SQLException
+	 */
+	public long selectActivateGroupListTotalCount(HashMap<String, Object> options) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("CtrlMstDAO.selectActivateGroupListTotalCount", options);
+	}
+
+	/**
+	 * response filtered control item and property list data by options.
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return long filtered count number.
+	 * @throws SQLException
+	 */
+	public long selectActivateGroupListFilteredCount(HashMap<String, Object> options) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("CtrlMstDAO.selectActivateGroupListFilteredCount", options);
 	}
 }

@@ -144,29 +144,34 @@ public class DeptController {
 					}
 				}
 
-				// inherit
-				if (GPMSConstants.GUBUN_YES.equalsIgnoreCase(paramVO.getParamIsInherit())) {
-					// get children dept list
-					ResultVO allDeptResultVo = deptService.getAllChildrenDeptList(paramVO.getDeptCd());
-					if (allDeptResultVo != null && allDeptResultVo.getData() != null
-							&& allDeptResultVo.getData().length > 0) {
-						DeptVO[] depts = (DeptVO[]) allDeptResultVo.getData();
-						String[] deptCds = new String[depts.length];
-						for (int i = 0; i < depts.length; i++) {
-							deptCds[i] = depts[i].getDeptCd();
-							ResultVO deptUsers = userService.getUserListInDept(depts[i].getDeptCd());
-							if (deptUsers != null && deptUsers.getData() != null && deptUsers.getData().length > 0) {
-								for (int c = 0; c < deptUsers.getData().length; c++) {
-									userIdList.add(((UserVO) deptUsers.getData()[c]).getUserId());
-								}
+				// get children dept list
+				ResultVO allDeptResultVo = deptService.getAllChildrenDeptList(paramVO.getDeptCd());
+				if (allDeptResultVo != null && allDeptResultVo.getData() != null
+						&& allDeptResultVo.getData().length > 0) {
+					DeptVO[] depts = (DeptVO[]) allDeptResultVo.getData();
+					String[] deptCds = new String[depts.length];
+					for (int i = 0; i < depts.length; i++) {
+						deptCds[i] = depts[i].getDeptCd();
+						ResultVO deptUsers = userService.getUserListInDept(depts[i].getDeptCd());
+						if (deptUsers != null && deptUsers.getData() != null && deptUsers.getData().length > 0) {
+							for (int c = 0; c < deptUsers.getData().length; c++) {
+								userIdList.add(((UserVO) deptUsers.getData()[c]).getUserId());
 							}
 						}
-						StatusVO inheritStatus = deptService.updateRuleInfoToMultiDept(deptCds,
-								paramVO.getBrowserRuleId(), paramVO.getMediaRuleId(), paramVO.getSecurityRuleId(),
-								paramVO.getFilteredSoftwareRuleId(), paramVO.getCtrlCenterItemRuleId(),
-								paramVO.getPolicyKitRuleId(), paramVO.getDesktopConfId());
-						resultVO.setStatus(inheritStatus);
 					}
+
+					//하위 조직 정책 변경
+					StatusVO inheritDeptStatus = deptService.updateRuleInfoToMultiDept(deptCds,
+							paramVO.getBrowserRuleId(), paramVO.getMediaRuleId(), paramVO.getSecurityRuleId(),
+							paramVO.getFilteredSoftwareRuleId(), paramVO.getCtrlCenterItemRuleId(),
+							paramVO.getPolicyKitRuleId(), paramVO.getDesktopConfId());
+					resultVO.setStatus(inheritDeptStatus);
+
+					//하위 사용자 정책 변경
+					StatusVO inheritUserStatus = userService.updateRuleInfoToMultiUser(userIdList, paramVO.getBrowserRuleId(), paramVO.getMediaRuleId(), paramVO.getSecurityRuleId(),
+							paramVO.getFilteredSoftwareRuleId(), paramVO.getCtrlCenterItemRuleId(),
+							paramVO.getPolicyKitRuleId(), paramVO.getDesktopConfId());
+					resultVO.setStatus(inheritUserStatus);
 				}
 			}
 

@@ -216,10 +216,9 @@ public class CustomJobMaker {
 	 * <p>
 	 * target client is assigned client group and online.
 	 * 
-	 * @param objId     string configuration id.
+	 * @param confId     string configuration id.
 	 * @param jobName   string job name.
 	 * @param map       configuration item hierarchy data.
-	 * @param clientIds string client id array that will null if none.
 	 * @return void
 	 * @throws Exception
 	 */
@@ -291,7 +290,6 @@ public class CustomJobMaker {
 	 * 
 	 * @param jobName   string job name.
 	 * @param map       configuration item hierarchy data.
-	 * @param clientIds string client id array that will null if none.
 	 * @return void
 	 * @throws Exception
 	 */
@@ -1032,6 +1030,65 @@ public class CustomJobMaker {
 			createJobForClientSetupWithClients(GPMSConstants.JOB_CLIENTSECU_PASSWORDTIME_CHANGE, null, clientIds);
 			createJobForClientSetupWithClients(GPMSConstants.JOB_CLIENTSECU_SCREENTIME_CHANGE, null, clientIds);
 			createJobForClientSetupWithClients(GPMSConstants.JOB_MEDIA_RULE_CHANGE, null, clientIds);
+		}
+	}
+
+	public void createJobForCustomTheme(HashMap<String, String> map) throws Exception {
+
+		String[] clientIds = null;
+		// select target clients, online client.
+		ResultVO re = clientService.getClientAllList();
+		if (GPMSConstants.MSG_SUCCESS.equals(re.getStatus().getResult())) {
+			ClientVO[] row = (ClientVO[]) re.getData();
+			// create target client array.
+			clientIds = new String[row.length];
+			for (int i = 0; i < row.length; i++) {
+				clientIds[i] = row[i].getClientId();
+			}
+		}
+
+		if (clientIds != null && clientIds.length > 0) {
+			try {
+				// create job
+				Job[] jobs = new Job[1];
+				if (map == null) {
+					map = new HashMap<String, String>();
+				}
+				jobs[0] = Job.generateJobWithMap("config", GPMSConstants.JOB_CLIENTSETTING_THEME_CHANGE, map);
+
+				String jsonStr = "";
+				StringWriter outputWriter = new StringWriter();
+				try {
+					ObjectMapper mapper = new ObjectMapper();
+					mapper.setSerializationInclusion(Include.NON_NULL);
+					mapper.writeValue(outputWriter, jobs);
+					jsonStr = outputWriter.toString();
+
+				} catch (Exception jsonex) {
+					logger.error("CustomJobMaker.createJobForCustomTheme (make json) Exception occurred. ", jsonex);
+				} finally {
+					try {
+						if (outputWriter != null) {
+							outputWriter.close();
+						}
+					} catch (Exception finalex) {
+					}
+				}
+
+				JobVO jobVO = new JobVO();
+				jobVO.setJobData(jsonStr);
+				jobVO.setJobName(GPMSConstants.JOB_CLIENTSETTING_THEME_CHANGE);
+				jobVO.setRegUserId(LoginInfoHelper.getUserId());
+
+				// assign target clients
+				jobVO.setClientIds(clientIds);
+
+				jobService.createJob(jobVO);
+
+			} catch (Exception ex) {
+				logger.error("error in createJobForCustomTheme : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			}
 		}
 	}
 
