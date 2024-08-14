@@ -70,7 +70,7 @@ public class ExcelCommonServiceImpl implements ExcelCommonService {
                         rowData.add(""); //빈공간채우기
                         continue;
                     }
-                    cell.setCellType(CellType.STRING);
+                    //cell.setCellType(CellType.STRING);
                     rowData.add(getValue(cell));
                 }
 
@@ -127,7 +127,7 @@ public class ExcelCommonServiceImpl implements ExcelCommonService {
             return "";
         }
 
-        cell.setCellType(CellType.STRING);
+       //cell.setCellType(CellType.STRING);
         return cell.getStringCellValue();
     }
 

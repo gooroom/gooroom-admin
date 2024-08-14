@@ -21,9 +21,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,8 +172,8 @@ public class SecurityStatsController {
 			options.put("defaultViolatedLogType", GPMSConstants.DEFAULT_VIOLATED_LOGTYPE);
 
 			// << paging >>
-			options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-			options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+			options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+			options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 			// << order >>
 			String paramOrderColumn = req.getParameter("orderColumn");
@@ -199,7 +200,7 @@ public class SecurityStatsController {
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));
 			resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
 			resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
-			resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+			resultVO.setRowLength(ObjectUtils.defaultIfNull(req.getParameter("length"), "10"));
 
 		} catch (Exception ex) {
 			logger.error("error in readViolatedListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,

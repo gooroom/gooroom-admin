@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import kr.gooroom.gpms.common.controller.GRFileHandleException;
 import kr.gooroom.gpms.common.service.impl.GpmsCommonDAO;

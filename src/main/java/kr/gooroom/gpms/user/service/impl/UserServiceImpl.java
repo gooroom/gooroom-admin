@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import kr.gooroom.gpms.common.service.ExcelCommonService;
 import kr.gooroom.gpms.common.utils.CommonUtils;
@@ -35,6 +35,8 @@ import org.apache.poi.ss.usermodel.ExcelStyleDateFormatter;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +77,9 @@ public class UserServiceImpl implements UserService {
 
 	@Resource(name = "excelCommonService")
 	private ExcelCommonService excelCommonService;
+
+	@Autowired
+	private Pbkdf2PasswordEncoder passwordEncoder;
 
 	private void updateUserConf(UserVO userVO) {
 		StatusVO statusVO = new StatusVO();
@@ -197,6 +202,9 @@ public class UserServiceImpl implements UserService {
 			if (GPMSConstants.GUBUN_YES.equalsIgnoreCase(userVO.getIsChangePasswd())) {
 				userVO.setPasswordStatus(GPMSConstants.STS_TEMP_PASSWORD);
 			}
+
+			String pwd = userVO.getUserPasswd();
+			userVO.setUserPasswd(passwordEncoder.encode(pwd));
 
 			long reCnt = userDao.updateUserData(userVO);
 			if (reCnt > 0) {
@@ -499,6 +507,9 @@ public class UserServiceImpl implements UserService {
 			if (!isPortable)
 				vo.setPasswordStatus(GPMSConstants.STS_TEMP_PASSWORD);
 
+			String pwd = vo.getUserPasswd();
+			vo.setUserPasswd(passwordEncoder.encode(pwd));
+
 			long resultCnt = userDao.createUser(vo);
 			if (resultCnt > 0) {
 				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
@@ -541,6 +552,9 @@ public class UserServiceImpl implements UserService {
 				userVO.setPasswordStatus(GPMSConstants.STS_NORMAL_USER);
 			else
 				userVO.setPasswordStatus(GPMSConstants.STS_TEMP_PASSWORD);
+
+			String pwd = userVO.getUserPasswd();
+			userVO.setUserPasswd(passwordEncoder.encode(pwd));
 
 			long resultCnt = userDao.createUser(userVO);
 			if (resultCnt > 0) {

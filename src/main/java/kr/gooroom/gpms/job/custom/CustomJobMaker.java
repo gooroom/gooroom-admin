@@ -20,7 +20,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.StringUtils;

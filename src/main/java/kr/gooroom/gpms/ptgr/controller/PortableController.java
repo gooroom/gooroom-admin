@@ -17,6 +17,7 @@ import kr.gooroom.gpms.ptgr.util.JenkinsJob;
 import kr.gooroom.gpms.ptgr.util.JenkinsUtils;
 import kr.gooroom.gpms.user.service.UserService;
 import kr.gooroom.gpms.user.service.UserVO;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
@@ -29,9 +30,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.channels.CompletionHandler;
@@ -379,8 +380,8 @@ public class PortableController {
                 }
             }
 
-            options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-            options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+            options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+            options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
             String searchType = req.getParameter("searchType");
             if (searchType != null) {
@@ -419,7 +420,7 @@ public class PortableController {
             resultVO.setDraw(String.valueOf(req.getParameter("page")));
             resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
             resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
-            resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+            resultVO.setRowLength(ObjectUtils.defaultIfNull(req.getParameter("length"), "10"));
         } catch (Exception e) {
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));

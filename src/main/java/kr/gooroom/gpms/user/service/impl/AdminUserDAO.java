@@ -203,19 +203,17 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * @return AdminUserVO List
 	 * @throws SQLException
 	 */
-	public AdminUserVO selectAdminUserAuthAndInfo(String adminId, String adminPw) throws SQLException {
+	public AdminUserVO selectAdminUserAuthAndInfo(String adminId) throws SQLException {
 		AdminUserVO re = null;
 		try {
 			HashMap<String, String> map = new HashMap<String, String>();
 			map.put("adminId", adminId);
-			map.put("adminPw", adminPw);
 
 			re = sqlSessionMeta.selectOne("selectAdminUserAuthAndInfo", map);
 
 		} catch (Exception ex) {
 			logger.error("error in selectAdminUserAuthAndInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;

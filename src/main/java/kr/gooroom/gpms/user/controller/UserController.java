@@ -16,32 +16,28 @@
 
 package kr.gooroom.gpms.user.controller;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import kr.gooroom.gpms.common.service.ExcelCommonService;
 import kr.gooroom.gpms.common.utils.CommonUtils;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.dept.service.DeptService;
-import kr.gooroom.gpms.dept.service.DeptVO;
 import kr.gooroom.gpms.user.service.UserReqService;
 import kr.gooroom.gpms.user.service.UserReqVO;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -159,8 +155,8 @@ public class UserController {
 		options.put("status", req.getParameter("status"));
 
 		// << paging >>
-		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+		options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 		// << ordering >>
 		String paramOrderColumn = req.getParameter("orderColumn");
@@ -513,8 +509,8 @@ public class UserController {
 		}
 
 		// << paging >>
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -878,8 +874,8 @@ public class UserController {
 		// << paging >>
 		String paramOrderColumn = req.getParameter("orderColumn");
 		String paramOrderDir = req.getParameter("orderDir");
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 
 		if("chReqSeq".equals(paramOrderColumn)) {
 			options.put("paramOrderColumn", "REQ_SEQ");
@@ -954,8 +950,8 @@ public class UserController {
 			options.put("toDate", toDate);
 
 			// << paging >>
-			options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-			options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+			options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+			options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 			// << order >>
 			options.put("paramOrderColumn", "REQ_SEQ");
@@ -974,7 +970,7 @@ public class UserController {
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));
 			resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
 			resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
-			resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+			resultVO.setRowLength(ObjectUtils.defaultIfNull(req.getParameter("length"), "10"));
 
 		} catch (Exception ex) {
 			logger.error("error in readUserReqActListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,

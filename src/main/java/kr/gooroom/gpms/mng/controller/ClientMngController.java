@@ -23,10 +23,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,8 +117,8 @@ public class ClientMngController {
 		// << paging >>
 		String paramOrderColumn = req.getParameter("orderColumn");
 		String paramOrderDir = req.getParameter("orderDir");
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 
 		if ("chRegKey".equalsIgnoreCase(paramOrderColumn)) {
 			options.put("paramOrderColumn", "REGKEY_NO");
@@ -297,9 +298,9 @@ public class ClientMngController {
 	public @ResponseBody ResultVO createProfileSet(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
 		ClientProfileSetVO vo = new ClientProfileSetVO();
-		vo.setClientId(StringUtils.defaultString(req.getParameter("clientId"), ""));
-		vo.setProfileNm(StringUtils.defaultString(req.getParameter("profileNm"), ""));
-		vo.setProfileCmt(StringUtils.defaultString(req.getParameter("profileCmt"), ""));
+		vo.setClientId(StringUtils.defaultString(req.getParameter("clientId")));
+		vo.setProfileNm(StringUtils.defaultString(req.getParameter("profileNm")));
+		vo.setProfileCmt(StringUtils.defaultString(req.getParameter("profileCmt")));
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -327,10 +328,10 @@ public class ClientMngController {
 	@PostMapping(value = "/createProfileJob")
 	public @ResponseBody ResultVO createProfileJob(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
-		String profileNo = StringUtils.defaultString(req.getParameter("profileNo"), "");
-		String targetClientIds = StringUtils.defaultString(req.getParameter("targetClientIds"), "");
-		String targetClientGroupIds = StringUtils.defaultString(req.getParameter("targetClientGroupIds"), "");
-		String isRemoval = StringUtils.defaultString(req.getParameter("isRemoval"), "");
+		String profileNo = StringUtils.defaultString(req.getParameter("profileNo"));
+		String targetClientIds = StringUtils.defaultString(req.getParameter("targetClientIds"));
+		String targetClientGroupIds = StringUtils.defaultString(req.getParameter("targetClientGroupIds"));
+		String isRemoval = StringUtils.defaultString(req.getParameter("isRemoval"));
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -429,8 +430,8 @@ public class ClientMngController {
 		// << paging >>
 		String paramOrderColumn = req.getParameter("orderColumn");
 		String paramOrderDir = req.getParameter("orderDir");
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 
 		// << Order >>
 		if ("chProfileSetNo".equalsIgnoreCase(paramOrderColumn)) {
@@ -494,8 +495,8 @@ public class ClientMngController {
 		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
 
 		// << paging >>
-		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+		options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 		// << ordering >>
 		String paramOrderColumn = req.getParameter("orderColumn");
@@ -578,10 +579,10 @@ public class ClientMngController {
 
 		ClientProfileSetVO vo = new ClientProfileSetVO();
 
-		vo.setProfileNo(StringUtils.defaultString(req.getParameter("profileNo"), ""));
-		vo.setClientId(StringUtils.defaultString(req.getParameter("clientId"), ""));
-		vo.setProfileNm(StringUtils.defaultString(req.getParameter("profileNm"), ""));
-		vo.setProfileCmt(StringUtils.defaultString(req.getParameter("profileCmt"), ""));
+		vo.setProfileNo(StringUtils.defaultString(req.getParameter("profileNo")));
+		vo.setClientId(StringUtils.defaultString(req.getParameter("clientId")));
+		vo.setProfileNm(StringUtils.defaultString(req.getParameter("profileNm")));
+		vo.setProfileCmt(StringUtils.defaultString(req.getParameter("profileCmt")));
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -717,8 +718,8 @@ public class ClientMngController {
 		// << paging >>
 		String paramOrderColumn = req.getParameter("orderColumn");
 		String paramOrderDir = req.getParameter("orderDir");
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "5");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "5");
 
 		if ("chSwId".equalsIgnoreCase(paramOrderColumn)) {
 			options.put("paramOrderColumn", "REGKEY_NO");

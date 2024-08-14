@@ -16,32 +16,11 @@
 
 package kr.gooroom.gpms.client.controller;
 
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import kr.gooroom.gpms.client.service.ClientService;
 import kr.gooroom.gpms.client.service.ClientVO;
 import kr.gooroom.gpms.common.GPMSConstants;
@@ -50,10 +29,24 @@ import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.config.service.CtrlMstService;
 import kr.gooroom.gpms.job.nodes.Job;
 import kr.gooroom.gpms.job.service.JobService;
 import kr.gooroom.gpms.job.service.JobVO;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Handles requests for the client management process.
@@ -74,17 +67,12 @@ public class ClientController {
 	@Resource(name = "jobService")
 	private JobService jobService;
 
-	@Resource(name = "ctrlMstService")
-	private CtrlMstService ctrlMstService;
-
 	/**
 	 * initialize binder for date format
 	 * <p>
 	 * ex) date format : 2017-10-04
 	 * 
 	 * @param binder WebDataBinder
-	 * @return void
-	 * 
 	 */
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
@@ -107,17 +95,13 @@ public class ClientController {
 
 		ResultVO resultVO = new ResultVO();
 		try {
-
 			StatusVO status = clientService.updateClientInfo(paramVO);
 			resultVO.setStatus(status);
-
 		} catch (Exception ex) {
 			logger.error("error in updateClientInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -307,8 +291,8 @@ public class ClientController {
 		options.put("searchKey", searchKey);
 
 		// << paging >>
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -803,8 +787,8 @@ public class ClientController {
 			// << paging >>
 			String paramOrderColumn = req.getParameter("orderColumn");
 			String paramOrderDir = req.getParameter("orderDir");
-			String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-			String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+			String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+			String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 
 			if ("chAAAAA".equalsIgnoreCase(paramOrderColumn)) {
 				options.put("paramOrderColumn", "CLIENT_ID");

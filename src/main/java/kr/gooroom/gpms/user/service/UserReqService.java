@@ -4,7 +4,6 @@ import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 
-import javax.xml.transform.Result;
 import java.util.HashMap;
 
 public interface UserReqService {

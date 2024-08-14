@@ -144,8 +144,8 @@
 		VALUES 
 			(#{adminId}, 
 			#{adminNm},
-			SHA2(#{adminPw}, 256),
-			#{adminTp}, 
+			#{adminPw},
+			#{adminTp},
 			#{status},
 			#{modUserId}, now(),
 			#{regUserId}, now())
@@ -187,7 +187,7 @@
 		UPDATE ADMIN_MSTR SET
 			ADMIN_NM = #{adminNm},
 			<if test="adminPw != null and adminPw != ''">
-    		ADMIN_PW = SHA2(#{adminPw}, 256),
+    		ADMIN_PW = #{adminPw},
   			</if>
 			ADMIN_TP = #{adminTp},
 			MOD_USER_ID = #{modUserId},
@@ -213,10 +213,9 @@
 
 	<!-- 관리자 정보 조회:인증!!!! -->
 	<select id="selectAdminUserAuthAndInfo" parameterType="hashmap" resultMap="adminUserInfo">
-		SELECT ADMIN_ID, ADMIN_NM
+		SELECT ADMIN_ID, ADMIN_NM, ADMON_PW
 		FROM ADMIN_MSTR
-		WHERE ADMIN_ID = #{adminId} AND ADMIN_PW = SHA2(#{adminPw}, 256)
-
+		WHERE ADMIN_ID = #{adminId}
 	</select>
 
 	

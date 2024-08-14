@@ -20,8 +20,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

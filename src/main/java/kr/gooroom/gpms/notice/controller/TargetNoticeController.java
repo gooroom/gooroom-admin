@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +110,7 @@ public class TargetNoticeController {
 		int pageNumber = 0;
 		try {
 			while (true) {
-				Pageable newPageable = new PageRequest(pageNumber, pageable.getPageSize(), pageable.getSort());
+				Pageable newPageable = PageRequest.of(pageNumber, pageable.getPageSize(), pageable.getSort());
 				Page<TargetNoticeVO> page = noticeService.getNoticesByTarget(newPageable, userId, clientId);
 				if (page.getNumberOfElements() <= 0) {
 					break;

@@ -207,7 +207,7 @@
 			#{userNm},
 			#{userId},
 			#{status},
-			SHA2(#{userPasswd}, 256),
+			#{userPasswd},
 			#{passwordExpireDate},
 			#{userEmail},
 			#{userType},
@@ -243,7 +243,7 @@
 			DEPT_CD = #{deptCd},
 			</if>
 			<if test='"Y".equalsIgnoreCase(isChangePasswd)'>
-    		USER_PASSWD = SHA2(#{userPasswd}, 256),
+    		USER_PASSWD = #{userPasswd},
     		USER_PASSWD_STATUS = #{passwordStatus},
   			</if>
   			USER_EMAIL = #{userEmail},
@@ -588,7 +588,7 @@
 				#{userPasswd},
 			</when>
 			<otherwise>
-				SHA2(SHA2(CONCAT(#{userId}, SHA2(#{userPasswd}, 256)), 256), 256),
+				CONCAT(#{userId}, SHA2(#{userPasswd}, 256)),
 			</otherwise>
 		</choose>
 			#{loginId}, #{status},

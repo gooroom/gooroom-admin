@@ -6,20 +6,20 @@ import java.util.Base64.Encoder;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -38,7 +38,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	private UserLoginService userLoginService;
 
 	@Autowired
-	private ShaPasswordEncoder passwordEncoder;
+	private Pbkdf2PasswordEncoder passwordEncoder;
 
 	@Resource(name = "gpmsCommonService")
 	private GpmsCommonService gpmsCommonService;
@@ -55,7 +55,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 		String username = authentication.getName();
 		String password = (String) authentication.getCredentials();
-		String hashedPassword = passwordEncoder.encodePassword(password, null);
 		// String sessionId = ((WebAuthenticationDetails)
 		// authentication.getDetails()).getSessionId();
 
@@ -66,7 +65,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 			user = userLoginService.loadUserByUsername(username);
 
 			// check password
-			if (!hashedPassword.equals(user.getPassword())) {
+			if (!passwordEncoder.matches(password, user.getPassword())) {
 				throw new BadCredentialsException(GPMSConstants.ERR_LOGIN_PASSWORD);
 			}
 
@@ -167,7 +166,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 			throw new RuntimeException(new String(encodedBytes));
 		}
 
-		return new UsernamePasswordAuthenticationToken(username, hashedPassword, authorities);
+		return new UsernamePasswordAuthenticationToken(username, user.getPassword(), authorities);
 	}
 
 	@Override

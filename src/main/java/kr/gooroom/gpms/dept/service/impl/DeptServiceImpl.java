@@ -1,18 +1,13 @@
 package kr.gooroom.gpms.dept.service.impl;
 
-import java.sql.Array;
 import java.sql.SQLException;
 import java.util.*;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.xml.transform.Result;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
 
 import kr.gooroom.gpms.common.service.ExcelCommonService;
 import kr.gooroom.gpms.common.utils.CommonUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -24,8 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;

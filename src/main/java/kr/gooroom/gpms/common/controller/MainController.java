@@ -20,9 +20,9 @@ import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import kr.gooroom.gpms.account.service.AccountVO;
 import kr.gooroom.gpms.account.service.LoginService;
 import kr.gooroom.gpms.client.service.ClientService;
 import kr.gooroom.gpms.client.service.ClientSummaryVO;
@@ -49,7 +48,6 @@ import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.service.impl.EmailServiceImpl;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.user.service.AdminUserService;
-import kr.gooroom.gpms.user.service.AdminUserVO;
 
 /**
  * Handles requests for main process

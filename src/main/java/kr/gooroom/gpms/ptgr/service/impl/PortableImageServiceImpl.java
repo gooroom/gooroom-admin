@@ -10,10 +10,9 @@ import kr.gooroom.gpms.ptgr.service.PortableImageVO;
 import kr.gooroom.gpms.ptgr.service.PortableImageViewVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 

@@ -21,10 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +57,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 
 	@Resource(name = "adminUserDAO")
 	private AdminUserDAO adminUserDao;
+
+	@Autowired
+	private Pbkdf2PasswordEncoder passwordEncoder;
 
 	private String[][] RULEINFOS = { { "client_admin", "client_admin", "isClientAdmin" },
 			{ "user_admin", "user_admin", "isUserAdmin" }, { "desktop_admin", "desktop_admin", "isDesktopAdmin" }, 
@@ -133,6 +138,10 @@ public class AdminUserServiceImpl implements AdminUserService {
 		try {
 			adminUserVO.setModUserId(LoginInfoHelper.getUserId());
 			adminUserVO.setRegUserId(LoginInfoHelper.getUserId());
+
+			String adminPw =  adminUserVO.getAdminPw();
+			adminUserVO.setAdminPw(passwordEncoder.encode(adminPw));
+
 			long reCnt = adminUserDao.updateAdminUserData(adminUserVO);
 			if (reCnt > 0) {
 				saveClientConfiguration(adminUserVO);
@@ -370,6 +379,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 			adminUserVO.setRegUserId(LoginInfoHelper.getUserId());
 			adminUserVO.setStatus(GPMSConstants.STS_NORMAL_USER);
 
+			String hashedPassword = passwordEncoder.encode(adminUserVO.getAdminPw());
+			adminUserVO.setAdminPw(hashedPassword);
+
 			long reCnt = adminUserDao.createAdminUser(adminUserVO);
 			if (reCnt > 0) {
 				saveClientConfiguration(adminUserVO);
@@ -462,23 +474,22 @@ public class AdminUserServiceImpl implements AdminUserService {
 		ResultVO resultVO = new ResultVO();
 
 		try {
-
-			AdminUserVO re = adminUserDao.selectAdminUserAuthAndInfo(adminId, adminPw);
-
+			AdminUserVO re = adminUserDao.selectAdminUserAuthAndInfo(adminId);
 			if (re != null) {
-				AdminUserVO[] row = new AdminUserVO[1];
-				row[0] = re;
-				resultVO.setData(row);
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
-
-			} else {
-				Object[] o = new Object[0];
-				resultVO.setData(o);
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
-						MessageSourceHelper.getMessage("system.common.noselectdata")));
+				if (passwordEncoder.matches(adminPw, re.getAdminPw())) {
+					AdminUserVO[] row = new AdminUserVO[1];
+					row[0] = re;
+					resultVO.setData(row);
+					resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+							MessageSourceHelper.getMessage("system.common.selectdata")));
+					return resultVO;
+				}
 			}
 
+			Object[] o = new Object[0];
+			resultVO.setData(o);
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+					MessageSourceHelper.getMessage("system.common.noselectdata")));
 		} catch (Exception ex) {
 			logger.error("error in getAdminUserAuthAndInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());

@@ -72,13 +72,14 @@
 	</beans:bean>
 
 	<!-- 파일업로드 -->
+	<!--
 	<beans:bean id="multipartResolver"
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-		<!-- setting maxInMemorySize 4M, maxUploadSize 4G -->
 		<beans:property name="maxInMemorySize" value="46137344" />
 		<beans:property name="maxUploadSize" value="4294967296" />
 		<beans:property name="defaultEncoding" value="UTF-8" />
 	</beans:bean>
+	-->
 
 	<!-- 트랜잭션 처리 -->
 	<tx:annotation-driven transaction-manager="transactionManagerMeta"

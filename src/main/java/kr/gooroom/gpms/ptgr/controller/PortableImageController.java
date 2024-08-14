@@ -14,6 +14,7 @@ import kr.gooroom.gpms.ptgr.service.PortableImageViewVO;
 import kr.gooroom.gpms.ptgr.service.PortableJobService;
 import kr.gooroom.gpms.ptgr.util.JenkinsJob;
 import kr.gooroom.gpms.ptgr.util.JenkinsUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +22,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 @Controller
 @RequestMapping("/portable")
@@ -103,8 +102,8 @@ public class PortableImageController {
             options.put("fromDate", fromDate);
             options.put("toDate", toDate);
 
-            options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-            options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+            options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+            options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
             String searchType = req.getParameter("searchType");
             if (searchType != null) {
@@ -155,7 +154,7 @@ public class PortableImageController {
             resultVO.setDraw(String.valueOf(req.getParameter("page")));
             resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
             resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
-            resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+            resultVO.setRowLength(ObjectUtils.defaultIfNull(req.getParameter("length"), "10"));
 
             for ( Object o : resultVO.getData()) {
                 PortableImageViewVO imgViewVO = (PortableImageViewVO) o;

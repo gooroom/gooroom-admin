@@ -1,9 +1,10 @@
 package kr.gooroom.sample.schedule;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -51,7 +52,7 @@ public class ProgrammableScheduler {
     }
  
     private Trigger getTrigger(int period) {
-        // 작업 주기 설정 
-        return new PeriodicTrigger(period, TimeUnit.SECONDS);
+        // 작업 주기 설정
+        return  new PeriodicTrigger(Duration.ofSeconds(period));
     }
 }

@@ -20,9 +20,9 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultVO;
@@ -176,7 +176,7 @@ public class GPMSInterceptor implements HandlerInterceptor {
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> paramMap = (Map<String, Object>) req.getParameterMap();
+		Map<String, String[]> paramMap = (Map<String, String[]>) req.getParameterMap();
 		String actData = "";
 		if (paramMap.size() > 0) {
 			StringBuffer sb = new StringBuffer();
