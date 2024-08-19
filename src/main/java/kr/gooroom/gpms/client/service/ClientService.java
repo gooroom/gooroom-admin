@@ -217,7 +217,7 @@ public interface ClientService {
 	/**
 	 * generate online client data list by noticePublishId
 	 * 
-	 * @param noticePublishId
+	 * @param noticePublishId string
 	 * @return ResultVO result object
 	 * @throws Exception
 	 */

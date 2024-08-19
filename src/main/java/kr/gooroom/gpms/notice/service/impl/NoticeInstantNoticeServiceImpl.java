@@ -26,7 +26,7 @@ public class NoticeInstantNoticeServiceImpl implements NoticeInstantNoticeServic
 	private NoticeInstantNoticeDAO noticeInstantNoticeDAO;
 
 	@Override
-	public StatusVO createNoticeInstantNotice(NoticeInstantNoticeVO noticeInstantNoticeVO) throws Exception {
+	public StatusVO createNoticeInstantNotice(NoticeInstantNoticeVO noticeInstantNoticeVO) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			noticeInstantNoticeVO.setRegUserId(LoginInfoHelper.getUserId());
@@ -44,16 +44,14 @@ public class NoticeInstantNoticeServiceImpl implements NoticeInstantNoticeServic
 		} catch (Exception ex) {
 			logger.error("error in createNoticeInstantNotice : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
 
 	@Override
-	public ResultPagingVO getNoticeInstantNoticeList(Map<String, Object> options) throws Exception {
+	public ResultPagingVO getNoticeInstantNoticeList(Map<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 		try {
 			List<NoticeInstantNoticeVO> re = noticeInstantNoticeDAO.selectNoticeInstantNoticeList(options);
@@ -61,7 +59,7 @@ public class NoticeInstantNoticeServiceImpl implements NoticeInstantNoticeServic
 			long filteredCount = noticeInstantNoticeDAO.selectNoticeInstantNoticeListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				resultVO.setData(re.stream().toArray(NoticeInstantNoticeVO[]::new));
+				resultVO.setData(re.toArray(NoticeInstantNoticeVO[]::new));
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
 
@@ -75,10 +73,8 @@ public class NoticeInstantNoticeServiceImpl implements NoticeInstantNoticeServic
 		} catch (Exception ex) {
 			logger.error("error in getNoticeInstantNoticeList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;

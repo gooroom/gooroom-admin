@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.user.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,9 +28,10 @@ import java.util.Date;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class UserRoleVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = -816711953159989183L;
 	private String nullColumn;
 
 	private String roleId;

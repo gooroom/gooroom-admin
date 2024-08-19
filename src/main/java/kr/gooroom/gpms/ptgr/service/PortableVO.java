@@ -2,11 +2,14 @@ package kr.gooroom.gpms.ptgr.service;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 public class PortableVO extends PortableUserVO implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = -3043677709902880978L;
     int ptgrId;
     int logId;
     int certId;

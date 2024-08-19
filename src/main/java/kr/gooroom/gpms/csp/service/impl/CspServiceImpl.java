@@ -19,6 +19,7 @@ package kr.gooroom.gpms.csp.service.impl;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -70,10 +71,9 @@ public class CspServiceImpl implements CspService {
 	 * 
 	 * @param gcspId string target csp id.
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isExistGcspId(String gcspId) throws Exception {
+	public StatusVO isExistGcspId(String gcspId) {
 		StatusVO statusVO = new StatusVO();
 
 		try {
@@ -91,10 +91,8 @@ public class CspServiceImpl implements CspService {
 		} catch (Exception ex) {
 			logger.error("error in isExistGcspId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -105,10 +103,9 @@ public class CspServiceImpl implements CspService {
 	 * 
 	 * @param cspVO CspVO csp cofiguration data bean.
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO createGcspData(CspVO cspVO) throws Exception {
+	public StatusVO createGcspData(CspVO cspVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -132,10 +129,8 @@ public class CspServiceImpl implements CspService {
 		} catch (Exception ex) {
 			logger.error("error in createGcspData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+				MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -146,10 +141,9 @@ public class CspServiceImpl implements CspService {
 	 * 
 	 * @param cspVO CspVO csp cofiguration data bean.
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO editGcspData(CspVO cspVO) throws Exception {
+	public StatusVO editGcspData(CspVO cspVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -168,10 +162,8 @@ public class CspServiceImpl implements CspService {
 		} catch (Exception ex) {
 			logger.error("error in editGcspData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -180,18 +172,18 @@ public class CspServiceImpl implements CspService {
 	/**
 	 * generate gooroom csp list data.
 	 * 
-	 * @param statusCd   string status value.
+	 * @param gcsp_status string status value.
 	 * @param search_key string search keyword.
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getGcspDataList(String gcsp_status, String search_key) throws Exception {
+	public ResultVO getGcspDataList(String gcsp_status, String search_key) {
+
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<CspVO> re = cspDao.selectGcspDataList(gcsp_status, search_key);
 			if (re != null && re.size() > 0) {
-				CspVO[] row = re.stream().toArray(CspVO[]::new);
+				CspVO[] row = re.toArray(CspVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -204,10 +196,8 @@ public class CspServiceImpl implements CspService {
 		} catch (Exception ex) {
 			logger.error("error in getGcspDataList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -217,10 +207,10 @@ public class CspServiceImpl implements CspService {
 	 * 
 	 * @param options HashMap.
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getGcspListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getGcspListPaged(HashMap<String, Object> options) {
+
 		ResultPagingVO resultVO = new ResultPagingVO();
 		try {
 			List<CspVO> re = cspDao.selectGcspListPaged(options);
@@ -228,7 +218,7 @@ public class CspServiceImpl implements CspService {
 			long filteredCount = cspDao.selectGcspListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				CspVO[] row = re.stream().toArray(CspVO[]::new);
+				CspVO[] row = re.toArray(CspVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -244,10 +234,8 @@ public class CspServiceImpl implements CspService {
 		} catch (Exception ex) {
 			logger.error("error in getGcspDataListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -257,10 +245,9 @@ public class CspServiceImpl implements CspService {
 	 * 
 	 * @param gcspId string csp id.
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getGcspData(String gcspId) throws Exception {
+	public ResultVO getGcspData(String gcspId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -286,10 +273,8 @@ public class CspServiceImpl implements CspService {
 		} catch (Exception ex) {
 			logger.error("error in getGcspData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+				MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -298,7 +283,7 @@ public class CspServiceImpl implements CspService {
 	/**
 	 * generate certificate for csp from CSR.
 	 * 
-	 * @param cspVO CspVO csp cofiguration data bean.
+	 * @param vo CspVO csp cofiguration data bean.
 	 * @return ResultVO result object
 	 * @throws Exception
 	 */
@@ -320,7 +305,7 @@ public class CspServiceImpl implements CspService {
 		}
 
 		// create unique number.
-		UUID uuid = UUID.nameUUIDFromBytes(vo.getGcspId().getBytes("UTF-8"));
+		UUID uuid = UUID.nameUUIDFromBytes(vo.getGcspId().getBytes(StandardCharsets.UTF_8));
 		BigInteger newSerialNo = utils.getBigIntegerFromUuid(uuid);
 
 		try {
@@ -342,13 +327,9 @@ public class CspServiceImpl implements CspService {
 				// change data format to PEM
 				PemObject pemObject = new PemObject("CERTIFICATE", clientCert.getEncoded());
 				StringWriter sw = new StringWriter();
-				PemWriter pemWriter = new PemWriter(sw);
-				try {
+				try (PemWriter pemWriter = new PemWriter(sw)) {
 					pemWriter.writeObject(pemObject);
-				} finally {
-					pemWriter.close();
 				}
-
 				certPem = sw.toString();
 
 				if (certPem != null && !"".equals(certPem) && certPem.length() > 0) {
@@ -390,10 +371,8 @@ public class CspServiceImpl implements CspService {
 
 			logger.error("error in createGCSPCertificateFromCSR : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		}
 
@@ -403,13 +382,12 @@ public class CspServiceImpl implements CspService {
 	/**
 	 * generate certificate for csp.
 	 * 
-	 * @param cspVO CspVO csp cofiguration data bean.
+	 * @param vo CspVO csp cofiguration data bean.
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-	synchronized public ResultVO createGCSPCertificate(CspVO vo) throws Exception {
+	synchronized public ResultVO createGCSPCertificate(CspVO vo) {
 
 		ResultVO resultVO = new ResultVO();
 		String certPem = "";
@@ -418,7 +396,7 @@ public class CspServiceImpl implements CspService {
 		CertificateUtils utils = new CertificateUtils();
 
 		// create unique number.
-		UUID uuid = UUID.nameUUIDFromBytes(vo.getGcspId().getBytes("UTF-8"));
+		UUID uuid = UUID.nameUUIDFromBytes(vo.getGcspId().getBytes(StandardCharsets.UTF_8));
 		BigInteger newSerialNo = utils.getBigIntegerFromUuid(uuid);
 
 		try {
@@ -464,10 +442,8 @@ public class CspServiceImpl implements CspService {
 
 			logger.error("error in createGCSPCertificate : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		}
 
@@ -479,10 +455,9 @@ public class CspServiceImpl implements CspService {
 	 * 
 	 * @param vo AdminUserVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO deleteGcspData(CspVO vo) throws Exception {
+	public StatusVO deleteGcspData(CspVO vo) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -499,10 +474,8 @@ public class CspServiceImpl implements CspService {
 		} catch (Exception ex) {
 			logger.error("error in deleteGcspData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}

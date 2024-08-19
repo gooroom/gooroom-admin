@@ -11,5 +11,5 @@ public interface UserTokenService {
 	 * @return
 	 * @throws Exception
 	 */
-	public UserTokenVO selectTokenByTokenId(String clientId, String token, String statusCd) throws Exception;
+	UserTokenVO selectTokenByTokenId(String clientId, String token, String statusCd) throws Exception;
 }

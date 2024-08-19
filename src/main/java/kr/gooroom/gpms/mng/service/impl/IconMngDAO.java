@@ -49,13 +49,12 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param grpId string icon group id
 	 * @return IconVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<IconVO> selectIconList(String grpId) throws SQLException {
+	public List<IconVO> selectIconList(String grpId) {
 
 		List<IconVO> re = null;
 		try {
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("grpId", grpId);
 
 			re = sqlSessionMeta.selectList("selectIconList", map);
@@ -63,7 +62,6 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectIconList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -73,9 +71,8 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * get icon information list data that not include any icon group.
 	 * 
 	 * @return IconVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<IconVO> selectNoGroupIconList() throws SQLException {
+	public List<IconVO> selectNoGroupIconList() {
 
 		List<IconVO> re = null;
 		try {
@@ -83,7 +80,6 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectNoGroupIconList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -94,9 +90,8 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param iconId String icon id
 	 * @return IconVO selected data
-	 * @throws SQLException
 	 */
-	public IconVO selectIconData(String iconId) throws SQLException {
+	public IconVO selectIconData(String iconId) {
 
 		IconVO re = null;
 		try {
@@ -106,7 +101,6 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectIconData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -120,9 +114,7 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertIconData(IconVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertIconData", vo);
-
+		return sqlSessionMeta.insert("insertIconData", vo);
 	}
 
 	/**
@@ -133,9 +125,7 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteIconData(String iconId) throws SQLException {
-
-		return (long) sqlSessionMeta.delete("deleteIconData", iconId);
-
+		return sqlSessionMeta.delete("deleteIconData", iconId);
 	}
 
 	/**
@@ -146,9 +136,7 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateIconData(IconVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.update("updateIconData", vo);
-
+		return sqlSessionMeta.update("updateIconData", vo);
 	}
 
 	/**
@@ -156,12 +144,9 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo IconGroupVO icon group information data bean
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long insertIconGroupData(IconGroupVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertIconGroupData", vo);
-
+	public long insertIconGroupData(IconGroupVO vo) {
+		return sqlSessionMeta.insert("insertIconGroupData", vo);
 	}
 
 	/**
@@ -169,9 +154,8 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param groupId String icon group id
 	 * @return IconGroupVO selected data
-	 * @throws SQLException
 	 */
-	public IconGroupVO selectIconGroupData(String groupId) throws SQLException {
+	public IconGroupVO selectIconGroupData(String groupId) {
 
 		IconGroupVO re = null;
 		try {
@@ -179,7 +163,6 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectIconGroupData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -189,9 +172,8 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * get icon group information list data.
 	 * 
 	 * @return IconGroupVO list selected list data
-	 * @throws SQLException
 	 */
-	public List<IconGroupVO> selectIconGroupList() throws SQLException {
+	public List<IconGroupVO> selectIconGroupList() {
 
 		List<IconGroupVO> re = null;
 		try {
@@ -199,7 +181,6 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectIconGroupList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -213,9 +194,7 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteIconGroup(String groupId) throws SQLException {
-
-		return (long) sqlSessionMeta.delete("deleteIconGroup", groupId);
-
+		return sqlSessionMeta.delete("deleteIconGroup", groupId);
 	}
 
 	/**
@@ -226,22 +205,17 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteIconGroupLink(String groupId) throws SQLException {
-
-		return (long) sqlSessionMeta.delete("deleteIconGroupLink", groupId);
-
+		return sqlSessionMeta.delete("deleteIconGroupLink", groupId);
 	}
 
 	/**
 	 * modify icon group data.
 	 * 
-	 * @param vo IconGroupVO icon group information data bean
+	 * @param iconGroupVO IconGroupVO icon group information data bean
 	 * @return long data update result count.
-	 * @throws SQLException
 	 */
-	public long updateIconGroup(IconGroupVO iconGroupVO) throws SQLException {
-
-		return (long) sqlSessionMeta.update("updateIconGroup", iconGroupVO);
-
+	public long updateIconGroup(IconGroupVO iconGroupVO) {
+		return sqlSessionMeta.update("updateIconGroup", iconGroupVO);
 	}
 
 	/**
@@ -256,12 +230,12 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 */
 	public long insertIconInGroup(String grpId, String iconId) throws SQLException {
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("grpId", grpId);
 		map.put("iconId", iconId);
 		map.put("regUserId", LoginInfoHelper.getUserId());
 
-		return (long) sqlSessionMeta.insert("insertIconInGroup", map);
+		return sqlSessionMeta.insert("insertIconInGroup", map);
 	}
 
 	/**
@@ -276,14 +250,14 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 */
 	public long deleteIconInGroup(String grpId, String iconId) throws SQLException {
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("grpId", grpId);
 		map.put("iconId", iconId);
 
-		if (iconId != null && "ALL".equals(iconId)) {
-			return (long) sqlSessionMeta.delete("deleteAllIconInGroup", map);
+		if (iconId.equals("ALL")) {
+			return sqlSessionMeta.delete("deleteAllIconInGroup", map);
 		} else {
-			return (long) sqlSessionMeta.delete("deleteIconInGroup", map);
+			return sqlSessionMeta.delete("deleteIconInGroup", map);
 		}
 	}
 
@@ -298,9 +272,9 @@ public class IconMngDAO extends SqlSessionMetaDAO {
 	 */
 	public long deleteIconInGroupMapper(String iconId) throws SQLException {
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("iconId", iconId);
 
-		return (long) sqlSessionMeta.delete("deleteIconInGroupMapper", map);
+		return sqlSessionMeta.delete("deleteIconInGroupMapper", map);
 	}
 }

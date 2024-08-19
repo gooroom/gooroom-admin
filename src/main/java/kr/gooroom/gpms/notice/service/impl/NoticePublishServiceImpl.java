@@ -26,7 +26,7 @@ public class NoticePublishServiceImpl implements NoticePublishService {
     private NoticePublishDAO noticePublishDAO;
 
 	@Override
-	public StatusVO createNoticePublish(NoticePublishVO noticePublishVO) throws Exception {
+	public StatusVO createNoticePublish(NoticePublishVO noticePublishVO) {
 	    StatusVO statusVO = new StatusVO();
 	    try {
 	        noticePublishVO.setModUserId(LoginInfoHelper.getUserId());
@@ -50,7 +50,7 @@ public class NoticePublishServiceImpl implements NoticePublishService {
 	}
 
     @Override
-    public StatusVO updateNoticePublish(NoticePublishVO noticePublishVO) throws Exception {
+    public StatusVO updateNoticePublish(NoticePublishVO noticePublishVO) {
         StatusVO statusVO = new StatusVO();
         try {
             NoticePublishVO existedNoticePublishVO = noticePublishDAO.selectNoticePublish(noticePublishVO.getNoticePublishId());
@@ -81,12 +81,12 @@ public class NoticePublishServiceImpl implements NoticePublishService {
     }
 
     @Override
-    public NoticePublishVO getNoticePublish(String noticePublishId) throws Exception {
+    public NoticePublishVO getNoticePublish(String noticePublishId) {
         return noticePublishDAO.selectNoticePublish(noticePublishId);
     }
 
 	@Override
-	public ResultPagingVO getNoticePublishList(Map<String, Object> options) throws Exception {
+	public ResultPagingVO getNoticePublishList(Map<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 		
@@ -96,7 +96,7 @@ public class NoticePublishServiceImpl implements NoticePublishService {
 			long filteredCount = noticePublishDAO.selectNoticePublishListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				resultVO.setData(re.stream().toArray(NoticePublishVO[]::new));
+				resultVO.setData(re.toArray(NoticePublishVO[]::new));
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
 
@@ -110,10 +110,8 @@ public class NoticePublishServiceImpl implements NoticePublishService {
 		} catch (Exception ex) {
 			logger.error("error in getNoticePublishList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		
 		return resultVO;

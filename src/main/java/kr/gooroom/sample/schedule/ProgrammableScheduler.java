@@ -1,18 +1,15 @@
 package kr.gooroom.sample.schedule;
 
-import java.time.Duration;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
 import jakarta.annotation.Resource;
-
+import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.sample.schedule.service.MigSampleService;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.stereotype.Component;
 
-import kr.gooroom.gpms.common.service.StatusVO;
-import kr.gooroom.sample.schedule.service.MigSampleService;
+import java.time.Duration;
+import java.util.Date;
 
 @Component
 public class ProgrammableScheduler {

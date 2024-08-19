@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.user.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -29,6 +30,7 @@ import java.util.Date;
 
 public class UserTokenVO implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 3538239955449723982L;
 
 	private String token;

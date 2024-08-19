@@ -30,6 +30,8 @@ import kr.gooroom.gpms.common.service.StatusVO;
  * @since 1.8
  */
 
+//TODO
+
 public interface CspService {
 
 	/**
@@ -90,7 +92,7 @@ public interface CspService {
 	/**
 	 * generate certificate for csp from CSR.
 	 * 
-	 * @param cspVO CspVO csp cofiguration data bean.
+	 * @param vo CspVO csp cofiguration data bean.
 	 * @return ResultVO result object
 	 * @throws Exception
 	 */
@@ -99,7 +101,7 @@ public interface CspService {
 	/**
 	 * generate certificate for csp.
 	 * 
-	 * @param cspVO CspVO csp cofiguration data bean.
+	 * @param vo CspVO csp cofiguration data bean.
 	 * @return ResultVO result object
 	 * @throws Exception
 	 */
@@ -108,7 +110,7 @@ public interface CspService {
 	/**
 	 * delete csp information data
 	 * 
-	 * @param cspVO CspVO csp cofiguration data bean.
+	 * @param vo CspVO csp cofiguration data bean.
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */

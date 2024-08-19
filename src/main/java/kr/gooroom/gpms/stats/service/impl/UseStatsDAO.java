@@ -16,14 +16,6 @@
 
 package kr.gooroom.gpms.stats.service.impl;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-
 import kr.gooroom.gpms.client.service.ClientStatsVO;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
@@ -31,6 +23,12 @@ import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.stats.service.ClientMngCountVO;
 import kr.gooroom.gpms.stats.service.LoginCountVO;
 import kr.gooroom.gpms.stats.service.LoginDataVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * data access object class for use gooroom service statistic process.
@@ -48,12 +46,10 @@ public class UseStatsDAO extends SqlSessionMetaDAO {
 	/**
 	 * generate daily login action count data
 	 * 
-	 * @param fromDate String start date
-	 * @param toDate   String end date
+	 * @param options HashMap<String,Object>
 	 * @return LoginCountVO List
-	 * @throws SQLException
 	 */
-	public List<LoginCountVO> selectLoginDailyCount(HashMap<String, Object> options) throws SQLException {
+	public List<LoginCountVO> selectLoginDailyCount(HashMap<String, Object> options) {
 
 		List<LoginCountVO> re = null;
 		try {
@@ -73,12 +69,11 @@ public class UseStatsDAO extends SqlSessionMetaDAO {
 	 * @param searchType String search type
 	 * @param searchDate String search date
 	 * @return LoginDataVO List
-	 * @throws SQLException
 	 */
-	public List<LoginDataVO> selectLoginList(String searchType, String searchDate) throws SQLException {
+	public List<LoginDataVO> selectLoginList(String searchType, String searchDate) {
 		List<LoginDataVO> re = null;
 		try {
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("searchType", searchType.toUpperCase());
 			map.put("searchDate", searchDate);
 			re = sqlSessionMeta.selectList("selectLoginList", map);
@@ -95,9 +90,8 @@ public class UseStatsDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return LoginDataVO List
-	 * @throws SQLException
 	 */
-	public List<LoginDataVO> selectLoginListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<LoginDataVO> selectLoginListPaged(HashMap<String, Object> options) {
 		List<LoginDataVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectLoginListPaged", options);
@@ -114,10 +108,9 @@ public class UseStatsDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectLoginTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectLoginTotalCount", options);
+	public long selectLoginTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectLoginTotalCount", options);
 	}
 
 	/**
@@ -125,21 +118,18 @@ public class UseStatsDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectLoginFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectLoginFilteredCount", options);
+	public long selectLoginFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectLoginFilteredCount", options);
 	}
 
 	/**
 	 * generate daily client create and revoke action count data
 	 * 
-	 * @param fromDate String start date
-	 * @param toDate   String end date
+	 * @param options HashMap<String,Object>
 	 * @return ClientMngCountVO List
-	 * @throws SQLException
 	 */
-	public List<ClientMngCountVO> selectClientMngCount(HashMap<String, Object> options) throws SQLException {
+	public List<ClientMngCountVO> selectClientMngCount(HashMap<String, Object> options) {
 
 		List<ClientMngCountVO> re = null;
 		try {
@@ -158,9 +148,8 @@ public class UseStatsDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ClientVO List
-	 * @throws SQLException
 	 */
-	public List<ClientStatsVO> selectClientMngListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ClientStatsVO> selectClientMngListPaged(HashMap<String, Object> options) {
 		List<ClientStatsVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectClientMngListPaged", options);
@@ -177,10 +166,9 @@ public class UseStatsDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectClientMngTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectClientMngTotalCount", options);
+	public long selectClientMngTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectClientMngTotalCount", options);
 	}
 
 	/**
@@ -188,10 +176,9 @@ public class UseStatsDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectClientMngFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectClientMngFilteredCount", options);
+	public long selectClientMngFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectClientMngFilteredCount", options);
 	}
 
 }

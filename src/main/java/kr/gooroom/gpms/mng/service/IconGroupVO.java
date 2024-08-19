@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.mng.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,9 +28,10 @@ import java.util.Date;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class IconGroupVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = 6400947575235400108L;
 	private String grpId;
 	private String grpNm;
 

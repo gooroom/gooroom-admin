@@ -90,7 +90,7 @@ public class ClientLogController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = null;
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		try {
 			// << options >>
@@ -149,10 +149,10 @@ public class ClientLogController {
 
 			resultVO = clientLogService.getSecurityLogListPaged(options);
 
-			HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> fromDateHm = new HashMap<>();
 			fromDateHm.put("name", "fromDate");
 			fromDateHm.put("value", fromDate);
-			HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> toDateHm = new HashMap<>();
 			toDateHm.put("name", "toDate");
 			toDateHm.put("value", toDate);
 			resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -231,7 +231,7 @@ public class ClientLogController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		try {
 			// << options >>
@@ -284,10 +284,10 @@ public class ClientLogController {
 
 			resultVO = clientLogService.getGeneralLogListPaged(options);
 
-			HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> fromDateHm = new HashMap<>();
 			fromDateHm.put("name", "fromDate");
 			fromDateHm.put("value", fromDate);
-			HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> toDateHm = new HashMap<>();
 			toDateHm.put("name", "toDate");
 			toDateHm.put("value", toDate);
 			resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -318,8 +318,8 @@ public class ClientLogController {
 	 *
 	 */
 	@PostMapping(value = "/deleteUserClientUseHist")
-	public @ResponseBody ResultVO deleteUserClientUseHist(@RequestParam(value = "userId", required = true) String userId,
-														  @RequestParam(value = "clientIds", required = true) String clientIds) throws Exception {
+	public @ResponseBody ResultVO deleteUserClientUseHist(@RequestParam(value = "userId" ) String userId,
+														  @RequestParam(value = "clientIds") String clientIds) {
 		ResultVO resultVO = new ResultVO();
 
 		HashMap<String, Object> options = new HashMap<>();

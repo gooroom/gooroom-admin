@@ -89,7 +89,7 @@ public class PortableImageController {
 
         try
         {
-            HashMap<String, Object> options = new HashMap<String, Object>();
+            HashMap<String, Object> options = new HashMap<>();
             String fromDate = StringUtils.defaultString(req.getParameter("fromDate"));
             String toDate = StringUtils.defaultString(req.getParameter("toDate"));
             if ("".equals(fromDate) || "".equals(toDate)) {
@@ -143,10 +143,10 @@ public class PortableImageController {
 
             resultVO = portableImageService.readImageData(options);
 
-            HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+            HashMap<String, Object> fromDateHm = new HashMap<>();
             fromDateHm.put("name", "fromDate");
             fromDateHm.put("value", fromDate);
-            HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+            HashMap<String, Object> toDateHm = new HashMap<>();
             toDateHm.put("name", "toDate");
             toDateHm.put("value", toDate);
             resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -276,7 +276,7 @@ public class PortableImageController {
         }
         try
         {
-            HashMap<String, Object> options =  new HashMap<String, Object>();
+            HashMap<String, Object> options = new HashMap<>();
             options.put("imageId", imageId);
             options.put("status", status);
             statusVO = portableImageService.updateImageStatus(options);
@@ -307,7 +307,7 @@ public class PortableImageController {
                 statusVO = portableImageService.removeAllImageData();
             }
             else {
-                HashMap<String, Object> options = new HashMap<String, Object>();
+                HashMap<String, Object> options = new HashMap<>();
                 options.put("imageIds", ids);
                 statusVO = portableImageService.removeImageDataByImageIds(options);
             }

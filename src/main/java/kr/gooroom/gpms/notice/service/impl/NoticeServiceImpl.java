@@ -32,7 +32,7 @@ public class NoticeServiceImpl implements NoticeService {
 	private NoticeDAO noticeDAO;
 
 	@Override
-	public StatusVO createNoticeData(NoticeVO noticeVO) throws Exception {
+	public StatusVO createNoticeData(NoticeVO noticeVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -53,17 +53,15 @@ public class NoticeServiceImpl implements NoticeService {
 		} catch (Exception ex) {
 			logger.error("error in createNoticeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
 	}
 
 	@Override
-	public StatusVO updateNoticeData(NoticeVO noticeVO) throws Exception {
+	public StatusVO updateNoticeData(NoticeVO noticeVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -83,10 +81,8 @@ public class NoticeServiceImpl implements NoticeService {
 		} catch (Exception ex) {
 			logger.error("error in updateNoticeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -97,10 +93,9 @@ public class NoticeServiceImpl implements NoticeService {
 	 * 
 	 * @param noticeId String notice id
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO deleteNoticeMaster(String noticeId) throws Exception {
+	public StatusVO deleteNoticeMaster(String noticeId) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -121,17 +116,15 @@ public class NoticeServiceImpl implements NoticeService {
 		} catch (Exception ex) {
 			logger.error("error in deleteUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
 	}
 
 	@Override
-	public ResultPagingVO getNoticeList(Map<String, Object> options) throws Exception {
+	public ResultPagingVO getNoticeList(Map<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -147,7 +140,7 @@ public class NoticeServiceImpl implements NoticeService {
 			long filteredCount = noticeDAO.selectNoticeListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				NoticeVO[] row = re.stream().toArray(NoticeVO[]::new);
+				NoticeVO[] row = re.toArray(NoticeVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -162,18 +155,16 @@ public class NoticeServiceImpl implements NoticeService {
 		} catch (Exception ex) {
 			logger.error("error in getNoticeList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
 	}
 
 	@Override
-	public Page<TargetNoticeVO> getNoticesByTarget(Pageable pageable, String userId, String clientId) throws Exception {
-		Map<String, Object> options = new HashMap<String, Object>();
+	public Page<TargetNoticeVO> getNoticesByTarget(Pageable pageable, String userId, String clientId) {
+		Map<String, Object> options = new HashMap<>();
 		options.put("start", pageable.getPageNumber() * pageable.getPageSize());
 		options.put("size", pageable.getPageSize());
 		pageable.getSort().forEach(sort -> {
@@ -193,13 +184,12 @@ public class NoticeServiceImpl implements NoticeService {
 		List<TargetNoticeVO> targetNotices = noticeDAO.findAllByTarget(options);
 		long totalCount = noticeDAO.getTotalCountByTarget(options);
 
-		return new PageImpl<TargetNoticeVO>(targetNotices, pageable, totalCount);
+		return new PageImpl<>(targetNotices, pageable, totalCount);
 	}
 
 	@Override
-	public Optional<TargetNoticeVO> getNoticeByTarget(String userId, String clientId, String noticePublishId)
-			throws Exception {
-		Map<String, Object> options = new HashMap<String, Object>();
+	public Optional<TargetNoticeVO> getNoticeByTarget(String userId, String clientId, String noticePublishId) {
+		Map<String, Object> options = new HashMap<>();
 
 		if (userId != null) {
 			options.put("userId", userId);

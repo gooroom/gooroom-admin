@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.stats.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -26,9 +27,10 @@ import java.io.Serializable;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class LoginCountVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = -2086537390618668442L;
 	private String userAll = "";
 	private String userSuccess = "";
 	private String clientAll = "";

@@ -29,12 +29,14 @@ public class ExcelCommonServiceImpl implements ExcelCommonService {
 
         String fileName = file.getOriginalFilename();
         try {
-            if(fileName.endsWith(".xls")) {
-                workbook = new HSSFWorkbook(file.getInputStream());
-            } else if(fileName.endsWith(".xlsx")) {
-                workbook = new XSSFWorkbook(file.getInputStream());
-            } else {
-                throw new Exception();
+            if (fileName != null) {
+                if(fileName.endsWith(".xls")) {
+                    workbook = new HSSFWorkbook(file.getInputStream());
+                } else if(fileName.endsWith(".xlsx")) {
+                    workbook = new XSSFWorkbook(file.getInputStream());
+                } else {
+                    throw new Exception();
+                }
             }
         } catch (Exception e) {
             throw new Exception(e.getMessage(), e);
@@ -52,7 +54,7 @@ public class ExcelCommonServiceImpl implements ExcelCommonService {
         if(fileType.equals(GPMSConstants.RULE_GRADE_DEPT)) {
             cellBaseType = 4;
         }
-        List<List<String>> dataList = new ArrayList<List<String>>();
+        List<List<String>> dataList = new ArrayList<>();
         try {
             Sheet sheet = wb.getSheetAt(0);
             for (int rowIdx = 0; rowIdx < sheet.getPhysicalNumberOfRows(); rowIdx++) {
@@ -63,7 +65,7 @@ public class ExcelCommonServiceImpl implements ExcelCommonService {
                     break;
                 }
 
-                Cell cell = null;
+                Cell cell;
                 for(int cellIdx = 0; cellIdx < cellBaseType; cellIdx++) {
                     cell = row.getCell(cellIdx);
                     if(cell == null) {
@@ -77,8 +79,9 @@ public class ExcelCommonServiceImpl implements ExcelCommonService {
                 //data check - is real data
                 boolean isData = false;
                 for(String data : rowData) {
-                    if(!data.equals("")) {
+                    if (!data.equals("")) {
                         isData = true;
+                        break;
                     }
                 }
                 if(isData) {
@@ -97,12 +100,12 @@ public class ExcelCommonServiceImpl implements ExcelCommonService {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet();
-        XSSFRow row = null;
+        XSSFRow row;
 
         int rowIndex = 0;
-        int colIndex = 0;
+        int colIndex;
 
-        XSSFCell cell = null;
+        XSSFCell cell;
 
         for (List<String> rowList : list) {
 
@@ -134,28 +137,18 @@ public class ExcelCommonServiceImpl implements ExcelCommonService {
     @Override
     public boolean deptCdRegex(String deptCd) {
         Matcher userIdMatcher = Pattern.compile("(^[a-zA-Z0-9_.-]*$)").matcher(deptCd);
-        if(userIdMatcher.find()) {
-            return true;
-        }
-        return false;
+        return userIdMatcher.find();
     }
 
     @Override
     public boolean userIdRegex(String userId) {
         Matcher userIdMatcher = Pattern.compile("(^[a-z0-9]*$)").matcher(userId);
-        if(userIdMatcher.find()) {
-            return true;
-        }
-        return false;
+        return userIdMatcher.find();
     }
 
     @Override
     public boolean emailRegex(String email) {
-
         Matcher emailMatcher = Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$").matcher(email);
-        if(emailMatcher.find()) {
-            return true;
-        }
-        return false;
+        return emailMatcher.find();
     }
 }

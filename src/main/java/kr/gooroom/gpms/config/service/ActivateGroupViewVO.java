@@ -1,9 +1,12 @@
 package kr.gooroom.gpms.config.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class ActivateGroupViewVO implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = -2063338831297664285L;
     private String gubun;
     private String deptCd;
     private String deptNm;

@@ -38,7 +38,6 @@ import kr.gooroom.gpms.user.service.impl.UserDAO;
  * @version 1.0
  * @see
  * 
- * 		Copyright (C) All right reserved.
  */
 
 @Service("deptService")
@@ -63,15 +62,14 @@ public class DeptServiceImpl implements DeptService {
 	 * 
 	 * @param
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getChildrenDeptList(String deptCd, String hasWithRoot) throws Exception {
+	public ResultVO getChildrenDeptList(String deptCd, String hasWithRoot) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("deptCd", deptCd);
 
 			if (GPMSConstants.DEFAULT_DEPTCD.equals(deptCd) || "0".equals(deptCd)) {
@@ -83,7 +81,7 @@ public class DeptServiceImpl implements DeptService {
 
 			List<DeptVO> re = deptDao.selectChildrenDeptListByAdmin(map);
 			if (re != null && re.size() > 0) {
-				DeptVO[] row = re.stream().toArray(DeptVO[]::new);
+				DeptVO[] row = re.toArray(DeptVO[]::new);
 				resultVO.setData(row);
 				
 				if(GPMSConstants.GUBUN_YES.equalsIgnoreCase(hasWithRoot)) {
@@ -103,10 +101,8 @@ public class DeptServiceImpl implements DeptService {
 		} catch (Exception ex) {
 			logger.error("error in getChildrenDeptList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -117,10 +113,9 @@ public class DeptServiceImpl implements DeptService {
 	 * 
 	 * @param
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getAllChildrenDeptList(String deptCd) throws Exception {
+	public ResultVO getAllChildrenDeptList(String deptCd) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -129,7 +124,7 @@ public class DeptServiceImpl implements DeptService {
 			List<DeptVO> re = deptDao.selectAllChildrenDeptList(deptCd);
 
 			if (re != null && re.size() > 0) {
-				DeptVO[] row = re.stream().toArray(DeptVO[]::new);
+				DeptVO[] row = re.toArray(DeptVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -143,10 +138,8 @@ public class DeptServiceImpl implements DeptService {
 		} catch (Exception ex) {
 			logger.error("error in getAllChildrenDeptList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -157,10 +150,9 @@ public class DeptServiceImpl implements DeptService {
 	 * 
 	 * @param deptVO
 	 * @return StatusVO
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO updateDeptData(DeptVO deptVO) throws Exception {
+	public StatusVO updateDeptData(DeptVO deptVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -282,10 +274,9 @@ public class DeptServiceImpl implements DeptService {
 	 * 
 	 * @param deptVO
 	 * @return StatusVO
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO updateChildrenDeptExpireData(DeptVO deptVO) throws Exception {
+	public StatusVO updateChildrenDeptExpireData(DeptVO deptVO) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			deptVO.setModUserId(LoginInfoHelper.getUserId());
@@ -316,103 +307,102 @@ public class DeptServiceImpl implements DeptService {
 	 * @param policyKitRuleId
 	 * @param desktopConfId
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
 	public StatusVO updateRuleInfoToMultiDept(String[] deptCds, String browserRuleId, String mediaRuleId,
 			String securityRuleId, String filteredSoftwareRuleId, String ctrlCenterItemRuleId, String policyKitRuleId,
-			String desktopConfId) throws Exception {
+			String desktopConfId) {
 
 		StatusVO statusVO = new StatusVO();
 
 		try {
 			if (deptCds != null && deptCds.length > 0) {
 				String modUserId = LoginInfoHelper.getUserId();
-				for (int i = 0; i < deptCds.length; i++) {
+				for (String deptCd : deptCds) {
 
 					long cnt = -1;
 					// 브라우져설정
 					if (browserRuleId != null && !"".equals(browserRuleId)) {
-						cnt = deptDao.insertOrUpdateConfigWithDept(deptCds[i], modUserId, browserRuleId,
+						cnt = deptDao.insertOrUpdateConfigWithDept(deptCd, modUserId, browserRuleId,
 								GPMSConstants.TYPE_BROWSERRULE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						deptDao.deleteConfigWithDept(deptCds[i], GPMSConstants.TYPE_BROWSERRULE);
+						deptDao.deleteConfigWithDept(deptCd, GPMSConstants.TYPE_BROWSERRULE);
 					}
 
 					cnt = -1;
 					// 매체제어설정
 					if (mediaRuleId != null && mediaRuleId.length() > 0) {
-						cnt = deptDao.insertOrUpdateConfigWithDept(deptCds[i], modUserId, mediaRuleId,
+						cnt = deptDao.insertOrUpdateConfigWithDept(deptCd, modUserId, mediaRuleId,
 								GPMSConstants.TYPE_MEDIARULE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						deptDao.deleteConfigWithDept(deptCds[i], GPMSConstants.TYPE_MEDIARULE);
+						deptDao.deleteConfigWithDept(deptCd, GPMSConstants.TYPE_MEDIARULE);
 					}
 
 					cnt = -1;
 					// 단말보안설정
 					if (securityRuleId != null && securityRuleId.length() > 0) {
-						cnt = deptDao.insertOrUpdateConfigWithDept(deptCds[i], modUserId, securityRuleId,
+						cnt = deptDao.insertOrUpdateConfigWithDept(deptCd, modUserId, securityRuleId,
 								GPMSConstants.TYPE_SECURITYRULE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						cnt = deptDao.deleteConfigWithDept(deptCds[i], GPMSConstants.TYPE_SECURITYRULE);
+						cnt = deptDao.deleteConfigWithDept(deptCd, GPMSConstants.TYPE_SECURITYRULE);
 					}
 
 					cnt = -1;
 					// filtered software rule
 					if (filteredSoftwareRuleId != null && filteredSoftwareRuleId.length() > 0) {
-						cnt = deptDao.insertOrUpdateConfigWithDept(deptCds[i], modUserId, filteredSoftwareRuleId,
+						cnt = deptDao.insertOrUpdateConfigWithDept(deptCd, modUserId, filteredSoftwareRuleId,
 								GPMSConstants.TYPE_FILTEREDSOFTWARE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						cnt = deptDao.deleteConfigWithDept(deptCds[i], GPMSConstants.TYPE_FILTEREDSOFTWARE);
+						cnt = deptDao.deleteConfigWithDept(deptCd, GPMSConstants.TYPE_FILTEREDSOFTWARE);
 					}
 
 					cnt = -1;
 					// control center item
 					if (ctrlCenterItemRuleId != null && ctrlCenterItemRuleId.length() > 0) {
-						cnt = deptDao.insertOrUpdateConfigWithDept(deptCds[i], modUserId, ctrlCenterItemRuleId,
+						cnt = deptDao.insertOrUpdateConfigWithDept(deptCd, modUserId, ctrlCenterItemRuleId,
 								GPMSConstants.TYPE_CTRLCENTERITEMRULE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						cnt = deptDao.deleteConfigWithDept(deptCds[i], GPMSConstants.TYPE_CTRLCENTERITEMRULE);
+						cnt = deptDao.deleteConfigWithDept(deptCd, GPMSConstants.TYPE_CTRLCENTERITEMRULE);
 					}
 
 					cnt = -1;
 					// policy kit
 					if (policyKitRuleId != null && policyKitRuleId.length() > 0) {
-						cnt = deptDao.insertOrUpdateConfigWithDept(deptCds[i], modUserId, policyKitRuleId,
+						cnt = deptDao.insertOrUpdateConfigWithDept(deptCd, modUserId, policyKitRuleId,
 								GPMSConstants.TYPE_POLICYKITRULE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						cnt = deptDao.deleteConfigWithDept(deptCds[i], GPMSConstants.TYPE_POLICYKITRULE);
+						cnt = deptDao.deleteConfigWithDept(deptCd, GPMSConstants.TYPE_POLICYKITRULE);
 					}
 
 					cnt = -1;
 					// 데스크톱설정
 					if (desktopConfId != null && desktopConfId.length() > 0) {
-						cnt = deptDao.insertOrUpdateConfigWithDept(deptCds[i], modUserId, desktopConfId,
+						cnt = deptDao.insertOrUpdateConfigWithDept(deptCd, modUserId, desktopConfId,
 								GPMSConstants.TYPE_DESKTOPCONF);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						cnt = deptDao.deleteConfigWithDept(deptCds[i], GPMSConstants.TYPE_DESKTOPCONF);
+						cnt = deptDao.deleteConfigWithDept(deptCd, GPMSConstants.TYPE_DESKTOPCONF);
 					}
 				}
 
@@ -443,10 +433,9 @@ public class DeptServiceImpl implements DeptService {
 	 * @param cfgId
 	 * @param confType
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO updateDeptConf(String deptCd, String cfgId, String confType) throws Exception {
+	public StatusVO updateDeptConf(String deptCd, String cfgId, String confType) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			long cnt = -1;
@@ -471,10 +460,9 @@ public class DeptServiceImpl implements DeptService {
 	 * 조직 아이디 중복 검사
 	 * @param deptCd
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isExistDeptCd(String deptCd) throws Exception {
+	public StatusVO isExistDeptCd(String deptCd) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			boolean re = deptDao.isExistDeptCd(deptCd);
@@ -488,10 +476,8 @@ public class DeptServiceImpl implements DeptService {
 		} catch (Exception ex) {
 			logger.error("error in isExistDeptCd : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -501,10 +487,9 @@ public class DeptServiceImpl implements DeptService {
 	 * 신규 조직 정보 등록
 	 * @param vo
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO createDeptData(DeptVO vo) throws Exception {
+	public StatusVO createDeptData(DeptVO vo) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -615,10 +600,8 @@ public class DeptServiceImpl implements DeptService {
 		} catch (Exception ex) {
 			logger.error("error in createDeptData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -628,10 +611,9 @@ public class DeptServiceImpl implements DeptService {
 	 * 하위 포함하여 조직을 미허용으로 수정
 	 * @param deptCd
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO updateDeptUnusedWithChildren(String deptCd) throws Exception {
+	public StatusVO updateDeptUnusedWithChildren(String deptCd) {
 
 		StatusVO statusVO = new StatusVO();
 		DeptVO deptVO = new DeptVO();
@@ -653,10 +635,8 @@ public class DeptServiceImpl implements DeptService {
 		} catch (Exception ex) {
 			logger.error("error in updateDeptUnusedWithChildren : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -666,10 +646,9 @@ public class DeptServiceImpl implements DeptService {
 	 * 하위 포함하여 조직 정보 삭제
 	 * @param deptCd
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO deleteDeptWithChildren(String deptCd) throws Exception {
+	public StatusVO deleteDeptWithChildren(String deptCd) {
 
 		StatusVO statusVO = new StatusVO();
 		DeptVO deptVO = new DeptVO();
@@ -681,15 +660,12 @@ public class DeptServiceImpl implements DeptService {
 			List<DeptVO> re = deptDao.selectAllChildrenDeptList(deptCd);
 			if (re != null && re.size() > 0) {
 
-				DeptVO[] deptVOs = re.stream().toArray(DeptVO[]::new);
+				DeptVO[] deptVOs = re.toArray(DeptVO[]::new);
 				if (deptVOs != null && deptVOs.length > 0) {
 					String[] depdCds = new String[deptVOs.length];
 					for (int i = 0; i < depdCds.length; i++) {
 						depdCds[i] = deptVOs[i].getDeptCd();
 					}
-
-					HashMap<String, Object> map = new HashMap<String, Object>();
-					map.put("depdCds", depdCds);
 
 					// 사용자 정보에서 조직 정보 제거
 					userDao.removeUserInDeptList(depdCds);
@@ -719,10 +695,8 @@ public class DeptServiceImpl implements DeptService {
 		} catch (Exception ex) {
 			logger.error("error in deleteDeptWithChildren : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -762,21 +736,21 @@ public class DeptServiceImpl implements DeptService {
 
 			// DELETE DEPT
 			String regUserId = LoginInfoHelper.getUserId();
-			for (int i = 0; i < newDeptCds.length; i++) {
+			for (String newDeptCd : newDeptCds) {
 				// 2. insert history
-				long histRe = deptDao.createDeptHist("DELETE", newDeptCds[i], regUserId);
+				long histRe = deptDao.createDeptHist("DELETE", newDeptCd, regUserId);
 				if (histRe > 0) {
 					// 3. delete master
-					long mstrRe = deptDao.deleteDeptData(newDeptCds[i]);
+					long mstrRe = deptDao.deleteDeptData(newDeptCd);
 					if (mstrRe > 0) {
 
 						// DELETE DEPT IN Relation tables
 						// 4. delete rule config
-						deptDao.deleteDeptFromRule(newDeptCds[i]);
+						deptDao.deleteDeptFromRule(newDeptCd);
 						// 5. delete admin config
-						deptDao.deleteDeptForAdmin(newDeptCds[i]);
+						deptDao.deleteDeptForAdmin(newDeptCd);
 						// 6. delete notify config
-						deptDao.deleteDeptForNoti(newDeptCds[i]);
+						deptDao.deleteDeptForNoti(newDeptCd);
 					} else {
 						throw new SQLException();
 					}
@@ -788,17 +762,17 @@ public class DeptServiceImpl implements DeptService {
 			if (newUserIds != null && newUserIds.length > 0) {
 				deptDao.updateDeptToUser(GPMSConstants.DEFAULT_DEPTCD, newUserIds);
 				if ("Y".equalsIgnoreCase(isDeleteUser)) {
-					for (int i = 0; i < newUserIds.length; i++) {
+					for (String newUserId : newUserIds) {
 						// ##. insert history
-						long histRe = userDao.createUserHist("DELETE", newUserIds[i], regUserId);
+						long histRe = userDao.createUserHist("DELETE", newUserId, regUserId);
 						if (histRe > 0) {
 							// ##. delete user mstr
-							long deleteRe = userDao.deleteUserDataById(newUserIds[i], regUserId);
+							long deleteRe = userDao.deleteUserDataById(newUserId, regUserId);
 							if (deleteRe > 0) {
 								// ##. delete rule config
-								userDao.deleteUserFromRule(newUserIds[i]);
+								userDao.deleteUserFromRule(newUserId);
 								// ##. delete notify config
-								userDao.deleteUserForNoti(newUserIds[i]);
+								userDao.deleteUserForNoti(newUserId);
 							} else {
 								throw new SQLException();
 							}
@@ -820,19 +794,15 @@ public class DeptServiceImpl implements DeptService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in deleteDeptList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in deleteDeptList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -843,10 +813,9 @@ public class DeptServiceImpl implements DeptService {
 	 * 
 	 * @param
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getDeptData(String deptCd) throws Exception {
+	public ResultVO getDeptData(String deptCd) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			DeptVO re = deptDao.selectDeptData(deptCd);
@@ -880,16 +849,15 @@ public class DeptServiceImpl implements DeptService {
 	 * 
 	 * @param deptCds string target dept cd array
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readDeptNodeList(String[] deptCds) throws Exception {
+	public ResultVO readDeptNodeList(String[] deptCds) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<DeptVO> re = deptDao.selectDeptNodeList(deptCds);
 
 			if (re != null && re.size() > 0) {
-				DeptVO[] row = re.stream().toArray(DeptVO[]::new);
+				DeptVO[] row = re.toArray(DeptVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -917,10 +885,9 @@ public class DeptServiceImpl implements DeptService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getDeptListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getDeptListPaged(HashMap<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 
 		try {
@@ -930,7 +897,7 @@ public class DeptServiceImpl implements DeptService {
 			long filteredCount = deptDao.selectDeptListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				DeptVO[] row = re.stream().toArray(DeptVO[]::new);
+				DeptVO[] row = re.toArray(DeptVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -947,10 +914,8 @@ public class DeptServiceImpl implements DeptService {
 		} catch (Exception ex) {
 			logger.error("error in getDeptListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -961,14 +926,13 @@ public class DeptServiceImpl implements DeptService {
 	 *
 	 * @param dataList List<List<String>> dataList
 	 * @return StatusVO
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO isCanUpdateDeptDataFromFile(List<List<String>> dataList) throws Exception {
+	public ResultVO isCanUpdateDeptDataFromFile(List<List<String>> dataList) {
 
 		ResultVO resultVO = new ResultVO();
 
-		List<DeptVO> deptList = new ArrayList<DeptVO>();
+		List<DeptVO> deptList = new ArrayList<>();
 		try {
 
 			// excel head list check
@@ -1079,26 +1043,21 @@ public class DeptServiceImpl implements DeptService {
 				}
 
 				if (deptList != null && deptList.size() > 0) {
-					DeptVO[] row = deptList.stream().toArray(DeptVO[]::new);
+					DeptVO[] row = deptList.toArray(DeptVO[]::new);
 					resultVO.setData(row);
 					resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, "GRSM0000",
 							"파일데이터확인 완료"));
 				}
 
 			} else {
-				if (resultVO != null) {
-					resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-							"저장할 내용이 없음"));
-				}
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR, "저장할 내용이 없음"));
 			}
 
 		} catch (Exception ex) {
 			logger.error("error in isCanDeptDataFromFile : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -1108,19 +1067,17 @@ public class DeptServiceImpl implements DeptService {
 	 * 조직 정보 일괄 등록 (파일자료)
 	 * @param deptVOs DeptVOs
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-	public StatusVO updateDeptDataFromFile(List<DeptVO> deptVOs) throws Exception {
+	public StatusVO updateDeptDataFromFile(List<DeptVO> deptVOs) {
 
 		StatusVO statusVO = new StatusVO();
 
 		try {
-
 			// delete old dept cd and userList in dept
 			List<DeptVO> depts = deptDao.selectAllChildrenDeptList("0");
-			List<String> willDeleteDept = new ArrayList<String>();
+			List<String> willDeleteDept = new ArrayList<>();
 			boolean isExist = false;
 			for(DeptVO oldDeptVO : depts) {
 				for(DeptVO newDeptVO : deptVOs) {
@@ -1135,7 +1092,7 @@ public class DeptServiceImpl implements DeptService {
 				isExist = false;
 			}
 			if(willDeleteDept.size() > 0) {
-				deleteDeptList(willDeleteDept.toArray(new String[willDeleteDept.size()]), GPMSConstants.GUBUN_NO);
+				deleteDeptList(willDeleteDept.toArray(new String[0]), GPMSConstants.GUBUN_NO);
 			}
 
 			// main logic
@@ -1181,15 +1138,14 @@ public class DeptServiceImpl implements DeptService {
 	 * 조직 정보 일괄 다운로드
 	 *
 	 * @return XSSFWorkbook
-	 * @throws Exception
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-	public XSSFWorkbook createDeptFileFromData() throws Exception {
+	public XSSFWorkbook createDeptFileFromData() {
 
 		try {
             List<DeptVO> re = deptDao.selectAllChildrenDeptList("DEPTDEFAULT"); //최상위부터 전체 조직 리스트
-			List<List<String>> excleWriteList = new ArrayList<List<String>>();
+			List<List<String>> excleWriteList = new ArrayList<>();
 
 			// sort dept level
 			re.sort(Comparator.comparingInt(DeptVO::getDeptLevelInt));
@@ -1226,14 +1182,13 @@ public class DeptServiceImpl implements DeptService {
 	 * 조직 정보 업로드 샘플파일 다운로드
 	 *
 	 * @return XSSFWorkbook
-	 * @throws Exception
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-	public XSSFWorkbook createDeptSampleFileFromData() throws Exception {
+	public XSSFWorkbook createDeptSampleFileFromData() {
 
 		try {
-			List<List<String>> excleWriteList = new ArrayList<List<String>>();
+			List<List<String>> excleWriteList = new ArrayList<>();
 
 			//title
 			excleWriteList.add(Arrays.asList("조직아이디",
@@ -1255,10 +1210,9 @@ public class DeptServiceImpl implements DeptService {
 	 * 조직 일괄등록 항목 리스트 존재하는지 확인
 	 * @param headList
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isDeptHeadListExist(List<String> headList) throws Exception {
+	public StatusVO isDeptHeadListExist(List<String> headList) {
 		StatusVO statusVO = new StatusVO();
 		boolean re = true;
 		try {
@@ -1292,7 +1246,7 @@ public class DeptServiceImpl implements DeptService {
 	}
 
 	@Override
-	public StatusVO isRequiredDataExist(List<String> rowData) throws Exception {
+	public StatusVO isRequiredDataExist(List<String> rowData) {
 		StatusVO statusVO = new StatusVO();
 		try {
 
@@ -1320,7 +1274,7 @@ public class DeptServiceImpl implements DeptService {
 	}
 
 	@Override
-	public StatusVO isExistDeptNameByParentCd(String parentDeptCd, String deptName) throws Exception {
+	public StatusVO isExistDeptNameByParentCd(String parentDeptCd, String deptName) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			boolean re = deptDao.isExistDeptNameByParentCd(parentDeptCd, deptName);
@@ -1343,7 +1297,7 @@ public class DeptServiceImpl implements DeptService {
 	}
 
 	@Override
-	public StatusVO isExistDeptNameByDeptCd(String deptCd, String deptName) throws Exception {
+	public StatusVO isExistDeptNameByDeptCd(String deptCd, String deptName) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			boolean re = deptDao.isExistDeptNameByDeptCd(deptCd, deptName);

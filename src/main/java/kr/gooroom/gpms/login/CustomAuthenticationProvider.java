@@ -74,10 +74,10 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 			String myIp = details.getRemoteAddress();
 			boolean isOk = false;
 			try {
-				List<String> connectIpList = (List<String>) user.getConnectIpList();
+				List<String> connectIpList = user.getConnectIpList();
 				if (connectIpList != null && connectIpList.size() > 0) {
 					for (String connIp : connectIpList) {
-						if (connIp != null && connIp.indexOf("*") > -1) {
+						if (connIp != null && connIp.contains("*")) {
 							connIp = connIp.substring(0, connIp.indexOf("*"));
 							if (myIp.startsWith(connIp)) {
 								isOk = true;
@@ -117,7 +117,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 					// false);
 					if (sessions != null) {
 						for (SessionInformation sessionInformation : sessions) {
-							List<String> sessionsToClose = new ArrayList<String>();
+							List<String> sessionsToClose = new ArrayList<>();
 							sessionsToClose.add(sessionInformation.getSessionId());
 
 							// logging.

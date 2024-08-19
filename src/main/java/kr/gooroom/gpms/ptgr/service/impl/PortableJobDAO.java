@@ -6,22 +6,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.sql.SQLException;
-
 @Repository("portableJobDAO")
 public class PortableJobDAO extends SqlSessionMetaDAO {
     private static final Logger logger = LoggerFactory.getLogger(PortableJobDAO.class);
 
-    public long createPortableJob (PortableJobVO vo) throws SQLException {
-        return (long) sqlSessionMeta.insert("insertPortableJob", vo);
+    public long createPortableJob (PortableJobVO vo) {
+        return sqlSessionMeta.insert("insertPortableJob", vo);
     }
 
-    public long deletePortableJobByImageId (int imageId) throws SQLException {
-        return (long) sqlSessionMeta.delete("deletePortableJobByImageId");
+    public long deletePortableJobByImageId (int imageId) {
+        return sqlSessionMeta.delete("deletePortableJobByImageId");
     }
 
-    public long deleteAllPortableJob () throws SQLException {
-        return (long) sqlSessionMeta.delete("deleteAllPortableJob");
+    public long deleteAllPortableJob () {
+        return sqlSessionMeta.delete("deleteAllPortableJob");
     }
 
     public PortableJobVO selectPortableJobByImageId (int imageId)  {
@@ -31,6 +29,6 @@ public class PortableJobDAO extends SqlSessionMetaDAO {
     }
 
     public long updatePortableJob (PortableJobVO jobVO)  {
-       return (long) sqlSessionMeta.update ("updatePortableJob", jobVO);
+       return sqlSessionMeta.update ("updatePortableJob", jobVO);
     }
 }

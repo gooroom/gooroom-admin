@@ -102,10 +102,10 @@ public class UseStatsController {
 
 			resultVO = useStatsService.getLoginDailyCount(fromDate, toDate);
 
-			HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> fromDateHm = new HashMap<>();
 			fromDateHm.put("name", "fromDate");
 			fromDateHm.put("value", fromDate);
-			HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> toDateHm = new HashMap<>();
 			toDateHm.put("name", "toDate");
 			toDateHm.put("value", toDate);
 			resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -158,7 +158,7 @@ public class UseStatsController {
 	public @ResponseBody ResultPagingVO readLoginListPaged(HttpServletRequest req, HttpServletResponse res,
 			ModelMap model) {
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		try {
 			// << options >>
@@ -235,10 +235,10 @@ public class UseStatsController {
 
 			resultVO = useStatsService.getClientMngCount(fromDate, toDate);
 
-			HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> fromDateHm = new HashMap<>();
 			fromDateHm.put("name", "fromDate");
 			fromDateHm.put("value", fromDate);
-			HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> toDateHm = new HashMap<>();
 			toDateHm.put("name", "toDate");
 			toDateHm.put("value", toDate);
 			resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -265,7 +265,7 @@ public class UseStatsController {
 	@PostMapping(value = "/readClientMngListPaged")
 	public @ResponseBody ResultPagingVO readClientMngListPaged(HttpServletRequest req) {
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		try {
 			// << options >>

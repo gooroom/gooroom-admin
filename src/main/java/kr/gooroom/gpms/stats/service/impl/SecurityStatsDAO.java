@@ -16,19 +16,17 @@
 
 package kr.gooroom.gpms.stats.service.impl;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.stats.service.ViolatedCountVO;
 import kr.gooroom.gpms.stats.service.ViolatedLogVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * data access object class for protector attacked statistic process.
@@ -46,13 +44,11 @@ public class SecurityStatsDAO extends SqlSessionMetaDAO {
 	/**
 	 * generate daily count data
 	 * 
-	 * @param fromDate String start date
-	 * @param toDate   String end date
+	 * @param map HashMap<Sring,String>
+	 * @param countType string
 	 * @return ViolatedCountVO List
-	 * @throws SQLException
 	 */
-	public List<ViolatedCountVO> selectViolatedCount(HashMap<String, String> map, String countType)
-			throws SQLException {
+	public List<ViolatedCountVO> selectViolatedCount(HashMap<String, String> map, String countType) {
 
 		List<ViolatedCountVO> re = null;
 		try {
@@ -78,14 +74,13 @@ public class SecurityStatsDAO extends SqlSessionMetaDAO {
 	 * @param searchType String search type
 	 * @param searchDate String search date.
 	 * @return ViolatedLogVO List
-	 * @throws SQLException
 	 */
-	public List<ViolatedLogVO> selectViolatedList(String searchType, String searchDate) throws SQLException {
+	public List<ViolatedLogVO> selectViolatedList(String searchType, String searchDate) {
 
 		List<ViolatedLogVO> re = null;
 
 		try {
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("searchType", searchType.toLowerCase());
 			map.put("searchDate", searchDate);
 			map.put("defaultViolatedLogType", GPMSConstants.DEFAULT_VIOLATED_LOGTYPE);
@@ -106,9 +101,8 @@ public class SecurityStatsDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ViolatedLogVO List
-	 * @throws SQLException
 	 */
-	public List<ViolatedLogVO> selectViolatedListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ViolatedLogVO> selectViolatedListPaged(HashMap<String, Object> options) {
 		List<ViolatedLogVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectViolatedListPaged", options);
@@ -125,10 +119,9 @@ public class SecurityStatsDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectViolatedTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectViolatedTotalCount", options);
+	public long selectViolatedTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectViolatedTotalCount", options);
 	}
 
 	/**
@@ -136,10 +129,9 @@ public class SecurityStatsDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectViolatedFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectViolatedFilteredCount", options);
+	public long selectViolatedFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectViolatedFilteredCount", options);
 	}
 
 }

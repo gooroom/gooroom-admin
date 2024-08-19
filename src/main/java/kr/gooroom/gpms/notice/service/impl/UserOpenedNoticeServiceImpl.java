@@ -21,7 +21,7 @@ public class UserOpenedNoticeServiceImpl implements UserOpenedNoticeService {
 	private UserOpenedNoticeDAO userOpenedNoticeDAO;
 
 	@Override
-	public StatusVO createUserOpenedNotice(String userId, String noticePublishId) throws Exception {
+	public StatusVO createUserOpenedNotice(String userId, String noticePublishId) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -41,10 +41,8 @@ public class UserOpenedNoticeServiceImpl implements UserOpenedNoticeService {
 		} catch (Exception ex) {
 			logger.error("error in createUserOpenedNotice : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}

@@ -17,8 +17,8 @@ public class UserTokenServiceImpl implements UserTokenService {
 	private UserTokenDAO userTokenDAO;
 
 	@Override
-	public UserTokenVO selectTokenByTokenId(String clientId, String token, String statusCd) throws Exception {
-		Map<String, Object> paramMap = new HashMap<String, Object>();
+	public UserTokenVO selectTokenByTokenId(String clientId, String token, String statusCd) {
+		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("clientId", clientId);
 		paramMap.put("token", token);
 		if (statusCd != null)

@@ -67,17 +67,16 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * 
 	 * @param mngObjTp string control item type
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readCtrlItemList(String mngObjTp) throws Exception {
+	public ResultVO readCtrlItemList(String mngObjTp) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
 			List<CtrlItemVO> re = ctrlMstDao.selectCtrlItemList(mngObjTp);
 			if (re != null && re.size() > 0) {
-				CtrlItemVO[] row = re.stream().toArray(CtrlItemVO[]::new);
+				CtrlItemVO[] row = re.toArray(CtrlItemVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -105,16 +104,15 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * 
 	 * @param mngObjTp string control item type
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readCtrlItemAndPropList(String mngObjTp) throws Exception {
+	public ResultVO readCtrlItemAndPropList(String mngObjTp) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
 			
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("mngObjTp", mngObjTp);
 			
 			String grRole = LoginInfoHelper.getUserGRRole();
@@ -126,7 +124,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 			
 			List<CtrlItemVO> re = ctrlMstDao.selectCtrlItemAndPropList(map);
 			if (re != null && re.size() > 0) {
-				CtrlItemVO[] row = re.stream().toArray(CtrlItemVO[]::new);
+				CtrlItemVO[] row = re.toArray(CtrlItemVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -154,10 +152,9 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO readCtrlItemAndPropListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO readCtrlItemAndPropListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -175,7 +172,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 			long filteredCount = ctrlMstDao.selectCtrlItemAndPropListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				CtrlItemVO[] row = re.stream().toArray(CtrlItemVO[]::new);
+				CtrlItemVO[] row = re.toArray(CtrlItemVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -207,10 +204,9 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * 
 	 * @param objId string control item id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readCtrlItem(String objId) throws Exception {
+	public ResultVO readCtrlItem(String objId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -255,18 +251,16 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * 
 	 * @param objId string control item id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readCtrlPropList(String objId) throws Exception {
+	public ResultVO readCtrlPropList(String objId) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
 			List<CtrlPropVO> re = ctrlMstDao.selectCtrlPropList(objId);
 			if (re != null && re.size() > 0) {
-
-				CtrlPropVO[] row = re.stream().toArray(CtrlPropVO[]::new);
+				CtrlPropVO[] row = re.toArray(CtrlPropVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -280,10 +274,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (Exception ex) {
 			logger.error("error in readCtrlPropList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -293,7 +285,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * create new control item and property data
 	 * 
 	 * @param itemVo CtrlItemVO control item object bean
-	 * @param propVo CtrlPropVO array control property object array
+	 * @param propVos CtrlPropVO array control property object array
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -341,10 +333,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in createCtrlItem : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 
 		} catch (Exception ex) {
@@ -407,10 +397,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in createCtrlItem : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -420,7 +408,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * create default control item and property data
 	 * 
 	 * @param itemVo CtrlItemVO control item object bean
-	 * @param propVo CtrlPropVO array control property object array
+	 * @param propVos CtrlPropVO array control property object array
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -471,19 +459,15 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in createCtrlDefaultItem : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in createCtrlDefaultItem : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -493,7 +477,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * modify control item and property data
 	 * 
 	 * @param itemVo CtrlItemVO control item object bean
-	 * @param propVo CtrlPropVO array control property object array
+	 * @param propVos CtrlPropVO array control property object array
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -544,10 +528,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in updateCtrlItem : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -650,19 +632,15 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in deleteCtrlItem : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in deleteCtrlItem : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -673,10 +651,9 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * 
 	 * @param confId string configuration id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readClientGroupIdByConfId(String confId) throws Exception {
+	public ResultVO readClientGroupIdByConfId(String confId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -685,7 +662,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 			List<ClientGroupVO> re = ctrlMstDao.selectClientGroupIdByConfId(confId);
 
 			if (re != null && re.size() > 0) {
-				ClientGroupVO[] row = re.stream().toArray(ClientGroupVO[]::new);
+				ClientGroupVO[] row = re.toArray(ClientGroupVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -699,10 +676,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (Exception ex) {
 			logger.error("error in readClientGroupIdByConfId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -714,17 +689,16 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * @param groupId  string client group id
 	 * @param confType string configuration type
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readConfIdInClientGroupId(String groupId, String confType) throws Exception {
+	public ResultVO readConfIdInClientGroupId(String groupId, String confType) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
 			List<String> re = ctrlMstDao.selectConfIdInClientGroupId(groupId, confType);
 			if (re != null && re.size() > 0) {
-				String[] row = re.stream().toArray(String[]::new);
+				String[] row = re.toArray(String[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -738,10 +712,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (Exception ex) {
 			logger.error("error in readConfIdInClientGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -754,16 +726,15 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * @param userId   string user id
 	 * @param clientId string client id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getRuleIdsByClientAndUser(String userId, String clientId) throws Exception {
+	public ResultVO getRuleIdsByClientAndUser(String userId, String clientId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<RuleIdsVO> re = ctrlMstDao.selectRuleIdsByClientAndUser(userId, clientId);
 
 			if (re != null && re.size() > 0) {
-				RuleIdsVO[] row = re.stream().toArray(RuleIdsVO[]::new);
+				RuleIdsVO[] row = re.toArray(RuleIdsVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -777,10 +748,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (Exception ex) {
 			logger.error("error in readConfIdInClientGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -790,10 +759,9 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * 
 	 * @param groupId string group id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getRuleIdsByGroupId(String groupId) throws Exception {
+	public ResultVO getRuleIdsByGroupId(String groupId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			RuleIdsVO re = ctrlMstDao.selectRuleIdsByGroupId(groupId);
@@ -812,10 +780,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (Exception ex) {
 			logger.error("error in getRuleIdsByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -825,15 +791,14 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * 
 	 * @param groupId string group id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readCtrlItemByGroupId(String groupId) throws Exception {
+	public ResultVO readCtrlItemByGroupId(String groupId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
 
-			HashMap<String, Object> hm_total = new HashMap<String, Object>();
+			HashMap<String, Object> hm_total = new HashMap<>();
 
 			// Desktop Conf
 			DesktopConfVO desktopConfVO = desktopConfDao.selectDesktopConfByGroupId(groupId);
@@ -856,36 +821,18 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 					String confType = "";
 
 					switch (item.getMngObjTp()) {
-					case GPMSConstants.CTRL_CLIENT_SETUP_CONF:
-						confType = GPMSConstants.TYPE_CLIENTCONF;
-						break;
-					case GPMSConstants.CTRL_HOSTS_SETUP_CONF:
-						confType = GPMSConstants.TYPE_HOSTNAMECONF;
-						break;
-					case GPMSConstants.CTRL_UPDATE_SERVER_CONF:
-						confType = GPMSConstants.TYPE_UPDATESERVERCONF;
-						break;
-
-					case GPMSConstants.CTRL_ITEM_BROWSERCTRL_RULE:
-						confType = GPMSConstants.TYPE_BROWSERRULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_MEDIACTRL_RULE:
-						confType = GPMSConstants.TYPE_MEDIARULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_GRSECU_RULE:
-						confType = GPMSConstants.TYPE_SECURITYRULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_SWFILTER_RULE:
-						confType = GPMSConstants.TYPE_FILTEREDSOFTWARE;
-						break;
-					case GPMSConstants.CTRL_ITEM_CTRLCENTERITEM_RULE:
-						confType = GPMSConstants.TYPE_CTRLCENTERITEMRULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_POLICYKIT_RULE:
-						confType = GPMSConstants.TYPE_POLICYKITRULE;
-						break;
-					default:
-						break;
+						case GPMSConstants.CTRL_CLIENT_SETUP_CONF -> confType = GPMSConstants.TYPE_CLIENTCONF;
+						case GPMSConstants.CTRL_HOSTS_SETUP_CONF -> confType = GPMSConstants.TYPE_HOSTNAMECONF;
+						case GPMSConstants.CTRL_UPDATE_SERVER_CONF -> confType = GPMSConstants.TYPE_UPDATESERVERCONF;
+						case GPMSConstants.CTRL_ITEM_BROWSERCTRL_RULE -> confType = GPMSConstants.TYPE_BROWSERRULE;
+						case GPMSConstants.CTRL_ITEM_MEDIACTRL_RULE -> confType = GPMSConstants.TYPE_MEDIARULE;
+						case GPMSConstants.CTRL_ITEM_GRSECU_RULE -> confType = GPMSConstants.TYPE_SECURITYRULE;
+						case GPMSConstants.CTRL_ITEM_SWFILTER_RULE -> confType = GPMSConstants.TYPE_FILTEREDSOFTWARE;
+						case GPMSConstants.CTRL_ITEM_CTRLCENTERITEM_RULE ->
+								confType = GPMSConstants.TYPE_CTRLCENTERITEMRULE;
+						case GPMSConstants.CTRL_ITEM_POLICYKIT_RULE -> confType = GPMSConstants.TYPE_POLICYKITRULE;
+						default -> {
+						}
 					}
 
 					addCtrolProp(hm_total, props, item, confType);
@@ -906,10 +853,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (Exception ex) {
 			logger.error("error in readCtrlItemByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -926,7 +871,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 
 		Object[] data = { item };
 		Object[] extend = { item.getExtValue() };
-		HashMap<String, Object> ruleMap = new HashMap<String, Object>();
+		HashMap<String, Object> ruleMap = new HashMap<>();
 		ruleMap.put("data", data);
 		ruleMap.put("extend", extend);
 
@@ -938,15 +883,14 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * 
 	 * @param deptCd string
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readCtrlItemByDeptCd(String deptCd) throws Exception {
+	public ResultVO readCtrlItemByDeptCd(String deptCd) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
 
-			HashMap<String, Object> hm_total = new HashMap<String, Object>();
+			HashMap<String, Object> hm_total = new HashMap<>();
 
 			// Desktop Conf
 			DesktopConfVO desktopConfVO = desktopConfDao.selectDesktopConfByDeptCd(deptCd);
@@ -969,26 +913,15 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 					String confType = "";
 
 					switch (item.getMngObjTp()) {
-					case GPMSConstants.CTRL_ITEM_BROWSERCTRL_RULE:
-						confType = GPMSConstants.TYPE_BROWSERRULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_MEDIACTRL_RULE:
-						confType = GPMSConstants.TYPE_MEDIARULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_GRSECU_RULE:
-						confType = GPMSConstants.TYPE_SECURITYRULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_SWFILTER_RULE:
-						confType = GPMSConstants.TYPE_FILTEREDSOFTWARE;
-						break;
-					case GPMSConstants.CTRL_ITEM_CTRLCENTERITEM_RULE:
-						confType = GPMSConstants.TYPE_CTRLCENTERITEMRULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_POLICYKIT_RULE:
-						confType = GPMSConstants.TYPE_POLICYKITRULE;
-						break;
-					default:
-						break;
+						case GPMSConstants.CTRL_ITEM_BROWSERCTRL_RULE -> confType = GPMSConstants.TYPE_BROWSERRULE;
+						case GPMSConstants.CTRL_ITEM_MEDIACTRL_RULE -> confType = GPMSConstants.TYPE_MEDIARULE;
+						case GPMSConstants.CTRL_ITEM_GRSECU_RULE -> confType = GPMSConstants.TYPE_SECURITYRULE;
+						case GPMSConstants.CTRL_ITEM_SWFILTER_RULE -> confType = GPMSConstants.TYPE_FILTEREDSOFTWARE;
+						case GPMSConstants.CTRL_ITEM_CTRLCENTERITEM_RULE ->
+								confType = GPMSConstants.TYPE_CTRLCENTERITEMRULE;
+						case GPMSConstants.CTRL_ITEM_POLICYKIT_RULE -> confType = GPMSConstants.TYPE_POLICYKITRULE;
+						default -> {
+						}
 					}
 
 					addCtrolProp(hm_total, props, item, confType);
@@ -1009,10 +942,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (Exception ex) {
 			logger.error("error in readCtrlItemByDeptCd : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -1034,17 +965,16 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	/**
 	 * response control item data by group id
 	 * 
-	 * @param groupId string group id
+	 * @param userId string user id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readCtrlItemByUserId(String userId) throws Exception {
+	public ResultVO readCtrlItemByUserId(String userId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
 
-			HashMap<String, Object> hm_total = new HashMap<String, Object>();
+			HashMap<String, Object> hm_total = new HashMap<>();
 
 			// Desktop Conf
 			DesktopConfVO desktopConfVO = desktopConfDao.selectDesktopConfByUserId(userId);
@@ -1067,26 +997,15 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 					String confType = "";
 
 					switch (item.getMngObjTp()) {
-					case GPMSConstants.CTRL_ITEM_BROWSERCTRL_RULE:
-						confType = GPMSConstants.TYPE_BROWSERRULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_MEDIACTRL_RULE:
-						confType = GPMSConstants.TYPE_MEDIARULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_GRSECU_RULE:
-						confType = GPMSConstants.TYPE_SECURITYRULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_SWFILTER_RULE:
-						confType = GPMSConstants.TYPE_FILTEREDSOFTWARE;
-						break;
-					case GPMSConstants.CTRL_ITEM_CTRLCENTERITEM_RULE:
-						confType = GPMSConstants.TYPE_CTRLCENTERITEMRULE;
-						break;
-					case GPMSConstants.CTRL_ITEM_POLICYKIT_RULE:
-						confType = GPMSConstants.TYPE_POLICYKITRULE;
-						break;
-					default:
-						break;
+						case GPMSConstants.CTRL_ITEM_BROWSERCTRL_RULE -> confType = GPMSConstants.TYPE_BROWSERRULE;
+						case GPMSConstants.CTRL_ITEM_MEDIACTRL_RULE -> confType = GPMSConstants.TYPE_MEDIARULE;
+						case GPMSConstants.CTRL_ITEM_GRSECU_RULE -> confType = GPMSConstants.TYPE_SECURITYRULE;
+						case GPMSConstants.CTRL_ITEM_SWFILTER_RULE -> confType = GPMSConstants.TYPE_FILTEREDSOFTWARE;
+						case GPMSConstants.CTRL_ITEM_CTRLCENTERITEM_RULE ->
+								confType = GPMSConstants.TYPE_CTRLCENTERITEMRULE;
+						case GPMSConstants.CTRL_ITEM_POLICYKIT_RULE -> confType = GPMSConstants.TYPE_POLICYKITRULE;
+						default -> {
+						}
 					}
 
 					addCtrolProp(hm_total, props, item, confType);
@@ -1107,10 +1026,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (Exception ex) {
 			logger.error("error in readCtrlItemByUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -1120,7 +1037,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 	 * 정책 - 적용 그룹 리스트
 	 */
 	@Override
-	public ResultPagingVO readActivateGroupListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO readActivateGroupListPaged(HashMap<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 
 		try {
@@ -1129,7 +1046,7 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 			long filteredCount = ctrlMstDao.selectActivateGroupListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				ActivateGroupViewVO[] row = re.stream().toArray(ActivateGroupViewVO[]::new);
+				ActivateGroupViewVO[] row = re.toArray(ActivateGroupViewVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -1147,10 +1064,8 @@ public class CtrlMstServiceImpl implements CtrlMstService {
 		} catch (Exception ex) {
 			logger.error("error in readActivateGroupListPaged( : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;

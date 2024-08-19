@@ -84,7 +84,7 @@ public class ClientRuleController {
 	public @ResponseBody HashMap<String, Object> readClientRuleByGroupId(HttpServletRequest req) {
 		
 		String groupId = req.getParameter("groupId");
-		HashMap<String, Object> hm_total = new HashMap<String, Object>();
+		HashMap<String, Object> hm_total = new HashMap<>();
 		
 		try {
 			if (groupId != null && groupId.trim().length() > 0) {

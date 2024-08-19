@@ -16,22 +16,21 @@
 
 package kr.gooroom.gpms.user.service.impl;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import jakarta.annotation.Resource;
-
+import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ExcelCommonService;
+import kr.gooroom.gpms.common.service.ResultPagingVO;
+import kr.gooroom.gpms.common.service.ResultVO;
+import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.CommonUtils;
+import kr.gooroom.gpms.common.utils.LoginInfoHelper;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.config.service.impl.ClientConfDAO;
-import kr.gooroom.gpms.dept.service.DeptVO;
 import kr.gooroom.gpms.dept.service.impl.DeptDAO;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.ExcelStyleDateFormatter;
+import kr.gooroom.gpms.user.service.UserAndClientVO;
+import kr.gooroom.gpms.user.service.UserRoleVO;
+import kr.gooroom.gpms.user.service.UserService;
+import kr.gooroom.gpms.user.service.UserVO;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,16 +41,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import kr.gooroom.gpms.common.GPMSConstants;
-import kr.gooroom.gpms.common.service.ResultPagingVO;
-import kr.gooroom.gpms.common.service.ResultVO;
-import kr.gooroom.gpms.common.service.StatusVO;
-import kr.gooroom.gpms.common.utils.LoginInfoHelper;
-import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.user.service.UserAndClientVO;
-import kr.gooroom.gpms.user.service.UserRoleVO;
-import kr.gooroom.gpms.user.service.UserService;
-import kr.gooroom.gpms.user.service.UserVO;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * user management service implements class
@@ -190,10 +184,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param userVO UserVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO updateUserData(UserVO userVO) throws Exception {
+	public StatusVO updateUserData(UserVO userVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -219,10 +212,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in updateUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -233,10 +224,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param userId String user id
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO updateUserLoginTrialCount(String userId) throws Exception {
+	public StatusVO updateUserLoginTrialCount(String userId) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -257,10 +247,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in updateUserLoginTrialCount : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -271,10 +259,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param userId String user id
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO deleteUserData(String userId) throws Exception {
+	public StatusVO deleteUserData(String userId) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -297,10 +284,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in deleteUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -310,10 +295,9 @@ public class UserServiceImpl implements UserService {
 	 * generate user list data
 	 * 
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readUserList() throws Exception {
+	public ResultVO readUserList() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -331,9 +315,9 @@ public class UserServiceImpl implements UserService {
 						obj.setStatus(MessageSourceHelper.getMessage("user.status.delete"));
 					}
 					return obj;
-				}).collect(Collectors.toList());
+				}).toList();
 
-				UserVO[] row = result.stream().toArray(UserVO[]::new);
+				UserVO[] row = result.toArray(UserVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -349,10 +333,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in readUserList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -363,10 +345,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param options HashMap<String, Object>.
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getUserListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getUserListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -386,9 +367,9 @@ public class UserServiceImpl implements UserService {
 						obj.setStatus(MessageSourceHelper.getMessage("user.status.delete"));
 					}
 					return obj;
-				}).collect(Collectors.toList());
+				}).toList();
 
-				UserVO[] row = result.stream().toArray(UserVO[]::new);
+				UserVO[] row = result.toArray(UserVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -407,10 +388,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in getUserListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -421,10 +400,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param userId string user id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isNoExistUserId(String userId) throws Exception {
+	public StatusVO isNoExistUserId(String userId) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -444,10 +422,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in isExistUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -458,10 +434,9 @@ public class UserServiceImpl implements UserService {
 	 *
 	 * @param ids list of user id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO isNoExistInUserIdList(HashMap<String, Object> ids) throws Exception {
+	public ResultVO isNoExistInUserIdList(HashMap<String, Object> ids) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -478,10 +453,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in duplicate id : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -492,10 +465,9 @@ public class UserServiceImpl implements UserService {
 	 *
 	 * @param vo UserVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO createUserData(UserVO vo, boolean isPortable) throws Exception {
+	public StatusVO createUserData(UserVO vo, boolean isPortable) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -522,10 +494,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in createUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -536,10 +506,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param userVO UserVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO createUserDataWithRule(UserVO userVO, boolean isPortable) throws Exception {
+	public StatusVO createUserDataWithRule(UserVO userVO, boolean isPortable) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -569,10 +538,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in createUserDataWithRule : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -583,10 +550,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param userId string user id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readUserData(String userId) throws Exception {
+	public ResultVO readUserData(String userId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -614,10 +580,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in readUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -628,10 +592,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param userVO UserVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO editUserNfcData(UserVO userVO) throws Exception {
+	public StatusVO editUserNfcData(UserVO userVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -650,10 +613,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in editUserNfcData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -664,10 +625,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param deptCd string organization id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getUserListInDept(String deptCd) throws Exception {
+	public ResultVO getUserListInDept(String deptCd) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -684,9 +644,9 @@ public class UserServiceImpl implements UserService {
 						obj.setStatus(MessageSourceHelper.getMessage("user.status.delete"));
 					}
 					return obj;
-				}).collect(Collectors.toList());
+				}).toList();
 
-				UserVO[] row = result.stream().toArray(UserVO[]::new);
+				UserVO[] row = result.toArray(UserVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -699,10 +659,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in getUserListInDept : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -712,10 +670,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param options HashMap<String, Object>.
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getUserListPagedInDept(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getUserListPagedInDept(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -740,9 +697,9 @@ public class UserServiceImpl implements UserService {
 						obj.setStatus(MessageSourceHelper.getMessage("user.status.delete"));
 					}
 					return obj;
-				}).collect(Collectors.toList());
+				}).toList();
 
-				UserVO[] row = result.stream().toArray(UserVO[]::new);
+				UserVO[] row = result.toArray(UserVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -761,10 +718,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in getUserListPagedInDept : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -775,17 +730,16 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param deptCds string array organization id list
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getUserListInDeptArray(String[] deptCds) throws Exception {
+	public ResultVO getUserListInDeptArray(String[] deptCds) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<UserVO> re = userDao.selectUserListInDept(deptCds);
 
 			if (re != null && re.size() > 0) {
-				UserVO[] row = re.stream().toArray(UserVO[]::new);
+				UserVO[] row = re.toArray(UserVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -798,10 +752,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in getUserListInDeptArray : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -810,10 +762,9 @@ public class UserServiceImpl implements UserService {
 	 * response user list data in online user.
 	 * 
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getUserListInOnline() throws Exception {
+	public ResultVO getUserListInOnline() {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -822,7 +773,7 @@ public class UserServiceImpl implements UserService {
 			List<UserAndClientVO> re = userDao.selectUserListInOnline();
 
 			if (re != null && re.size() > 0) {
-				UserAndClientVO[] row = re.stream().toArray(UserAndClientVO[]::new);
+				UserAndClientVO[] row = re.toArray(UserAndClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -835,10 +786,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in getUserListInOnline : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -848,10 +797,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param userId String user id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getUserConfIdByUserId(String userId) throws Exception {
+	public ResultVO getUserConfIdByUserId(String userId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -873,10 +821,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in getUserConfIdByUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -886,10 +832,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param userId String user id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getUserConfIdByDeptCdFromUserId(String userId) throws Exception {
+	public ResultVO getUserConfIdByDeptCdFromUserId(String userId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -911,10 +856,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in getUserConfIdByUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -923,10 +866,9 @@ public class UserServiceImpl implements UserService {
 	 * get user configuration information data by dept code.
 	 * @param deptCd
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getUserConfIdByDeptCd(String deptCd) throws Exception {
+	public ResultVO getUserConfIdByDeptCd(String deptCd) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -946,10 +888,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in getUserConfIdByDeptCd : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -959,10 +899,9 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param groupId String group id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getUserConfIdByGroupId(String groupId) throws Exception {
+	public ResultVO getUserConfIdByGroupId(String groupId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -982,10 +921,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in getUserConfIdByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -1005,8 +942,8 @@ public class UserServiceImpl implements UserService {
 		StatusVO statusVO = new StatusVO();
 		try {
 			boolean isOk = true;
-			for (int i = 0; i < user_list.length; i++) {
-				long cnt = userDao.updateUserWithDept(deptCd, user_list[i]);
+			for (String s : user_list) {
+				long cnt = userDao.updateUserWithDept(deptCd, s);
 				if (cnt < 1) {
 					isOk = false;
 					break;
@@ -1023,19 +960,15 @@ public class UserServiceImpl implements UserService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in createUsersInDept : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in createUsersInDept : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
@@ -1044,10 +977,9 @@ public class UserServiceImpl implements UserService {
 	 *
 	 * @param headList
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isUserHeadListExist(List<String> headList) throws Exception {
+	public StatusVO isUserHeadListExist(List<String> headList) {
 		StatusVO statusVO = new StatusVO();
 		boolean re = true;
 		try {
@@ -1075,10 +1007,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in isUserHeadListExist : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
@@ -1087,10 +1017,9 @@ public class UserServiceImpl implements UserService {
 	 *
 	 * @param rowData
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isRequiredDataExist(List<String> rowData) throws Exception {
+	public StatusVO isRequiredDataExist(List<String> rowData) {
 		StatusVO statusVO = new StatusVO();
 		try {
 
@@ -1109,10 +1038,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in isRequiredDataExist : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
@@ -1121,14 +1048,13 @@ public class UserServiceImpl implements UserService {
 	 * 사용자 정보 일괄 등록 체크(파일자료)
 	 * @param dataList
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO isCanUpdateUserDataFromFile(List<List<String>> dataList) throws Exception {
+	public ResultVO isCanUpdateUserDataFromFile(List<List<String>> dataList) {
 
 		ResultVO resultVO = new ResultVO();
 
-		List<UserVO> userList = new ArrayList<UserVO>();
+		List<UserVO> userList = new ArrayList<>();
 		try {
 			// excel head list check
 			StatusVO statusVO = isUserHeadListExist(dataList.get(0));
@@ -1213,14 +1139,12 @@ public class UserServiceImpl implements UserService {
 					userList.add(userVO);
 				}
 			} else {
-				if (resultVO != null) {
-					resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-							"저장할 내용이 없음"));
-				}
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					"저장할 내용이 없음"));
 			}
 
 			if (userList != null && userList.size() > 0) {
-				UserVO[] row = userList.stream().toArray(UserVO[]::new);
+				UserVO[] row = userList.toArray(UserVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, "GRSM0000",
 						"파일데이터확인 완료"));
@@ -1229,10 +1153,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in isCanUpdateUserDataFromFile : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -1242,11 +1164,10 @@ public class UserServiceImpl implements UserService {
 	 * insert user data all from file.
 	 * @param userVOs
 	 * @return
-	 * @throws Exception
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-	public StatusVO updateUserDataFromFile(List<UserVO> userVOs) throws Exception {
+	public StatusVO updateUserDataFromFile(List<UserVO> userVOs) {
 
 		StatusVO statusVO = new StatusVO();
 		try {
@@ -1298,19 +1219,18 @@ public class UserServiceImpl implements UserService {
 	 * 사용자 정보 일괄 다운로드
 	 *
 	 * @return XSSFWorkbook
-	 * @throws Exception
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-	public XSSFWorkbook createUserFileFromData() throws Exception {
+	public XSSFWorkbook createUserFileFromData() {
 
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 		options.put("status", GPMSConstants.STS_NORMAL_USER);
 
 		try {
 			//List<UserVO> re = userDao.readUserList(); //삭제된 사용자 포함시
 			List<UserVO> re = userDao.readUserListWithoutDel(options);
-			List<List<String>> excleWriteList = new ArrayList<List<String>>();
+			List<List<String>> excleWriteList = new ArrayList<>();
 
 			//title
 			excleWriteList.add(Arrays.asList("사용자아이디",
@@ -1349,14 +1269,13 @@ public class UserServiceImpl implements UserService {
 	 * 사용자 정보 업로드 샘플파일 다운로드
 	 *
 	 * @return XSSFWorkbook
-	 * @throws Exception
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-	public XSSFWorkbook createUserSampleFileFromData() throws Exception {
+	public XSSFWorkbook createUserSampleFileFromData() {
 
 		try {
-			List<List<String>> excleWriteList = new ArrayList<List<String>>();
+			List<List<String>> excleWriteList = new ArrayList<>();
 
 			//title
 			excleWriteList.add(Arrays.asList("사용자아이디",
@@ -1382,35 +1301,35 @@ public class UserServiceImpl implements UserService {
 	 */
 	public StatusVO updateRuleInfoToMultiUser(ArrayList<String> users, String browserRuleId, String mediaRuleId,
 											  String securityRuleId, String filteredSoftwareRuleId, String ctrlCenterItemRuleId, String policyKitRuleId,
-											  String desktopConfId) throws Exception {
+											  String desktopConfId) {
 		StatusVO statusVO = new StatusVO();
 
 		try {
 			if (users != null && users.size() > 0) {
 				String modUserId = LoginInfoHelper.getUserId();
 				// 사용자 정책이 적용 되어 있으면 삭제(사용자 정책이 없을 경우 조직의 정책을 따라감)
-				for (int i=0; i < users.size(); i++) {
+				for (String user : users) {
 					long cnt = -1;
 					// 브라우져설정
-					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_BROWSERRULE);
+					userDao.deleteConfigWithUser(user, GPMSConstants.TYPE_BROWSERRULE);
 
 					// 매체제어설정
-					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_MEDIARULE);
+					userDao.deleteConfigWithUser(user, GPMSConstants.TYPE_MEDIARULE);
 
 					// 단말보안설정
-					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_SECURITYRULE);
+					userDao.deleteConfigWithUser(user, GPMSConstants.TYPE_SECURITYRULE);
 
 					// filtered software rule
-					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_FILTEREDSOFTWARE);
+					userDao.deleteConfigWithUser(user, GPMSConstants.TYPE_FILTEREDSOFTWARE);
 
 					// control center item
-					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_CTRLCENTERITEMRULE);
+					userDao.deleteConfigWithUser(user, GPMSConstants.TYPE_CTRLCENTERITEMRULE);
 
 					// policy kit
-					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_POLICYKITRULE);
+					userDao.deleteConfigWithUser(user, GPMSConstants.TYPE_POLICYKITRULE);
 
 					// 데스크톱설정
-					userDao.deleteConfigWithUser(users.get(i), GPMSConstants.TYPE_DESKTOPCONF);
+					userDao.deleteConfigWithUser(user, GPMSConstants.TYPE_DESKTOPCONF);
 
 					statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
 							MessageSourceHelper.getMessage("user.result.update"));
@@ -1422,10 +1341,8 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception ex) {
 			logger.error("error in updateRuleInfoToMultiUser : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return  statusVO;
 	}

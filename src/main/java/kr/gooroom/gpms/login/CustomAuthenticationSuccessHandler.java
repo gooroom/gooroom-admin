@@ -1,14 +1,10 @@
 package kr.gooroom.gpms.login;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Collection;
-
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import kr.gooroom.gpms.user.service.impl.AdminUserDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -19,8 +15,9 @@ import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
-import kr.gooroom.gpms.common.service.impl.GpmsCommonDAO;
-import kr.gooroom.gpms.user.service.impl.AdminUserDAO;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Collection;
 
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 

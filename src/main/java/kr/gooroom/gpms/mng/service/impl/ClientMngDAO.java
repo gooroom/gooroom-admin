@@ -50,9 +50,8 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ClientRegKeyVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<ClientRegKeyVO> selectRegKeyList(HashMap<String, Object> options) throws SQLException {
+	public List<ClientRegKeyVO> selectRegKeyList(HashMap<String, Object> options) {
 
 		List<ClientRegKeyVO> re = null;
 		try {
@@ -60,7 +59,6 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectRegKeyList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -71,11 +69,9 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectRegKeyListTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectRegKeyListTotalCount", options);
+	public long selectRegKeyListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectRegKeyListTotalCount", options);
 	}
 
 	/**
@@ -84,11 +80,9 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectRegKeyListFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectRegKeyListFilteredCount", options);
+	public long selectRegKeyListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectRegKeyListFilteredCount", options);
 	}
 
 	/**
@@ -99,7 +93,7 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertRegKeyData(ClientRegKeyVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertRegKeyData", vo);
+		return sqlSessionMeta.insert("insertRegKeyData", vo);
 	}
 
 	/**
@@ -110,7 +104,7 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateRegKeyData(ClientRegKeyVO vo) throws SQLException {
-		return (long) sqlSessionMeta.update("updateRegKeyData", vo);
+		return sqlSessionMeta.update("updateRegKeyData", vo);
 	}
 
 	/**
@@ -121,7 +115,7 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteRegKeyData(String regKeyNo) throws SQLException {
-		return (long) sqlSessionMeta.insert("deleteRegKeyData", regKeyNo);
+		return sqlSessionMeta.insert("deleteRegKeyData", regKeyNo);
 	}
 
 	/**
@@ -132,8 +126,7 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertProfileSet(ClientProfileSetVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertProfileSet", vo);
+		return sqlSessionMeta.insert("insertProfileSet", vo);
 	}
 
 	/**
@@ -141,9 +134,8 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ClientRegKeyVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<ClientProfileSetVO> selectProfileSetListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ClientProfileSetVO> selectProfileSetListPaged(HashMap<String, Object> options) {
 
 		List<ClientProfileSetVO> re = null;
 		try {
@@ -151,9 +143,7 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectProfileSetListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
-
 		return re;
 	}
 
@@ -162,11 +152,9 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectProfileSetListFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectProfileSetListFilteredCount", options);
+	public long selectProfileSetListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectProfileSetListFilteredCount", options);
 	}
 
 	/**
@@ -174,11 +162,9 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectProfileSetListTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectProfileSetListTotalCount", options);
+	public long selectProfileSetListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectProfileSetListTotalCount", options);
 	}
 
 	/**
@@ -189,7 +175,7 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteProfileSetMaster(String profileNo) throws SQLException {
-		return (long) sqlSessionMeta.insert("deleteProfileSetMaster", profileNo);
+		return sqlSessionMeta.insert("deleteProfileSetMaster", profileNo);
 	}
 
 	/**
@@ -200,7 +186,7 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteProfileSetData(String profileNo) throws SQLException {
-		return (long) sqlSessionMeta.insert("deleteProfileSetData", profileNo);
+		return sqlSessionMeta.insert("deleteProfileSetData", profileNo);
 	}
 
 	/**
@@ -211,19 +197,18 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateProfileSetData(ClientProfileSetVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.update("updateProfileSetData", vo);
+		return sqlSessionMeta.update("updateProfileSetData", vo);
 	}
 
 	/**
 	 * delete client software information data.
 	 * 
-	 * @param regKeyNo String client software id
+	 * @param swId String client software id
 	 * @return long data delete result count.
 	 * @throws SQLException
 	 */
 	public long deleteClientSoftwareData(String swId) throws SQLException {
-		return (long) sqlSessionMeta.insert("deleteClientSoftwareData", swId);
+		return sqlSessionMeta.insert("deleteClientSoftwareData", swId);
 	}
 
 	/**
@@ -234,7 +219,7 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertClientSoftwareData(ClientSoftwareVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertClientSoftwareData", vo);
+		return sqlSessionMeta.insert("insertClientSoftwareData", vo);
 	}
 
 	/**
@@ -242,9 +227,8 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ClientRegKeyVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<ClientSoftwareVO> selectClientSoftwareList(HashMap<String, Object> options) throws SQLException {
+	public List<ClientSoftwareVO> selectClientSoftwareList(HashMap<String, Object> options) {
 
 		List<ClientSoftwareVO> re = null;
 		try {
@@ -252,7 +236,6 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectClientSoftwareList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -264,11 +247,9 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectClientSoftwareListFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectClientSoftwareListFilteredCount", options);
+	public long selectClientSoftwareListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectClientSoftwareListFilteredCount", options);
 	}
 
 	/**
@@ -276,11 +257,9 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectClientSoftwareListTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectClientSoftwareListTotalCount", options);
+	public long selectClientSoftwareListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectClientSoftwareListTotalCount", options);
 	}
 
 	/**
@@ -291,7 +270,7 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateClientSoftwareData(ClientSoftwareVO vo) throws SQLException {
-		return (long) sqlSessionMeta.update("updateClientSoftwareData", vo);
+		return sqlSessionMeta.update("updateClientSoftwareData", vo);
 	}
 
 	/**
@@ -299,9 +278,8 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ClientRegKeyVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<ClientPackageVO> selectProfilePackageListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ClientPackageVO> selectProfilePackageListPaged(HashMap<String, Object> options) {
 
 		List<ClientPackageVO> re = null;
 		try {
@@ -309,7 +287,6 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectProfileSetListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -320,11 +297,9 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectProfilePackageListFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectProfilePackageListFilteredCount", options);
+	public long selectProfilePackageListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectProfilePackageListFilteredCount", options);
 	}
 
 	/**
@@ -332,11 +307,9 @@ public class ClientMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectProfilePackageListTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectProfilePackageListTotalCount", options);
+	public long selectProfilePackageListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectProfilePackageListTotalCount", options);
 	}
 
 }

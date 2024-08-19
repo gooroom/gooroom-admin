@@ -44,11 +44,9 @@ public class WallpaperMngDAO extends SqlSessionMetaDAO {
 	/**
 	 * get wallpaper information list data
 	 * 
-	 * @param grpId string wallpaper group id
 	 * @return WallpaperVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<WallpaperVO> selectWallpaperList() throws SQLException {
+	public List<WallpaperVO> selectWallpaperList() {
 
 		List<WallpaperVO> re = null;
 		try {
@@ -56,7 +54,6 @@ public class WallpaperMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectWallpaperList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -66,9 +63,8 @@ public class WallpaperMngDAO extends SqlSessionMetaDAO {
 	 * get wallpaper information list data that not include any wallpaper group.
 	 * 
 	 * @return WallpaperVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<WallpaperVO> selectNoGroupWallpaperList() throws SQLException {
+	public List<WallpaperVO> selectNoGroupWallpaperList() {
 
 		List<WallpaperVO> re = null;
 		try {
@@ -76,7 +72,6 @@ public class WallpaperMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectNoGroupWallpaperList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -87,9 +82,8 @@ public class WallpaperMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param wallpaperId String wallpaper id
 	 * @return WallpaperVO selected data
-	 * @throws SQLException
 	 */
-	public WallpaperVO selectWallpaperData(String wallpaperId) throws SQLException {
+	public WallpaperVO selectWallpaperData(String wallpaperId) {
 
 		WallpaperVO re = null;
 		try {
@@ -99,7 +93,6 @@ public class WallpaperMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectWallpaperData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -113,9 +106,7 @@ public class WallpaperMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertWallpaperData(WallpaperVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertWallpaperData", vo);
-
+		return sqlSessionMeta.insert("insertWallpaperData", vo);
 	}
 
 	/**
@@ -126,9 +117,7 @@ public class WallpaperMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteWallpaperData(String wallpaperId) throws SQLException {
-
-		return (long) sqlSessionMeta.delete("deleteWallpaperData", wallpaperId);
-
+		return sqlSessionMeta.delete("deleteWallpaperData", wallpaperId);
 	}
 
 	/**
@@ -139,9 +128,7 @@ public class WallpaperMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateWallpaperData(WallpaperVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.update("updateWallpaperData", vo);
-
+		return sqlSessionMeta.update("updateWallpaperData", vo);
 	}
 
 }

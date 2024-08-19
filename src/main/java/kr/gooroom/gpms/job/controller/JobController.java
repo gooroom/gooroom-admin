@@ -142,7 +142,7 @@ public class JobController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		String jobStatus = req.getParameter("jobStatus");
 
@@ -218,7 +218,7 @@ public class JobController {
 	 *
 	 */
 	@PostMapping(value = "/readJobInfo")
-	public @ResponseBody ResultVO readJobInfo(@RequestParam(value = "jobNo", required = true) String jobNo) {
+	public @ResponseBody ResultVO readJobInfo(@RequestParam(value = "jobNo") String jobNo) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -240,7 +240,7 @@ public class JobController {
 	 *
 	 */
 	@PostMapping(value = "/readClientListInJob")
-	public @ResponseBody ResultVO readClientListInJob(@RequestParam(value = "jobNo", required = true) String jobNo) {
+	public @ResponseBody ResultVO readClientListInJob(@RequestParam(value = "jobNo") String jobNo) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -260,7 +260,6 @@ public class JobController {
 	/**
 	 * get gooroom job list data for paging.
 	 * 
-	 * @param jobNo string job number.
 	 * @return ResultVO
 	 *
 	 */
@@ -269,7 +268,7 @@ public class JobController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 

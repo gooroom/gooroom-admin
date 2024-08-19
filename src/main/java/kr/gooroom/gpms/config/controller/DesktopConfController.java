@@ -16,16 +16,17 @@
 
 package kr.gooroom.gpms.config.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import kr.gooroom.gpms.client.service.ClientGroupService;
+import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.common.service.ResultPagingVO;
+import kr.gooroom.gpms.common.service.ResultVO;
+import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
+import kr.gooroom.gpms.config.service.DesktopConfService;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -37,13 +38,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import kr.gooroom.gpms.client.service.ClientGroupService;
-import kr.gooroom.gpms.common.GPMSConstants;
-import kr.gooroom.gpms.common.service.ResultPagingVO;
-import kr.gooroom.gpms.common.service.ResultVO;
-import kr.gooroom.gpms.common.service.StatusVO;
-import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.config.service.DesktopConfService;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Handles requests for the desktop configuration management process.
@@ -115,7 +112,7 @@ public class DesktopConfController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
@@ -194,7 +191,7 @@ public class DesktopConfController {
 	 */
 	@PostMapping(value = "/createDesktopConf")
 	public @ResponseBody ResultVO createDesktopConf(
-			@RequestParam(value = "desktopConfNm", required = true) String desktopConfNm,
+			@RequestParam(value = "desktopConfNm") String desktopConfNm,
 			@RequestParam(value = "desktopTheme", required = false) String desktopTheme,
 			@RequestParam(value = "appDatas[]", required = false) String[] appDatas,
 			@RequestParam(value = "adminType", required = false) String adminType) {
@@ -230,8 +227,8 @@ public class DesktopConfController {
 	 */
 	@PostMapping(value = "/updateDesktopConf")
 	public @ResponseBody ResultVO updateDesktopConf(
-			@RequestParam(value = "desktopConfId", required = true) String desktopConfId,
-			@RequestParam(value = "desktopConfNm", required = true) String desktopConfNm,
+			@RequestParam(value = "desktopConfId") String desktopConfId,
+			@RequestParam(value = "desktopConfNm") String desktopConfNm,
 			@RequestParam(value = "desktopTheme", required = false) String desktopTheme,
 			@RequestParam(value = "appDatas[]", required = false) String[] appDatas) {
 
@@ -264,7 +261,7 @@ public class DesktopConfController {
 	 */
 	@PostMapping(value = "/readDesktopConf")
 	public @ResponseBody ResultVO readDesktopConf(
-			@RequestParam(value = "desktopConfId", required = true) String desktopConfId) {
+			@RequestParam(value = "desktopConfId") String desktopConfId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -290,7 +287,7 @@ public class DesktopConfController {
 	 */
 	@PostMapping(value = "/deleteDesktopConf")
 	public @ResponseBody ResultVO deleteDesktopConf(
-			@RequestParam(value = "desktopConfId", required = true) String desktopConfId) {
+			@RequestParam(value = "desktopConfId") String desktopConfId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -317,7 +314,7 @@ public class DesktopConfController {
 	 */
 	@PostMapping(value = "/readDesktopConfByGroupId")
 	public @ResponseBody ResultVO readDesktopConfByGroupId(
-			@RequestParam(value = "groupId", required = true) String groupId) {
+			@RequestParam(value = "groupId") String groupId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -343,7 +340,7 @@ public class DesktopConfController {
 	 */
 	@PostMapping(value = "/readDesktopConfByDeptCd")
 	public @ResponseBody ResultVO readDesktopConfByDeptCd(
-			@RequestParam(value = "deptCd", required = true) String deptCd) {
+			@RequestParam(value = "deptCd") String deptCd) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -363,13 +360,13 @@ public class DesktopConfController {
 	/**
 	 * get desktop configuration data by dept cd.
 	 * 
-	 * @param deptCd String department code.
+	 * @param userId String
 	 * @return ResultVO result data bean
 	 *
 	 */
 	@PostMapping(value = "/readDesktopConfByUserId")
 	public @ResponseBody ResultVO readDesktopConfByUserId(
-			@RequestParam(value = "userId", required = true) String userId) {
+			@RequestParam(value = "userId") String userId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -389,14 +386,13 @@ public class DesktopConfController {
 	/**
 	 * set new desktop configuration data.
 	 * 
-	 * @param desktopConfNm    String new desktop configuration name.
-	 * @param desktopConfValue String json format data for configuration data.
+	 * @param desktopConfId String
 	 * @return ResultVO result data bean
 	 *
 	 */
 	@PostMapping(value = "/cloneDesktopConf")
 	public @ResponseBody ResultVO cloneDesktopConf(
-			@RequestParam(value = "desktopConfId", required = true) String desktopConfId) {
+			@RequestParam(value = "desktopConfId") String desktopConfId) {
 
 		ResultVO resultVO = new ResultVO();
 

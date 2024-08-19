@@ -117,7 +117,7 @@ public class ClientConfController {
 
 	private ArrayList<CtrlPropVO> createCtrlPropList(HttpServletRequest req, String modUserId) {
 
-		ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+		ArrayList<CtrlPropVO> propList = new ArrayList<>();
 		int propSeq = 1;
 
 		String homeReset = req.getParameter(GPMSConstants.CTRL_ITEM_USEHOMERESET);
@@ -214,7 +214,7 @@ public class ClientConfController {
 	private ResultPagingVO readCommonCtrlItemAndPropList(HttpServletRequest req, String objectType) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_")
@@ -272,7 +272,6 @@ public class ClientConfController {
 		} catch (Exception ex) {
 			logger.error("error in readClientConfList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			resultVO = null;
 		}
 
 		return resultVO;
@@ -294,7 +293,6 @@ public class ClientConfController {
 		} catch (Exception ex) {
 			logger.error("error in readMgServerConfHistory : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			resultVO = null;
 		}
 
 		return resultVO;
@@ -348,7 +346,6 @@ public class ClientConfController {
 		} catch (Exception ex) {
 			logger.error("error in readCurrentMgServerConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			resultVO = null;
 		}
 
 		return resultVO;
@@ -375,7 +372,6 @@ public class ClientConfController {
 		} catch (Exception ex) {
 			logger.error("error in readClientConfList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			resultVO = null;
 		}
 
 		return resultVO;
@@ -429,6 +425,7 @@ public class ClientConfController {
 			}
 
 			ArrayList<CtrlPropVO> propList = createCtrlPropList(req, modUserId);
+
 			CtrlPropVO[] props = new CtrlPropVO[propList.size()];
 			props = propList.toArray(props);
 
@@ -438,10 +435,8 @@ public class ClientConfController {
 		} catch (Exception ex) {
 			logger.error("error in createClientConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -535,7 +530,7 @@ public class ClientConfController {
 	 *
 	 */
 	@PostMapping(value = "/deleteClientConf")
-	public @ResponseBody ResultVO deleteClientConf(@RequestParam(value = "objId", required = true) String objId) {
+	public @ResponseBody ResultVO deleteClientConf(@RequestParam(value = "objId") String objId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -586,7 +581,7 @@ public class ClientConfController {
 						}
 
 						// home reset job
-						HashMap<String, String> map = new HashMap<String, String>();
+						HashMap<String, String> map = new HashMap<>();
 						if ("true".equalsIgnoreCase(homeReset)) {
 							map.put("operation", "enable");
 						} else {
@@ -596,7 +591,7 @@ public class ClientConfController {
 								clientIds);
 						
 						// root / sudo allow job
-						HashMap<String, String> mapAccountAllow = new HashMap<String, String>();
+						HashMap<String, String> mapAccountAllow = new HashMap<>();
 						if ("true".equalsIgnoreCase(rootAllow)) {
 							mapAccountAllow.put("root_use", "allow");
 						} else {
@@ -674,6 +669,7 @@ public class ClientConfController {
 			itemVo.setModUserId(modUserId);
 
 			ArrayList<CtrlPropVO> propList = createCtrlPropList(req, modUserId);
+
 			CtrlPropVO[] props = new CtrlPropVO[propList.size()];
 			props = propList.toArray(props);
 
@@ -691,7 +687,7 @@ public class ClientConfController {
 				// use home reset job
 				if (homeReset != null && !(homeReset.equals(getPropertyValue((CtrlItemVO) currentConfObj.getData()[0],
 						GPMSConstants.CTRL_ITEM_USEHOMERESET)))) {
-					HashMap<String, String> map = new HashMap<String, String>();
+					HashMap<String, String> map = new HashMap<>();
 					if ("true".equalsIgnoreCase(homeReset)) {
 						map.put("operation", "enable");
 					} else {
@@ -702,7 +698,7 @@ public class ClientConfController {
 				}
 				
 				// root / sudo allow job
-				HashMap<String, String> mapAccountAllow = new HashMap<String, String>();
+				HashMap<String, String> mapAccountAllow = new HashMap<>();
 				if ("true".equalsIgnoreCase(rootAllow)) {
 					mapAccountAllow.put("root_use", "allow");
 				} else {
@@ -719,7 +715,7 @@ public class ClientConfController {
 				
 				// policykit user job
 				if (policykitUser != null && !(policykitUser.equals(getPropertyValue((CtrlItemVO) currentConfObj.getData()[0], "policykitUser")))) {
-					HashMap<String, String> map = new HashMap<String, String>();
+					HashMap<String, String> map = new HashMap<>();
 					map.put("polkit_admin", policykitUser);
 					jobMaker.createJobForClientConf(objId, GPMSConstants.TYPE_CLIENTCONF,
 							GPMSConstants.JOB_CLIENTCONF_POLICYKITUSER_CHANGE, map);
@@ -869,7 +865,7 @@ public class ClientConfController {
 				itemVo.setStandardObj(true);
 			}
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_MAINOS, mainOs, "",
@@ -1028,7 +1024,7 @@ public class ClientConfController {
 			itemVo.setComment(confComment);
 			itemVo.setModUserId(LoginInfoHelper.getUserId());
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_MAINOS, mainos, "",
@@ -1064,7 +1060,7 @@ public class ClientConfController {
 	 * @throws Exception
 	 */
 	@PostMapping(value = "/deleteUpdateServerConf")
-	public @ResponseBody ResultVO deleteUpdateServerConf(@RequestParam(value = "objId", required = true) String objId) {
+	public @ResponseBody ResultVO deleteUpdateServerConf(@RequestParam(value = "objId") String objId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -1158,7 +1154,7 @@ public class ClientConfController {
 				itemVo.setStandardObj(true);
 			}
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_HOSTNAME, hosts, "",
@@ -1312,7 +1308,7 @@ public class ClientConfController {
 			itemVo.setComment(confComment);
 			itemVo.setModUserId(LoginInfoHelper.getUserId());
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_HOSTNAME, hosts, "",
@@ -1353,7 +1349,7 @@ public class ClientConfController {
 	 * @throws Exception
 	 */
 	@PostMapping(value = "/deleteHostNameConf")
-	public @ResponseBody ResultVO deleteHostNameConf(@RequestParam(value = "objId", required = true) String objId) {
+	public @ResponseBody ResultVO deleteHostNameConf(@RequestParam(value = "objId") String objId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -1403,9 +1399,9 @@ public class ClientConfController {
 	 * get browser rule (websocket, webworker, whitelist, trust-rule, untrust-rule)
 	 * list data paged.
 	 * 
-	 * @param req                    HttpServletRequest
-	 * @param resHttpServletResponse
-	 * @param modelModelMap
+	 * @param req HttpServletRequest
+	 * @param res HttpServletResponse
+	 * @param model ModelMap
 	 * @return ResultPagingVO result data bean
 	 *
 	 */
@@ -1451,7 +1447,7 @@ public class ClientConfController {
 	@PostMapping(value = "/readBrowserRule")
 	public @ResponseBody HashMap<String, Object> readBrowserRule(HttpServletRequest req) {
 
-		HashMap<String, Object> hm = new HashMap<String, Object>();
+		HashMap<String, Object> hm = new HashMap<>();
 		ResultVO resultVO = new ResultVO();
 		String objId = req.getParameter("objId");
 
@@ -1461,51 +1457,6 @@ public class ClientConfController {
 
 			hm.put("status", resultVO.getStatus());
 			hm.put("data", resultVO.getData());
-
-//	    CtrlItemVO[] objs = (CtrlItemVO[]) resultVO.getData();
-//	    if (objs != null && objs.length > 0) {
-//		ArrayList<CtrlPropVO> props = objs[0].getPropList();
-//		if (props != null && props.size() > 0) {
-//		    ArrayList<Object> trustGroupList = new ArrayList<Object>();
-//		    for (CtrlPropVO prop : props) {
-//			if ("trustgroup".equalsIgnoreCase(prop.getPropNm())) {
-//			    ResultVO groupResultVO = ctrlMstService.readCtrlItem(prop.getPropValue());
-//			    trustGroupList.add(groupResultVO.getData()[0]);
-//			} else if ("trustSetup".equalsIgnoreCase(prop.getPropNm())) {
-//			    ResultVO setupResultVO = ctrlMstService.readCtrlItem(prop.getPropValue());
-//			    if (setupResultVO != null && setupResultVO.getData().length > 0) {
-//				ArrayList<CtrlPropVO> setupProps = ((CtrlItemVO) setupResultVO.getData()[0])
-//					.getPropList();
-//				for (CtrlPropVO setupProp : setupProps) {
-//				    if ("CONTENT".equals(setupProp.getPropNm())) {
-//					hm.put("TRUSTSITESETUP", ((CtrlItemVO) setupResultVO.getData()[0]).getObjNm());
-//					hm.put("TRUSTSITESETUPSCRIPT", setupProp.getPropValue());
-//				    }
-//				}
-//			    }
-//			} else if ("untrustSetup".equalsIgnoreCase(prop.getPropNm())) {
-//			    ResultVO setupResultVO = ctrlMstService.readCtrlItem(prop.getPropValue());
-//			    if (setupResultVO != null && setupResultVO.getData().length > 0) {
-//				ArrayList<CtrlPropVO> setupProps = ((CtrlItemVO) setupResultVO.getData()[0])
-//					.getPropList();
-//				for (CtrlPropVO setupProp : setupProps) {
-//				    if ("CONTENT".equals(setupProp.getPropNm())) {
-//					hm.put("UNTRUSTSITESETUP",
-//						((CtrlItemVO) setupResultVO.getData()[0]).getObjNm());
-//					hm.put("UNTRUSTSITESETUPSCRIPT", setupProp.getPropValue());
-//				    }
-//				}
-//			    }
-//			}
-//		    }
-//
-//		    if (trustGroupList != null && trustGroupList.size() > 0) {
-//			Object[] trustGroupArray = new Object[trustGroupList.size()];
-//			trustGroupArray = trustGroupList.toArray(trustGroupArray);
-//			hm.put("TRUSTGROUP", trustGroupArray);
-//		    }
-//		}
-//	    }
 
 		} catch (Exception ex) {
 			logger.error("error in readBrowserRule : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -1525,7 +1476,7 @@ public class ClientConfController {
 	 */
 	@PostMapping(value = "/readBrowserRuleByUserId")
 	public @ResponseBody HashMap<String, Object> readBrowserRuleByUserId(HttpServletRequest req) {
-		HashMap<String, Object> hm = new HashMap<String, Object>();
+		HashMap<String, Object> hm = new HashMap<>();
 		String userId = req.getParameter("userId");
 		try {
 			if (userId != null && userId.trim().length() > 0) {
@@ -1570,7 +1521,7 @@ public class ClientConfController {
 	 */
 	@PostMapping(value = "/readBrowserRuleByDeptCd")
 	public @ResponseBody HashMap<String, Object> readBrowserRuleByDeptCd(HttpServletRequest req) {
-		HashMap<String, Object> hm = new HashMap<String, Object>();
+		HashMap<String, Object> hm = new HashMap<>();
 		String deptCd = req.getParameter("deptCd");
 		try {
 			if (deptCd != null && deptCd.trim().length() > 0) {
@@ -1596,7 +1547,7 @@ public class ClientConfController {
 
 	private HashMap<String, Object> getBrowserRuleByRoleId(String roleId, String ruleGrade) {
 
-		HashMap<String, Object> hm = new HashMap<String, Object>();
+		HashMap<String, Object> hm = new HashMap<>();
 		ResultVO resultVO = new ResultVO();
 
 		try {
@@ -1641,7 +1592,7 @@ public class ClientConfController {
 	 */
 	@PostMapping(value = "/readBrowserRuleByGroupId")
 	public @ResponseBody HashMap<String, Object> readBrowserRuleByGroupId(HttpServletRequest req) {
-		HashMap<String, Object> hm = new HashMap<String, Object>();
+		HashMap<String, Object> hm = new HashMap<>();
 		String groupId = req.getParameter("groupId");
 		try {
 			if (groupId != null && groupId.trim().length() > 0) {
@@ -1710,7 +1661,7 @@ public class ClientConfController {
 				itemVo.setStandardObj(true);
 			}
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "websocket", webSocket, "",
@@ -1804,7 +1755,7 @@ public class ClientConfController {
 	 *
 	 */
 	@PostMapping(value = "/deleteBrowserRuleConf")
-	public @ResponseBody ResultVO deleteBrowserRuleConf(@RequestParam(value = "objId", required = true) String objId) {
+	public @ResponseBody ResultVO deleteBrowserRuleConf(@RequestParam(value = "objId") String objId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -1889,7 +1840,7 @@ public class ClientConfController {
 			itemVo.setComment(objComment);
 			itemVo.setModUserId(LoginInfoHelper.getUserId());
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), "websocket", webSocket, "",
@@ -2017,9 +1968,9 @@ public class ClientConfController {
 	/**
 	 * get client media rule list data paged.
 	 * 
-	 * @param req                    HttpServletRequest
-	 * @param resHttpServletResponse
-	 * @param modelModelMap
+	 * @param req HttpServletRequest
+	 * @param res HttpServletResponse
+	 * @param model ModelMap
 	 * @return ResultPagingVO result data bean
 	 *
 	 */
@@ -2276,7 +2227,7 @@ public class ClientConfController {
 				itemVo.setStandardObj(true);
 			}
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.MEDIA_ITEM_USB_MEMORY,
@@ -2377,7 +2328,7 @@ public class ClientConfController {
 	 *
 	 */
 	@PostMapping(value = "/deleteMediaRuleConf")
-	public @ResponseBody ResultVO deleteMediaRuleConf(@RequestParam(value = "objId", required = true) String objId) {
+	public @ResponseBody ResultVO deleteMediaRuleConf(@RequestParam(value = "objId") String objId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -2463,7 +2414,7 @@ public class ClientConfController {
 			itemVo.setMngObjTp(GPMSConstants.CTRL_ITEM_MEDIACTRL_RULE);
 			itemVo.setMngObjTpAbbr(GPMSConstants.CTRL_ITEM_MEDIACTRL_RULE_ABBR);
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.MEDIA_ITEM_USB_MEMORY,
@@ -2648,7 +2599,7 @@ public class ClientConfController {
 				itemVo.setStandardObj(true);
 			}
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_SCREENTIME, screen_time,
@@ -2739,9 +2690,9 @@ public class ClientConfController {
 	/**
 	 * get client security rule (new) list data paged.
 	 * 
-	 * @param req                    HttpServletRequest
-	 * @param resHttpServletResponse
-	 * @param modelModelMap
+	 * @param req HttpServletRequest
+	 * @param res HttpServletResponse
+	 * @param model ModelMap
 	 * @return ResultPagingVO result data bean
 	 *
 	 */
@@ -2962,7 +2913,7 @@ public class ClientConfController {
 			itemVo.setComment(objComment);
 			itemVo.setModUserId(LoginInfoHelper.getUserId());
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.CTRL_ITEM_SCREENTIME, screen_time,
 					"", LoginInfoHelper.getUserId(), ""));
@@ -3034,7 +2985,7 @@ public class ClientConfController {
 	 *
 	 */
 	@PostMapping(value = "/deleteSecurityRule")
-	public @ResponseBody ResultVO deleteSecurityRule(@RequestParam(value = "objId", required = true) String objId) {
+	public @ResponseBody ResultVO deleteSecurityRule(@RequestParam(value = "objId") String objId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -3324,7 +3275,7 @@ public class ClientConfController {
 				itemVo.setStandardObj(true);
 			}
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			if (swList != null && swList.length > 0) {
@@ -3382,7 +3333,7 @@ public class ClientConfController {
 			itemVo.setComment(objComment);
 			itemVo.setModUserId(LoginInfoHelper.getUserId());
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 			if (swList != null && swList.length > 0) {
 				for (String sw : swList) {
@@ -3423,7 +3374,7 @@ public class ClientConfController {
 	 *
 	 */
 	@PostMapping(value = "/deleteSoftwareFilter")
-	public @ResponseBody ResultVO deleteSoftwareFilter(@RequestParam(value = "objId", required = true) String objId) {
+	public @ResponseBody ResultVO deleteSoftwareFilter(@RequestParam(value = "objId") String objId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -3741,7 +3692,7 @@ public class ClientConfController {
 				itemVo.setStandardObj(true);
 			}
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 
 			if (itemList != null && itemList.length > 0) {
@@ -3799,7 +3750,7 @@ public class ClientConfController {
 			itemVo.setComment(objComment);
 			itemVo.setModUserId(LoginInfoHelper.getUserId());
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 			if (itemList != null && itemList.length > 0) {
 				for (String item : itemList) {
@@ -3840,7 +3791,7 @@ public class ClientConfController {
 	 *
 	 */
 	@PostMapping(value = "/deleteCtrlCenterItem")
-	public @ResponseBody ResultVO deleteCtrlCenterItem(@RequestParam(value = "objId", required = true) String objId) {
+	public @ResponseBody ResultVO deleteCtrlCenterItem(@RequestParam(value = "objId") String objId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -4171,7 +4122,7 @@ public class ClientConfController {
 				itemVo.setStandardObj(true);
 			}
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 			
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.POLICYKIT_ITEM_GOOROOMUPDATE, paramGooroomUpdate, "",
@@ -4256,7 +4207,7 @@ public class ClientConfController {
 			itemVo.setModUserId(regUserId);
 			itemVo.setMngObjTp(GPMSConstants.CTRL_ITEM_POLICYKIT_RULE);
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 			
 			propList.add(new CtrlPropVO("", String.valueOf(propSeq++), GPMSConstants.POLICYKIT_ITEM_GOOROOMUPDATE, paramGooroomUpdate, "",
@@ -4312,7 +4263,7 @@ public class ClientConfController {
 	 *
 	 */
 	@PostMapping(value = "/deletePolicyKitRule")
-	public @ResponseBody ResultVO deletePolicyKitRule(@RequestParam(value = "objId", required = true) String objId) {
+	public @ResponseBody ResultVO deletePolicyKitRule(@RequestParam(value = "objId") String objId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -4382,10 +4333,10 @@ public class ClientConfController {
 	
 	@PostMapping(value = "/readTotalRule")
 	public @ResponseBody HashMap<String, Object> readTotalRule(
-			@RequestParam(value = "userId", required = true) String userId,
-			@RequestParam(value = "clientId", required = true) String clientId, ModelMap model) {
+			@RequestParam(value = "userId") String userId,
+			@RequestParam(value = "clientId") String clientId, ModelMap model) {
 
-		HashMap<String, Object> hm = new HashMap<String, Object>();
+		HashMap<String, Object> hm = new HashMap<>();
 
 		try {
 			// get rule ids
@@ -4490,7 +4441,7 @@ public class ClientConfController {
 	public @ResponseBody ResultPagingVO readActivateGroupList(HttpServletRequest req, HttpServletResponse res,
 																	ModelMap model) {
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		//gubun
 		String gubun = req.getParameter("gubun"); //user, group, date

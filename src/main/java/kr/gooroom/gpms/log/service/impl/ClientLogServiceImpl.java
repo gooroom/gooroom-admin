@@ -58,16 +58,15 @@ public class ClientLogServiceImpl implements ClientLogService {
 	 * @param toDate   string to date.
 	 * @param logItem  string log type for select.
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getGeneralLogList(String fromDate, String toDate, String logItem) throws Exception {
+	public ResultVO getGeneralLogList(String fromDate, String toDate, String logItem) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
 
-			Map<String, Object> param = new HashMap<String, Object>();
+			Map<String, Object> param = new HashMap<>();
 			param.put("fromDate", fromDate);
 			param.put("toDate", toDate);
 			String[] items = null;
@@ -86,7 +85,7 @@ public class ClientLogServiceImpl implements ClientLogService {
 
 			if (re != null && re.size() > 0) {
 
-				ClientLogVO[] row = re.stream().toArray(ClientLogVO[]::new);
+				ClientLogVO[] row = re.toArray(ClientLogVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -104,10 +103,8 @@ public class ClientLogServiceImpl implements ClientLogService {
 		} catch (Exception ex) {
 			logger.error("error in getGeneralLogList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -118,10 +115,9 @@ public class ClientLogServiceImpl implements ClientLogService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getGeneralLogListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getGeneralLogListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -132,7 +128,7 @@ public class ClientLogServiceImpl implements ClientLogService {
 			long filteredCount = clientLogDAO.selectGeneralLogFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				ClientLogVO[] row = re.stream().toArray(ClientLogVO[]::new);
+				ClientLogVO[] row = re.toArray(ClientLogVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -148,10 +144,8 @@ public class ClientLogServiceImpl implements ClientLogService {
 		} catch (Exception ex) {
 			logger.error("error in getGeneralLogListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -162,10 +156,9 @@ public class ClientLogServiceImpl implements ClientLogService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getSecurityLogListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getSecurityLogListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -181,7 +174,7 @@ public class ClientLogServiceImpl implements ClientLogService {
 			long filteredCount = clientLogDAO.selectSecurityLogFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				ClientLogVO[] row = re.stream().toArray(ClientLogVO[]::new);
+				ClientLogVO[] row = re.toArray(ClientLogVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -198,10 +191,8 @@ public class ClientLogServiceImpl implements ClientLogService {
 		} catch (Exception ex) {
 			logger.error("error in getSecurityLogListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -212,9 +203,8 @@ public class ClientLogServiceImpl implements ClientLogService {
 	 *
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
-	public StatusVO deleteUserClientUseHist(HashMap<String, Object> options) throws Exception {
+	public StatusVO deleteUserClientUseHist(HashMap<String, Object> options) {
 		StatusVO statusVO = new StatusVO();
 
 		try {
@@ -231,10 +221,8 @@ public class ClientLogServiceImpl implements ClientLogService {
 		} catch (Exception ex) {
 			logger.error("error in deleteUserClientUseHist : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;

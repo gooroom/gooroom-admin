@@ -49,9 +49,8 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * response user list data
 	 * 
 	 * @return UserVO List
-	 * @throws SQLException
 	 */
-	public List<UserVO> readUserList() throws SQLException {
+	public List<UserVO> readUserList() {
 
 		List<UserVO> re = null;
 		try {
@@ -70,9 +69,8 @@ public class UserDAO extends SqlSessionMetaDAO {
 	/**
 	 * response user list data without delete user
 	 * @return UserVO List
-	 * @throws SQLException
 	 */
-	public List<UserVO> readUserListWithoutDel(HashMap<String, Object> options) throws SQLException {
+	public List<UserVO> readUserListWithoutDel(HashMap<String, Object> options) {
 
 		List<UserVO> re = null;
 		try {
@@ -93,9 +91,8 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return UserVO List
-	 * @throws SQLException
 	 */
-	public List<UserVO> selectUserListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<UserVO> selectUserListPaged(HashMap<String, Object> options) {
 
 		List<UserVO> re = null;
 		try {
@@ -116,11 +113,9 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectUserListFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectUserListFilteredCount", options);
+	public long selectUserListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectUserListFilteredCount", options);
 	}
 
 	/**
@@ -128,11 +123,9 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectUserListTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectUserListTotalCount", options);
+	public long selectUserListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectUserListTotalCount", options);
 	}
 
 	/**
@@ -140,13 +133,12 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param usertId string user id
 	 * @return boolean true if exist
-	 * @throws SQLException
 	 */
-	public boolean isExistUserId(String usertId) throws SQLException {
+	public boolean isExistUserId(String usertId) {
 
 		boolean re = true;
 		try {
-			re = ((Boolean) sqlSessionMeta.selectOne("isExistUserId", usertId)).booleanValue();
+			re = sqlSessionMeta.selectOne("isExistUserId", usertId);
 
 		} catch (Exception ex) {
 			logger.error("error in isExistUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -162,27 +154,25 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo UserVO user information data bean
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long createUser(UserVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertUser", vo);
+	public long createUser(UserVO vo) {
+		return sqlSessionMeta.insert("insertUser", vo);
 	}
 	
 	/**
 	 * create new user information data - from file
 	 * 
-	 * @param UserVO
+	 * @param vo UserVO
 	 * @return long
-	 * @throws Exception
 	 */
-	public long createUserRawData(UserVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertUserRawData", vo);
+	public long createUserRawData(UserVO vo) {
+		return sqlSessionMeta.insert("insertUserRawData", vo);
 	}
 
 	/**
 	 * response user information data
 	 * 
-	 * @param usertId string user id
+	 * @param userId string user id
 	 * @return UserVO user data bean
 	 * @throws SQLException
 	 */
@@ -207,10 +197,9 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo UserVO user data bean
 	 * @return long data update result count.
-	 * @throws SQLException
 	 */
-	public long updateUserData(UserVO vo) throws SQLException {
-		return (long) sqlSessionMeta.update("updateUserData", vo);
+	public long updateUserData(UserVO vo) {
+		return sqlSessionMeta.update("updateUserData", vo);
 	}
 
 	/**
@@ -221,18 +210,16 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * @param configId  string configuration id
 	 * @param configTp  string configuration type
 	 * @return long query result count
-	 * @throws SQLException
 	 */
-	public long insertOrUpdateConfigWithUser(String userId, String regUserId, String configId, String configTp)
-			throws SQLException {
+	public long insertOrUpdateConfigWithUser(String userId, String regUserId, String configId, String configTp) {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("userId", userId);
 		map.put("regUserId", regUserId);
 		map.put("configId", configId);
 		map.put("configTp", configTp);
 
-		return (long) sqlSessionMeta.update("insertOrUpdateConfigWithUser", map);
+		return sqlSessionMeta.update("insertOrUpdateConfigWithUser", map);
 	}
 
 	/**
@@ -241,14 +228,13 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * @param userId   string target user Id
 	 * @param configTp string configuration type
 	 * @return long query result count
-	 * @throws SQLException
 	 */
-	public long deleteConfigWithUser(String userId, String configTp) throws SQLException {
+	public long deleteConfigWithUser(String userId, String configTp) {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("userId", userId);
 		map.put("configTp", configTp);
-		return (long) sqlSessionMeta.update("deleteConfigWithUser", map);
+		return sqlSessionMeta.update("deleteConfigWithUser", map);
 	}
 
 	/**
@@ -258,13 +244,12 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param deptCds string array organization id
 	 * @return long data delete result count.
-	 * @throws SQLException
 	 */
-	public long removeUserInDeptList(String[] deptCds) throws SQLException {
+	public long removeUserInDeptList(String[] deptCds) {
 
 		long re = 0L;
 		try {
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("deptCds", deptCds);
 			map.put("modUserId", LoginInfoHelper.getUserId());
 			re = sqlSessionMeta.update("UserDAO.updateUserInDeptList", map);
@@ -283,11 +268,9 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo UserVO user data bean
 	 * @return long data update result count.
-	 * @throws SQLException
 	 */
-	public long editUserNfcData(UserVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("updateUserNfcData", vo);
+	public long editUserNfcData(UserVO vo) {
+		return sqlSessionMeta.insert("updateUserNfcData", vo);
 
 	}
 
@@ -296,11 +279,10 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo UserVO user data bean
 	 * @return long data delete result count.
-	 * @throws SQLException
 	 */
 
-	public long updateUserLoginTrialCount(UserVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("updateUserLoginTrialCount", vo);
+	public long updateUserLoginTrialCount(UserVO vo) {
+		return sqlSessionMeta.insert("updateUserLoginTrialCount", vo);
 	}
 
 
@@ -309,29 +291,29 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo UserVO user data bean
 	 * @return long data delete result count.
-	 * @throws SQLException
 	 */
 
-	public long deleteUserData(UserVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("deleteUserData", vo);
+	public long deleteUserData(UserVO vo) {
+		return sqlSessionMeta.insert("deleteUserData", vo);
 	}
 
 	/**
 	 * delete user information data by id
 	 * 
-	 * @param vo UserVO user data bean
+	 * @param userId String UserId
+	 * @param modUserId String modUserId
 	 * @return long data delete result count.
 	 * @throws SQLException
 	 */
 
 	public long deleteUserDataById(String userId, String modUserId) throws SQLException {
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("status", GPMSConstants.STS_DELETE_USER);
 		map.put("modUserId", modUserId);
 		map.put("userId", userId);
 		
-		return (long) sqlSessionMeta.insert("deleteUserDataById", map);
+		return sqlSessionMeta.insert("deleteUserDataById", map);
 	}
 
 	/**
@@ -339,9 +321,8 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param userId string user id
 	 * @return UserRoleVO user role data bean
-	 * @throws SQLException
 	 */
-	public UserRoleVO selectUserConfIdByUserId(String userId) throws SQLException {
+	public UserRoleVO selectUserConfIdByUserId(String userId) {
 
 		UserRoleVO re = null;
 		try {
@@ -360,9 +341,8 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param userId string user id
 	 * @return UserRoleVO user role data bean
-	 * @throws SQLException
 	 */
-	public UserRoleVO selectUserConfIdByDeptCdFromUserId(String userId) throws SQLException {
+	public UserRoleVO selectUserConfIdByDeptCdFromUserId(String userId) {
 
 		UserRoleVO re = null;
 		try {
@@ -381,9 +361,8 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param deptCd string dept code
 	 * @return UserRoleVO user role data bean
-	 * @throws SQLException
 	 */
-	public UserRoleVO selectUserConfIdByDeptCd(String deptCd) throws SQLException {
+	public UserRoleVO selectUserConfIdByDeptCd(String deptCd) {
 
 		UserRoleVO re = null;
 		try {
@@ -402,9 +381,8 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param groupId string group id
 	 * @return UserRoleVO user role data bean
-	 * @throws SQLException
 	 */
-	public UserRoleVO selectUserConfIdByGroupId(String groupId) throws SQLException {
+	public UserRoleVO selectUserConfIdByGroupId(String groupId) {
 
 		UserRoleVO re = null;
 		try {
@@ -422,13 +400,12 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * response user in organizations.
 	 *
 	 * @return UserAndRoleVO List
-	 * @throws SQLException
 	 */
-	public List<UserVO> selectUserListNotInDept(String[] deptCds) throws SQLException {
+	public List<UserVO> selectUserListNotInDept(String[] deptCds) {
 
 		List<UserVO> re = null;
 		try {
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("deptCds", deptCds);
 			re = sqlSessionMeta.selectList("UserDAO.selectUserListNotInDept", map);
 
@@ -452,7 +429,7 @@ public class UserDAO extends SqlSessionMetaDAO {
 
 		List<UserVO> re = null;
 		try {
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("deptCds", deptCds);
 			re = sqlSessionMeta.selectList("UserDAO.selectUserListInDept", map);
 
@@ -470,9 +447,8 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return UserVO List
-	 * @throws SQLException
 	 */
-	public List<UserVO> selectUserListPagedInDept(HashMap<String, Object> options) throws SQLException {
+	public List<UserVO> selectUserListPagedInDept(HashMap<String, Object> options) {
 
 		List<UserVO> re = null;
 		try {
@@ -491,11 +467,10 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectUserListInDeptFilteredCount(HashMap<String, Object> options) throws SQLException {
+	public long selectUserListInDeptFilteredCount(HashMap<String, Object> options) {
 
-		return (long) sqlSessionMeta.selectOne("selectUserListInDeptFilteredCount", options);
+		return sqlSessionMeta.selectOne("selectUserListInDeptFilteredCount", options);
 	}
 
 	/**
@@ -503,20 +478,18 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectUserListInDeptTotalCount(HashMap<String, Object> options) throws SQLException {
+	public long selectUserListInDeptTotalCount(HashMap<String, Object> options) {
 
-		return (long) sqlSessionMeta.selectOne("selectUserListInDeptTotalCount", options);
+		return sqlSessionMeta.selectOne("selectUserListInDeptTotalCount", options);
 	}
 
 	/**
 	 * response user in online.
 	 * 
 	 * @return UserAndClientVO List
-	 * @throws SQLException
 	 */
-	public List<UserAndClientVO> selectUserListInOnline() throws SQLException {
+	public List<UserAndClientVO> selectUserListInOnline() {
 
 		List<UserAndClientVO> re = null;
 		try {
@@ -541,12 +514,12 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 */
 	public long updateUserWithDept(String deptCd, String userId) throws SQLException {
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("deptCd", deptCd);
 		map.put("userId", userId);
 		map.put("regUserId", LoginInfoHelper.getUserId());
 
-		return (long) sqlSessionMeta.insert("updateUserWithDept", map);
+		return sqlSessionMeta.insert("updateUserWithDept", map);
 	}
 
 	
@@ -554,14 +527,13 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * response result delete user table all
 	 * 
 	 * @return boolean
-	 * @throws SQLException
 	 */
-	public boolean deleteUserAll() throws SQLException {
+	public boolean deleteUserAll() {
 		boolean reFlag = false; 
 		
-		long existRowCount = (long) sqlSessionMeta.selectOne("selectUserALLCount");
+		long existRowCount = sqlSessionMeta.selectOne("selectUserALLCount");
 		if(existRowCount > 0) {
-			long deleteRowCount = (long) sqlSessionMeta.delete("deleteUserALL");
+			long deleteRowCount = sqlSessionMeta.delete("deleteUserALL");
 			return existRowCount == deleteRowCount;			
 		} else {
 			reFlag = true;
@@ -582,12 +554,12 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 */
 	public long createUserHist(String chgTp, String userId, String regUserId) throws SQLException {
 		
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("chgTp", chgTp);
 		map.put("regUserId", regUserId);
 		map.put("userId", userId);
 		
-		return (long) sqlSessionMeta.insert("insertUserHist", map);
+		return sqlSessionMeta.insert("insertUserHist", map);
 	}
 	
 	
@@ -599,7 +571,7 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteUserFromRule(String userId) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteDeptFromRule", userId);
+		return sqlSessionMeta.delete("deleteDeptFromRule", userId);
 	}
 
 	/**
@@ -610,16 +582,15 @@ public class UserDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteUserForNoti(String userId) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteUserForNoti", userId);
+		return sqlSessionMeta.delete("deleteUserForNoti", userId);
 	}
 
 	/**
 	 * user id duplicate checklist .
 	 * @param ids
 	 * @return list
-	 * @throws SQLException
 	 */
-	public List<String> selectUserListForDuplicateUserId (HashMap<String, Object> ids) throws SQLException {
+	public List<String> selectUserListForDuplicateUserId (HashMap<String, Object> ids) {
 		List<String> res = null;
 		res = sqlSessionMeta.selectList("selectUserListForDuplicateUserId", ids);
 		return res;

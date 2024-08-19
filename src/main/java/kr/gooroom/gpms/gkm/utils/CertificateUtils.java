@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -101,7 +102,7 @@ public class CertificateUtils {
 		}
 	}
 
-	public static enum RevocationReason {
+	public enum RevocationReason {
 		unspecified, keyCompromise, caCompromise, affiliationChanged, superseded, cessationOfOperation, certificateHold,
 		unused, removeFromCRL, privilegeWithdrawn, ACompromise;
 
@@ -114,7 +115,7 @@ public class CertificateUtils {
 		}
 	}
 
-	private String CA_OCSP_ENDPOINT_URL = prop.getProperty("gooroom.ocsp.url");
+	private final String CA_OCSP_ENDPOINT_URL = prop.getProperty("gooroom.ocsp.url");
 
 	/**
 	 * check csp certificate from cn string.
@@ -154,7 +155,7 @@ public class CertificateUtils {
 		// load root certificate private key
 		File privKeyFile = new File(GPMSConstants.ROOT_KEYPATH + "/" + GPMSConstants.ROOT_KEYFILENAME);
 		// PemReader pemReader = new PemReader(new FileReader(privKeyFile));
-		PemReader pemReader = new PemReader(new InputStreamReader(new FileInputStream(privKeyFile), "UTF-8"));
+		PemReader pemReader = new PemReader(new InputStreamReader(new FileInputStream(privKeyFile), StandardCharsets.UTF_8));
 
 		PemObject pemObject = pemReader.readPemObject();
 		pemReader.close();
@@ -190,14 +191,11 @@ public class CertificateUtils {
 
 		PemObject certPemObject = new PemObject("CERTIFICATE", cert.getEncoded());
 		ByteArrayOutputStream certBs = new ByteArrayOutputStream();
-		PemWriter certPemWriter = new PemWriter(new OutputStreamWriter(certBs, "UTF-8"));
-		certBs.close();
-		try {
+		try (PemWriter certPemWriter = new PemWriter(new OutputStreamWriter(certBs, StandardCharsets.UTF_8))) {
+			certBs.close();
 			certPemWriter.writeObject(certPemObject);
-		} finally {
-			certPemWriter.close();
 		}
-		vo.setCertificatePem(certBs.toString("UTF-8"));
+		vo.setCertificatePem(certBs.toString(StandardCharsets.UTF_8));
 
 		PemObject priPemObject;
 		if (pw == null || pw.length() == 0)
@@ -212,14 +210,11 @@ public class CertificateUtils {
 		}
 
 		ByteArrayOutputStream priBs = new ByteArrayOutputStream();
-		PemWriter priPemWriter = new PemWriter(new OutputStreamWriter(priBs, "UTF-8"));
-		priBs.close();
-		try {
+		try (PemWriter priPemWriter = new PemWriter(new OutputStreamWriter(priBs, StandardCharsets.UTF_8))) {
+			priBs.close();
 			priPemWriter.writeObject(priPemObject);
-		} finally {
-			priPemWriter.close();
 		}
-		vo.setPrivateKeyPem(priBs.toString("UTF-8"));
+		vo.setPrivateKeyPem(priBs.toString(StandardCharsets.UTF_8));
 
 		return vo;
 	}
@@ -245,7 +240,7 @@ public class CertificateUtils {
 
 		// load root private key
 		File privKeyFile = new File(GPMSConstants.ROOT_KEYPATH + "/" + GPMSConstants.ROOT_KEYFILENAME);
-		PemReader pemReader = new PemReader(new InputStreamReader(new FileInputStream(privKeyFile), "UTF-8"));
+		PemReader pemReader = new PemReader(new InputStreamReader(new FileInputStream(privKeyFile), StandardCharsets.UTF_8));
 
 		PemObject pemObject = pemReader.readPemObject();
 		pemReader.close();
@@ -278,8 +273,7 @@ public class CertificateUtils {
 			builder.addExtension(Extension.authorityInfoAccess, false, new DERSequence(authInfoAccessASN));
 
 			X509CertificateHolder holder = builder.build(createSigner(serverPriKey));
-			X509Certificate cert = new JcaX509CertificateConverter().getCertificate(holder);
-			return cert;
+			return new JcaX509CertificateConverter().getCertificate(holder);
 
 		} catch (CertificateException | CertIOException ex) {
 			logger.error("error in signCSR[1] : {}, {}, {}", GPMSConstants.CODE_SYSERROR,

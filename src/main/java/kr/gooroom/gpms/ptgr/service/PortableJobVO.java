@@ -1,9 +1,12 @@
 package kr.gooroom.gpms.ptgr.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class PortableJobVO implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 7339941593707076562L;
     int jobId;
     int imageId;
 

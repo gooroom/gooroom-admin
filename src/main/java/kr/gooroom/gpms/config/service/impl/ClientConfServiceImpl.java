@@ -64,10 +64,9 @@ public class ClientConfServiceImpl implements ClientConfService {
 	 * get gooroom managements server information(address) history data.
 	 * 
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getMgServerConfList() throws Exception {
+	public ResultVO getMgServerConfList() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -77,7 +76,7 @@ public class ClientConfServiceImpl implements ClientConfService {
 
 			if (re != null && re.size() > 0) {
 
-				MgServerConfVO[] row = re.stream().toArray(MgServerConfVO[]::new);
+				MgServerConfVO[] row = re.toArray(MgServerConfVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -174,49 +173,24 @@ public class ClientConfServiceImpl implements ClientConfService {
 
 				if (Long.parseLong(vo.getPollingTime()) != oldPollingTime) {
 					// create client job for change polling time
-					HashMap<String, String> map = new HashMap<String, String>();
+					HashMap<String, String> map = new HashMap<>();
 					map.put("dispatch_time", vo.getPollingTime());
 					jobMaker.createJobForAllClient(GPMSConstants.JOB_CLIENTCONF_AGENTPOLLING_CHANGE, map);
 				}
 				
 				if (Long.parseLong(vo.getTrialCount()) != oldTrialCount) {
 					// update user login trial count
-					HashMap<String, Object> map = new HashMap<String, Object>();
+					HashMap<String, Object> map = new HashMap<>();
 					map.put("trialCount", vo.getTrialCount());
 					clientConfDao.updateLoginTrialInUser(map);
 				}
 
 				if (Long.parseLong(vo.getMaxMediaCnt()) != oldMaxMediaCnt) {
 					// create client job for change max media count
-					HashMap<String, String> map = new HashMap<String, String>();
+					HashMap<String, String> map = new HashMap<>();
 					jobMaker.createJobForAllClient(GPMSConstants.JOB_CLIENTCONF_MAXMEDIACNT_CHANGE, map);
 				}
 			}
-
-//			if (Long.parseLong(vo.getPollingTime()) != oldPollingTime) {
-//				// update polling time
-//				// add history data
-//				SiteConfVO confVo = new SiteConfVO();
-//				confVo.setPollingCycle(vo.getPollingTime());
-//				// update
-//				long updateCnt = clientConfDao.updateSiteConf(confVo);
-//				if (updateCnt > 0) {
-//					long insertCnt = clientConfDao.createSiteConfHist(confVo);
-//					if (insertCnt > 0) {
-//						statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
-//								MessageSourceHelper.getMessage("serverconf.result.insert"));
-//					} else {
-//						TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-//						statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_INSERTERROR,
-//								MessageSourceHelper.getMessage("serverconf.result.noinsert"));
-//					}
-//
-//					// create client job for change polling time
-//					HashMap<String, String> map = new HashMap<String, String>();
-//					map.put("dispatch_time", vo.getPollingTime());
-//					jobMaker.createJobForAllClient(GPMSConstants.JOB_CLIENTCONF_AGENTPOLLING_CHANGE, map);
-//				}
-//			}
 
 		} catch (SQLException sqlEx) {
 			logger.error("error in createMgServerConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -243,10 +217,9 @@ public class ClientConfServiceImpl implements ClientConfService {
 	 * get current gooroom managements server information(address) data.
 	 * 
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readCurrentMgServerConf() throws Exception {
+	public ResultVO readCurrentMgServerConf() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -304,10 +277,9 @@ public class ClientConfServiceImpl implements ClientConfService {
 	 * 
 	 * @param groupId String group id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getClientConfIdByGroupId(String groupId) throws Exception {
+	public ResultVO getClientConfIdByGroupId(String groupId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {

@@ -16,15 +16,22 @@
 
 package kr.gooroom.gpms.client.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-
 import jakarta.annotation.Resource;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import kr.gooroom.gpms.client.service.ClientGroupService;
+import kr.gooroom.gpms.client.service.ClientGroupVO;
+import kr.gooroom.gpms.client.service.ClientVO;
+import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.common.service.ResultPagingVO;
+import kr.gooroom.gpms.common.service.ResultVO;
+import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.common.utils.LoginInfoHelper;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
+import kr.gooroom.gpms.config.service.CtrlMstService;
+import kr.gooroom.gpms.job.custom.CustomJobMaker;
+import kr.gooroom.gpms.job.service.JobService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,18 +45,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import kr.gooroom.gpms.client.service.ClientGroupService;
-import kr.gooroom.gpms.client.service.ClientGroupVO;
-import kr.gooroom.gpms.client.service.ClientVO;
-import kr.gooroom.gpms.common.GPMSConstants;
-import kr.gooroom.gpms.common.service.ResultPagingVO;
-import kr.gooroom.gpms.common.service.ResultVO;
-import kr.gooroom.gpms.common.service.StatusVO;
-import kr.gooroom.gpms.common.utils.LoginInfoHelper;
-import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.config.service.CtrlMstService;
-import kr.gooroom.gpms.job.custom.CustomJobMaker;
-import kr.gooroom.gpms.job.service.JobService;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Handles requests for the client management process.
@@ -82,8 +80,7 @@ public class ClientGroupController {
 	 * ex) date format : 2017-10-04
 	 * 
 	 * @param binder WebDataBinder
-	 * @return void
-	 * 
+	 *
 	 */
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
@@ -112,10 +109,8 @@ public class ClientGroupController {
 		} catch (Exception ex) {
 			logger.error("error in readClientGroupList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -135,7 +130,7 @@ public class ClientGroupController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
@@ -213,10 +208,8 @@ public class ClientGroupController {
 		} catch (Exception ex) {
 			logger.error("error in readClientGroupData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -242,10 +235,8 @@ public class ClientGroupController {
 		} catch (Exception ex) {
 			logger.error("error in readClientGroupNodeList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -322,10 +313,8 @@ public class ClientGroupController {
 		} catch (Exception ex) {
 			logger.error("error in createClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -342,7 +331,7 @@ public class ClientGroupController {
 	 * 
 	 */
 	@PostMapping(value = "/deleteClientGroup")
-	public @ResponseBody ResultVO deleteClientGroup(@RequestParam(value = "groupId", required = true) String groupId,
+	public @ResponseBody ResultVO deleteClientGroup(@RequestParam(value = "groupId") String groupId,
 			ModelMap model) {
 
 		ResultVO resultVO = new ResultVO();
@@ -379,10 +368,8 @@ public class ClientGroupController {
 		} catch (Exception ex) {
 			logger.error("error in deleteClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -413,10 +400,8 @@ public class ClientGroupController {
 		} catch (Exception ex) {
 			logger.error("error in deleteClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -513,10 +498,8 @@ public class ClientGroupController {
 		} catch (Exception ex) {
 			logger.error("error in updateClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -534,8 +517,8 @@ public class ClientGroupController {
 	 * 
 	 */
 	@PostMapping(value = "/addClientsInGroup")
-	public @ResponseBody ResultVO addClientsInGroup(@RequestParam(value = "groupId", required = true) String groupId,
-			@RequestParam(value = "clients", required = true) String clients, ModelMap model) {
+	public @ResponseBody ResultVO addClientsInGroup(@RequestParam(value = "groupId") String groupId,
+			@RequestParam(value = "clients") String clients, ModelMap model) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -558,10 +541,8 @@ public class ClientGroupController {
 		} catch (Exception ex) {
 			logger.error("error in addClientsInGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -572,14 +553,13 @@ public class ClientGroupController {
 	 * <p>
 	 * create job for client config(rule) change.
 	 * 
-	 * @param groupId string group id
 	 * @param clients string clients data, comma separated
 	 * @param model   ModelMap
 	 * @return ResultVO
 	 * 
 	 */
 	@PostMapping(value = "/removeClientsInGroup")
-	public @ResponseBody ResultVO removeClientsInGroup(@RequestParam(value = "clients", required = true) String clients,
+	public @ResponseBody ResultVO removeClientsInGroup(@RequestParam(value = "clients") String clients,
 			ModelMap model) {
 
 		ResultVO resultVO = new ResultVO();
@@ -603,10 +583,8 @@ public class ClientGroupController {
 		} catch (Exception ex) {
 			logger.error("error in removeClientsInGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -633,7 +611,7 @@ public class ClientGroupController {
 				hm = new Object[objs.length];
 				for (int i = 0; i < objs.length; i++) {
 					ClientGroupVO vo = (ClientGroupVO) objs[i];
-					HashMap<String, Object> vm = new HashMap<String, Object>();
+					HashMap<String, Object> vm = new HashMap<>();
 					vm.put("title", vo.getGrpNm());
 					vm.put("key", vo.getGrpId());
 					vm.put("hasChildren", vo.getHasChildren());
@@ -661,15 +639,13 @@ public class ClientGroupController {
 	/**
 	 * 단말그룹 설정 수정 - 하위조직 포함
 	 *
-	 * @param parentDeptCd String
 	 * @param objId        String
 	 * @param confType     String
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@PostMapping(value = "/updateClientGroupConfInherit")
 	public @ResponseBody ResultVO updateClientGroupConfInherit(
-			@RequestParam(value = "grpId", required=true) String parentGrpId,
+			@RequestParam(value = "grpId") String parentGrpId,
 			@RequestParam(value = "objId" ) String objId,
 			@RequestParam(value = "confType" ) String confType, ModelMap model) {
 		ResultVO resultVO = new ResultVO();
@@ -698,13 +674,11 @@ public class ClientGroupController {
 	/**
 	 * 여러그룹의 권한정보 일괄 수정
 	 * 
-	 * @param
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@PostMapping(value = "/updateRuleForGroups")
 	public @ResponseBody ResultVO updateRuleForGroups(
-			@RequestParam(value = "grpIds", required=true) String grpIds,
+			@RequestParam(value = "grpIds") String grpIds,
 
 			@RequestParam(value = "clientConfigId" ) String clientConfigId,
 			@RequestParam(value = "hostNameConfigId" ) String hostNameConfigId,

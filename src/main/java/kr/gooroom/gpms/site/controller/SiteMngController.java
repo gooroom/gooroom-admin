@@ -104,7 +104,7 @@ public class SiteMngController {
 	public @ResponseBody ResultPagingVO readSiteMngListPaged(HttpServletRequest req, HttpServletResponse res,
 			ModelMap model) {
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
@@ -156,7 +156,7 @@ public class SiteMngController {
 	/**
 	 * create new site information data
 	 * 
-	 * @param req HttpServletRequest
+	 * @param paramVO SiteMngVO
 	 * @return ResultVO result data bean
 	 * 
 	 */
@@ -233,7 +233,7 @@ public class SiteMngController {
 	 * 
 	 */
 	@PostMapping(value = "/deleteSiteMngData")
-	public @ResponseBody ResultVO deleteSiteMngData(@RequestParam(value = "siteId", required = true) String siteId) {
+	public @ResponseBody ResultVO deleteSiteMngData(@RequestParam(value = "siteId") String siteId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			SiteMngVO vo = new SiteMngVO();
@@ -259,7 +259,7 @@ public class SiteMngController {
 	 * 
 	 */
 	@PostMapping(value = "/readSiteMngData")
-	public @ResponseBody ResultVO readSiteMngData(@RequestParam(value = "siteId", required = true) String siteId) {
+	public @ResponseBody ResultVO readSiteMngData(@RequestParam(value = "siteId") String siteId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			resultVO = siteMngService.selectSiteMngData();

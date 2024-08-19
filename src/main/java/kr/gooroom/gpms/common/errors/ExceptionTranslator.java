@@ -32,9 +32,6 @@ public class ExceptionTranslator implements ProblemHandling {
 	 */
 	@Override
 	public ResponseEntity<Problem> process(@Nullable ResponseEntity<Problem> entity, NativeWebRequest request) {
-		if (entity == null) {
-			return entity;
-		}
 		Problem problem = entity.getBody();
 		if (!(problem instanceof ConstraintViolationProblem || problem instanceof DefaultProblem)) {
 			return entity;

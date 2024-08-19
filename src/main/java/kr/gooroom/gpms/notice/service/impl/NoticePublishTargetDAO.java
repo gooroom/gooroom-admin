@@ -23,10 +23,9 @@ public class NoticePublishTargetDAO extends SqlSessionMetaDAO {
      * 
      * @param noticePublishTargetVOs
      * @return long data insert result count.
-     * @throws SQLException
      */
-	public long createNoticePublishTargets(List<NoticePublishTargetVO> noticePublishTargetVOs) throws SQLException {
-        return (long) sqlSessionMeta.insert("insertNoticePublishTargets", noticePublishTargetVOs);
+	public long createNoticePublishTargets(List<NoticePublishTargetVO> noticePublishTargetVOs) {
+        return sqlSessionMeta.insert("insertNoticePublishTargets", noticePublishTargetVOs);
     }
 
     /**
@@ -34,16 +33,14 @@ public class NoticePublishTargetDAO extends SqlSessionMetaDAO {
      * 
      * @param options
      * @return NoticePublishTargetVO List selected list data
-     * @throws SQLException
      */
-    public List<NoticePublishTargetVO> selectNoticePublishTargetList(Map<String, Object> options) throws SQLException {
+    public List<NoticePublishTargetVO> selectNoticePublishTargetList(Map<String, Object> options) {
         List<NoticePublishTargetVO> re = null;
         try {
             re = sqlSessionMeta.selectList("selectNoticePublishTargetList", options);
         } catch (Exception ex) {
             logger.error("error in selectNoticePublishTargetList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                 MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-            re = null;
         }
 
         return re;
@@ -54,16 +51,14 @@ public class NoticePublishTargetDAO extends SqlSessionMetaDAO {
      * 
      * @param options
      * @return NoticePublishTargetVO List selected list data
-     * @throws SQLException
      */
-	public List<NoticePublishTargetVO> selectNoticePublishTargetListPaged(Map<String, Object> options) throws SQLException {
+	public List<NoticePublishTargetVO> selectNoticePublishTargetListPaged(Map<String, Object> options) {
 		List<NoticePublishTargetVO> re = null;
 		try {
 		    re = sqlSessionMeta.selectList("selectNoticePublishTargetListPaged", options);
 		} catch (Exception ex) {
 		    logger.error("error in selectNoticePublishTargetListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 			    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-		    re = null;
 		}
 
 		return re;
@@ -77,7 +72,7 @@ public class NoticePublishTargetDAO extends SqlSessionMetaDAO {
      * @throws SQLException
      */
     public long selectNoticePublishTargetListTotalCount(Map<String, Object> options) {
-        return (long) sqlSessionMeta.selectOne("selectNoticePublishTargetListTotalCount", options);
+        return sqlSessionMeta.selectOne("selectNoticePublishTargetListTotalCount", options);
     }
 
     /**
@@ -89,7 +84,7 @@ public class NoticePublishTargetDAO extends SqlSessionMetaDAO {
      * @throws SQLException
      */
     public long selectNoticePublishTargetListFilteredCount(Map<String, Object> options) {
-        return (long) sqlSessionMeta.selectOne("selectNoticePublishTargetListFilteredCount", options);
+        return sqlSessionMeta.selectOne("selectNoticePublishTargetListFilteredCount", options);
     }
 
 }

@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,31 +13,31 @@ import java.util.List;
 public class PortableLogDAO extends SqlSessionMetaDAO {
     private static final Logger logger = LoggerFactory.getLogger(PortableLogDAO.class);
 
-    public long createPortableLog (PortableLogVO vo) throws SQLException {
-        return (long) sqlSessionMeta.insert("insertPortableLog", vo);
+    public long createPortableLog (PortableLogVO vo) {
+        return sqlSessionMeta.insert("insertPortableLog", vo);
     }
 
-    public List<PortableLogVO> selectPortableLogList () throws SQLException {
+    public List<PortableLogVO> selectPortableLogList () {
         List<PortableLogVO> res = null;
         res = sqlSessionMeta.selectList("selectPortableLogList");
         return res;
     }
 
-    public List<PortableLogVO> selectPortableLogList (HashMap<String, Object> options) throws SQLException {
+    public List<PortableLogVO> selectPortableLogList (HashMap<String, Object> options) {
         List<PortableLogVO> res = null;
         res = sqlSessionMeta.selectList("selectPortableLogListByCondition", options);
         return res;
     }
 
-    public long deleteAllPortableLog () throws SQLException {
-        return (long) sqlSessionMeta.delete("deleteAllPortableLog");
+    public long deleteAllPortableLog () {
+        return sqlSessionMeta.delete("deleteAllPortableLog");
     }
 
-    public int selectNextPortableLogNumber() throws SQLException {
+    public int selectNextPortableLogNumber() {
         return sqlSessionMeta.selectOne("selectNextLogNo" );
     }
 
-    public int selectPortableLogCount() throws SQLException {
+    public int selectPortableLogCount() {
         return sqlSessionMeta.selectOne("selectNextLogCount" );
     }
 }

@@ -83,10 +83,10 @@ public class UserRestController {
 	 *
 	 */
 	@GetMapping("/v1/gpms/nfc_reg")
-	public ResultVO registerNFCCode(@RequestParam(value = "nfc_secret_data", required = true) String nfc_secret_data,
-			@RequestParam(value = "admin_id", required = true) String admin_id,
-			@RequestParam(value = "admin_pw", required = true) String admin_pw,
-			@RequestParam(value = "user_id", required = true) String user_id) {
+	public ResultVO registerNFCCode(@RequestParam(value = "nfc_secret_data") String nfc_secret_data,
+			@RequestParam(value = "admin_id") String admin_id,
+			@RequestParam(value = "admin_pw") String admin_pw,
+			@RequestParam(value = "user_id") String user_id) {
 
 		ResultVO resultVO = new ResultVO();
 

@@ -1,12 +1,15 @@
 package kr.gooroom.gpms.notice.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.common.service.ResultPagingVO;
+import kr.gooroom.gpms.common.service.ResultVO;
+import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
+import kr.gooroom.gpms.notice.service.NoticePublishService;
+import kr.gooroom.gpms.notice.service.NoticePublishVO;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +18,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import kr.gooroom.gpms.common.GPMSConstants;
-import kr.gooroom.gpms.common.service.ResultPagingVO;
-import kr.gooroom.gpms.common.service.ResultVO;
-import kr.gooroom.gpms.common.service.StatusVO;
-import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.notice.service.NoticePublishService;
-import kr.gooroom.gpms.notice.service.NoticePublishVO;
+import java.util.Collections;
+import java.util.HashMap;
 
 @Controller
 public class NoticePublishController {
@@ -38,7 +36,7 @@ public class NoticePublishController {
 	    
 	    try {
 	        StatusVO status = noticePublishService.createNoticePublish(noticePublishVO);
-	        resultVO.setData(Arrays.asList(noticePublishVO).toArray());
+	        resultVO.setData(Collections.singletonList(noticePublishVO).toArray());
             resultVO.setStatus(status);
 	    } catch (Exception e) {
             logger.error("error in createNoticePublish : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -57,7 +55,7 @@ public class NoticePublishController {
         
         try {
             StatusVO status = noticePublishService.updateNoticePublish(noticePublishVO);
-            resultVO.setData(Arrays.asList(noticePublishVO).toArray());
+            resultVO.setData(Collections.singletonList(noticePublishVO).toArray());
             resultVO.setStatus(status);
         } catch (Exception e) {
             logger.error("error in updateNoticeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -76,7 +74,7 @@ public class NoticePublishController {
 	public ResultVO readNoticePublishListPaged(HttpServletRequest req, HttpServletResponse res) {
 		
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 		
 		// << options >>
 		options.put("noticeId", req.getParameter("noticeId"));
@@ -129,5 +127,5 @@ public class NoticePublishController {
 		}
 		
 		return resultVO;
-	};
+	}
 }

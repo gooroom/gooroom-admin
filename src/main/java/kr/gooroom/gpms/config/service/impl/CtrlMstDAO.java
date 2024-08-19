@@ -51,18 +51,14 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param mngObjTp string control item type
 	 * @return CtrlItemVO List
-	 * @throws SQLException
 	 */
-	public List<CtrlItemVO> selectCtrlItemList(String mngObjTp) throws SQLException {
+	public List<CtrlItemVO> selectCtrlItemList(String mngObjTp) {
 		List<CtrlItemVO> re = null;
 		try {
-
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectCtrlItemList", mngObjTp);
-
 		} catch (Exception ex) {
 			logger.error("error in selectCtrlItemList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -71,20 +67,16 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	/**
 	 * response control item and property list data
 	 * 
-	 * @param mngObjTp string control item type
+	 * @param  map HashMap<String, Object>
 	 * @return CtrlItemVO List
-	 * @throws SQLException
 	 */
-	public List<CtrlItemVO> selectCtrlItemAndPropList(HashMap<String, Object> map) throws SQLException {
+	public List<CtrlItemVO> selectCtrlItemAndPropList(HashMap<String, Object> map) {
 		List<CtrlItemVO> re = null;
 		try {
-
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectCtrlItemAndPropList", map);
-
 		} catch (Exception ex) {
 			logger.error("error in selectCtrlItemAndPropList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -95,18 +87,14 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return CtrlItemVO List
-	 * @throws SQLException
 	 */
-	public List<CtrlItemVO> selectCtrlItemAndPropListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<CtrlItemVO> selectCtrlItemAndPropListPaged(HashMap<String, Object> options) {
 		List<CtrlItemVO> re = null;
 		try {
-
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectCtrlItemAndPropListPaged", options);
-
 		} catch (Exception ex) {
 			logger.error("error in selectCtrlItemAndPropList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -117,11 +105,9 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectCtrlItemAndPropListFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("CtrlMstDAO.selectCtrlItemAndPropListFilteredCount", options);
+	public long selectCtrlItemAndPropListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("CtrlMstDAO.selectCtrlItemAndPropListFilteredCount", options);
 	}
 
 	/**
@@ -129,11 +115,9 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectCtrlItemAndPropListTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("CtrlMstDAO.selectCtrlItemAndPropListTotalCount", options);
+	public long selectCtrlItemAndPropListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("CtrlMstDAO.selectCtrlItemAndPropListTotalCount", options);
 	}
 
 	/**
@@ -141,19 +125,15 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param objId string control item id
 	 * @return CtrlItemVO
-	 * @throws SQLException
 	 */
-	public CtrlItemVO selectCtrlItem(String objId) throws SQLException {
+	public CtrlItemVO selectCtrlItem(String objId) {
 
 		CtrlItemVO re = null;
 		try {
-
 			re = sqlSessionMeta.selectOne("CtrlMstDAO.selectCtrlItem", objId);
-
 		} catch (Exception ex) {
 			logger.error("error in selectCtrlItem : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -162,24 +142,20 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	/**
 	 * response control item datas by item ids
 	 * 
-	 * @param objId string array control item id array
+	 * @param objIds string array control item id array
 	 * @return CtrlItemVO List
-	 * @throws SQLException
 	 */
-	public List<CtrlItemVO> selectParentCtrlItem(String[] objIds) throws SQLException {
+	public List<CtrlItemVO> selectParentCtrlItem(String[] objIds) {
 		List<CtrlItemVO> re = null;
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("objIds", objIds);
 
 		try {
-
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectParentCtrlItems", map);
-
 		} catch (Exception ex) {
 			logger.error("error in selectParentCtrlItem : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -190,18 +166,14 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param objId string control item id
 	 * @return CtrlPropVO List
-	 * @throws SQLException
 	 */
-	public List<CtrlPropVO> selectCtrlPropList(String objId) throws SQLException {
+	public List<CtrlPropVO> selectCtrlPropList(String objId) {
 		List<CtrlPropVO> re = null;
 		try {
-
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectCtrlPropList", objId);
-
 		} catch (Exception ex) {
 			logger.error("error in selectCtrlPropList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -215,7 +187,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertCtrlItem(CtrlItemVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.insertCtrlItem", vo);
+		return sqlSessionMeta.insert("CtrlMstDAO.insertCtrlItem", vo);
 	}
 
 	/**
@@ -226,7 +198,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertCtrlDefaultItem(CtrlItemVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.insertCtrlDefaultItem", vo);
+		return sqlSessionMeta.insert("CtrlMstDAO.insertCtrlDefaultItem", vo);
 	}
 
 	/**
@@ -237,7 +209,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateCtrlItem(CtrlItemVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.updateCtrlItem", vo);
+		return sqlSessionMeta.insert("CtrlMstDAO.updateCtrlItem", vo);
 	}
 
 	/**
@@ -248,7 +220,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteCtrlItem(String objId) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.deleteCtrlItem", objId);
+		return sqlSessionMeta.insert("CtrlMstDAO.deleteCtrlItem", objId);
 	}
 
 	/**
@@ -259,7 +231,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertCtrlProp(CtrlPropVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.insertCtrlProp", vo);
+		return sqlSessionMeta.insert("CtrlMstDAO.insertCtrlProp", vo);
 	}
 
 	/**
@@ -267,10 +239,9 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo CtrlPropVO control property object bean
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long updateCtrlProp(CtrlPropVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.updateCtrlProp", vo);
+	public long updateCtrlProp(CtrlPropVO vo) {
+		return sqlSessionMeta.insert("CtrlMstDAO.updateCtrlProp", vo);
 	}
 
 	/**
@@ -281,7 +252,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteCtrlProp(String objId) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.deleteCtrlProp", objId);
+		return sqlSessionMeta.insert("CtrlMstDAO.deleteCtrlProp", objId);
 	}
 
 	/**
@@ -292,7 +263,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteCtrlPropWithLink(String objId) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.deleteCtrlPropWithLink", objId);
+		return sqlSessionMeta.insert("CtrlMstDAO.deleteCtrlPropWithLink", objId);
 	}
 
 	/**
@@ -300,10 +271,9 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param confId string configuration id
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long deleteCtrlItemInGroupMapper(String confId) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.deleteCtrlItemInGroupMapper", confId);
+	public long deleteCtrlItemInGroupMapper(String confId) {
+		return sqlSessionMeta.insert("CtrlMstDAO.deleteCtrlItemInGroupMapper", confId);
 	}
 
 	/**
@@ -311,20 +281,16 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param confId string configuration id
 	 * @return ClientGroupVO List
-	 * @throws SQLException
 	 */
-	public List<ClientGroupVO> selectClientGroupIdByConfId(String confId) throws SQLException {
+	public List<ClientGroupVO> selectClientGroupIdByConfId(String confId) {
 
 		List<ClientGroupVO> re = null;
 
 		try {
-
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectClientGroupIdByConfId", confId);
-
 		} catch (Exception ex) {
 			logger.error("error in selectClientGroupIdByConfId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -336,15 +302,14 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @param groupId  string group id
 	 * @param confType string configuration type
 	 * @return String List
-	 * @throws SQLException
 	 */
-	public List<String> selectConfIdInClientGroupId(String groupId, String confType) throws SQLException {
+	public List<String> selectConfIdInClientGroupId(String groupId, String confType) {
 
 		List<String> re = null;
 
 		try {
 
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("groupId", groupId);
 			map.put("confType", confType);
 
@@ -353,7 +318,6 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectConfIdInClientGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -367,7 +331,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertClonedCtrlItem(CtrlItemVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.insertClonedCtrlItem", vo);
+		return sqlSessionMeta.insert("CtrlMstDAO.insertClonedCtrlItem", vo);
 	}
 
 	/**
@@ -378,7 +342,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertClonedCtrlProp(CtrlPropVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.insertClonedCtrlProp", vo);
+		return sqlSessionMeta.insert("CtrlMstDAO.insertClonedCtrlProp", vo);
 	}
 
 	/**
@@ -389,10 +353,10 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteGroupRuleConf(String confId, String confType) throws SQLException {
-		HashMap<String, String> hm = new HashMap<String, String>();
+		HashMap<String, String> hm = new HashMap<>();
 		hm.put("confId", confId);
 		hm.put("confTp", confType);
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.deleteGroupRuleConf", hm);
+		return sqlSessionMeta.insert("CtrlMstDAO.deleteGroupRuleConf", hm);
 	}
 
 	/**
@@ -403,10 +367,10 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteDeptRuleConf(String confId, String confType) throws SQLException {
-		HashMap<String, String> hm = new HashMap<String, String>();
+		HashMap<String, String> hm = new HashMap<>();
 		hm.put("confId", confId);
 		hm.put("confTp", confType);
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.deleteDeptRuleConf", hm);
+		return sqlSessionMeta.insert("CtrlMstDAO.deleteDeptRuleConf", hm);
 	}
 
 	/**
@@ -417,10 +381,10 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteUserRuleConf(String confId, String confType) throws SQLException {
-		HashMap<String, String> hm = new HashMap<String, String>();
+		HashMap<String, String> hm = new HashMap<>();
 		hm.put("confId", confId);
 		hm.put("confTp", confType);
-		return (long) sqlSessionMeta.insert("CtrlMstDAO.deleteUserRuleConf", hm);
+		return sqlSessionMeta.insert("CtrlMstDAO.deleteUserRuleConf", hm);
 	}
 
 	/**
@@ -429,15 +393,13 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * @param userId   string user id
 	 * @param clientId string client id
 	 * @return String List
-	 * @throws SQLException
 	 */
-	public List<RuleIdsVO> selectRuleIdsByClientAndUser(String userId, String clientId) throws SQLException {
+	public List<RuleIdsVO> selectRuleIdsByClientAndUser(String userId, String clientId) {
 
 		List<RuleIdsVO> re = null;
 
 		try {
-
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("userId", userId);
 			map.put("clientId", clientId);
 
@@ -449,7 +411,6 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectRuleIdsByClientAndUser : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -460,9 +421,8 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param groupId   client group id
 	 * @return RuleIdsVO vo
-	 * @throws SQLException
 	 */
-	public RuleIdsVO selectRuleIdsByGroupId(String groupId) throws SQLException {
+	public RuleIdsVO selectRuleIdsByGroupId(String groupId) {
 
 		RuleIdsVO re = null;
 		try {
@@ -470,7 +430,6 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectRuleIdsByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -482,17 +441,17 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param groupId string control group id
 	 * @return CtrlItemVO
-	 * @throws SQLException
 	 */
-	public List<CtrlItemVO> selectCtrlItemByGroupId(String groupId) throws SQLException {
+	public List<CtrlItemVO> selectCtrlItemByGroupId(String groupId) {
+
 		List<CtrlItemVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectCtrlItemByGroupId", groupId);
 		} catch (Exception ex) {
 			logger.error("error in selectCtrlItemByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
+
 		return re;
 	}
 	
@@ -501,9 +460,9 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param groupId string control group id
 	 * @return CtrlPropVO List
-	 * @throws SQLException
 	 */
-	public List<CtrlPropVO> selectCtrlPropListByGroupId(String groupId) throws SQLException {
+	public List<CtrlPropVO> selectCtrlPropListByGroupId(String groupId) {
+
 		List<CtrlPropVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectCtrlPropListByGroupId", groupId);
@@ -512,6 +471,7 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 			re = null;
 		}
+
 		return re;
 	}
 	
@@ -520,17 +480,17 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param deptCd string
 	 * @return CtrlItemVO
-	 * @throws SQLException
 	 */
-	public List<CtrlItemVO> selectCtrlItemByDeptCd(String deptCd) throws SQLException {
+	public List<CtrlItemVO> selectCtrlItemByDeptCd(String deptCd) {
+
 		List<CtrlItemVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectCtrlItemByDeptCd", deptCd);
 		} catch (Exception ex) {
 			logger.error("error in selectCtrlItemByDeptCd : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
+
 		return re;
 	}
 	
@@ -539,17 +499,17 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param deptCd string control dept cd
 	 * @return CtrlPropVO List
-	 * @throws SQLException
 	 */
-	public List<CtrlPropVO> selectCtrlPropListByDeptCd(String deptCd) throws SQLException {
+	public List<CtrlPropVO> selectCtrlPropListByDeptCd(String deptCd) {
+
 		List<CtrlPropVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectCtrlPropListByDeptCd", deptCd);
 		} catch (Exception ex) {
 			logger.error("error in selectCtrlPropListByDeptCd : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
+
 		return re;
 	}
 
@@ -558,17 +518,17 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param userId string
 	 * @return CtrlItemVO
-	 * @throws SQLException
 	 */
-	public List<CtrlItemVO> selectCtrlItemByUserId(String userId) throws SQLException {
+	public List<CtrlItemVO> selectCtrlItemByUserId(String userId) {
+
 		List<CtrlItemVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectCtrlItemByUserId", userId);
 		} catch (Exception ex) {
 			logger.error("error in selectCtrlItemByUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
+
 		return re;
 	}
 	
@@ -577,17 +537,17 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param userId string
 	 * @return CtrlPropVO List
-	 * @throws SQLException
 	 */
-	public List<CtrlPropVO> selectCtrlPropListByUserId(String userId) throws SQLException {
+	public List<CtrlPropVO> selectCtrlPropListByUserId(String userId) {
+
 		List<CtrlPropVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectCtrlPropListByUserId", userId);
 		} catch (Exception ex) {
 			logger.error("error in selectCtrlPropListByUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
+
 		return re;
 	}
 
@@ -595,17 +555,17 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 * 정책 - 적용 그룹 리스트
 	 * @param options HashMap<String, Object> options for select
 	 * @return List<ActivateGroupViewVO> ActivateGroupList
-	 * @throws SQLException
 	 */
-	public List<ActivateGroupViewVO> selectActivateGroupListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ActivateGroupViewVO> selectActivateGroupListPaged(HashMap<String, Object> options) {
+
 		List<ActivateGroupViewVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("CtrlMstDAO.selectActivateGroupListPaged", options);
 		} catch (Exception ex) {
 			logger.error("error in selectActivateGroupListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
+
 		return re;
 	}
 
@@ -614,10 +574,9 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 *
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectActivateGroupListTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("CtrlMstDAO.selectActivateGroupListTotalCount", options);
+	public long selectActivateGroupListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("CtrlMstDAO.selectActivateGroupListTotalCount", options);
 	}
 
 	/**
@@ -625,9 +584,8 @@ public class CtrlMstDAO extends SqlSessionMetaDAO {
 	 *
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectActivateGroupListFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("CtrlMstDAO.selectActivateGroupListFilteredCount", options);
+	public long selectActivateGroupListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("CtrlMstDAO.selectActivateGroupListFilteredCount", options);
 	}
 }

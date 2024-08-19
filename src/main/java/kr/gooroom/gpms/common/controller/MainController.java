@@ -16,18 +16,18 @@
 
 package kr.gooroom.gpms.common.controller;
 
-import java.security.Principal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.codehaus.jettison.json.JSONException;
+import kr.gooroom.gpms.client.service.ClientService;
+import kr.gooroom.gpms.client.service.ClientSummaryVO;
+import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.common.service.GpmsCommonService;
+import kr.gooroom.gpms.common.service.ResultVO;
+import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -38,16 +38,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import kr.gooroom.gpms.account.service.LoginService;
-import kr.gooroom.gpms.client.service.ClientService;
-import kr.gooroom.gpms.client.service.ClientSummaryVO;
-import kr.gooroom.gpms.common.GPMSConstants;
-import kr.gooroom.gpms.common.service.GpmsCommonService;
-import kr.gooroom.gpms.common.service.ResultVO;
-import kr.gooroom.gpms.common.service.StatusVO;
-import kr.gooroom.gpms.common.service.impl.EmailServiceImpl;
-import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.user.service.AdminUserService;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Handles requests for main process
@@ -64,21 +56,11 @@ public class MainController {
 
 	private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
-	@Resource(name = "loginService")
-	private LoginService loginService;
-
-	@Resource(name = "adminUserService")
-	private AdminUserService adminUserService;
-
 	@Resource(name = "clientService")
 	private ClientService clientService;
 
 	@Resource(name = "gpmsCommonService")
 	private GpmsCommonService gpmsCommonService;
-	
-	@Autowired
-    public EmailServiceImpl emailService;
-
 
 	/**
 	 * initialize binder for date format
@@ -86,7 +68,6 @@ public class MainController {
 	 * ex) date format : 2017-10-04
 	 * 
 	 * @param binder WebDataBinder
-	 * @return void
 	 *
 	 */
 	@InitBinder
@@ -96,67 +77,12 @@ public class MainController {
 	}
 
 	/**
-	 * show(generate) home(main) page
-	 * 
-	 * @param req       HttpServletRequest
-	 * @param res       HttpServletResponse
-	 * @param principal Principal
-	 * @return ModelAndView home
-	 * @throws JSONException
-	 */
-//	@GetMapping(value = "/home")
-//	public ModelAndView loginSuccess(HttpServletRequest request, HttpServletResponse response, Principal principal)
-//			throws JSONException {
-//
-//		String userId = principal.getName();
-//		try {
-//			request.getSession().setAttribute("AccountVO", (AccountVO) loginService.getLoginInfo(userId));
-//		} catch (Exception e1) {
-//			e1.printStackTrace();
-//		}
-//
-//		ModelAndView mv = new ModelAndView("/");
-//
-//		try {
-//			ResultVO vo = adminUserService.selectAdminUserData(userId);
-//			if (vo != null && vo.getData() != null && vo.getData().length > 0) {
-//				AdminUserVO user = (AdminUserVO) vo.getData()[0];
-//				if (user != null) {
-//					mv.addObject("adminName", user.getAdminNm());
-//					mv.addObject("adminId", user.getAdminId());
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//		return mv;
-//	}
-
-	
-	@GetMapping(value = "/testMail")
-	public ModelAndView testMail(HttpServletRequest request, HttpServletResponse response, Principal principal)
-			throws JSONException {
-
-		ModelAndView mv = new ModelAndView("/");
-		
-		String cont = "<html><h1>Hello</h1><br>world!</html>";
-		
-		
-		
-		emailService.sendSimpleMessage("syhan@cloudrim.co.kr", "mail title", cont);
-
-		return mv;
-	}
-
-	/**
 	 * show(generate) dashboard page
 	 * 
 	 * @param req   HttpServletRequest
 	 * @param res   HttpServletResponse
 	 * @param model ModelMap
 	 * @return ModelAndView home
-	 * @throws JSONException
 	 */
 	@GetMapping(value = "/pageDashboard")
 	public ModelAndView pageDashboard(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
@@ -227,10 +153,8 @@ public class MainController {
 		} catch (Exception ex) {
 			logger.error("error in readGpmsAvailableNetwork : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -249,8 +173,7 @@ public class MainController {
 	 */
 	@PostMapping(value = "/refusePage")
 	public ModelAndView pageClient(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
-		ModelAndView mv = new ModelAndView("refusePage");
-		return mv;
+		return new ModelAndView("refusePage");
 	}
 
 }

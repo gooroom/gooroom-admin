@@ -15,19 +15,17 @@ public class UserOpenedNoticeDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param userOpenedNoticeVO
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long createUserOpenedNotice(UserOpenedNoticeVO userOpenedNoticeVO) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertUserOpenedNotice", userOpenedNoticeVO);
+	public long createUserOpenedNotice(UserOpenedNoticeVO userOpenedNoticeVO) {
+		return sqlSessionMeta.insert("insertUserOpenedNotice", userOpenedNoticeVO);
 	}
 
 	/**
 	 * select user opened notice count
 	 * 
 	 * @return list count
-	 * @throws SQLException
 	 */
-	public long selectUserOpenedNoticeCount(String noticePublishId) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectUserOpenedNoticeCount", noticePublishId);
+	public long selectUserOpenedNoticeCount(String noticePublishId) {
+		return sqlSessionMeta.selectOne("selectUserOpenedNoticeCount", noticePublishId);
 	}
 }

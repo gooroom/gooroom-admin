@@ -48,20 +48,18 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * get theme information list data
 	 * 
 	 * @return ThemeVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<ThemeVO> selectThemeList() throws SQLException {
+	public List<ThemeVO> selectThemeList() {
 
 		List<ThemeVO> re = null;
 		try {
-			HashMap<String, Object> options = new HashMap<String, Object>();
+			HashMap<String, Object> options = new HashMap<>();
 			options.put("ICON_ADDRESS", CommonUtils.createIconUrlPath());
 
 			re = sqlSessionMeta.selectList("selectThemeList", options);
 		} catch (Exception ex) {
 			logger.error("error in selectThemeList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -72,16 +70,14 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap
 	 * @return ThemeVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<ThemeVO> selectThemeListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ThemeVO> selectThemeListPaged(HashMap<String, Object> options) {
 		List<ThemeVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectThemeListPaged", options);
 		} catch (Exception ex) {
 			logger.error("error in selectThemeListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 		return re;
 	}
@@ -91,10 +87,9 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectThemeListFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectThemeListFilteredCount", options);
+	public long selectThemeListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectThemeListFilteredCount", options);
 	}
 
 	/**
@@ -102,19 +97,17 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectThemeListTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectThemeListTotalCount", options);
+	public long selectThemeListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectThemeListTotalCount", options);
 	}
 
 	/**
 	 * get theme information list data that not include any theme group.
 	 * 
 	 * @return ThemeVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<ThemeVO> selectNoGroupThemeList() throws SQLException {
+	public List<ThemeVO> selectNoGroupThemeList() {
 
 		List<ThemeVO> re = null;
 		try {
@@ -122,7 +115,6 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectNoGroupThemeList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -133,9 +125,8 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ThemeVO selected data
-	 * @throws SQLException
 	 */
-	public ThemeVO selectThemeData(HashMap<String, Object> options) throws SQLException {
+	public ThemeVO selectThemeData(HashMap<String, Object> options) {
 
 		ThemeVO re = null;
 		try {
@@ -145,7 +136,6 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectThemeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -168,7 +158,6 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectThemeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -182,9 +171,7 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertThemeData(ThemeVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertThemeData", vo);
-
+		return sqlSessionMeta.insert("insertThemeData", vo);
 	}
 
 	/**
@@ -195,9 +182,7 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertThemeIconData(HashMap<String, String> param) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertThemeIconData", param);
-
+		return sqlSessionMeta.insert("insertThemeIconData", param);
 	}
 
 	/**
@@ -208,9 +193,7 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteThemeData(String themeId) throws SQLException {
-
-		return (long) sqlSessionMeta.delete("deleteThemeData", themeId);
-
+		return sqlSessionMeta.delete("deleteThemeData", themeId);
 	}
 
 	/**
@@ -221,9 +204,7 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteThemeIconData(String themeId) throws SQLException {
-
-		return (long) sqlSessionMeta.delete("deleteThemeIconData", themeId);
-
+		return sqlSessionMeta.delete("deleteThemeIconData", themeId);
 	}
 
 	/**
@@ -234,9 +215,7 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateThemeData(ThemeVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.update("updateThemeData", vo);
-
+		return sqlSessionMeta.update("updateThemeData", vo);
 	}
 
 	/**
@@ -246,9 +225,7 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateFileSeqToReset() throws SQLException {
-
-		return (long) sqlSessionMeta.update("updateFileSeqToReset");
-
+		return sqlSessionMeta.update("updateFileSeqToReset");
 	}
 
 	/**
@@ -259,9 +236,7 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateThemeFileInfo(FileVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.update("updateThemeFileInfo", vo);
-
+		return sqlSessionMeta.update("updateThemeFileInfo", vo);
 	}
 
 	/**
@@ -272,9 +247,7 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertWallpaperFileInfo(FileVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertWallpaperFileInfo", vo);
-
+		return sqlSessionMeta.insert("insertWallpaperFileInfo", vo);
 	}
 
 	/**
@@ -285,9 +258,7 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long insertIconFileInfo(FileVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertIconFileInfo", vo);
-
+		return sqlSessionMeta.insert("insertIconFileInfo", vo);
 	}
 
 	/**
@@ -298,8 +269,6 @@ public class ThemeMngDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteThemeFileInfo(String themeId) throws SQLException {
-
-		return (long) sqlSessionMeta.delete("deleteThemeFileInfo", themeId);
-
+		return sqlSessionMeta.delete("deleteThemeFileInfo", themeId);
 	}
 }

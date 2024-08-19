@@ -16,18 +16,16 @@
 
 package kr.gooroom.gpms.client.service.impl;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-
 import kr.gooroom.gpms.client.service.ClientPackageVO;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * data access object class for client package management process.
@@ -47,16 +45,14 @@ public class ClientPackageDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ClientPackageVO List selected package object
-	 * @throws SQLException
 	 */
-	public List<ClientPackageVO> selectTotalPackageListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ClientPackageVO> selectTotalPackageListPaged(HashMap<String, Object> options) {
 
 		List<ClientPackageVO> re = null;
 
 		try {
 			re = sqlSessionMeta.selectList("selectTotalPackageListPaged", options);
 		} catch (Exception ex) {
-			re = null;
 			logger.error("error in selectTotalPackageListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
@@ -69,11 +65,9 @@ public class ClientPackageDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectTotalPackageListTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectTotalPackageListTotalCount", options);
+	public long selectTotalPackageListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectTotalPackageListTotalCount", options);
 	}
 
 	/**
@@ -81,11 +75,9 @@ public class ClientPackageDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectTotalPackageListFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectTotalPackageListFilteredCount", options);
+	public long selectTotalPackageListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectTotalPackageListFilteredCount", options);
 	}
 
 	/**
@@ -93,16 +85,14 @@ public class ClientPackageDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ClientPackageVO List selected package object
-	 * @throws SQLException
 	 */
-	public List<ClientPackageVO> selectClientPackageListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ClientPackageVO> selectClientPackageListPaged(HashMap<String, Object> options) {
 
 		List<ClientPackageVO> re = null;
 
 		try {
 			re = sqlSessionMeta.selectList("selectClientPackageListPaged", options);
 		} catch (Exception ex) {
-			re = null;
 			logger.error("error in selectClientPackageListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
@@ -115,11 +105,9 @@ public class ClientPackageDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectClientPackageListTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectClientPackageListTotalCount", options);
+	public long selectClientPackageListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectClientPackageListTotalCount", options);
 	}
 
 	/**
@@ -127,11 +115,9 @@ public class ClientPackageDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectClientPackageListFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectClientPackageListFilteredCount", options);
+	public long selectClientPackageListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectClientPackageListFilteredCount", options);
 	}
 
 	/**
@@ -139,16 +125,14 @@ public class ClientPackageDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ClientPackageVO List selected package object
-	 * @throws SQLException
 	 */
-	public List<ClientPackageVO> selectTotalPackageList(HashMap<String, Object> options) throws SQLException {
+	public List<ClientPackageVO> selectTotalPackageList(HashMap<String, Object> options) {
 
 		List<ClientPackageVO> re = null;
 
 		try {
 			re = sqlSessionMeta.selectList("selectTotalPackageList", options);
 		} catch (Exception ex) {
-			re = null;
 			logger.error("error in selectTotalPackageList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
@@ -161,11 +145,9 @@ public class ClientPackageDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectTotalPackageCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectTotalPackageCount", options);
+	public long selectTotalPackageCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectTotalPackageCount", options);
 	}
 
 	/**
@@ -173,11 +155,8 @@ public class ClientPackageDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectTotalPackageFiltered(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectTotalPackageFiltered", options);
+	public long selectTotalPackageFiltered(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectTotalPackageFiltered", options);
 	}
-
 }

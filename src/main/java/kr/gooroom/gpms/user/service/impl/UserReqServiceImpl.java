@@ -1,7 +1,7 @@
 package kr.gooroom.gpms.user.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import kr.gooroom.gpms.account.service.ActHistoryVO;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
 import kr.gooroom.gpms.client.service.ClientService;
 import kr.gooroom.gpms.client.service.ClientVO;
 import kr.gooroom.gpms.common.GPMSConstants;
@@ -11,9 +11,7 @@ import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.job.custom.CustomJobMaker;
-import kr.gooroom.gpms.job.nodes.Job;
 import kr.gooroom.gpms.job.service.JobService;
-import kr.gooroom.gpms.job.service.JobVO;
 import kr.gooroom.gpms.user.service.UserReqService;
 import kr.gooroom.gpms.user.service.UserReqVO;
 import org.slf4j.Logger;
@@ -22,11 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.annotation.Resource;
-import jakarta.inject.Inject;
-import java.io.StringWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,10 +50,9 @@ public class UserReqServiceImpl implements UserReqService {
      *
      * @param userId String
      * @return ResultVO result object
-     * @throws Exception
      */
     @Override
-    public ResultVO getUserReqList(String userId) throws Exception {
+    public ResultVO getUserReqList(String userId) {
 
         ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -67,7 +60,7 @@ public class UserReqServiceImpl implements UserReqService {
             List<UserReqVO> re = userReqDao.selectUserReqList(userId);
             if (re != null && re.size() > 0) {
 
-                UserReqVO[] row = re.stream().toArray(UserReqVO[]::new);
+                UserReqVO[] row = re.toArray(UserReqVO[]::new);
                 resultVO.setData(row);
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
                         MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -81,10 +74,8 @@ public class UserReqServiceImpl implements UserReqService {
         } catch (Exception ex) {
             logger.error("error in getUserReqList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-            if (resultVO != null) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-            }
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;
@@ -95,10 +86,9 @@ public class UserReqServiceImpl implements UserReqService {
      *
      * @param reqSeq String
      * @return ResultVO result object
-     * @throws Exception
      */
     @Override
-    public ResultVO getUserReqData(String reqSeq) throws Exception {
+    public ResultVO getUserReqData(String reqSeq) {
         ResultVO resultVO = new ResultVO();
 
         try {
@@ -120,10 +110,8 @@ public class UserReqServiceImpl implements UserReqService {
         } catch (Exception ex) {
             logger.error("error in getUserReqList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-            if (resultVO != null) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-            }
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;
@@ -134,10 +122,9 @@ public class UserReqServiceImpl implements UserReqService {
      *
      * @param options HashMap<String, Object> option data
      * @return ResultPagingVO result object
-     * @throws Exception
-     */
+      */
     @Override
-    public ResultPagingVO getUserReqListPaged(HashMap<String, Object> options) throws Exception {
+    public ResultPagingVO getUserReqListPaged(HashMap<String, Object> options) {
 
         ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -147,8 +134,7 @@ public class UserReqServiceImpl implements UserReqService {
 			long filteredCount = userReqDao.selectUserReqListFilteredCount(options);
 
             if (re != null && re.size() > 0) {
-
-                UserReqVO[] row = re.stream().toArray(UserReqVO[]::new);
+                UserReqVO[] row = re.toArray(UserReqVO[]::new);
                 resultVO.setData(row);
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
                         MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -165,10 +151,8 @@ public class UserReqServiceImpl implements UserReqService {
         } catch (Exception ex) {
             logger.error("error in getUserReqListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-            if (resultVO != null) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-            }
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;
@@ -181,10 +165,9 @@ public class UserReqServiceImpl implements UserReqService {
      *
      * @param options HashMap<String, Object> option data
      * @return ResultPagingVO result data bean
-     * @throws Exception
      */
     @Override
-    public ResultPagingVO getUserReqActListPaged(HashMap<String, Object> options) throws Exception {
+    public ResultPagingVO getUserReqActListPaged(HashMap<String, Object> options) {
 
         ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -194,7 +177,7 @@ public class UserReqServiceImpl implements UserReqService {
             long filteredCount = userReqDao.selectUserReqActListFilteredCount(options);
 
             if (re != null && re.size() > 0) {
-                UserReqVO[] row = re.stream().toArray(UserReqVO[]::new);
+                UserReqVO[] row = re.toArray(UserReqVO[]::new);
                 resultVO.setData(row);
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
                         MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -210,10 +193,8 @@ public class UserReqServiceImpl implements UserReqService {
         } catch (Exception ex) {
             logger.error("error in getUserReqActListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-            if (resultVO != null) {
-                resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-            }
+            resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
 
         return resultVO;
@@ -233,8 +214,8 @@ public class UserReqServiceImpl implements UserReqService {
         StatusVO statusVO = new StatusVO();
 
         try {
-            for (int i = 0; i < reqSeqs.length; i++) {
-                UserReqVO re = userReqDao.selectUserReq(reqSeqs[i]);
+            for (String reqSeq : reqSeqs) {
+                UserReqVO re = userReqDao.selectUserReq(reqSeq);
                 re.setModUserId(LoginInfoHelper.getUserId());
                 re.setStatus(re.getActionType().equals(GPMSConstants.ACTION_REGISTERING)
                         ? GPMSConstants.REQ_STS_USABLE : GPMSConstants.REQ_STS_REVOKE);
@@ -272,7 +253,7 @@ public class UserReqServiceImpl implements UserReqService {
                     userReqDao.updateUserReqStatus(denySerial);
                 }
 
-                HashMap<String, String> map = new HashMap<String, String>();
+                HashMap<String, String> map = new HashMap<>();
                 if (re.getActionType().equals(GPMSConstants.ACTION_UNREGISTERING)) {
                     map.put("action", GPMSConstants.ACTION_UNREGISTER_APPROVAL);
                 } else {
@@ -288,11 +269,11 @@ public class UserReqServiceImpl implements UserReqService {
                 map.put("req_seq", re.getReqSeq());
 
                 ResultVO vo = clientService.getOnlineClientIdByClientId(re.getClientId());
-                if (vo != null && vo.getData() != null && vo.getData().length > 0 ){
+                if (vo != null && vo.getData() != null && vo.getData().length > 0) {
                     String clientId = ((ClientVO) vo.getData()[0]).getClientId();
                     String[] clientIds = new String[1];
                     clientIds[0] = clientId;
-                    if(clientId.equals(re.getClientId())) {
+                    if (clientId.equals(re.getClientId())) {
                         //4. 온라인 상태면 job으로 등록
                         jobMaker.createJobForClientSetupWithClients(GPMSConstants.JOB_MEDIA_RULE_CHANGE, null, clientIds);
                     }
@@ -304,19 +285,15 @@ public class UserReqServiceImpl implements UserReqService {
         } catch (SQLException sqlEx) {
             logger.error("error in approvalUserReq : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-            if (statusVO != null) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-            }
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
             throw sqlEx;
         } catch (Exception ex) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("error in approvalUserReq : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-            if (statusVO != null) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-            }
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
          }
         return statusVO;
     }
@@ -335,8 +312,8 @@ public class UserReqServiceImpl implements UserReqService {
         StatusVO statusVO = new StatusVO();
 
         try {
-            for (int i = 0; i < reqSeqs.length; i++) {
-                UserReqVO re = userReqDao.selectUserReq(reqSeqs[i]);
+            for (String reqSeq : reqSeqs) {
+                UserReqVO re = userReqDao.selectUserReq(reqSeq);
                 re.setModUserId(LoginInfoHelper.getUserId());
                 re.setStatus(re.getActionType().equals(GPMSConstants.ACTION_REGISTERING)
                         ? GPMSConstants.REQ_STS_REVOKE : GPMSConstants.REQ_STS_USABLE);
@@ -364,7 +341,7 @@ public class UserReqServiceImpl implements UserReqService {
                             MessageSourceHelper.getMessage("denyUserReq.result.noupdate"));
                 }
 
-                HashMap<String, String> map = new HashMap<String, String>();
+                HashMap<String, String> map = new HashMap<>();
                 if (re.getActionType().equals(GPMSConstants.ACTION_UNREGISTERING)) {
                     map.put("action", GPMSConstants.ACTION_UNREGISTER_DENY);
                 } else {
@@ -380,11 +357,11 @@ public class UserReqServiceImpl implements UserReqService {
                 map.put("req_seq", re.getReqSeq());
 
                 ResultVO vo = clientService.getOnlineClientIdByClientId(re.getClientId());
-                if (vo != null && vo.getData() != null && vo.getData().length > 0 ) {
+                if (vo != null && vo.getData() != null && vo.getData().length > 0) {
                     String clientId = ((ClientVO) vo.getData()[0]).getClientId();
                     String[] clientIds = new String[1];
                     clientIds[0] = clientId;
-                    if(clientId.equals(re.getClientId())) {
+                    if (clientId.equals(re.getClientId())) {
                         //2. 온라인 상태면 job으로 등록
                         jobMaker.createJobForClientSetupWithClients(GPMSConstants.JOB_MEDIA_RULE_CHANGE, null, clientIds);
                     }
@@ -396,19 +373,15 @@ public class UserReqServiceImpl implements UserReqService {
         } catch (SQLException sqlEx) {
             logger.error("error in denyUserReq : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-            if (statusVO != null) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-            }
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
             throw sqlEx;
         } catch (Exception ex) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("error in denyUserReq : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-            if (statusVO != null) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-            }
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
         return statusVO;
     }
@@ -453,7 +426,7 @@ public class UserReqServiceImpl implements UserReqService {
 			                MessageSourceHelper.getMessage("revokeUserReq.result.noinsert"));
                 }
 
-                HashMap<String, String> map = new HashMap<String, String>();
+                HashMap<String, String> map = new HashMap<>();
                 map.put("action", GPMSConstants.ACTION_REGISTER_APPROVAL_CANCEL);
                 map.put("datetime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                 map.put("login_id", re.getUserId());
@@ -482,19 +455,15 @@ public class UserReqServiceImpl implements UserReqService {
         } catch (SQLException sqlEx) {
             logger.error("error in revokeUsbPermissionFromAdmin : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-            if (statusVO != null) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-            }
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
             throw sqlEx;
         } catch (Exception ex) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("error in revokeUsbPermissionFromAdmin : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-            if (statusVO != null) {
-                statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-            }
+            statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+                    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
         }
 
         return statusVO;

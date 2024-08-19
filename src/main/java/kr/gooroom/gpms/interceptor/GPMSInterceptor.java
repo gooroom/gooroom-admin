@@ -45,9 +45,6 @@ import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 
 public class GPMSInterceptor implements HandlerInterceptor {
 
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(GPMSInterceptor.class);
-
 	@Resource(name = "gpmsCommonService")
 	private GpmsCommonService gpmsCommonService;
 
@@ -68,7 +65,7 @@ public class GPMSInterceptor implements HandlerInterceptor {
 
 		String actItem = req.getRequestURI();
 
-		if (actItem.indexOf("/") > -1) {
+		if (actItem.contains("/")) {
 			actItem = actItem.substring(actItem.lastIndexOf("/"));
 		}
 
@@ -176,10 +173,10 @@ public class GPMSInterceptor implements HandlerInterceptor {
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, String[]> paramMap = (Map<String, String[]>) req.getParameterMap();
+		Map<String, String[]> paramMap = req.getParameterMap();
 		String actData = "";
 		if (paramMap.size() > 0) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			Set<String> keys = paramMap.keySet();
 			for (String key : keys) {
 				sb.append("{[").append(key).append("][").append(req.getParameter(key)).append("]}\n");
@@ -202,11 +199,9 @@ public class GPMSInterceptor implements HandlerInterceptor {
 	 * @param res     HttpServletResponse
 	 * @param handler Object
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public void postHandle(HttpServletRequest req, HttpServletResponse res, Object handler, ModelAndView modelAndView)
-			throws Exception {
+	public void postHandle(HttpServletRequest req, HttpServletResponse res, Object handler, ModelAndView modelAndView) {
 
 		// for version
 		if (modelAndView != null) {

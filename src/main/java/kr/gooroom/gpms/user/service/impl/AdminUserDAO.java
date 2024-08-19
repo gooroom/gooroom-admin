@@ -16,20 +16,18 @@
 
 package kr.gooroom.gpms.user.service.impl;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-
 import kr.gooroom.gpms.account.service.ActHistoryVO;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.user.service.AdminUserVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * data access object class for administrator user management process.
@@ -48,9 +46,8 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * response administrator user list data
 	 * 
 	 * @return AdminUserVO List
-	 * @throws SQLException
 	 */
-	public List<AdminUserVO> selectAdminUserList() throws SQLException {
+	public List<AdminUserVO> selectAdminUserList() {
 		List<AdminUserVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectAdminUserList", "");
@@ -66,9 +63,8 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * response administrator user list data for paging
 	 * 
 	 * @return AdminUserVO List
-	 * @throws SQLException
 	 */
-	public List<AdminUserVO> selectAdminUserListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<AdminUserVO> selectAdminUserListPaged(HashMap<String, Object> options) {
 		List<AdminUserVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectAdminUserListPaged", options);
@@ -85,11 +81,10 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectAdminUserListFilteredCount(HashMap<String, Object> options) throws SQLException {
+	public long selectAdminUserListFilteredCount(HashMap<String, Object> options) {
 
-		return (long) sqlSessionMeta.selectOne("selectAdminUserListFilteredCount", options);
+		return sqlSessionMeta.selectOne("selectAdminUserListFilteredCount", options);
 	}
 
 	/**
@@ -97,11 +92,10 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectAdminUserListTotalCount(HashMap<String, Object> options) throws SQLException {
+	public long selectAdminUserListTotalCount(HashMap<String, Object> options) {
 
-		return (long) sqlSessionMeta.selectOne("selectAdminUserListTotalCount", options);
+		return sqlSessionMeta.selectOne("selectAdminUserListTotalCount", options);
 	}
 
 	/**
@@ -109,13 +103,12 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param adminId string administrator user id
 	 * @return boolean true if exist
-	 * @throws SQLException
 	 */
-	public boolean isExistAdminUserId(String adminId) throws SQLException {
+	public boolean isExistAdminUserId(String adminId) {
 
 		boolean re = true;
 		try {
-			re = ((Boolean) sqlSessionMeta.selectOne("isExistAdminUserId", adminId)).booleanValue();
+			re = sqlSessionMeta.selectOne("isExistAdminUserId", adminId);
 		} catch (Exception ex) {
 			logger.error("error in isExistAdminUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
@@ -128,24 +121,22 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	/**
 	 * create new administrator user information data
 	 * 
-	 * @param adminId string administrator user id
+	 * @param vo AdminUserVO
 	 * @return long data insert result count.
 	 * @throws SQLException
 	 */
 	public long createAdminUser(AdminUserVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertAdminUser", vo);
+		return sqlSessionMeta.insert("insertAdminUser", vo);
 
 	}
 
 	/**
 	 * response administrator user information by user id
 	 * 
-	 * @param adminId string administrator user id
+	 * @param  options HashMap<String,Object>
 	 * @return AdminUserVO List
-	 * @throws SQLException
 	 */
-	public AdminUserVO selectAdminUserData(HashMap<String, Object> options) throws SQLException {
+	public AdminUserVO selectAdminUserData(HashMap<String, Object> options) {
 
 		AdminUserVO re = null;
 		try {
@@ -166,10 +157,9 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo AdminUserVO administrator user data bean
 	 * @return long data update result count.
-	 * @throws SQLException
 	 */
 	public long updateAdminUserData(AdminUserVO vo) throws SQLException {
-		return (long) sqlSessionMeta.update("updateAdminUserData", vo);
+		return sqlSessionMeta.update("updateAdminUserData", vo);
 	}
 
 	/**
@@ -177,10 +167,9 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo AdminUserVO administrator user data bean
 	 * @return long data update result count.
-	 * @throws SQLException
 	 */
-	public long updateCurrentAdminUserData(AdminUserVO vo) throws SQLException {
-		return (long) sqlSessionMeta.update("updateCurrentAdminUserData", vo);
+	public long updateCurrentAdminUserData(AdminUserVO vo) {
+		return sqlSessionMeta.update("updateCurrentAdminUserData", vo);
 	}
 
 	/**
@@ -188,10 +177,9 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo AdminUserVO administrator user data bean
 	 * @return long data delete result count.
-	 * @throws SQLException
 	 */
-	public long deleteAdminUserData(AdminUserVO vo) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteAdminUserData", vo);
+	public long deleteAdminUserData(AdminUserVO vo) {
+		return sqlSessionMeta.delete("deleteAdminUserData", vo);
 	}
 
 	/**
@@ -199,14 +187,12 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * authority.
 	 * 
 	 * @param adminId string administrator user id
-	 * @param adminPw string administrator user password
 	 * @return AdminUserVO List
-	 * @throws SQLException
 	 */
-	public AdminUserVO selectAdminUserAuthAndInfo(String adminId) throws SQLException {
+	public AdminUserVO selectAdminUserAuthAndInfo(String adminId) {
 		AdminUserVO re = null;
 		try {
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("adminId", adminId);
 
 			re = sqlSessionMeta.selectOne("selectAdminUserAuthAndInfo", map);
@@ -224,7 +210,6 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ActHistoryVO List
-	 * @throws SQLException
 	 */
 	public List<ActHistoryVO> selectAdminActListPaged(HashMap<String, Object> options) {
 		List<ActHistoryVO> re = null;
@@ -243,10 +228,9 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectAdminActListTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectAdminActListTotalCount", options);
+	public long selectAdminActListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectAdminActListTotalCount", options);
 	}
 
 	/**
@@ -254,19 +238,17 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectAdminActListFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectAdminActListFilteredCount", options);
+	public long selectAdminActListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectAdminActListFilteredCount", options);
 	}
 
 	/**
 	 * response administrator action logging history data for paging
 	 * 
 	 * @return AdminUserVO List
-	 * @throws SQLException
 	 */
-	public List<ActHistoryVO> selectAdminRecordListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ActHistoryVO> selectAdminRecordListPaged(HashMap<String, Object> options) {
 		List<ActHistoryVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("adminDAO.selectAdminRecordListPaged", options);
@@ -284,10 +266,9 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectAdminRecordListFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("adminDAO.selectAdminRecordListFilteredCount", options);
+	public long selectAdminRecordListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("adminDAO.selectAdminRecordListFilteredCount", options);
 	}
 
 	/**
@@ -295,10 +276,9 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectAdminRecordListTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("adminDAO.selectAdminRecordListTotalCount", options);
+	public long selectAdminRecordListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("adminDAO.selectAdminRecordListTotalCount", options);
 	}
 
 	/**
@@ -315,14 +295,14 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	public long insertOrUpdateAdminRule(String adminId, String ruleType, String ruleName, String ruleValue,
 			String regUserId) throws SQLException {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("adminId", adminId);
 		map.put("ruleType", ruleType);
 		map.put("ruleName", ruleName);
 		map.put("ruleValue", ruleValue);
 		map.put("regUserId", regUserId);
 
-		return (long) sqlSessionMeta.update("insertOrUpdateAdminRule", map);
+		return sqlSessionMeta.update("insertOrUpdateAdminRule", map);
 	}
 
 	/**
@@ -330,10 +310,9 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param adminId string target admin Id
 	 * @return long query result count
-	 * @throws SQLException
 	 */
 	public long deleteAdminUserConnIps(String adminId) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteAdminUserConnIps", adminId);
+		return sqlSessionMeta.delete("deleteAdminUserConnIps", adminId);
 	}
 
 	/**
@@ -343,15 +322,14 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * @param regUserId string administrator user id
 	 * @param connIp    string target ip
 	 * @return long query result count
-	 * @throws SQLException
 	 */
 	public long insertAdminUserConnIp(String adminId, String regUserId, String connIp) throws SQLException {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("adminId", adminId);
 		map.put("regUserId", regUserId);
 		map.put("connIp", connIp);
-		return (long) sqlSessionMeta.update("insertAdminUserConnIp", map);
+		return sqlSessionMeta.update("insertAdminUserConnIp", map);
 	}
 
 	/**
@@ -359,10 +337,9 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param adminId string target admin Id
 	 * @return long query result count
-	 * @throws SQLException
 	 */
 	public long deleteAdminUserGrpIds(String adminId) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteAdminUserGrpIds", adminId);
+		return sqlSessionMeta.delete("deleteAdminUserGrpIds", adminId);
 	}
 
 	/**
@@ -370,17 +347,15 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param adminId   string target admin Id
 	 * @param regUserId string administrator user id
-	 * @param connIp    string target ip
 	 * @return long query result count
-	 * @throws SQLException
 	 */
 	public long insertAdminUserGrpId(String adminId, String regUserId, String grpId) throws SQLException {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("adminId", adminId);
 		map.put("regUserId", regUserId);
 		map.put("grpId", grpId);
-		return (long) sqlSessionMeta.update("insertAdminUserGrpId", map);
+		return sqlSessionMeta.update("insertAdminUserGrpId", map);
 	}
 
 	/**
@@ -388,10 +363,9 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param adminId string target admin Id
 	 * @return long query result count
-	 * @throws SQLException
 	 */
 	public long deleteAdminUserDeptCds(String adminId) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteAdminUserDeptCds", adminId);
+		return sqlSessionMeta.delete("deleteAdminUserDeptCds", adminId);
 	}
 
 	/**
@@ -399,17 +373,16 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param adminId   string target admin Id
 	 * @param regUserId string administrator user id
-	 * @param connIp    string target ip
+	 * @param deptCd string
 	 * @return long query result count
-	 * @throws SQLException
 	 */
 	public long insertAdminUserDeptCd(String adminId, String regUserId, String deptCd) throws SQLException {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("adminId", adminId);
 		map.put("regUserId", regUserId);
 		map.put("deptCd", deptCd);
-		return (long) sqlSessionMeta.update("insertAdminUserDeptCd", map);
+		return sqlSessionMeta.update("insertAdminUserDeptCd", map);
 	}
 
 	/**
@@ -423,12 +396,12 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 */
 	public long insertAdminUserPresentData(String adminId, String connectIp, String sessionId) throws SQLException {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("adminId", adminId);
 		map.put("connectIp", connectIp);
 		map.put("sessionId", sessionId);
 
-		long rePresentData = (long) sqlSessionMeta.update("insertAdminUserPresentData", map);
+		long rePresentData = sqlSessionMeta.update("insertAdminUserPresentData", map);
 		
 		map.clear();
 		map.put("actType", "L");
@@ -437,9 +410,9 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 		map.put("accessIp", connectIp);
 		map.put("userId", adminId);
 		
-		long reActLogData = (long) sqlSessionMeta.insert("insertUserActLogHistory", map);
+		long reActLogData = sqlSessionMeta.insert("insertUserActLogHistory", map);
 
-		return (rePresentData > reActLogData) ? rePresentData : reActLogData;
+		return Math.max(rePresentData, reActLogData);
 	}
 
 	/**
@@ -453,18 +426,18 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 */
 	public long deleteAdminUserPresentData(String adminId, String connectIp, String sessionId) throws SQLException {
 		
-		long rePresentData = (long) sqlSessionMeta.update("deleteAdminUserPresentData", adminId);
+		long rePresentData = sqlSessionMeta.update("deleteAdminUserPresentData", adminId);
 		
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("actType", "L");
 		map.put("actItem", "LOGOUT");
 		map.put("actData", "SUCCESS");
 		map.put("accessIp", connectIp);
 		map.put("userId", adminId);
 		
-		long reActLogData = (long) sqlSessionMeta.insert("insertUserActLogHistory", map);
+		long reActLogData = sqlSessionMeta.insert("insertUserActLogHistory", map);
 
-		return (rePresentData > reActLogData) ? rePresentData : reActLogData;
+		return Math.max(rePresentData, reActLogData);
 	}
 
 	/**
@@ -473,14 +446,13 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * @param adminId String
 	 * @param connectIp String
 	 * @return long data update result count.
-	 * @throws SQLException
 	 */
-	public long updateDuplicateReqLoginData(String adminId, String connectIp) throws SQLException {
-		HashMap<String, String> map = new HashMap<String, String>();
+	public long updateDuplicateReqLoginData(String adminId, String connectIp) {
+		HashMap<String, String> map = new HashMap<>();
 		map.put("adminId", adminId);
 		map.put("connectIp", connectIp);
 		
-		return (long) sqlSessionMeta.update("updateDuplicateReqLoginData", map);
+		return sqlSessionMeta.update("updateDuplicateReqLoginData", map);
 	}
 
 	/**
@@ -488,13 +460,12 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param adminId String
 	 * @return long data update result count.
-	 * @throws SQLException
 	 */
-	public long deleteDuplicateReqLoginData(String adminId) throws SQLException {
-		HashMap<String, String> map = new HashMap<String, String>();
+	public long deleteDuplicateReqLoginData(String adminId) {
+		HashMap<String, String> map = new HashMap<>();
 		map.put("adminId", adminId);
 		
-		return (long) sqlSessionMeta.update("deleteDuplicateReqLoginData", map);
+		return sqlSessionMeta.update("deleteDuplicateReqLoginData", map);
 	}
 
 	/**
@@ -502,9 +473,8 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param adminId String
 	 * @return AdminUserVO
-	 * @throws SQLException
 	 */
-	public AdminUserVO selectDuplicateReqLoginData(String adminId) throws SQLException {
+	public AdminUserVO selectDuplicateReqLoginData(String adminId) {
 		AdminUserVO re = null;
 		try {
 			re = sqlSessionMeta.selectOne("selectDuplicateReqLoginData", adminId);
@@ -524,7 +494,7 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateLoginTrialData(String adminId) throws SQLException {
-		return (long) sqlSessionMeta.update("updateLoginTrialData", adminId);
+		return sqlSessionMeta.update("updateLoginTrialData", adminId);
 	}
 
 	/**
@@ -533,12 +503,11 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 *
 	 * @param adminId string administrator user id
 	 * @return AdminUserVO List
-	 * @throws SQLException
 	 */
-	public AdminUserVO selectAdminUserInfo(String adminId) throws SQLException {
+	public AdminUserVO selectAdminUserInfo(String adminId) {
 		AdminUserVO re = null;
 		try {
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("adminId", adminId);
 
 			re = sqlSessionMeta.selectOne("selectAdminUserInfo", map);
@@ -559,12 +528,11 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * @param adminId string administrator user id
 	 * @param adminRule string administrator Rule
 	 * @return AdminUserVO List
-	 * @throws SQLException
 	 */
-	public AdminUserVO selectAdminUserAuthority(String adminId, String adminRule) throws SQLException {
+	public AdminUserVO selectAdminUserAuthority(String adminId, String adminRule) {
 		AdminUserVO re = null;
 		try {
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("adminId", adminId);
 			map.put("adminRule", adminRule);
 

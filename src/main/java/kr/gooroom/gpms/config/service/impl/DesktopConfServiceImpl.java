@@ -67,16 +67,15 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 	 * generate desktop configuration list data
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readDesktopConfList() throws Exception {
+	public ResultVO readDesktopConfList() {
 
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<DesktopConfVO> re = desktopConfDao.readDesktopConfList();
 			if (re != null && re.size() > 0) {
-				DesktopConfVO[] row = re.stream().toArray(DesktopConfVO[]::new);
+				DesktopConfVO[] row = re.toArray(DesktopConfVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -90,10 +89,8 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 		} catch (Exception ex) {
 			logger.error("error in readDesktopConfList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -103,10 +100,9 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 	 * generate desktop configuration list data with paging
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getDesktopConfListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getDesktopConfListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -118,7 +114,7 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 
 			if (re != null && re.size() > 0) {
 
-				DesktopConfVO[] row = re.stream().toArray(DesktopConfVO[]::new);
+				DesktopConfVO[] row = re.toArray(DesktopConfVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -136,10 +132,8 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 		} catch (Exception ex) {
 			logger.error("error in getDesktopConfListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -149,7 +143,9 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 	 * create new desktop configuration data.
 	 * 
 	 * @param desktopConfNm    String desktop configuration name.
-	 * @param desktopConfValue String desktop configuration data, json format.
+	 * @param desktopTheme String
+	 * @param appDatas String
+	 * @param adminType String
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -190,20 +186,16 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in createDesktopConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in createDesktopConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -214,7 +206,7 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 	 * 
 	 * @param desktopConfId    String desktop configuration id.
 	 * @param desktopConfNm    String desktop configuration name.
-	 * @param desktopConfValue String desktop configuration data, json format.
+	 * @param desktopTheme String
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -252,20 +244,16 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in updateDesktopConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in updateDesktopConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -276,10 +264,9 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 	 * 
 	 * @param desktopConfId string target desktop configuration id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getDesktopConfData(String desktopConfId) throws Exception {
+	public ResultVO getDesktopConfData(String desktopConfId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -287,46 +274,38 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 
 			DesktopConfVO re = desktopConfDao.getDesktopConfData(desktopConfId);
 
-			Map<String, Object> paramMap = new HashMap<String, Object>();
+			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("confId", desktopConfId);
 			DesktopInfoVO desktopInfoVO = desktopConfDao.getDesktopInfoByConfId(paramMap);
 
 			ArrayList<DesktopItemVO> appVOs = desktopInfoVO.getApps();
-			StringBuffer iconUrlStr = new StringBuffer();
+			StringBuilder iconUrlStr = new StringBuilder();
 			iconUrlStr.append(GPMSConstants.ICON_SERVER_PROTOCOL).append("://");
 			iconUrlStr.append(GPMSConstants.ICON_SERVERPATH).append("/");
 			iconUrlStr.append(GPMSConstants.PATH_FOR_ICONURL).append("/");
 
 			// wallpaper url set
 			if (desktopInfoVO.getWallpaperFile() != null && desktopInfoVO.getWallpaperFile().length() > 0) {
-				desktopInfoVO.setWallpaperFile(iconUrlStr.toString() + desktopInfoVO.getWallpaperFile());
+				desktopInfoVO.setWallpaperFile(iconUrlStr + desktopInfoVO.getWallpaperFile());
 			}
 
 			for (DesktopItemVO app : appVOs) {
 				DesktopApplicationInfoVO infoVO = app.getDesktop();
 				if (infoVO != null) {
 					if ("library".equalsIgnoreCase(infoVO.getIconGubun())) {
-						infoVO.setIcon(iconUrlStr.toString() + infoVO.getIcon());
+						infoVO.setIcon(iconUrlStr + infoVO.getIcon());
 					}
 				}
 			}
 
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, desktopInfoVO);
 				jsonStr = outputWriter.toString();
 			} catch (Exception jsonex) {
 				logger.error("error in getDesktopConfData : {}", jsonex.toString());
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 
 			if (re != null) {
@@ -350,10 +329,8 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 		} catch (Exception ex) {
 			logger.error("error in getDesktopConfData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -394,20 +371,16 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in deleteDesktopConfData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in deleteDesktopConfData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -418,10 +391,9 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 	 * 
 	 * @param groupId string target group id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getDesktopConfByGroupId(String groupId) throws Exception {
+	public ResultVO getDesktopConfByGroupId(String groupId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -443,10 +415,8 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 		} catch (Exception ex) {
 			logger.error("error in getDesktopConfByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -457,10 +427,9 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 	 * 
 	 * @param deptCd string dept cd
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getDesktopConfByDeptCd(String deptCd) throws Exception {
+	public ResultVO getDesktopConfByDeptCd(String deptCd) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -482,10 +451,8 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 		} catch (Exception ex) {
 			logger.error("error in getDesktopConfByDeptCd : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -496,10 +463,9 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 	 * 
 	 * @param userId string user id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getDesktopConfByUserId(String userId) throws Exception {
+	public ResultVO getDesktopConfByUserId(String userId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -521,10 +487,8 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 		} catch (Exception ex) {
 			logger.error("error in getDesktopConfByUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -569,20 +533,16 @@ public class DesktopConfServiceImpl implements DesktopConfService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in cloneDesktopConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in cloneDesktopConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;

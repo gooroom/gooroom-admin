@@ -1,20 +1,19 @@
 package kr.gooroom.gpms.common.utils;
 
+import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.config.service.CtrlItemVO;
+import kr.gooroom.gpms.config.service.CtrlPropVO;
+import org.springframework.util.ObjectUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import kr.gooroom.gpms.common.GPMSConstants;
-import kr.gooroom.gpms.config.service.CtrlItemVO;
-import kr.gooroom.gpms.config.service.CtrlPropVO;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
-
 public class CommonUtils {
 
-	private static SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
+	private static final SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
 
 	public static Date covertDateForEndTime(Date paramDate) {
 
@@ -68,8 +67,6 @@ public class CommonUtils {
 	/**
 	 * get property value by property name
 	 * 
-	 * @param vo       CtrlItemVO property item
-	 * @param propName string property name
 	 * @return string property value
 	 *
 	 */
@@ -122,7 +119,7 @@ public class CommonUtils {
 	 *
 	 */
 	public static ArrayList<String> getPropertyValues(CtrlItemVO vo, String propName) {
-		ArrayList<String> values = new ArrayList<String>();
+		ArrayList<String> values = new ArrayList<>();
 
 		if (vo != null && propName != null) {
 			ArrayList<CtrlPropVO> props = vo.getPropList();
@@ -141,8 +138,6 @@ public class CommonUtils {
 	/**
 	 * check if value array has same value
 	 * 
-	 * @param ntpAddresses string array ntp addresses.
-	 * @param vo           CtrlItemVO property item
 	 * @return boolean true if ntp addresses was same data
 	 *
 	 */
@@ -166,6 +161,7 @@ public class CommonUtils {
 					for (String prop : propertyArray) {
 						if (value != null && value.equals(prop)) {
 							isequal = true;
+							break;
 						}
 					}
 					if (!isequal) {
@@ -187,40 +183,31 @@ public class CommonUtils {
 	/**
 	 * create context address for Images (icon...).
 	 * 
-	 * @param req HttpServletRequest
 	 * @return string context url.
 	 *
 	 */
 	public static String createContextAddress() {
-		StringBuffer sb = new StringBuffer();
 
-		sb.append(GPMSConstants.ICON_SERVER_PROTOCOL).append("://");
-		sb.append(GPMSConstants.ICON_SERVERPATH).append("/");
-
-		return sb.toString();
+		return GPMSConstants.ICON_SERVER_PROTOCOL + "://" +
+				GPMSConstants.ICON_SERVERPATH + "/";
 	}
 
 	/**
 	 * create context address for Images (icon...).
 	 * 
-	 * @param req HttpServletRequest
 	 * @return string context url.
 	 *
 	 */
 	public static String createIconUrlPath() {
-		StringBuffer sb = new StringBuffer();
 
-		sb.append(GPMSConstants.ICON_SERVER_PROTOCOL).append("://");
-		sb.append(GPMSConstants.ICON_SERVERPATH).append("/");
-		sb.append(GPMSConstants.PATH_FOR_ICONURL).append("/");
-
-		return sb.toString();
+		return GPMSConstants.ICON_SERVER_PROTOCOL + "://" +
+				GPMSConstants.ICON_SERVERPATH + "/" +
+				GPMSConstants.PATH_FOR_ICONURL + "/";
 	}
 	
 	/**
 	  * MyBatis String endswith condition
 	  * 
-	  * @param 
 	  * @return Boolean : true / false
 	  */
 	 public static Boolean endsWith(Object param1, Object param2) {

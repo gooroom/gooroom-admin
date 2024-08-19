@@ -16,16 +16,7 @@
 
 package kr.gooroom.gpms.mng.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import jakarta.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
@@ -34,6 +25,12 @@ import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.mng.service.DesktopAppService;
 import kr.gooroom.gpms.mng.service.DesktopAppVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Desktop application management service implemts class
@@ -56,10 +53,9 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 	 * 
 	 * @param desktopAppVO DesktopAppVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO createDesktopApp(DesktopAppVO desktopAppVO) throws Exception {
+	public StatusVO createDesktopApp(DesktopAppVO desktopAppVO) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			desktopAppVO.setRegUserId(LoginInfoHelper.getUserId());
@@ -75,10 +71,8 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 		} catch (Exception ex) {
 			logger.error("error in createDesktopApp : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -89,10 +83,9 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 	 * 
 	 * @param appId String app id
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO cloneDesktopApp(String appId) throws Exception {
+	public StatusVO cloneDesktopApp(String appId) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			DesktopAppVO desktopAppVO = new DesktopAppVO();
@@ -110,10 +103,8 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 		} catch (Exception ex) {
 			logger.error("error in cloneDesktopApp : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -124,10 +115,9 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 	 * 
 	 * @param desktopAppId String desktop application id
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO deleteDesktopApp(String desktopAppId) throws Exception {
+	public StatusVO deleteDesktopApp(String desktopAppId) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -149,13 +139,10 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 			}
 
 		} catch (Exception ex) {
-
 			logger.error("error in deleteDesktopApp : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -166,10 +153,9 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 	 * 
 	 * @param desktopAppVO DesktopAppVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO editDesktopApp(DesktopAppVO desktopAppVO) throws Exception {
+	public StatusVO editDesktopApp(DesktopAppVO desktopAppVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -188,10 +174,8 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 		} catch (Exception ex) {
 			logger.error("error in editDesktopApp : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -200,17 +184,15 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 	/**
 	 * get desktop application list data
 	 * 
-	 * @param contextAddress String use desktop application.
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getDesktopAppList() throws Exception {
+	public ResultVO getDesktopAppList() {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<DesktopAppVO> re = desktopAppDAO.selectNormalAppInfoList();
 			if (re != null && re.size() > 0) {
-				DesktopAppVO[] row = re.stream().toArray(DesktopAppVO[]::new);
+				DesktopAppVO[] row = re.toArray(DesktopAppVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -223,10 +205,8 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 		} catch (Exception ex) {
 			logger.error("error in getDesktopAppList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -235,12 +215,11 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 	/**
 	 * get desktop application list data for paging.
 	 * 
-	 * @param contextAddress String use desktop application.
+	 * @param options HashMap<String, Object>
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getDesktopAppListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getDesktopAppListPaged(HashMap<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 		try {
 
@@ -265,9 +244,9 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 					}
 
 					return obj;
-				}).collect(Collectors.toList());
+				}).toList();
 
-				DesktopAppVO[] row = result.stream().toArray(DesktopAppVO[]::new);
+				DesktopAppVO[] row = result.toArray(DesktopAppVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -283,10 +262,8 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 		} catch (Exception ex) {
 			logger.error("error in getDesktopAppListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -297,10 +274,9 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 	 * 
 	 * @param desktopAppId String desktop application id.
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getDesktopAppData(String desktopAppId) throws Exception {
+	public ResultVO getDesktopAppData(String desktopAppId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -327,10 +303,8 @@ public class DesktopAppServiceImpl implements DesktopAppService {
 
 			logger.error("error in getDesktopAppData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;

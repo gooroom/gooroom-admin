@@ -16,25 +16,7 @@
 
 package kr.gooroom.gpms.client.service.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import jakarta.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
-
 import kr.gooroom.gpms.client.service.ClientService;
 import kr.gooroom.gpms.client.service.ClientSummaryVO;
 import kr.gooroom.gpms.client.service.ClientVO;
@@ -46,11 +28,26 @@ import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.CommonUtils;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.config.service.CtrlMstService;
 import kr.gooroom.gpms.job.custom.OnlineClientAndUserVO;
 import kr.gooroom.gpms.user.service.AdminUserVO;
 import kr.gooroom.gpms.user.service.impl.AdminUserDAO;
-import kr.gooroom.gpms.user.service.impl.UserReqDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Client management service implement class
@@ -68,14 +65,8 @@ public class ClientServiceImpl implements ClientService {
 	@Resource(name = "clientDAO")
 	private ClientDAO clientDao;
 
-	@Resource(name = "ctrlMstService")
-	private CtrlMstService ctrlMstService;
-	
 	@Resource(name = "adminUserDAO")
 	private AdminUserDAO adminUserDao;
-
-	@Resource(name = "userReqDAO")
-	private UserReqDAO userReqDao;
 
 	/**
 	 * modify client information
@@ -108,20 +99,16 @@ public class ClientServiceImpl implements ClientService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in updateClientInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in updateClientInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -132,10 +119,9 @@ public class ClientServiceImpl implements ClientService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getClientList(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getClientList(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -159,7 +145,7 @@ public class ClientServiceImpl implements ClientService {
 					return obj;
 				}).collect(Collectors.toList());
 
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -167,7 +153,6 @@ public class ClientServiceImpl implements ClientService {
 				resultVO.setRecordsTotal(String.valueOf(totalCount));
 				resultVO.setRecordsFiltered(String.valueOf(filteredCount));
 			} else {
-
 				Object[] o = new Object[0];
 				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
@@ -177,10 +162,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getClientList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -191,10 +174,9 @@ public class ClientServiceImpl implements ClientService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO selectClientListForGroups(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO selectClientListForGroups(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -203,14 +185,12 @@ public class ClientServiceImpl implements ClientService {
 			List<ClientVO> re = clientDao.selectClientListForGroups(options);
 
 			if (re != null && re.size() > 0) {
-
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
 
 			} else {
-
 				Object[] o = new Object[0];
 				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
@@ -220,10 +200,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in selectClientListForGroups : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -234,10 +212,9 @@ public class ClientServiceImpl implements ClientService {
 	 * 
 	 * @param groupId string target group id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getClientListForAddingGroup(String groupId) throws Exception {
+	public ResultVO getClientListForAddingGroup(String groupId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -247,12 +224,11 @@ public class ClientServiceImpl implements ClientService {
 
 			if (re != null && re.size() > 0) {
 
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
-
 				Object[] o = new Object[0];
 				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
@@ -262,10 +238,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getClientListForAddingGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -276,10 +250,9 @@ public class ClientServiceImpl implements ClientService {
 	 * 
 	 * @param clientId string target client id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO selectClientInfo(String clientId) throws Exception {
+	public ResultVO selectClientInfo(String clientId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -291,7 +264,7 @@ public class ClientServiceImpl implements ClientService {
 
 				// select certificate information
 				CertificateFactory fact = CertificateFactory.getInstance("X.509");
-				InputStream input = new ByteArrayInputStream(re.getKeyInfo().getBytes("UTF-8"));
+				InputStream input = new ByteArrayInputStream(re.getKeyInfo().getBytes(StandardCharsets.UTF_8));
 				X509Certificate clientCert = (X509Certificate) fact.generateCertificate(input);
 
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -316,10 +289,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in selectClientInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -330,10 +301,9 @@ public class ClientServiceImpl implements ClientService {
 	 * 
 	 * @param clientId string target client id
 	 * @return StatusVO result status object
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isExistClientId(String clientId) throws Exception {
+	public StatusVO isExistClientId(String clientId) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -352,10 +322,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in isExistClientId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -366,10 +334,9 @@ public class ClientServiceImpl implements ClientService {
 	 * 
 	 * @param clientId string target client id
 	 * @return StatusVO result status object
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO revokeClientCertificate(String clientId) throws Exception {
+	public StatusVO revokeClientCertificate(String clientId) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			// get client information for revoke
@@ -380,23 +347,19 @@ public class ClientServiceImpl implements ClientService {
 				if (re <= 0) {
 					statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_DELETEERROR,
 							MessageSourceHelper.getMessage("client.result.norevoked"));
-				} else if (re > 0) {
+				} else {
 					statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
 							MessageSourceHelper.getMessage("client.result.revoked"));
 				}
 			} else {
-				if (statusVO != null) {
-					statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-							MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-				}
+				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			}
 		} catch (Exception ex) {
 			logger.error("error in revokeClientCertificate : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
@@ -406,10 +369,9 @@ public class ClientServiceImpl implements ClientService {
 	 * 
 	 * @param groupId string target group id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getClientListInGroup(String groupId) throws Exception {
+	public ResultVO getClientListInGroup(String groupId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -420,7 +382,7 @@ public class ClientServiceImpl implements ClientService {
 			List<ClientVO> re = clientDao.selectClientListInGroup(groupArray);
 
 			if (re != null && re.size() > 0) {
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -434,10 +396,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getClientListInGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -447,25 +407,21 @@ public class ClientServiceImpl implements ClientService {
 	 * generate online client data list
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getClientListInOnline() throws Exception {
+	public ResultVO getClientListInOnline() {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
-
 			List<ClientVO> re = clientDao.selectClientListInOnline();
 
 			if (re != null && re.size() > 0) {
-
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
-
 				Object[] o = new Object[0];
 				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
@@ -475,10 +431,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getClientListInOnline : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -488,15 +442,14 @@ public class ClientServiceImpl implements ClientService {
 	 * generate online client data list
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getClientInOnline(String gubun) throws Exception {
+	public ResultVO getClientInOnline(String gubun) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<ClientVO> re = clientDao.selectClientInOnline(gubun);
 			if (re != null && re.size() > 0) {
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -509,10 +462,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getClientIdInOnline : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -523,25 +474,21 @@ public class ClientServiceImpl implements ClientService {
 	 * 
 	 * @param confId string rule configuration id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getOnlineClientIdsInClientUseConfId(String confId, String confTp) throws Exception {
+	public ResultVO getOnlineClientIdsInClientUseConfId(String confId, String confTp) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
-
-			boolean hasDefault = (confId != null && confId.endsWith(GPMSConstants.MSG_DEFAULT)) ? true : false;
+			boolean hasDefault = confId != null && confId.endsWith(GPMSConstants.MSG_DEFAULT);
 			List<ClientVO> re = clientDao.selectOnlineClientIdsInUserConf(confId, hasDefault, confTp);
 
 			if (re != null && re.size() > 0) {
-
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
-
 				Object[] o = new Object[0];
 				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
@@ -551,10 +498,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getOnlineClientIdsInClientUseConfId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -565,10 +510,9 @@ public class ClientServiceImpl implements ClientService {
 	 * 
 	 * @param userIds string array user id list
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getOnlineClientIdsInUserIds(String[] userIds) throws Exception {
+	public ResultVO getOnlineClientIdsInUserIds(String[] userIds) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -577,13 +521,11 @@ public class ClientServiceImpl implements ClientService {
 			List<OnlineClientAndUserVO> re = clientDao.selectOnlineClientIdsInUserIds(userIds);
 
 			if (re != null && re.size() > 0) {
-
-				OnlineClientAndUserVO[] row = re.stream().toArray(OnlineClientAndUserVO[]::new);
+				OnlineClientAndUserVO[] row = re.toArray(OnlineClientAndUserVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
-
 				Object[] o = new Object[0];
 				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
@@ -593,10 +535,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getOnlineClientIdsInUserIds : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -608,10 +548,9 @@ public class ClientServiceImpl implements ClientService {
 	 * @param confId string configuration id
 	 * @param confTp string configuration type
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getOnlineClientIdsInClientConf(String confId, String confTp) throws Exception {
+	public ResultVO getOnlineClientIdsInClientConf(String confId, String confTp) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -620,7 +559,7 @@ public class ClientServiceImpl implements ClientService {
 			List<ClientVO> re = clientDao.selectOnlineClientIdsInClientConf(confId, confTp);
 
 			if (re != null && re.size() > 0) {
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -634,10 +573,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getOnlineClientIdsInClientConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -648,10 +585,9 @@ public class ClientServiceImpl implements ClientService {
 	 *
 	 * @param clientId string client id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getOnlineClientIdByClientId(String clientId) throws Exception {
+	public ResultVO getOnlineClientIdByClientId(String clientId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -659,7 +595,7 @@ public class ClientServiceImpl implements ClientService {
 			List<ClientVO> re = clientDao.selectOnlineClientIdInClientId(clientId);
 
 			if (re != null && re.size() > 0) {
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -673,10 +609,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getOnlineClientIdByClientId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -687,10 +621,9 @@ public class ClientServiceImpl implements ClientService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getViolatedClientList(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getViolatedClientList(HashMap<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 		try {
 			
@@ -704,7 +637,7 @@ public class ClientServiceImpl implements ClientService {
 			long filteredCount = clientDao.selectViolatedClientListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -720,10 +653,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getViolatedClientList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -732,14 +663,12 @@ public class ClientServiceImpl implements ClientService {
 	 * generate client count that attacked protector rule
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getViolatedClientCount() throws Exception {
+	public ResultVO getViolatedClientCount() {
 		ResultVO resultVO = new ResultVO();
 		try {
-			
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			String grRole = LoginInfoHelper.getUserGRRole();
 			if(GPMSConstants.GRROLE_ADMIN.equals(grRole) || GPMSConstants.GRROLE_PART.equals(grRole)) {
 				map.put("adminId", LoginInfoHelper.getUserId());
@@ -749,8 +678,7 @@ public class ClientServiceImpl implements ClientService {
 			AdminUserVO reVo = adminUserDao.selectDuplicateReqLoginData(LoginInfoHelper.getUserId());
 			
 			if (reCnt > -1 || reVo != null) {
-				
-				HashMap<String, Object> resultMap = new HashMap<String, Object>();
+				HashMap<String, Object> resultMap = new HashMap<>();
 				resultMap.put("violatedCount", String.valueOf(reCnt));
 				resultMap.put("dupLoginIp", reVo.getDupLoginTryIp());
 				resultMap.put("dupLoginDate", reVo.getDupLoginTryDate());
@@ -769,10 +697,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getViolatedClientCount : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -781,10 +707,9 @@ public class ClientServiceImpl implements ClientService {
 	 * generate client list data
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getClientAllList() throws Exception {
+	public ResultVO getClientAllList() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -793,13 +718,11 @@ public class ClientServiceImpl implements ClientService {
 			List<ClientVO> re = clientDao.selectClientAllList();
 
 			if (re != null && re.size() > 0) {
-
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
-
 				Object[] o = new Object[0];
 				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
@@ -809,10 +732,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getClientAllList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -822,16 +743,14 @@ public class ClientServiceImpl implements ClientService {
 	 * generate client count data by status
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getClientStatusSummary() throws Exception {
+	public ResultVO getClientStatusSummary() {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
-			
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			String grRole = LoginInfoHelper.getUserGRRole();
 			if(GPMSConstants.GRROLE_ADMIN.equals(grRole) || GPMSConstants.GRROLE_PART.equals(grRole)) {
 				map.put("adminId", LoginInfoHelper.getUserId());
@@ -840,13 +759,11 @@ public class ClientServiceImpl implements ClientService {
 			ClientSummaryVO re = clientDao.selectClientStatusSummary(map);
 
 			if (re != null) {
-
 				ClientSummaryVO[] row = new ClientSummaryVO[1];
 				row[0] = re;
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
-
 			} else {
 				Object[] o = new Object[0];
 				resultVO.setData(o);
@@ -857,10 +774,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getClientStatusSummary : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -870,10 +785,9 @@ public class ClientServiceImpl implements ClientService {
 	 * generate user login count data by status
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getLoginStatusSummary() throws Exception {
+	public ResultVO getLoginStatusSummary() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -882,7 +796,6 @@ public class ClientServiceImpl implements ClientService {
 			ClientSummaryVO re = clientDao.selectLoginStatusSummary();
 
 			if (re != null) {
-
 				ClientSummaryVO[] row = new ClientSummaryVO[1];
 				row[0] = re;
 				resultVO.setData(row);
@@ -899,10 +812,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getLoginStatusSummary : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -912,10 +823,9 @@ public class ClientServiceImpl implements ClientService {
 	 * generate package count by client and need update
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getUpdatePackageSummary() throws Exception {
+	public ResultVO getUpdatePackageSummary() {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -937,10 +847,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getUpdatePackageSummary : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -950,18 +858,16 @@ public class ClientServiceImpl implements ClientService {
 	 * generate client list data that need update package.
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getUpdatePackageClientList() throws Exception {
+	public ResultVO getUpdatePackageClientList() {
 
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<UpdatePackageClientVO> re = clientDao.selectUpdatePackageClientList();
 
 			if (re != null) {
-
-				UpdatePackageClientVO[] row = re.stream().toArray(UpdatePackageClientVO[]::new);
+				UpdatePackageClientVO[] row = re.toArray(UpdatePackageClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -976,22 +882,20 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getUpdatePackageClientList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
 	}
 
 	@Override
-	public ResultVO getClientListForNoticeInstantNotice(String noticePublishId) throws Exception {
+	public ResultVO getClientListForNoticeInstantNotice(String noticePublishId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<ClientVO> re = clientDao.selectOnlineClientIdsForNoticeInstantNotice(noticePublishId);
 			if (re != null && re.size() > 0) {
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -1004,10 +908,8 @@ public class ClientServiceImpl implements ClientService {
 		} catch (Exception ex) {
 			logger.error("error in getClientListInOnline : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}

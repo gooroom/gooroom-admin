@@ -88,7 +88,7 @@ public interface AdminUserService {
 	/**
 	 * modify administrator user information data
 	 * 
-	 * @param vo AdminUserVO data bean
+	 * @param adminUserVO AdminUserVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -97,7 +97,7 @@ public interface AdminUserService {
 	/**
 	 * modify current administrator user information data (pollingCycle)
 	 * 
-	 * @param vo AdminUserVO data bean
+	 * @param adminUserVO AdminUserVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -106,7 +106,7 @@ public interface AdminUserService {
 	/**
 	 * delete administrator user information data
 	 * 
-	 * @param vo AdminUserVO data bean
+	 * @param adminUserVO AdminUserVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -131,7 +131,7 @@ public interface AdminUserService {
 	 * @return ResultPagingVO result data bean
 	 * @throws Exception
 	 */
-	public ResultPagingVO getAdminActListPaged(HashMap<String, Object> options) throws Exception;
+	ResultPagingVO getAdminActListPaged(HashMap<String, Object> options) throws Exception;
 
 	/**
 	 * clear administrator login trial info

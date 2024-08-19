@@ -2,13 +2,11 @@ package kr.gooroom.gpms.login.exception;
 
 import org.springframework.security.core.AuthenticationException;
 
-public class BadAccessIpException extends AuthenticationException {
-	// ~ Constructors
-	// ===================================================================================================
+import java.io.Serial;
 
-	/**
-	 * 
-	 */
+public class BadAccessIpException extends AuthenticationException {
+
+	@Serial
 	private static final long serialVersionUID = -4548271530012295383L;
 
 	/**

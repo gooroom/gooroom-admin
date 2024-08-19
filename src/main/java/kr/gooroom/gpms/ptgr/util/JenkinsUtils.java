@@ -30,9 +30,7 @@ public class JenkinsUtils {
             Process bProcess = bProcessBuilder.start();
             bProcess.waitFor(1, TimeUnit.MINUTES);
             bProcess.destroy();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -57,9 +55,7 @@ public class JenkinsUtils {
             Process bProcess = bProcessBuilder.start();
             bProcess.waitFor(1, TimeUnit.MINUTES);
             bProcess.destroy();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -77,9 +73,7 @@ public class JenkinsUtils {
 
             bProcess.waitFor(1, TimeUnit.MINUTES);
             bProcess.destroy();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return res;
@@ -106,9 +100,7 @@ public class JenkinsUtils {
 
             bProcess.waitFor(1, TimeUnit.MINUTES);
             bProcess.destroy();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return res;

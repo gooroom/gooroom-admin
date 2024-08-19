@@ -99,7 +99,7 @@ public interface ClientGroupService {
 	/**
 	 * check duplicate client group name in group id
 	 * 
-	 * @param groupId   string target group id
+	 * @param grpId   string target group id
 	 * @param groupName string target group name
 	 * @return StatusVO result status object
 	 * @throws Exception
@@ -181,7 +181,6 @@ public interface ClientGroupService {
 	/**
 	 * response client group children id array
 	 * 
-	 * @param
 	 * @return ResultVO
 	 * @throws Exception
 	 */
@@ -190,7 +189,9 @@ public interface ClientGroupService {
 	/**
 	 * update group rule and conf
 	 * 
-	 * @param String grpId, String cfgId, String confType
+	 * @param grpId string
+	 * @param cfgId string
+	 * @param confType string
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -199,7 +200,7 @@ public interface ClientGroupService {
 	/**
 	 * get child group list
 	 * 
-	 * @param String grpId
+	 * @param grpId string
 	 * @return ResultVO
 	 * @throws Exception
 	 */
@@ -208,7 +209,6 @@ public interface ClientGroupService {
 	/**
 	 * 여러그룹 정책정보 일괄수정
 	 * 
-	 * @param
 	 * @return StatusVO
 	 * @throws Exception
 	 */

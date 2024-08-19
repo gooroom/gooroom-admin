@@ -16,13 +16,10 @@
 
 package kr.gooroom.sample.schedule.service.impl;
 
-import java.sql.SQLException;
-
+import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-
-import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 
 /**
  * data access object class for site information management process.
@@ -35,89 +32,89 @@ public class MigSampleDAO extends SqlSessionMetaDAO {
 
 	private static final Logger logger = LoggerFactory.getLogger(MigSampleDAO.class);
 
-	public int getLimitValue() throws SQLException {
-		return (int) sqlSessionMeta.selectOne("getLimitValue");
+	public int getLimitValue() {
+		return sqlSessionMeta.selectOne("getLimitValue");
 	}
-	public long updatePeriod(String value) throws SQLException {
-		return (long) sqlSessionMeta.update("updatePeriod", value);
+	public long updatePeriod(String value) {
+		return sqlSessionMeta.update("updatePeriod", value);
 	}
-	public long updateLimit(String value) throws SQLException {
-		return (long) sqlSessionMeta.update("updateLimit", value);
+	public long updateLimit(String value) {
+		return sqlSessionMeta.update("updateLimit", value);
 	}
 
 	
-	public long deleteDeptTempData() throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteDeptTempData");
+	public long deleteDeptTempData() {
+		return sqlSessionMeta.delete("deleteDeptTempData");
 	}
 	
-	public long copyViewToDeptTemp() throws SQLException {
-		return (long) sqlSessionMeta.update("copyViewToDeptTemp");
+	public long copyViewToDeptTemp() {
+		return sqlSessionMeta.update("copyViewToDeptTemp");
 	}
 
-	public long getCountForDeptDelete() throws SQLException {
-		return (long) sqlSessionMeta.selectOne("getCountForDeptDelete");
+	public long getCountForDeptDelete() {
+		return sqlSessionMeta.selectOne("getCountForDeptDelete");
 	}
 
-	public long getCountForDeptUpdate() throws SQLException {
-		return (long) sqlSessionMeta.selectOne("getCountForDeptUpdate");
+	public long getCountForDeptUpdate() {
+		return sqlSessionMeta.selectOne("getCountForDeptUpdate");
 	}
 
-	public long getCountForDeptInsert() throws SQLException {
-		return (long) sqlSessionMeta.selectOne("getCountForDeptInsert");
+	public long getCountForDeptInsert() {
+		return sqlSessionMeta.selectOne("getCountForDeptInsert");
 	}
 
-	public long getCountForDept() throws SQLException {
-		return (long) sqlSessionMeta.selectOne("getCountForDept");
+	public long getCountForDept() {
+		return sqlSessionMeta.selectOne("getCountForDept");
 	}
 	
-	public long deleteForMigDeptData() throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteForMigDeptData");
+	public long deleteForMigDeptData() {
+		return sqlSessionMeta.delete("deleteForMigDeptData");
 	}
 
-	public long updateForMigDeptData() throws SQLException {
-		return (long) sqlSessionMeta.update("updateForMigDeptData");
+	public long updateForMigDeptData() {
+		return sqlSessionMeta.update("updateForMigDeptData");
 	}
 
-	public long insertForMigDeptData() throws SQLException {
-		return (long) sqlSessionMeta.insert("insertForMigDeptData");
+	public long insertForMigDeptData() {
+		return sqlSessionMeta.insert("insertForMigDeptData");
 	}
 	
 
 
-	public long deleteUserTempData() throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteUserTempData");
+	public long deleteUserTempData() {
+		return sqlSessionMeta.delete("deleteUserTempData");
 	}
 	
-	public long copyViewToUserTemp() throws SQLException {
-		return (long) sqlSessionMeta.update("copyViewToUserTemp");
+	public long copyViewToUserTemp() {
+		return sqlSessionMeta.update("copyViewToUserTemp");
 	}
 
-	public long getCountForUserDelete() throws SQLException {
-		return (long) sqlSessionMeta.selectOne("getCountForUserDelete");
+	public long getCountForUserDelete() {
+		return sqlSessionMeta.selectOne("getCountForUserDelete");
 	}
 
-	public long getCountForUserUpdate() throws SQLException {
-		return (long) sqlSessionMeta.selectOne("getCountForUserUpdate");
+	public long getCountForUserUpdate() {
+		return sqlSessionMeta.selectOne("getCountForUserUpdate");
 	}
 
-	public long getCountForUserInsert() throws SQLException {
-		return (long) sqlSessionMeta.selectOne("getCountForUserInsert");
+	public long getCountForUserInsert() {
+		return sqlSessionMeta.selectOne("getCountForUserInsert");
 	}
 
-	public long getCountForUser() throws SQLException {
-		return (long) sqlSessionMeta.selectOne("getCountForUser");
+	public long getCountForUser() {
+		return sqlSessionMeta.selectOne("getCountForUser");
 	}
 	
-	public long deleteForMigUserData() throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteForMigUserData");
+	public long deleteForMigUserData() {
+		return sqlSessionMeta.delete("deleteForMigUserData");
 	}
 
-	public long updateForMigUserData() throws SQLException {
-		return (long) sqlSessionMeta.update("updateForMigUserData");
+	public long updateForMigUserData() {
+		return sqlSessionMeta.update("updateForMigUserData");
 	}
 
-	public long insertForMigUserData() throws SQLException {
-		return (long) sqlSessionMeta.insert("insertForMigUserData");
+	public long insertForMigUserData() {
+		return sqlSessionMeta.insert("insertForMigUserData");
 	}
 
 }

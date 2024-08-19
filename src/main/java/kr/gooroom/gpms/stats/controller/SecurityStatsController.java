@@ -100,10 +100,10 @@ public class SecurityStatsController {
 
 			resultVO = securityStatsService.getViolatedCount(fromDate, toDate, "day");
 
-			HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> fromDateHm = new HashMap<>();
 			fromDateHm.put("name", "fromDate");
 			fromDateHm.put("value", fromDate);
-			HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> toDateHm = new HashMap<>();
 			toDateHm.put("name", "toDate");
 			toDateHm.put("value", toDate);
 			resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -162,7 +162,7 @@ public class SecurityStatsController {
 	public @ResponseBody ResultPagingVO readViolatedListPaged(HttpServletRequest req) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		try {
 			// << options >>
@@ -232,9 +232,6 @@ public class SecurityStatsController {
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Calendar cal = Calendar.getInstance();
-//	cal.set(Calendar.YEAR, 2018);	
-//	cal.set(Calendar.MONTH, 10);
-//	cal.set(Calendar.DATE, 7);
 		String toDate = dateFormat.format(cal.getTime());
 		if ("day".equalsIgnoreCase(countType)) {
 			cal.add(Calendar.DATE, -7);

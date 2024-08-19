@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.config.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -26,9 +27,10 @@ import java.io.Serializable;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class DesktopItemVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = -2343888349593237635L;
 	private String appId;
 	private String appGubun;
 	private String position;

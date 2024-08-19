@@ -66,7 +66,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 	}
 
 	private String createNewFilename(Path path, String filename, int count) {
-		String newFilename = null;
+		String newFilename;
 		try {
 			newFilename = FilenameUtils.getBaseName(filename) + "-" + count + "."
 					+ FilenameUtils.getExtension(filename);
@@ -126,9 +126,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
 			return vo;
 
-		} catch (IOException e) {
-			throw new GRFileHandleException("Failed to store file " + filename, e);
-		} catch (SQLException e) {
+		} catch (IOException | SQLException e) {
 			throw new GRFileHandleException("Failed to store file " + filename, e);
 		}
 	}
@@ -210,8 +208,6 @@ public class FileUploadServiceImpl implements FileUploadService {
 	 * delete all file data.
 	 * <p>
 	 * use spring util.
-	 * 
-	 * @return void
 	 *
 	 */
 	@Override
@@ -222,8 +218,6 @@ public class FileUploadServiceImpl implements FileUploadService {
 	/**
 	 * initialize method from object
 	 * 
-	 * @return void
-	 *
 	 */
 	@Override
 	public void init() {

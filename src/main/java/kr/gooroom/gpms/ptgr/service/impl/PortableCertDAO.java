@@ -6,40 +6,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.sql.SQLException;
-
 @Repository("portableCertDAO")
 public class PortableCertDAO extends SqlSessionMetaDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(PortableCertDAO.class);
 
-    public long createPortableCert(PortableCertVO vo) throws SQLException {
-        return (long) sqlSessionMeta.insert("insertPortableCert", vo);
+    public long createPortableCert(PortableCertVO vo) {
+        return sqlSessionMeta.insert("insertPortableCert", vo);
     }
 
-    public PortableCertVO selectPortableCert(String certId) throws SQLException {
+    public PortableCertVO selectPortableCert(String certId) {
         PortableCertVO res = null;
         res = sqlSessionMeta.selectOne("selectPortableCert", certId);
         return res;
     }
 
-    public long updatePortableCert(PortableCertVO vo) throws SQLException {
-        return (long) sqlSessionMeta.update("updatePortableCert", vo);
+    public long updatePortableCert(PortableCertVO vo) {
+        return sqlSessionMeta.update("updatePortableCert", vo);
     }
 
-    public long deletePortableCert(int certId) throws SQLException {
-        return (long) sqlSessionMeta.delete("deletePortableCert", certId);
+    public long deletePortableCert(int certId) {
+        return sqlSessionMeta.delete("deletePortableCert", certId);
     }
 
-    public long deletePortableCertAll() throws SQLException {
-        return (long) sqlSessionMeta.delete("deletePortableCertAll");
+    public long deletePortableCertAll() {
+        return sqlSessionMeta.delete("deletePortableCertAll");
     }
 
-    public int selectNextPortableCertNumber() throws SQLException {
+    public int selectNextPortableCertNumber() {
         return sqlSessionMeta.selectOne("selectNextCertNo" );
     }
 
-    public int selectPortableCertCount() throws SQLException {
+    public int selectPortableCertCount() {
         return sqlSessionMeta.selectOne("selectNextCertCount" );
     }
 }

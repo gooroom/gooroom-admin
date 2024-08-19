@@ -118,7 +118,7 @@ public class AdminUserController {
 	public @ResponseBody ResultPagingVO readAdminUserListPaged(HttpServletRequest req, HttpServletResponse res,
 			ModelMap model) {
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		options.put("adminType", req.getParameter("adminType"));
@@ -162,10 +162,8 @@ public class AdminUserController {
 		} catch (Exception ex) {
 			logger.error("error in readAdminUserListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -178,7 +176,7 @@ public class AdminUserController {
 	 * 
 	 */
 	@PostMapping(value = "/isExistAdminUserId")
-	public @ResponseBody ResultVO isExistAdminUserId(@RequestParam(value = "adminId", required = true) String adminId) {
+	public @ResponseBody ResultVO isExistAdminUserId(@RequestParam(value = "adminId") String adminId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -189,10 +187,8 @@ public class AdminUserController {
 		} catch (Exception ex) {
 			logger.error("error in isExistAdminUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -240,7 +236,7 @@ public class AdminUserController {
 
 		// array : client group id
 		String[] grpInfoList = req.getParameterValues("grpInfoList[][value]");
-		ArrayList<String> grpList = new ArrayList<String>();
+		ArrayList<String> grpList = new ArrayList<>();
 		if (grpInfoList != null && grpInfoList.length > 0) {
 			grpList = new ArrayList<>(Arrays.asList(grpInfoList));
 		}
@@ -249,7 +245,7 @@ public class AdminUserController {
 
 		// array : dept cd
 		String[] deptInfoList = req.getParameterValues("deptInfoList[][value]");
-		ArrayList<String> deptList = new ArrayList<String>();
+		ArrayList<String> deptList = new ArrayList<>();
 		if (deptInfoList != null && deptInfoList.length > 0) {
 			deptList = new ArrayList<>(Arrays.asList(deptInfoList));
 		}
@@ -273,10 +269,8 @@ public class AdminUserController {
 
 			logger.error("error in createAdminUser : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -285,7 +279,6 @@ public class AdminUserController {
 	/**
 	 * modify administrator user data
 	 * 
-	 * @param paramVO AdminUserVO data bean
 	 * @return ResultVO result data bean
 	 * 
 	 */
@@ -329,10 +322,8 @@ public class AdminUserController {
 		} catch (Exception ex) {
 			logger.error("error in updateAdminUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -353,10 +344,8 @@ public class AdminUserController {
 		} catch (Exception ex) {
 			logger.error("error in updateCurrentAdminUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -370,7 +359,7 @@ public class AdminUserController {
 	 */
 	@PostMapping(value = "/deleteAdminUserData")
 	public @ResponseBody ResultVO deleteAdminUserData(
-			@RequestParam(value = "adminId", required = true) String adminId) {
+			@RequestParam(value = "adminId") String adminId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -386,10 +375,8 @@ public class AdminUserController {
 
 			logger.error("error in deleteAdminUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -403,7 +390,7 @@ public class AdminUserController {
 	 * 
 	 */
 	@PostMapping(value = "/readAdminUserData")
-	public @ResponseBody ResultVO readAdminUserData(@RequestParam(value = "adminId", required = true) String adminId) {
+	public @ResponseBody ResultVO readAdminUserData(@RequestParam(value = "adminId") String adminId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -411,10 +398,8 @@ public class AdminUserController {
 		} catch (Exception ex) {
 			logger.error("error in readAdminUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -423,7 +408,6 @@ public class AdminUserController {
 	/**
 	 * generate current administrator user data
 	 * 
-	 * @param adminId String user id
 	 * @return ResultVO result data bean
 	 * 
 	 */
@@ -436,10 +420,8 @@ public class AdminUserController {
 		} catch (Exception ex) {
 			logger.error("error in readAdminUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -457,7 +439,7 @@ public class AdminUserController {
 			ModelMap model) {
 		
 		ResultPagingVO resultVO = null;
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		try {
 			// << options >>
@@ -507,10 +489,10 @@ public class AdminUserController {
 
 			resultVO = adminUserService.getAdminActListPaged(options);
 
-			HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> fromDateHm = new HashMap<>();
 			fromDateHm.put("name", "fromDate");
 			fromDateHm.put("value", fromDate);
-			HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> toDateHm = new HashMap<>();
 			toDateHm.put("name", "toDate");
 			toDateHm.put("value", toDate);
 			resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -523,10 +505,8 @@ public class AdminUserController {
 		} catch (Exception ex) {
 			logger.error("error in readAdminActListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -543,7 +523,7 @@ public class AdminUserController {
 	public @ResponseBody ResultPagingVO readAdminRecordListPaged(HttpServletRequest req) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
@@ -586,21 +566,11 @@ public class AdminUserController {
 			resultVO.setOrderDir(paramOrderDir);
 			resultVO.setRowLength(paramLength);
 
-//	    if ("".equals(fromDate) || "".equals(toDate)) {
-//		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//		Calendar cal = Calendar.getInstance();
-//		toDate = dateFormat.format(cal.getTime());
-//		cal.add(Calendar.DATE, -3);
-//		fromDate = dateFormat.format(cal.getTime());
-//	    }
-
 		} catch (Exception ex) {
 			logger.error("error in readAdminRecordListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -615,7 +585,7 @@ public class AdminUserController {
 	 */
 	@PostMapping(value = "/updateAdminAddress")
 	public @ResponseBody ResultVO createAdminAddress(
-			@RequestParam(value = "adminAddresses[]", required = true) List<String> adminAddresses) {
+			@RequestParam(value = "adminAddresses[]") List<String> adminAddresses) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -628,7 +598,7 @@ public class AdminUserController {
 			itemVo.setMngObjTpAbbr(GPMSConstants.CTRL_ITEM_AVAILCONNECT_RULE_ABBR);
 			itemVo.setModUserId(LoginInfoHelper.getUserId());
 
-			ArrayList<CtrlPropVO> propList = new ArrayList<CtrlPropVO>();
+			ArrayList<CtrlPropVO> propList = new ArrayList<>();
 			int propSeq = 1;
 			if (adminAddresses != null && adminAddresses.size() > 0) {
 				for (String address : adminAddresses) {
@@ -654,10 +624,8 @@ public class AdminUserController {
 
 			logger.error("error in createAdminAddress : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -667,7 +635,6 @@ public class AdminUserController {
 	/**
 	 * clear administrator login trial info
 	 * 
-	 * @param  AdminUserVO data bean
 	 * @return ResultVO result data bean
 	 * 
 	 */
@@ -681,10 +648,8 @@ public class AdminUserController {
 		} catch (Exception ex) {
 			logger.error("error in updateLoginTrialData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}

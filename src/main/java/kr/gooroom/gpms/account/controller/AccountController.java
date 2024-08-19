@@ -16,16 +16,15 @@
 
 package kr.gooroom.gpms.account.controller;
 
-import java.util.Base64;
-import java.util.Base64.Decoder;
-
+import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import kr.gooroom.gpms.common.GPMSConstants;
-import kr.gooroom.gpms.common.utils.MessageSourceHelper;
+import java.util.Base64;
+import java.util.Base64.Decoder;
 
 /**
  * Handles requests for login process

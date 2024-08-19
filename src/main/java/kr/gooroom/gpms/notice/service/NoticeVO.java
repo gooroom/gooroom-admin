@@ -1,14 +1,16 @@
 package kr.gooroom.gpms.notice.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@SuppressWarnings("serial")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NoticeVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = -8315654189394930964L;
 	private String noticeId;
 
 	private String title;

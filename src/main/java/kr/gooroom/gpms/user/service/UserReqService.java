@@ -44,7 +44,7 @@ public interface UserReqService {
      * @return ResultPagingVO result data bean
      * @throws Exception
      */
-    public ResultPagingVO getUserReqActListPaged(HashMap<String, Object> options) throws Exception;
+    ResultPagingVO getUserReqActListPaged(HashMap<String, Object> options) throws Exception;
 
     /**
      * 사용자 USB 등록/삭제 요청 승인

@@ -1,13 +1,16 @@
 package kr.gooroom.gpms.notice.controller;
 
-import java.util.HashMap;
-
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.common.service.ResultPagingVO;
+import kr.gooroom.gpms.common.service.ResultVO;
+import kr.gooroom.gpms.common.service.StatusVO;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
+import kr.gooroom.gpms.notice.service.NoticeService;
+import kr.gooroom.gpms.notice.service.NoticeVO;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -16,13 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import kr.gooroom.gpms.common.GPMSConstants;
-import kr.gooroom.gpms.common.service.ResultPagingVO;
-import kr.gooroom.gpms.common.service.ResultVO;
-import kr.gooroom.gpms.common.service.StatusVO;
-import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.notice.service.NoticeService;
-import kr.gooroom.gpms.notice.service.NoticeVO;
+import java.util.HashMap;
 
 @Controller
 public class NoticeController {
@@ -72,7 +69,7 @@ public class NoticeController {
 
 	@PostMapping(value = "/deleteNotice")
 	@ResponseBody
-	public ResultVO deleteNotice(@RequestParam(value = "noticeId", required = true) String noticeId) {
+	public ResultVO deleteNotice(@RequestParam(value = "noticeId") String noticeId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			StatusVO status = noticeService.deleteNoticeMaster(noticeId);
@@ -93,7 +90,7 @@ public class NoticeController {
 	public ResultVO readNoticeListPaged(HttpServletRequest req, HttpServletResponse res) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));

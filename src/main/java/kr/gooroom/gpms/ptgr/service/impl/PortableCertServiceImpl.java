@@ -21,7 +21,7 @@ public class PortableCertServiceImpl implements PortableCertService {
     private PortableCertDAO portableCertDAO;
 
     @Override
-    public StatusVO createCertData(PortableCertVO portableCertVO) throws Exception {
+    public StatusVO createCertData(PortableCertVO portableCertVO) {
 
         StatusVO statusVO = new StatusVO();
 
@@ -45,7 +45,7 @@ public class PortableCertServiceImpl implements PortableCertService {
     }
 
     @Override
-    public ResultVO readCertDataByCertId(String certId) throws Exception {
+    public ResultVO readCertDataByCertId(String certId) {
 
         ResultVO resultVO = new ResultVO();
         try {
@@ -69,7 +69,7 @@ public class PortableCertServiceImpl implements PortableCertService {
     }
 
     @Override
-    public StatusVO updateCertData(PortableCertVO portableCertVO) throws Exception {
+    public StatusVO updateCertData(PortableCertVO portableCertVO) {
 
         StatusVO statusVO = new StatusVO();
 
@@ -93,7 +93,7 @@ public class PortableCertServiceImpl implements PortableCertService {
     }
 
     @Override
-    public StatusVO deleteCertDataByCertId(int certId) throws Exception {
+    public StatusVO deleteCertDataByCertId(int certId) {
 
         StatusVO statusVO = new StatusVO();
 
@@ -117,12 +117,12 @@ public class PortableCertServiceImpl implements PortableCertService {
     }
 
     @Override
-    public int readNextCertDataIndex() throws Exception {
+    public int readNextCertDataIndex() {
         return portableCertDAO.selectNextPortableCertNumber();
     }
 
     @Override
-    public int readCertDataCount() throws Exception {
+    public int readCertDataCount() {
         return portableCertDAO.selectPortableCertCount();
     }
 }

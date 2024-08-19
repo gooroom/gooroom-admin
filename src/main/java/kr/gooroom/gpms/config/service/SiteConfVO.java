@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.config.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,9 +28,10 @@ import java.util.Date;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class SiteConfVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = 8570945303909301686L;
 	private String siteId;
 	private String siteName;
 

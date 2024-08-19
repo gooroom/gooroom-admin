@@ -1,10 +1,13 @@
 package kr.gooroom.gpms.ptgr.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 public class PortableViewVO implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 8826117308280195179L;
     int ptgrId;
     int certId;
 

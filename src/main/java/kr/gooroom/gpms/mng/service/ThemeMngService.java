@@ -117,7 +117,8 @@ public interface ThemeMngService {
 	/**
 	 * save file physically to specified location.
 	 *
-	 * @param file MultipartFile file request body
+	 * @param fileType MultipartFile file request body
+	 * @param voType FileVO
 	 * @return FileVO saved file data
 	 *
 	 */

@@ -70,7 +70,7 @@ public interface ClientMngService {
 	/**
 	 * create profile set by reference client id, start job.
 	 * 
-	 * @param ClientProfileSetVO
+	 * @param vo ClientProfileSetVO
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -124,7 +124,7 @@ public interface ClientMngService {
 	/**
 	 * delete client software data
 	 * 
-	 * @param regKeyNo String
+	 * @param swId String
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -133,7 +133,7 @@ public interface ClientMngService {
 	/**
 	 * update client software data
 	 * 
-	 * @param clientRegKeyVO ClientRegKeyVO data bean
+	 * @param  clientSoftwareVO ClientSoftwareVO
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */

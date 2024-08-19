@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.config.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -30,9 +31,10 @@ import kr.gooroom.gpms.mng.service.DesktopAppVO;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class DesktopConfVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = 4613604264464520431L;
 	private String confId;
 	private String confNm;
 	private String confInfo;

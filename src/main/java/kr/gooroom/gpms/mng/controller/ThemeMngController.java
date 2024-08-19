@@ -143,7 +143,7 @@ public class ThemeMngController {
 	 *
 	 */
 	@PostMapping(value = "/deleteThemeData")
-	public @ResponseBody ResultVO deleteThemeData(@RequestParam(value = "themeId", required = true) String themeId) {
+	public @ResponseBody ResultVO deleteThemeData(@RequestParam(value = "themeId") String themeId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -250,7 +250,7 @@ public class ThemeMngController {
 	public @ResponseBody ResultVO readThemeListPaged(HttpServletRequest req) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 		options.put("ICON_ADDRESS", CommonUtils.createIconUrlPath());
 
 		// << options >>
@@ -308,7 +308,7 @@ public class ThemeMngController {
 	 * @param themeId String theme id. @return ResultVO result data bean. @throws
 	 */
 	@PostMapping(value = "/readThemeData")
-	public @ResponseBody ResultVO readThemeData(@RequestParam(value = "themeId", required = true) String themeId) {
+	public @ResponseBody ResultVO readThemeData(@RequestParam(value = "themeId") String themeId) {
 
 		ResultVO resultVO = new ResultVO();
 		
@@ -406,7 +406,7 @@ public class ThemeMngController {
 	 */
 	@PostMapping(value = "/deleteWallpaperData")
 	public @ResponseBody ResultVO deleteWallpaperData(
-			@RequestParam(value = "wallpaperId", required = true) String wallpaperId) {
+			@RequestParam(value = "wallpaperId") String wallpaperId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {

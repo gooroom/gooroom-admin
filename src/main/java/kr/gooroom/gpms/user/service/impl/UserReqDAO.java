@@ -1,10 +1,8 @@
 package kr.gooroom.gpms.user.service.impl;
 
-import kr.gooroom.gpms.account.service.ActHistoryVO;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.config.service.SiteConfVO;
 import kr.gooroom.gpms.user.service.UserReqVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +21,8 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      * 사용자 USB 등록/삭제 요청 리스트
      *
      * @return UserReqVO List
-     * @throws SQLException
      */
-    public List<UserReqVO> selectUserReqList(String userId) throws SQLException {
+    public List<UserReqVO> selectUserReqList(String userId) {
         List<UserReqVO> re = null;
         try {
             re = sqlSessionMeta.selectList("selectUserReqList", userId);
@@ -41,9 +38,8 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      * 사용자 USB 등록/삭제 요청 검색
      *
      * @return UserReqVO List
-     * @throws SQLException
      */
-    public List<UserReqVO> selectUserReqListPaged(HashMap<String, Object> options) throws SQLException {
+    public List<UserReqVO> selectUserReqListPaged(HashMap<String, Object> options) {
         List<UserReqVO> re = null;
         try {
             re = sqlSessionMeta.selectList("selectUserReqListPaged", options);
@@ -60,10 +56,9 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      *
      * @param options HashMap<String, Object> options for select
      * @return long total count number.
-     * @throws SQLException
      */
-    public long selectUserReqListTotalCount(HashMap<String, Object> options) throws SQLException {
-        return (long) sqlSessionMeta.selectOne("selectUserReqListTotalCount", options);
+    public long selectUserReqListTotalCount(HashMap<String, Object> options) {
+        return sqlSessionMeta.selectOne("selectUserReqListTotalCount", options);
     }
 
     /**
@@ -71,10 +66,9 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      *
      * @param options HashMap<String, Object> options for select
      * @return long filtered count number.
-     * @throws SQLException
      */
-    public long selectUserReqListFilteredCount(HashMap<String, Object> options) throws SQLException {
-        return (long) sqlSessionMeta.selectOne("selectUserReqListFilteredCount", options);
+    public long selectUserReqListFilteredCount(HashMap<String, Object> options) {
+        return sqlSessionMeta.selectOne("selectUserReqListFilteredCount", options);
     }
 
     /**
@@ -101,10 +95,9 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      *
      * @param options HashMap<String, Object> options for select
      * @return long total count number.
-     * @throws SQLException
      */
-    public long selectUserReqActListTotalCount(HashMap<String, Object> options) throws SQLException {
-        return (long) sqlSessionMeta.selectOne("selectUserReqActListTotalCount", options);
+    public long selectUserReqActListTotalCount(HashMap<String, Object> options) {
+        return sqlSessionMeta.selectOne("selectUserReqActListTotalCount", options);
     }
 
     /**
@@ -112,10 +105,9 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      *
      * @param options HashMap<String, Object> options for select
      * @return long filtered count number.
-     * @throws SQLException
      */
-    public long selectUserReqActListFilteredCount(HashMap<String, Object> options) throws SQLException {
-        return (long) sqlSessionMeta.selectOne("selectUserReqActListFilteredCount", options);
+    public long selectUserReqActListFilteredCount(HashMap<String, Object> options) {
+        return sqlSessionMeta.selectOne("selectUserReqActListFilteredCount", options);
     }
 
     /**
@@ -144,7 +136,7 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      * @throws SQLException
      */
     public long updateUserReq(UserReqVO vo) throws SQLException {
-        return (long) sqlSessionMeta.update("updateUserReq", vo);
+        return sqlSessionMeta.update("updateUserReq", vo);
     }
 
     /**
@@ -155,7 +147,7 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      * @throws SQLException
      */
     public long updateUserReqStatus(UserReqVO vo) throws SQLException {
-        return (long) sqlSessionMeta.update("updateUserReqStatus", vo);
+        return sqlSessionMeta.update("updateUserReqStatus", vo);
     }
 
 
@@ -163,9 +155,8 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      * 사용자의 요청 데이타
      * @param reqSeq
      * @return
-     * @throws Exception
      */
-    public List<UserReqVO> selectUserReqData(String reqSeq) throws Exception {
+    public List<UserReqVO> selectUserReqData(String reqSeq) {
         return sqlSessionMeta.selectList("selectUserReqData", reqSeq);
     }
 
@@ -174,9 +165,8 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      *
      * @param vo
      * @return int
-     * @throws Exception
      */
-    public int insertUserReqMstr(UserReqVO vo) throws Exception {
+    public int insertUserReqMstr(UserReqVO vo) {
         return sqlSessionMeta.insert("insertUserReqMstr", vo);
     }
 
@@ -185,9 +175,8 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      *
      * @param vo
      * @return int
-     * @throws Exception
      */
-    public int insertUserReqProp(UserReqVO vo) throws Exception {
+    public int insertUserReqProp(UserReqVO vo) {
         return sqlSessionMeta.insert("insertUserReqProp", vo);
     }
 
@@ -195,9 +184,8 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      * 요청의 reqSeq 검색
      * @param urmVo
      * @return
-     * @throws Exception
      */
-    public String selectUserReqSeq(UserReqVO urmVo) throws Exception {
+    public String selectUserReqSeq(UserReqVO urmVo) {
         return sqlSessionMeta.selectOne("selectUserReqSeq", urmVo);
     }
 
@@ -208,7 +196,7 @@ public class UserReqDAO extends SqlSessionMetaDAO {
      * @throws SQLException
      */
     public long createUserReqHist(UserReqVO vo) throws SQLException {
-        return (long) sqlSessionMeta.insert("insertUserReqHist", vo);
+        return sqlSessionMeta.insert("insertUserReqHist", vo);
     }
 
     /**

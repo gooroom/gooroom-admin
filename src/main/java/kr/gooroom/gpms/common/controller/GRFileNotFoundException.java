@@ -26,7 +26,6 @@ package kr.gooroom.gpms.common.controller;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class GRFileNotFoundException extends GRFileHandleException {
 
 	public GRFileNotFoundException(String message) {

@@ -60,7 +60,7 @@ public class TargetNoticeController {
 	public ResponseEntity<List<TargetNoticeResponseModel>> getNoticesByTarget(
 			@RequestAttribute(value = "CLIENT_ID") String clientId,
 			@RequestAttribute(value = "USER_ID", required = false) String userId,
-			@PageableDefault(page = 0, size = 10, sort = "openDt", direction = Direction.DESC) Pageable pageable) {
+			@PageableDefault(sort = "openDt", direction = Direction.DESC) Pageable pageable) {
 
 		logger.debug("REST request to get Notices : {}, {}", clientId, userId);
 
@@ -84,7 +84,7 @@ public class TargetNoticeController {
 
 		logger.debug("REST request to get Notice : {}, {}, {}", clientId, userId, noticePublishId);
 
-		Optional<TargetNoticeResponseModel> notice = null;
+		Optional<TargetNoticeResponseModel> notice = Optional.empty();
 		try {
 			notice = noticeService.getNoticeByTarget(userId, clientId, noticePublishId)
 					.map(tnVO -> new TargetNoticeResponseModel(tnVO, true));
@@ -95,7 +95,7 @@ public class TargetNoticeController {
 			throw new InternalServerErrorException("error in getNoticeByTarget");
 		}
 
-		return notice.map(response -> ResponseEntity.ok(response)).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+		return notice.map(ResponseEntity::ok).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	@GetMapping(value = "/apis/notices/{noticePublishId}/pagenumber")
@@ -103,7 +103,7 @@ public class TargetNoticeController {
 	public ResponseEntity<Map<String, Integer>> getPageNumberOfNoticeByTarget(
 			@RequestAttribute(value = "CLIENT_ID") String clientId,
 			@RequestAttribute(value = "USER_ID", required = false) String userId, @PathVariable String noticePublishId,
-			@PageableDefault(page = 0, size = 10, sort = "openDt", direction = Direction.DESC) Pageable pageable) {
+			@PageableDefault(sort = "openDt", direction = Direction.DESC) Pageable pageable) {
 
 		logger.debug("REST request to get PageNumber of notice : {}, {}, {}", clientId, userId, noticePublishId);
 

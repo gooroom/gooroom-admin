@@ -16,16 +16,7 @@
 
 package kr.gooroom.gpms.site.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import jakarta.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
@@ -34,6 +25,12 @@ import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.site.service.SiteMngService;
 import kr.gooroom.gpms.site.service.SiteMngVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * site information management service implements class
@@ -53,15 +50,14 @@ public class SiteMngServiceImpl implements SiteMngService {
 	 * generate site information list data
 	 * 
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readSiteMngList() throws Exception {
+	public ResultVO readSiteMngList() {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<SiteMngVO> re = siteMngDao.selectSiteMngList();
 			if (re != null && re.size() > 0) {
-				SiteMngVO[] row = re.stream().toArray(SiteMngVO[]::new);
+				SiteMngVO[] row = re.toArray(SiteMngVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -74,10 +70,8 @@ public class SiteMngServiceImpl implements SiteMngService {
 		} catch (Exception ex) {
 			logger.error("error in readSiteMngList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -87,10 +81,9 @@ public class SiteMngServiceImpl implements SiteMngService {
 	 * 
 	 * @param options HashMap data bean
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getSiteMngListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getSiteMngListPaged(HashMap<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 
 		try {
@@ -107,9 +100,9 @@ public class SiteMngServiceImpl implements SiteMngService {
 						obj.setStatus(MessageSourceHelper.getMessage("user.status.delete"));
 					}
 					return obj;
-				}).collect(Collectors.toList());
+				}).toList();
 
-				SiteMngVO[] row = result.stream().toArray(SiteMngVO[]::new);
+				SiteMngVO[] row = result.toArray(SiteMngVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -126,10 +119,8 @@ public class SiteMngServiceImpl implements SiteMngService {
 		} catch (Exception ex) {
 			logger.error("error in getSiteMngListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -140,10 +131,9 @@ public class SiteMngServiceImpl implements SiteMngService {
 	 * 
 	 * @param vo SiteMngVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO createSiteMng(SiteMngVO vo) throws Exception {
+	public StatusVO createSiteMng(SiteMngVO vo) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -164,10 +154,8 @@ public class SiteMngServiceImpl implements SiteMngService {
 		} catch (Exception ex) {
 			logger.error("error in createSiteMng : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -177,10 +165,9 @@ public class SiteMngServiceImpl implements SiteMngService {
 	 * response site information data
 	 *
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO selectSiteMngData() throws Exception {
+	public ResultVO selectSiteMngData() {
 		ResultVO resultVO = new ResultVO();
 		try {
 			SiteMngVO re = siteMngDao.selectSiteMngData();
@@ -199,10 +186,8 @@ public class SiteMngServiceImpl implements SiteMngService {
 		} catch (Exception ex) {
 			logger.error("error in selectSiteMngData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -210,12 +195,11 @@ public class SiteMngServiceImpl implements SiteMngService {
 	/**
 	 * modify site information data
 	 * 
-	 * @param vo SiteMngVO data bean
+	 * @param siteMngVO SiteMngVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO updateSiteMngData(SiteMngVO siteMngVO) throws Exception {
+	public StatusVO updateSiteMngData(SiteMngVO siteMngVO) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			siteMngVO.setModUserId(LoginInfoHelper.getUserId());
@@ -230,10 +214,8 @@ public class SiteMngServiceImpl implements SiteMngService {
 		} catch (Exception ex) {
 			logger.error("error in updateSiteMngData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
@@ -241,12 +223,11 @@ public class SiteMngServiceImpl implements SiteMngService {
 	/**
 	 * modify site's status data
 	 * 
-	 * @param vo SiteMngVO data bean
+	 * @param siteMngVO SiteMngVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO updateSiteStatusData(SiteMngVO siteMngVO) throws Exception {
+	public StatusVO updateSiteStatusData(SiteMngVO siteMngVO) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			siteMngVO.setModUserId(LoginInfoHelper.getUserId());
@@ -261,10 +242,8 @@ public class SiteMngServiceImpl implements SiteMngService {
 		} catch (Exception ex) {
 			logger.error("error in updateSiteMngData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
@@ -272,12 +251,11 @@ public class SiteMngServiceImpl implements SiteMngService {
 	/**
 	 * delete site information data
 	 * 
-	 * @param vo SiteMngVO data bean
+	 * @param siteMngVO SiteMngVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO deleteSiteMngData(SiteMngVO siteMngVO) throws Exception {
+	public StatusVO deleteSiteMngData(SiteMngVO siteMngVO) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			long reCnt = siteMngDao.deleteSiteMngData(siteMngVO);
@@ -291,12 +269,9 @@ public class SiteMngServiceImpl implements SiteMngService {
 		} catch (Exception ex) {
 			logger.error("error in deleteSiteMngData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
-
 }

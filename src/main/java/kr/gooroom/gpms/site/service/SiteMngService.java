@@ -66,7 +66,7 @@ public interface SiteMngService {
 	/**
 	 * modify site information data
 	 * 
-	 * @param vo SiteMngVO data bean
+	 * @param siteMngVO SiteMngVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -75,7 +75,7 @@ public interface SiteMngService {
 	/**
 	 * modify site's status data
 	 * 
-	 * @param vo SiteMngVO data bean
+	 * @param siteMngVO SiteMngVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -84,7 +84,7 @@ public interface SiteMngService {
 	/**
 	 * delete site information data
 	 * 
-	 * @param vo SiteMngVO data bean
+	 * @param siteMngVO SiteMngVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */

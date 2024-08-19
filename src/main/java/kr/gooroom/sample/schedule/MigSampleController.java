@@ -73,8 +73,7 @@ public class MigSampleController {
 
 	@GetMapping(value = "/data_sync")
 	public ModelAndView syncPage() {
-		ModelAndView mv = new ModelAndView("syncPage");
-		return mv;
+		return new ModelAndView("syncPage");
 	}
 
 	/**

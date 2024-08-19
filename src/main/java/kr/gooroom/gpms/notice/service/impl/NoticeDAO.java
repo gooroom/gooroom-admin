@@ -1,18 +1,16 @@
 package kr.gooroom.gpms.notice.service.impl;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.notice.service.NoticeVO;
 import kr.gooroom.gpms.notice.service.TargetNoticeVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
 
 @Repository("noticeDAO")
 public class NoticeDAO extends SqlSessionMetaDAO {
@@ -24,10 +22,9 @@ public class NoticeDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param noticeVO
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long createNoticeMaster(NoticeVO noticeVO) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertNoticeMaster", noticeVO);
+	public long createNoticeMaster(NoticeVO noticeVO) {
+		return sqlSessionMeta.insert("insertNoticeMaster", noticeVO);
 	}
 
 	/**
@@ -35,10 +32,9 @@ public class NoticeDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param noticeVO
 	 * @return long data update result count.
-	 * @throws SQLException
 	 */
-	public long updateNoticeMaster(NoticeVO noticeVO) throws SQLException {
-		return (long) sqlSessionMeta.update("updateNoticeMaster", noticeVO);
+	public long updateNoticeMaster(NoticeVO noticeVO) {
+		return sqlSessionMeta.update("updateNoticeMaster", noticeVO);
 	}
 
 	/**
@@ -46,11 +42,10 @@ public class NoticeDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param noticeVO
 	 * @return long data delete result count.
-	 * @throws SQLException
 	 */
 
-	public long deleteNoticeMaster(NoticeVO noticeVO) throws SQLException {
-		return (long) sqlSessionMeta.insert("deleteNoticeMaster", noticeVO);
+	public long deleteNoticeMaster(NoticeVO noticeVO) {
+		return sqlSessionMeta.insert("deleteNoticeMaster", noticeVO);
 	}
 
 	/**
@@ -58,16 +53,14 @@ public class NoticeDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options Map<String, Object> options for select
 	 * @return NoticeVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<NoticeVO> selectNoticeList(Map<String, Object> options) throws SQLException {
+	public List<NoticeVO> selectNoticeList(Map<String, Object> options) {
 		List<NoticeVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectNoticeList", options);
 		} catch (Exception ex) {
 			logger.error("error in selectNoticeList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -78,10 +71,9 @@ public class NoticeDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options Map<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectNoticeListTotalCount(Map<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectNoticeListTotalCount", options);
+	public long selectNoticeListTotalCount(Map<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectNoticeListTotalCount", options);
 	}
 
 	/**
@@ -89,37 +81,34 @@ public class NoticeDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options Map<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectNoticeListFilteredCount(Map<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectNoticeListFilteredCount", options);
+	public long selectNoticeListFilteredCount(Map<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectNoticeListFilteredCount", options);
 	}
 
-	public List<TargetNoticeVO> findAllByTarget(Map<String, Object> options) throws SQLException {
+	public List<TargetNoticeVO> findAllByTarget(Map<String, Object> options) {
 		List<TargetNoticeVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectNoticesByTarget", options);
 		} catch (Exception ex) {
 			logger.error("error in selectNoticesByTarget : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
 	}
 
-	public long getTotalCountByTarget(Map<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectTotalCountByTarget", options);
+	public long getTotalCountByTarget(Map<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectTotalCountByTarget", options);
 	}
 
-	public TargetNoticeVO findOneByTarget(Map<String, Object> options) throws SQLException {
+	public TargetNoticeVO findOneByTarget(Map<String, Object> options) {
 		TargetNoticeVO re = null;
 		try {
 			re = sqlSessionMeta.selectOne("selectNoticeByTarget", options);
 		} catch (Exception ex) {
 			logger.error("error in selectNoticeByTarget : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 		return re;
 	}
