@@ -60,13 +60,14 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 	 */
 	@Override
 	public StatusVO createUserActLogHistory(String actType, String actItem, String actData, String accessIp,
-			String userId) {
+			String userId, String actTarget, boolean isSuccess) {
 
 		StatusVO statusVO = new StatusVO();
 
 		try {
 
-			long reCnt = gpmsCommonDAO.createUserActLogHistory(actType, actItem, actData, accessIp, userId);
+			long reCnt = gpmsCommonDAO.createUserActLogHistory(actType, actItem, actData, accessIp, userId, actTarget,
+					isSuccess);
 
 			if (reCnt > 0) {
 				// statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,

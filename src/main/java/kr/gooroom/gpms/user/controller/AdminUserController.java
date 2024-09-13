@@ -31,6 +31,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ObjectUtils;
 import kr.gooroom.gpms.config.service.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -484,6 +485,9 @@ public class AdminUserController {
 			} else {
 				options.put("paramOrderDir", "ASC");
 			}
+
+			String searchType = StringUtils.defaultString(req.getParameter("searchType"));
+			options.put("searchType", searchType);
 
 			resultVO = adminUserService.getAdminActListPaged(options);
 

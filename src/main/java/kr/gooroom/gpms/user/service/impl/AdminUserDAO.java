@@ -402,18 +402,7 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 		map.put("connectIp", connectIp);
 		map.put("sessionId", sessionId);
 
-		long rePresentData = sqlSessionMeta.update("insertAdminUserPresentData", map);
-		
-		map.clear();
-		map.put("actType", "L");
-		map.put("actItem", "LOGIN");
-		map.put("actData", "SUCCESS");
-		map.put("accessIp", connectIp);
-		map.put("userId", adminId);
-		
-		long reActLogData = sqlSessionMeta.insert("insertUserActLogHistory", map);
-
-		return Math.max(rePresentData, reActLogData);
+		return sqlSessionMeta.update("insertAdminUserPresentData", map);
 	}
 
 	/**
@@ -427,18 +416,8 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 */
 	public long deleteAdminUserPresentData(String adminId, String connectIp, String sessionId) throws SQLException {
 		
-		long rePresentData = sqlSessionMeta.update("deleteAdminUserPresentData", adminId);
-		
-		HashMap<String, String> map = new HashMap<>();
-		map.put("actType", "L");
-		map.put("actItem", "LOGOUT");
-		map.put("actData", "SUCCESS");
-		map.put("accessIp", connectIp);
-		map.put("userId", adminId);
-		
-		long reActLogData = sqlSessionMeta.insert("insertUserActLogHistory", map);
-
-		return Math.max(rePresentData, reActLogData);
+		return sqlSessionMeta.update("deleteAdminUserPresentData", adminId);
+	
 	}
 
 	/**

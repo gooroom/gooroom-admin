@@ -17,9 +17,6 @@
 package kr.gooroom.gpms.interceptor;
 
 import java.util.Calendar;
-import java.util.Map;
-import java.util.Set;
-
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,7 +26,6 @@ import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.user.service.AdminUserService;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-
 import kr.gooroom.gpms.common.service.GpmsCommonService;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 
@@ -65,26 +61,7 @@ public class GPMSInterceptor implements HandlerInterceptor {
 
 		String actItem = req.getRequestURI();
 
-		if (actItem.contains("/")) {
-			actItem = actItem.substring(actItem.lastIndexOf("/"));
-		}
-
-		String actType = "ETC";
-		if (actItem.startsWith("/create")) {
-			actType = "I";
-		} else if (actItem.startsWith("/delete")) {
-			actType = "D";
-		} else if (actItem.startsWith("/is")) {
-			actType = "B";
-		} else if (actItem.startsWith("/page")) {
-			actType = "M";
-		} else if (actItem.startsWith("/read")) {
-			actType = "R";
-		} else if (actItem.startsWith("/update")) {
-			actType = "U";
-		}
-
-		//check Authority
+		// check Authority
 		String adminId = LoginInfoHelper.getUserId();
 		String adminRule = "";
 		if (actItem.equalsIgnoreCase("/readUserList")) {
@@ -170,23 +147,6 @@ public class GPMSInterceptor implements HandlerInterceptor {
 			if (GPMSConstants.MSG_FAIL.equals(adminRuleRe.getStatus().getResult())) {
 				return false;
 			}
-		}
-
-		@SuppressWarnings("unchecked")
-		Map<String, String[]> paramMap = req.getParameterMap();
-		String actData = "";
-		if (paramMap.size() > 0) {
-			StringBuilder sb = new StringBuilder();
-			Set<String> keys = paramMap.keySet();
-			for (String key : keys) {
-				sb.append("{[").append(key).append("][").append(req.getParameter(key)).append("]}\n");
-			}
-			actData = sb.toString();
-		}
-
-		if (LoginInfoHelper.isAuthenticated()) {
-			gpmsCommonService.createUserActLogHistory(actType, actItem, actData, req.getRemoteAddr(),
-					adminId);
 		}
 
 		return true;

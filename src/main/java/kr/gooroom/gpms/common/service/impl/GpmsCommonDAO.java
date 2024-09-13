@@ -74,7 +74,8 @@ public class GpmsCommonDAO extends SqlSessionMetaDAO {
 	 * @param userId   string user id
 	 * @return long query result count
 	 */
-	public long createUserActLogHistory(String actType, String actItem, String actData, String accessIp, String userId) {
+	public long createUserActLogHistory(String actType, String actItem, String actData, String accessIp, String userId,
+			String actTarget, boolean isSuccess) {
 
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("actType", actType);
@@ -82,6 +83,8 @@ public class GpmsCommonDAO extends SqlSessionMetaDAO {
 		map.put("actData", actData);
 		map.put("accessIp", accessIp);
 		map.put("userId", userId);
+		map.put("actTarget", actTarget);
+		map.put("isSuccess", String.valueOf(isSuccess));
 
 		return sqlSessionMeta.insert("insertUserActLogHistory", map);
 	}

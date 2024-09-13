@@ -22,6 +22,8 @@
 		<result property="actData" column="ACT_DATA"/>
 		<result property="accessIp" column="ACCESS_IP"/>
 		<result property="actUserId" column="ACT_USER_ID"/>
+		<result property="actTarget" column="ACT_TARGET" />
+		<result property="isSuccess" column="IS_SUCCESS" />
 		<result property="actDt" column="ACT_DT"/>
 	</resultMap>
 	
@@ -43,6 +45,8 @@
 			ACT_DATA,
 			ACCESS_IP,
 			ACT_USER_ID,
+			ACT_TARGET,
+			IS_SUCCESS,
 			ACT_DT
 		FROM LOG_ADMIN_ACT
 		WHERE ACT_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
@@ -58,13 +62,31 @@
 			ACT_DATA,
 			ACCESS_IP,
 			ACT_USER_ID,
+			ACT_TARGET,
+			IS_SUCCESS,
 			ACT_DT
 		FROM LOG_ADMIN_ACT
 		WHERE ACT_DT BETWEEN concat(#{fromDate}, ' 00:00:00') AND concat(#{toDate}, ' 23:59:59')
 		AND ACT_USER_ID=#{adminId}
 		AND ACT_TP != 'R' AND ACT_TP != 'ETC' AND ACT_TP != 'M'
-		<if test="searchKey != null and searchKey != ''">
-		AND (ACT_ITEM LIKE CONCAT('%', #{searchKey}, '%') OR ACT_DATA LIKE CONCAT('%', #{searchKey}, '%'))
+		<if test="searchType == null or searchType == 'all'">
+			<if test="searchKey != null">
+				AND (ACT_ITEM LIKE CONCAT('%', #{searchKey}, '%') OR ACT_DATA LIKE CONCAT('%', #{searchKey}, '%') OR ACCESS_IP LIKE CONCAT('%', #{searchKey}, '%') OR ACT_TP LIKE CONCAT('%', #{searchKey}, '%'))
+			</if>
+		</if>
+		<if test="searchKey != null">
+			<if test="searchType == 'actItem'">
+				AND ACT_ITEM LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+			<if test="searchType == 'actData'">
+				AND ACT_DATA LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+			<if test="searchType == 'accessIp'">
+				AND ACCESS_IP LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+			<if test="searchType == 'actType'">
+				AND ACT_TP LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
 		</if>
 		<if test="status != null and status != ''">
 		AND ACT_TP = #{status}
@@ -97,7 +119,7 @@
 
 	<!-- 관리자 작업이력 조회 (Paged) -->
 	<select id="selectAdminRecordListPaged" parameterType="String" resultMap="actHistoryInfo">
-		SELECT LAA.LOG_SEQ, LAA.ACT_TP, LAA.ACT_ITEM, LAA.ACT_DATA, LAA.ACCESS_IP, LAA.ACT_USER_ID, LAA.ACT_DT
+		SELECT LAA.LOG_SEQ, LAA.ACT_TP, LAA.ACT_ITEM, LAA.ACT_DATA, LAA.ACCESS_IP, LAA.ACT_USER_ID, LAA.ACT_TARGET, LAA.IS_SUCCESS, LAA.ACT_DT
 		FROM LOG_ADMIN_ACT LAA
 		<where>
 			<if test="fromDate != null and fromDate != '' and toDate != null and toDate != ''">

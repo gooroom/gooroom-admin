@@ -50,6 +50,7 @@ public class OtpAuthenticationFilter extends OncePerRequestFilter {
                 otpAuthenticationSuccessHandler.onAuthenticationSuccess(request, response, authentication);
             } catch (AuthenticationException ex) {
                 otpAuthenticationFailureHandler.onAuthenticationFailure(request, response, ex);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
         } else {
             filterChain.doFilter(request, response);

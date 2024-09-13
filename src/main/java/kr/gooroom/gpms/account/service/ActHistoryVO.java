@@ -31,69 +31,75 @@ import java.util.Date;
 public class ActHistoryVO implements Serializable {
 
 	String logSeq;
-
 	String actTp;
 	String actItem;
 	String actData;
 	String accessIp;
 	String actUserId;
-
+	String actTarget;
+	String isSuccess;
 	Date actDt;
 
-	public String getLogSeq() {
-		return logSeq;
-	}
+    public String getLogSeq() {
+      return this.logSeq;
+    }
+    public void setLogSeq(String value) {
+      this.logSeq = value;
+    }
 
-	public void setLogSeq(String logSeq) {
-		this.logSeq = logSeq;
-	}
+    public String getActTp() {
+      return this.actTp;
+    }
+    public void setActTp(String value) {
+      this.actTp = value;
+    }
 
-	public String getActTp() {
-		return actTp;
-	}
+    public String getActItem() {
+      return this.actItem;
+    }
+    public void setActItem(String value) {
+      this.actItem = value;
+    }
 
-	public void setActTp(String actTp) {
-		this.actTp = actTp;
-	}
+    public String getActData() {
+      return this.actData;
+    }
+    public void setActData(String value) {
+      this.actData = value;
+    }
 
-	public String getActItem() {
-		return actItem;
-	}
+    public String getAccessIp() {
+      return this.accessIp;
+    }
+    public void setAccessIp(String value) {
+      this.accessIp = value;
+    }
 
-	public void setActItem(String actItem) {
-		this.actItem = actItem;
-	}
+    public String getActUserId() {
+      return this.actUserId;
+    }
+    public void setActUserId(String value) {
+      this.actUserId = value;
+    }
 
-	public String getActData() {
-		return actData;
-	}
+    public String getActTarget() {
+      return this.actTarget;
+    }
+    public void setActTarget(String value) {
+      this.actTarget = value;
+    }
 
-	public void setActData(String actData) {
-		this.actData = actData;
-	}
+    public String getIsSuccess() {
+      return this.isSuccess;
+    }
+    public void setIsSuccess(String value) {
+      this.isSuccess = value;
+    }
 
-	public String getAccessIp() {
-		return accessIp;
-	}
-
-	public void setAccessIp(String accessIp) {
-		this.accessIp = accessIp;
-	}
-
-	public String getActUserId() {
-		return actUserId;
-	}
-
-	public void setActUserId(String actUserId) {
-		this.actUserId = actUserId;
-	}
-
-	public Date getActDt() {
-		return actDt;
-	}
-
-	public void setActDt(Date actDt) {
-		this.actDt = actDt;
-	}
-
+    public Date getActDt() {
+      return this.actDt;
+    }
+    public void setActDt(Date value) {
+      this.actDt = value;
+    }
 }
