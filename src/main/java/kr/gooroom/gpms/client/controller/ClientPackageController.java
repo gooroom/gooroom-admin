@@ -34,6 +34,7 @@ import kr.gooroom.gpms.job.nodes.Job;
 import kr.gooroom.gpms.job.service.JobService;
 import kr.gooroom.gpms.job.service.JobVO;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -190,6 +191,252 @@ public class ClientPackageController {
 
 		try {
 			resultVO = clientPackageService.readPackageListPagedInClient(options);
+			resultVO.setDraw(String.valueOf(req.getParameter("page")));
+			resultVO.setOrderColumn(paramOrderColumn);
+			resultVO.setOrderDir(paramOrderDir);
+			resultVO.setRowLength(String.valueOf(options.get("paramLength")));
+		} catch (Exception ex) {
+			logger.error("error in readPackageListPagedInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
+	 * generate package list data.
+	 *
+	 * @param req   HttpServletRequest
+	 * @param res   HttpServletResponse
+	 * @param model ModelMap
+	 * @return ResultVO result data bean
+	 *
+	 */
+	@PostMapping(value = "/readPackageSpecListPagedInClient")
+	public @ResponseBody ResultPagingVO readPackageSpecListPagedInClient(HttpServletRequest req, HttpServletResponse res,
+																	 ModelMap model) {
+
+		ResultPagingVO resultVO = null;
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		// << options >>
+		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
+		options.put("clientId", req.getParameter("clientId"));
+		options.put("isFiltered", StringUtils.defaultString(req.getParameter("isFiltered"), "false"));
+
+		// << paging >>
+		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+
+		// << ordering >>
+		String paramOrderColumn = req.getParameter("orderColumn");
+		String paramOrderDir = req.getParameter("orderDir");
+		if ("chClientId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "CLIENT_ID");
+		} else if ("chPackageId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ID");
+		} else if ("chPackageArch".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ARCH");
+		} else if ("chInstallVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "INSTALL_VER");
+		} else if ("chSpec".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "SPEC");
+		} else if ("chLicense".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "LICENSE");
+		} else if ("chPackageLastVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_LAST_VER");
+		} else {
+			options.put("paramOrderColumn", "PACKAGE_ID");
+		}
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
+
+		try {
+			resultVO = clientPackageService.readPackageSpecListPagedInClient(options);
+			resultVO.setDraw(String.valueOf(req.getParameter("page")));
+			resultVO.setOrderColumn(paramOrderColumn);
+			resultVO.setOrderDir(paramOrderDir);
+			resultVO.setRowLength(String.valueOf(options.get("paramLength")));
+		} catch (Exception ex) {
+			logger.error("error in readPackageListPagedInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+
+	/**
+	 * generate package list data.
+	 *
+	 * @param req   HttpServletRequest
+	 * @param res   HttpServletResponse
+	 * @param model ModelMap
+	 * @return ResultVO result data bean
+	 *
+	 */
+	@PostMapping(value = "/readPackageSpecList")
+	public @ResponseBody ResultPagingVO readPackageSpecList(HttpServletRequest req, HttpServletResponse res,
+																				 ModelMap model) {
+
+		ResultPagingVO resultVO = null;
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		try {
+			resultVO = clientPackageService.readPackageSpecList(options);
+		} catch (Exception ex) {
+			logger.error("error in readPackageListPagedInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
+	 * generate package list data.
+	 *
+	 * @param req   HttpServletRequest
+	 * @param res   HttpServletResponse
+	 * @param model ModelMap
+	 * @return ResultVO result data bean
+	 *
+	 */
+	@PostMapping(value = "/readpackageSpecListPagedInVersionCompare")
+	public @ResponseBody ResultPagingVO readpackageSpecListPagedInVersionCompare(HttpServletRequest req, HttpServletResponse res,
+																		 ModelMap model) {
+
+		ResultPagingVO resultVO = null;
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		// << options >>
+		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
+		options.put("version1", req.getParameter("version1"));
+		options.put("version2", req.getParameter("version2"));
+		options.put("isFiltered", StringUtils.defaultString(req.getParameter("isFiltered"), "false"));
+
+		// << paging >>
+		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+
+		// << ordering >>
+		String paramOrderColumn = req.getParameter("orderColumn");
+		String paramOrderDir = req.getParameter("orderDir");
+		if ("chClientId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "CLIENT_ID");
+		} else if ("chPackageId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ID");;
+		} else if ("chV1Ver".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "V1_VER");
+		} else if ("chV1License".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "V1_LICENSE");
+		} else if ("chV2Ver".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "V2_VER");
+		} else if ("chV2License".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "V2_LICENSE");
+		} else if ("chPackageArch".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ARCH");
+		} else if ("chInstallVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "INSTALL_VER");
+		} else if ("chPackageLastVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_LAST_VER");
+		} else {
+			options.put("paramOrderColumn", "PACKAGE_ID");
+		}
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
+
+		try {
+			resultVO = clientPackageService.readPackageSpecListCompare(options);
+			resultVO.setDraw(String.valueOf(req.getParameter("page")));
+			resultVO.setOrderColumn(paramOrderColumn);
+			resultVO.setOrderDir(paramOrderDir);
+			resultVO.setRowLength(String.valueOf(options.get("paramLength")));
+		} catch (Exception ex) {
+			logger.error("error in readPackageListPagedInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
+	 * generate package list data.
+	 *
+	 * @param req   HttpServletRequest
+	 * @param res   HttpServletResponse
+	 * @param model ModelMap
+	 * @return ResultVO result data bean
+	 *
+	 */
+	@PostMapping(value = "/readpackageSpecListPagedInVersion")
+	public @ResponseBody ResultPagingVO readpackageSpecListPagedInVersion(HttpServletRequest req, HttpServletResponse res,
+																		 ModelMap model) {
+
+		ResultPagingVO resultVO = null;
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		// << options >>
+		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
+		options.put("version", req.getParameter("version"));
+		options.put("isFiltered", StringUtils.defaultString(req.getParameter("isFiltered"), "false"));
+
+		// << paging >>
+		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+
+		// << ordering >>
+		String paramOrderColumn = req.getParameter("orderColumn");
+		String paramOrderDir = req.getParameter("orderDir");
+		if ("chClientId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "CLIENT_ID");
+		} else if ("chPackageId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ID");
+		} else if ("chPackageArch".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ARCH");
+		} else if ("chInstallVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "INSTALL_VER");
+		} else if ("supplier".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "SUPPLIER");
+		} else if ("license".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "LICENSE");
+		} else if ("chPackageLastVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_LAST_VER");
+		} else {
+			options.put("paramOrderColumn", "PACKAGE_ID");
+		}
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
+
+		try {
+			resultVO = clientPackageService.readpackageSpecListPagedInVersion(options);
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));
 			resultVO.setOrderColumn(paramOrderColumn);
 			resultVO.setOrderDir(paramOrderDir);

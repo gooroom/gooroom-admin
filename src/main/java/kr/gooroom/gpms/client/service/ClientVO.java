@@ -42,6 +42,7 @@ public class ClientVO implements Serializable {
 
 	private String clientIp;
 	private String prodNo;
+	private String osVer;
 
 	private String patchVersion;
 
@@ -455,4 +456,11 @@ public class ClientVO implements Serializable {
 		this.strgUse = strgUse;
 	}
 
+	public String getOsVer() {
+		return osVer;
+	}
+
+	public void setOsVer(String osVer) {
+		this.osVer = osVer;
+	}
 }

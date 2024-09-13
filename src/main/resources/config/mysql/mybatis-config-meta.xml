@@ -12,6 +12,7 @@
 		<typeAlias type="kr.gooroom.gpms.client.service.ClientStatsVO" alias="clientStatsVO"/>
 		<typeAlias type="kr.gooroom.gpms.client.service.ClientGroupVO" alias="clientGroupVO"/>
 		<typeAlias type="kr.gooroom.gpms.client.service.ClientPackageVO" alias="clientPackageVO"/>
+		<typeAlias type="kr.gooroom.gpms.client.service.ClientPackageSpecVO" alias="clientPackageSpecVO"/>
 		<typeAlias type="kr.gooroom.gpms.client.service.ClientSummaryVO" alias="clientSummaryVO"/>
 		<typeAlias type="kr.gooroom.gpms.client.service.UpdatePackageClientVO" alias="updatePackageClientVO"/>
 				

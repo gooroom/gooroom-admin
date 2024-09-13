@@ -14,6 +14,7 @@
 		<result property="clientStatus" column="STATUS_CD"/>
 		
 		<result property="prodNo" column="PROD_NO"/>
+		<result property="osVer" column="OS_VER"/>
 
 		<result property="regDate" column="REG_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
 		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
@@ -110,6 +111,31 @@
 		
 	</resultMap>
 
+	<resultMap type="clientPackageSpecVO" id="clientPackageSpecInfo">
+
+		<result property="clientId" column="CLIENT_ID" />
+
+		<result property="packageId" column="PACKAGE_ID" />
+		<result property="packageArch" column="PACKAGE_ARCH" />
+
+		<result property="installVer" column="INSTALL_VER" />
+
+		<result property="spec" column="SPEC" />
+		<result property="spec" column="SPEC" />
+		<result property="license" column="LICENSE" />
+		<result property="supplier" column="SUPPLIER" />
+		<result property="integrity" column="INTEGRITY" />
+
+		<result property="isoVer" column="ISO_VER" />
+		<result property="v1Ver" column="V1_VER" />
+		<result property="v2Ver" column="V2_VER" />
+		<result property="v1License" column="V1_LICENSE" />
+		<result property="v2License" column="V2_LICENSE" />
+
+		<result property="modDate" column="MOD_DT" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+
+	</resultMap>
+
 	<resultMap type="clientSummaryVO" id="clientSummaryInfo">
 	
 		<result property="totalCount" column="TOTAL_COUNT" />
@@ -187,6 +213,7 @@
 		SELECT 
 			T.CLIENT_ID, T.SIMPLE_CLIENT_ID, T.CLIENT_NM, T.STATUS_CD, T.REG_DT, T.MOD_DT, T.REG_USER_ID, T.MOD_USER_ID, STR_TO_DATE(T.expiration_ymd, '%Y%m%d') EXPIRATION_YMD,
 			TX.IP AS CLIENT_IP, TX.STRG_SIZE AS STRG_SIZE, TX.STRG_USE AS STRG_USE, IFNULL(TX.SAFE_SCORE, 0) AS SAFE_SCORE,
+			SUBSTRING_INDEX(TX.OS, ' ', -1) as OS_VER,
 			CGM.GRP_ID AS GROUP_ID, CGM.GRP_NM AS GROUP_NAME, 
 			IFNULL(CPS.TOTAL_CNT, 0) AS TOTAL_CNT, 
 			IFNULL(CPS.UPDATE_TARGET_CNT, 0) AS UPDATE_TARGET_CNT, 
@@ -860,6 +887,471 @@
 			AND CP.INSTALL_VER != CP.PACKAGE_LAST_VER
 		</if>
 
+	</select>
+
+	<select id="selectPackageSpecList" parameterType="hashmap" resultMap="clientPackageSpecInfo">
+		SELECT iso_ver, integrity FROM sbom_iso_info
+	</select>
+
+	<select id="selectClientPackageSpecListPaged" parameterType="hashmap" resultMap="clientPackageSpecInfo">
+		SELECT * FROM (
+		SELECT
+		spi_result.package_id,
+		spi_result.spec,
+		spi_result.license,
+		cp.client_id,
+		cp.package_arch,
+		cp.install_ver,
+		cp.mod_dt
+		FROM
+		(
+		SELECT
+		spi.package_id,
+		spi.package_ver AS spec,
+		spi.license
+		FROM
+		sbom_package_info spi
+		JOIN
+		sbom_iso_package sip ON spi.id = sip.package_id
+		JOIN
+		sbom_iso_info sii ON sii.id = sip.iso_id
+		JOIN
+		client_ext ce ON sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)
+		WHERE
+		ce.client_id = #{clientId}
+		AND sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)
+		) AS spi_result
+		LEFT JOIN
+		(
+		SELECT
+		cp.client_id,
+		cp.package_id,
+		cp.package_arch,
+		cp.install_ver,
+		cp.mod_dt
+		FROM
+		client_package cp
+		WHERE
+		cp.client_id = #{clientId}
+		) AS cp
+		ON spi_result.package_id = cp.package_id
+
+		UNION
+
+		SELECT
+		cp.package_id,
+		spi_result.spec,
+		spi_result.license,
+		cp.client_id,
+		cp.package_arch,
+		cp.install_ver,
+		cp.mod_dt
+		FROM
+		(
+		SELECT
+		cp.client_id,
+		cp.package_id,
+		cp.package_arch,
+		cp.install_ver,
+		cp.mod_dt
+		FROM
+		client_package cp
+		WHERE
+		cp.client_id = #{clientId}
+		) AS cp
+		LEFT JOIN
+		(
+		SELECT
+		spi.package_id,
+		spi.package_ver AS spec,
+		spi.license
+		FROM
+		sbom_package_info spi
+		JOIN
+		sbom_iso_package sip ON spi.id = sip.package_id
+		JOIN
+		sbom_iso_info sii ON sii.id = sip.iso_id
+		JOIN
+		client_ext ce ON sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)
+		WHERE
+		ce.client_id = #{clientId}
+		AND sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)
+		) AS spi_result
+		ON spi_result.package_id = cp.package_id
+		) AS combined_results
+		<where>
+			<if test='isFiltered != null and "true".equals(isFiltered)'>
+				AND (
+					combined_results.spec != combined_results.install_ver
+					OR combined_results.spec IS NULL
+					OR combined_results.install_ver IS NULL
+				)
+			</if>
+			<if test='searchKey != null and searchKey != ""'>
+				AND combined_results.PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+
+	</select>
+
+	<select id="selectClientPackageSpecListTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(*) AS CNT
+		FROM (SELECT spi_result.package_id
+			  FROM (SELECT spi.package_id,
+						   spi.package_ver AS spec,
+						   spi.license
+					FROM sbom_package_info spi
+							 JOIN
+						 sbom_iso_package sip ON spi.id = sip.package_id
+							 JOIN
+						 sbom_iso_info sii ON sii.id = sip.iso_id
+							 JOIN
+						 client_ext ce ON sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)
+					WHERE ce.client_id = #{clientId}
+					  AND sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)) AS spi_result
+					   LEFT JOIN
+				   (SELECT cp.client_id,
+						   cp.package_id,
+						   cp.package_arch,
+						   cp.install_ver,
+						   cp.mod_dt
+					FROM client_package cp
+					WHERE cp.client_id = #{clientId}) AS cp
+				   ON spi_result.package_id = cp.package_id
+
+			  UNION
+
+			  SELECT spi_result.package_id
+			  FROM (SELECT cp.client_id,
+						   cp.package_id,
+						   cp.package_arch,
+						   cp.install_ver,
+						   cp.mod_dt
+					FROM client_package cp
+					WHERE cp.client_id = #{clientId}) AS cp
+					   LEFT JOIN
+				   (SELECT spi.package_id,
+						   spi.package_ver AS spec,
+						   spi.license
+					FROM sbom_package_info spi
+							 JOIN
+						 sbom_iso_package sip ON spi.id = sip.package_id
+							 JOIN
+						 sbom_iso_info sii ON sii.id = sip.iso_id
+							 JOIN
+						 client_ext ce ON sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)
+					WHERE ce.client_id = #{clientId}
+					  AND sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)) AS spi_result
+				   ON spi_result.package_id = cp.package_id)
+		as combined_results;
+
+	</select>
+
+	<select id="selectClientPackageSpecListFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(*) AS CNT FROM (
+		SELECT
+		spi_result.package_id,
+		spi_result.spec,
+		spi_result.license,
+		cp.client_id,
+		cp.package_arch,
+		cp.install_ver,
+		cp.mod_dt
+		FROM
+		(
+		SELECT
+		spi.package_id,
+		spi.package_ver AS spec,
+		spi.license
+		FROM
+		sbom_package_info spi
+		JOIN
+		sbom_iso_package sip ON spi.id = sip.package_id
+		JOIN
+		sbom_iso_info sii ON sii.id = sip.iso_id
+		JOIN
+		client_ext ce ON sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)
+		WHERE
+		ce.client_id = #{clientId}
+		AND sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)
+		) AS spi_result
+		LEFT JOIN
+		(
+		SELECT
+		cp.client_id,
+		cp.package_id,
+		cp.package_arch,
+		cp.install_ver,
+		cp.mod_dt
+		FROM
+		client_package cp
+		WHERE
+		cp.client_id = #{clientId}
+		) AS cp
+		ON spi_result.package_id = cp.package_id
+
+		UNION
+
+		SELECT
+		cp.package_id,
+		spi_result.spec,
+		spi_result.license,
+		cp.client_id,
+		cp.package_arch,
+		cp.install_ver,
+		cp.mod_dt
+		FROM
+		(
+		SELECT
+		cp.client_id,
+		cp.package_id,
+		cp.package_arch,
+		cp.install_ver,
+		cp.mod_dt
+		FROM
+		client_package cp
+		WHERE
+		cp.client_id = #{clientId}
+		) AS cp
+		LEFT JOIN
+		(
+		SELECT
+		spi.package_id,
+		spi.package_ver AS spec,
+		spi.license
+		FROM
+		sbom_package_info spi
+		JOIN
+		sbom_iso_package sip ON spi.id = sip.package_id
+		JOIN
+		sbom_iso_info sii ON sii.id = sip.iso_id
+		JOIN
+		client_ext ce ON sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)
+		WHERE
+		ce.client_id = #{clientId}
+		AND sii.iso_ver = SUBSTRING_INDEX(ce.os, ' ', -1)
+		) AS spi_result
+		ON spi_result.package_id = cp.package_id
+		) as combined_results
+		<where>
+			<if test='isFiltered != null and "true".equals(isFiltered)'>
+				AND (
+				combined_results.spec != combined_results.install_ver
+				OR combined_results.spec IS NULL
+				OR combined_results.install_ver IS NULL
+				)
+			</if>
+			<if test='searchKey != null and searchKey != ""'>
+				AND combined_results.PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>
+	</select>
+
+	<select id="selectPackageSpecListVersionComparePaged" parameterType="hashmap" resultMap="clientPackageSpecInfo">
+		SELECT *
+		FROM (
+		SELECT
+		v1.package_id,
+		v1.v1_ver,
+		v1.v1_license,
+		v2.v2_ver,
+		v2.v2_license
+		FROM
+		(SELECT spi.package_id, spi.package_ver AS v1_ver, spi.license AS v1_license
+		FROM sbom_iso_info sii
+		JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+		JOIN sbom_package_info spi ON sip.package_id = spi.id
+		WHERE sii.iso_ver = #{version1}) v1
+		LEFT JOIN
+		(SELECT spi.package_id, spi.package_ver AS v2_ver, spi.license AS v2_license
+		FROM sbom_iso_info sii
+		JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+		JOIN sbom_package_info spi ON sip.package_id = spi.id
+		WHERE sii.iso_ver = #{version2}) v2
+		ON v1.package_id = v2.package_id
+
+		UNION
+
+		SELECT
+		v2.package_id,
+		v1.v1_ver,
+		v1.v1_license,
+		v2.v2_ver,
+		v2.v2_license
+		FROM
+		(SELECT spi.package_id, spi.package_ver AS v1_ver, spi.license AS v1_license
+		FROM sbom_iso_info sii
+		JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+		JOIN sbom_package_info spi ON sip.package_id = spi.id
+		WHERE sii.iso_ver = #{version1}) v1
+		RIGHT JOIN
+		(SELECT spi.package_id, spi.package_ver AS v2_ver, spi.license AS v2_license
+		FROM sbom_iso_info sii
+		JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+		JOIN sbom_package_info spi ON sip.package_id = spi.id
+		WHERE sii.iso_ver = #{version2}) v2
+		ON v1.package_id = v2.package_id
+		) combined_result
+		<where>
+			<if test='isFiltered != null and "true".equals(isFiltered)'>
+				AND (
+				v1_ver != v2_ver
+				OR v1_ver IS NULL
+				OR v2_ver IS NULL
+				)
+			</if>
+			<if test='searchKey != null and searchKey != ""'>
+				AND combined_result.PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectVersionComparePackageSpecListTotalCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(*) AS CNT
+		FROM (
+				 SELECT
+					 v1.package_id,
+					 v1.v1_ver,
+					 v1.v1_license,
+					 v2.v2_ver,
+					 v2.v2_license
+				 FROM
+					 (SELECT spi.package_id, spi.package_ver AS v1_ver, spi.license AS v1_license
+					  FROM sbom_iso_info sii
+							   JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+							   JOIN sbom_package_info spi ON sip.package_id = spi.id
+					  WHERE sii.iso_ver = #{version1}) v1
+						 LEFT JOIN
+					 (SELECT spi.package_id, spi.package_ver AS v2_ver, spi.license AS v2_license
+					  FROM sbom_iso_info sii
+							   JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+							   JOIN sbom_package_info spi ON sip.package_id = spi.id
+					  WHERE sii.iso_ver = #{version2}) v2
+					 ON v1.package_id = v2.package_id
+
+				 UNION
+
+				 SELECT
+					 v2.package_id,
+					 v1.v1_ver,
+					 v1.v1_license,
+					 v2.v2_ver,
+					 v2.v2_license
+				 FROM
+					 (SELECT spi.package_id, spi.package_ver AS v1_ver, spi.license AS v1_license
+					  FROM sbom_iso_info sii
+							   JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+							   JOIN sbom_package_info spi ON sip.package_id = spi.id
+					  WHERE sii.iso_ver = #{version1}) v1
+						 RIGHT JOIN
+					 (SELECT spi.package_id, spi.package_ver AS v2_ver, spi.license AS v2_license
+					  FROM sbom_iso_info sii
+							   JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+							   JOIN sbom_package_info spi ON sip.package_id = spi.id
+					  WHERE sii.iso_ver = #{version2}) v2
+					 ON v1.package_id = v2.package_id
+			 ) combined_result
+	</select>
+
+	<select id="selectVersionComparePackageSpecListFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT COUNT(*) AS CNT
+		FROM (
+			SELECT
+				v1.package_id,
+				v1.v1_ver,
+				v1.v1_license,
+				v2.v2_ver,
+				v2.v2_license
+			FROM
+				(SELECT spi.package_id, spi.package_ver AS v1_ver, spi.license AS v1_license
+				 FROM sbom_iso_info sii
+						  JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+						  JOIN sbom_package_info spi ON sip.package_id = spi.id
+				 WHERE sii.iso_ver = #{version1}) v1
+					LEFT JOIN
+				(SELECT spi.package_id, spi.package_ver AS v2_ver, spi.license AS v2_license
+				 FROM sbom_iso_info sii
+						  JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+						  JOIN sbom_package_info spi ON sip.package_id = spi.id
+				 WHERE sii.iso_ver = #{version2}) v2
+				ON v1.package_id = v2.package_id
+
+			UNION
+
+			SELECT
+				v2.package_id,
+				v1.v1_ver,
+				v1.v1_license,
+				v2.v2_ver,
+				v2.v2_license
+			FROM
+				(SELECT spi.package_id, spi.package_ver AS v1_ver, spi.license AS v1_license
+				 FROM sbom_iso_info sii
+						  JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+						  JOIN sbom_package_info spi ON sip.package_id = spi.id
+				 WHERE sii.iso_ver = #{version1}) v1
+					RIGHT JOIN
+				(SELECT spi.package_id, spi.package_ver AS v2_ver, spi.license AS v2_license
+				 FROM sbom_iso_info sii
+						  JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+						  JOIN sbom_package_info spi ON sip.package_id = spi.id
+				 WHERE sii.iso_ver = #{version2}) v2
+				ON v1.package_id = v2.package_id
+		) combined_result
+		<where>
+			<if test='isFiltered != null and "true".equals(isFiltered)'>
+				AND (
+				v1_ver != v2_ver
+				OR v1_ver IS NULL
+				OR v2_ver IS NULL
+				)
+			</if>
+			<if test='searchKey != null and searchKey != ""'>
+				AND combined_result.PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+			</if>
+		</where>
+	</select>
+
+
+	<select id="selectVersionPackageSpecListPaged" parameterType="hashmap" resultMap="clientPackageSpecInfo">
+		SELECT spi.package_id,
+		       spi.package_ver as spec,
+		       spi.license,
+		       spi.supplier,
+	           sii.iso_ver
+		FROM sbom_iso_info sii
+		JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+		JOIN sbom_package_info spi ON sip.package_id = spi.id
+		WHERE sii.iso_ver = #{version}
+		<if test='searchKey != null and searchKey != ""'>
+			AND spi.PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+		</if>
+		ORDER BY ${paramOrderColumn} ${paramOrderDir}
+		LIMIT #{paramStart}, #{paramLength}
+	</select>
+
+	<select id="selectVersionPackageSpecListTotalCount" parameterType="hashmap" resultType="long">
+		SELECT count(spi.package_id) AS CNT
+		FROM sbom_iso_info sii
+		   JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+		   JOIN sbom_package_info spi ON sip.package_id = spi.id
+		WHERE sii.iso_ver = #{version}
+
+	</select>
+
+	<select id="selectVersionPackageSpecListFilteredCount" parameterType="hashmap" resultType="long">
+		SELECT count(spi.package_id) AS CNT
+		FROM sbom_iso_info sii
+		JOIN sbom_iso_package sip ON sii.id = sip.iso_id
+		JOIN sbom_package_info spi ON sip.package_id = spi.id
+		WHERE sii.iso_ver = #{version}
+		<if test='searchKey != null and searchKey != ""'>
+			AND spi.PACKAGE_ID LIKE CONCAT('%', #{searchKey}, '%')
+		</if>
 	</select>
 
 	<select id="selectClientStatusSummary" parameterType="hashMap" resultMap="clientSummaryInfo">

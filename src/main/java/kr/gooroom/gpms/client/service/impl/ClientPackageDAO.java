@@ -24,8 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import kr.gooroom.gpms.client.service.ClientPackageSpecVO;
+
 
 /**
  * data access object class for client package management process.
@@ -118,6 +121,166 @@ public class ClientPackageDAO extends SqlSessionMetaDAO {
 	 */
 	public long selectClientPackageListFilteredCount(HashMap<String, Object> options) {
 		return sqlSessionMeta.selectOne("selectClientPackageListFilteredCount", options);
+	}
+
+	/**
+	 * select package list by client
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return ClientPackageVO List selected package object
+	 * @throws SQLException
+	 */
+	public List<ClientPackageSpecVO> selectPackageSpecList(HashMap<String, Object> options) throws SQLException {
+
+		List<ClientPackageSpecVO> re = null;
+
+		try {
+			re = sqlSessionMeta.selectList("selectPackageSpecList", options);
+		} catch (Exception ex) {
+			re = null;
+			logger.error("error in selectClientPackageListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+		}
+
+		return re;
+	}
+
+
+	/**
+	 * select package list by client
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return ClientPackageVO List selected package object
+	 * @throws SQLException
+	 */
+	public List<ClientPackageSpecVO> selectClientPackageSpecListPaged(HashMap<String, Object> options) throws SQLException {
+
+		List<ClientPackageSpecVO> re = null;
+
+		try {
+			re = sqlSessionMeta.selectList("selectClientPackageSpecListPaged", options);
+		} catch (Exception ex) {
+			re = null;
+			logger.error("error in selectClientPackageListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+		}
+
+		return re;
+	}
+
+	/**
+	 * select package count by options
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return long filtered count number.
+	 * @throws SQLException
+	 */
+	public long selectClientPackageSpecListTotalCount(HashMap<String, Object> options) throws SQLException {
+
+		return (long) sqlSessionMeta.selectOne("selectClientPackageSpecListTotalCount", options);
+	}
+
+	/**
+	 * select filtered package count by options
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return long filtered count number.
+	 * @throws SQLException
+	 */
+	public long selectClientPackageSpecListFilteredCount(HashMap<String, Object> options) throws SQLException {
+
+		return (long) sqlSessionMeta.selectOne("selectClientPackageSpecListFilteredCount", options);
+	}
+
+	/**
+	 * select package list by version
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return ClientPackageVO List selected package object
+	 * @throws SQLException
+	 */
+	public List<ClientPackageSpecVO> selectPackageSpecListVersionComparePaged(HashMap<String, Object> options) throws SQLException {
+
+		List<ClientPackageSpecVO> re = null;
+
+		try {
+			re = sqlSessionMeta.selectList("selectPackageSpecListVersionComparePaged", options);
+		} catch (Exception ex) {
+			re = null;
+			logger.error("error in readPackageSpecListComparePaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+		}
+
+		return re;
+	}
+
+	/**
+	 * select package count by options
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return long filtered count number.
+	 * @throws SQLException
+	 */
+	public long selectVersionComparePackageSpecListTotalCount(HashMap<String, Object> options) throws SQLException {
+
+		return (long) sqlSessionMeta.selectOne("selectVersionComparePackageSpecListTotalCount", options);
+	}
+
+	/**
+	 * select filtered package count by options
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return long filtered count number.
+	 * @throws SQLException
+	 */
+	public long selectVersionComparePackageSpecListFilteredCount(HashMap<String, Object> options) throws SQLException {
+
+		return (long) sqlSessionMeta.selectOne("selectVersionComparePackageSpecListFilteredCount", options);
+	}
+	/**
+	 * select package list by client
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return ClientPackageVO List selected package object
+	 * @throws SQLException
+	 */
+	public List<ClientPackageSpecVO> selectVersionPackageSpecListPaged(HashMap<String, Object> options) throws SQLException {
+
+		List<ClientPackageSpecVO> re = null;
+
+		try {
+			re = sqlSessionMeta.selectList("selectVersionPackageSpecListPaged", options);
+		} catch (Exception ex) {
+			re = null;
+			logger.error("error in selectClientPackageListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+		}
+
+		return re;
+	}
+
+	/**
+	 * select package count by options
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return long filtered count number.
+	 * @throws SQLException
+	 */
+	public long selectVersionPackageSpecListTotalCount(HashMap<String, Object> options) throws SQLException {
+
+		return (long) sqlSessionMeta.selectOne("selectVersionPackageSpecListTotalCount", options);
+	}
+
+	/**
+	 * select filtered package count by options
+	 *
+	 * @param options HashMap<String, Object> options for select
+	 * @return long filtered count number.
+	 * @throws SQLException
+	 */
+	public long selectVersionPackageSpecListFilteredCount(HashMap<String, Object> options) throws SQLException {
+
+		return (long) sqlSessionMeta.selectOne("selectVersionPackageSpecListFilteredCount", options);
 	}
 
 	/**
