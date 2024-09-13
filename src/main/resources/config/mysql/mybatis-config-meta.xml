@@ -72,6 +72,12 @@
 		<typeAlias type="kr.gooroom.gpms.mng.service.WallpaperVO" alias="wallpaperVO" />
 		<typeAlias type="kr.gooroom.gpms.mng.service.IconVO" alias="iconVO" />
 		<typeAlias type="kr.gooroom.gpms.mng.service.IconGroupVO" alias="iconGroupVO" />
+
+		<typeAlias type="kr.gooroom.gpms.metrics.service.ResourceMetricsVO" alias="resourceMetricsVO" />
+		<typeAlias type="kr.gooroom.gpms.metrics.service.CpuResourceVO" alias="cpuResourceVO" />
+		<typeAlias type="kr.gooroom.gpms.metrics.service.MemResourceVO" alias="memResourceVO" />
+		<typeAlias type="kr.gooroom.gpms.metrics.service.NetResourceVO" alias="netResourceVO" />
+		<typeAlias type="kr.gooroom.gpms.metrics.service.DiskResourceVO" alias="diskResourceVO" />
 		
 		<typeAlias type="kr.gooroom.gpms.job.custom.OnlineClientAndUserVO" alias="onlineClientAndUserVO" />
 		<typeAlias type="kr.gooroom.gpms.config.service.RuleIdsVO" alias="ruleIdsVO" />

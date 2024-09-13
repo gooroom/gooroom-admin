@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NetResourceDAO">
+
+    <resultMap type="NetResourceVO" id="netResourceData" extends="ResourceMetricsDAO.resourceMetricsData">
+        <result property="recv" column="IpExtInOctets"/>
+        <result property="sent" column="IpExtOutOctets"/>
+        <result property="netInterface" column="INTERFACE"/>
+    </resultMap>
+
+    <select id="selectNetResourceList" parameterType="hashMap" resultMap="netResourceData">
+        SELECT DISTINCT insertion_timestamp, IpExtInOctets, IpExtOutOctets FROM NSTAT n
+        ORDER BY insertion_timestamp DESC
+        LIMIT 60
+    </select>
+</mapper>

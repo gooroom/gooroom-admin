@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MemResourceDAO">
+
+    <resultMap type="MemResourceVO" id="memResourceData" extends="ResourceMetricsDAO.resourceMetricsData">
+        <result property="value" column="USED_PERCENT"/>
+    </resultMap>
+
+    <select id="selectMemResourceList" parameterType="hashMap" resultMap="memResourceData">
+        SELECT DISTINCT insertion_timestamp, USED_PERCENT FROM MEM
+        ORDER BY insertion_timestamp DESC
+        LIMIT 60
+    </select>
+</mapper>
