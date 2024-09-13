@@ -18,12 +18,11 @@ package kr.gooroom.gpms.common.service.impl;
 
 import java.util.List;
 
-import jakarta.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.Resource;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.GpmsCommonService;
 import kr.gooroom.gpms.common.service.ResultVO;
@@ -70,8 +69,8 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 			long reCnt = gpmsCommonDAO.createUserActLogHistory(actType, actItem, actData, accessIp, userId);
 
 			if (reCnt > 0) {
-				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata"));
+				// statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+				// 		MessageSourceHelper.getMessage("system.common.selectdata"));
 			} else {
 				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
 						MessageSourceHelper.getMessage("system.common.noselectdata"));
@@ -108,8 +107,8 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 				ServerAddrInfoVO[] row = new ServerAddrInfoVO[1];
 				row[0] = re;
 				resultVO.setData(row);
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
+				// resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+				// 		MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
 				Object[] o = new Object[0];
 				resultVO.setData(o);
@@ -146,8 +145,8 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 			if (re != null && re.size() > 0) {
 				String[] row = re.toArray(String[]::new);
 				resultVO.setData(row);
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
+				// resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+				// 		MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
 				Object[] o = new Object[0];
 				resultVO.setData(o);
@@ -179,8 +178,8 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 			if (re != null && re.size() > 0) {
 				String[] row = re.toArray(String[]::new);
 				resultVO.setData(row);
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
+				// resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+				// 		MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
 				Object[] o = new Object[0];
 				resultVO.setData(o);

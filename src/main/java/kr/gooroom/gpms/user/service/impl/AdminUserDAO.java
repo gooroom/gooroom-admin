@@ -16,18 +16,19 @@
 
 package kr.gooroom.gpms.user.service.impl;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+
 import kr.gooroom.gpms.account.service.ActHistoryVO;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.user.service.AdminUserVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * data access object class for administrator user management process.
@@ -546,5 +547,99 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 
 		return re;
 	}
-	
+
+	public long insertOrUpdateAdminSecret(String adminId, String secret) throws SQLException {
+		HashMap<String, String> map = new HashMap<>();
+		map.put("adminId", adminId);
+		map.put("secret", secret);
+
+		return (long) sqlSessionMeta.update("insertOrUpdateAdminSecret", map);
+	}
+
+	public long updateOtpSecretSaved(HashMap<String, Object> paramMap) throws SQLException {
+		return (long) sqlSessionMeta.update("updateOtpSecretSaved", paramMap);
+	}
+
+	public long selectOtpSecretRenew(String adminId) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("selectOtpSecretRenew", adminId);
+	}
+
+	/**
+	 * update administrator login trial count
+	 *
+	 * @param map HashMap<String, Object>
+	 * @return long data update result count.
+	 * @throws SQLException
+	 */
+	public long updateLoginTrial(HashMap<String, Object> map) throws SQLException {
+		return (long) sqlSessionMeta.update("updateLoginTrial", map);
+	}
+
+	/**
+	 * select administrator login trial count
+	 *
+	 * @param map HashMap<String, Object>
+	 * @return long data update result count.
+	 * @throws SQLException
+	 */
+	public int selectLoginTrial(HashMap<String, Object> map) throws SQLException {
+		return sqlSessionMeta.update("selectLoginTrial", map);
+	}
+
+	/**
+	 * initialize login trial count
+	 *
+	 * @param map HashMap<String, Object>
+	 * @return long data update result count.
+	 * @throws SQLException
+	 */
+	public long updateLoginTrialInit(HashMap<String, Object> map) throws SQLException {
+		return (long) sqlSessionMeta.update("updateLoginTrialInit", map);
+	}
+
+	/**
+	 * site 관리자 trial count 조회
+	 *
+	 * @param siteId String
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectAdminLoginTrialCount(String siteId) throws Exception {
+
+		// select
+		return sqlSessionMeta.selectOne("selectAdminLoginTrialCount", siteId);
+	}
+
+	/**
+	 * Site 관리자 패스워드 시도 초기화 시간 조회
+	 *
+	 * @param siteId String
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectAdminLoginLockTimeValue(String siteId) throws Exception {
+		return sqlSessionMeta.selectOne("selectAdminLoginLockTimeValue", siteId);
+	}
+
+	/**
+	 * update otp login trial count
+	 *
+	 * @param map HashMap<String, Object>
+	 * @return long data update result count.
+	 * @throws SQLException
+	 */
+	public long updateOtpLoginTrial(HashMap<String, Object> map) throws SQLException {
+		return (long) sqlSessionMeta.update("updateOtpLoginTrial", map);
+	}
+
+	/**
+	 * initialize otp login trial count
+	 *
+	 * @param map HashMap<String, Object>
+	 * @return long data update result count.
+	 * @throws SQLException
+	 */
+	public long updateOtpLoginTrialInit(HashMap<String, Object> map) throws SQLException {
+		return (long) sqlSessionMeta.update("updateOtpLoginTrialInit", map);
+	}
 }

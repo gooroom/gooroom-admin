@@ -146,6 +146,7 @@ public class ClientConfServiceImpl implements ClientConfService {
 
 			long oldPollingTime = clientConfDao.selectSitePollingTime("");
 			long oldTrialCount = clientConfDao.selectSiteLoginTrialCount("");
+			long oldAdminLoginTrialCount = clientConfDao.selectSiteAdminLoginTrialCount("");
 			long oldMaxMediaCnt = clientConfDao.selectSiteMaxMediaCnt("");
 
 			// update polling time and trial count and passwordRule
@@ -153,12 +154,15 @@ public class ClientConfServiceImpl implements ClientConfService {
 			confVo.setPollingCycle(vo.getPollingTime());
 			confVo.setTrialCount(vo.getTrialCount());
 			confVo.setLockTime(vo.getLockTime());
+			confVo.setAdminLoginTrialCount(vo.getAdminLoginTrialCount());
+			confVo.setAdminLoginLockTime(vo.getAdminLoginLockTime());
 			confVo.setPasswordRule(vo.getPasswordRule());
 			confVo.setEnableDuplicateLogin(vo.getEnableDuplicateLogin());
+			confVo.setEnableOtpLogin(vo.getEnableOtpLogin());
 			confVo.setMaxMediaCnt(vo.getMaxMediaCnt());
 			confVo.setRegisterReq(vo.getRegisterReq());
 			confVo.setDeleteReq(vo.getDeleteReq());
-			
+
 			long updateCnt = clientConfDao.updateSiteConf(confVo);
 			if (updateCnt > 0) {
 				long insertCnt = clientConfDao.createSiteConfHist(confVo);
@@ -183,6 +187,13 @@ public class ClientConfServiceImpl implements ClientConfService {
 					HashMap<String, Object> map = new HashMap<>();
 					map.put("trialCount", vo.getTrialCount());
 					clientConfDao.updateLoginTrialInUser(map);
+				}
+
+				if (Long.parseLong(vo.getAdminLoginTrialCount()) != oldAdminLoginTrialCount) {
+					// update admin login trial count
+					HashMap<String, Object> map = new HashMap<>();
+					map.put("adminLoginTrialCount", vo.getAdminLoginTrialCount());
+					clientConfDao.updateLoginTrialInAdmin(map);
 				}
 
 				if (Long.parseLong(vo.getMaxMediaCnt()) != oldMaxMediaCnt) {
@@ -229,7 +240,11 @@ public class ClientConfServiceImpl implements ClientConfService {
 			long pollingTime = clientConfDao.selectSitePollingTime("");
 			long trialCount = clientConfDao.selectSiteLoginTrialCount("");
 			long lockTime = clientConfDao.selectSiteLoginLockTime("");
+			//Admin Login Trial Count
+			long adminLoginTrialCount = clientConfDao.selectSiteAdminLoginTrialCount("");
+			long adminLoginLockTime = clientConfDao.selectSiteAdminLoginLockTime("");
 			long enableDuplicateLogin = clientConfDao.selectSiteLoginDuplicateEnable("");
+			long enableOtpLogin = clientConfDao.selectSiteLoginOtpEnable("");
 			String passwordRule = clientConfDao.selectSitePasswordRule("");
 			long maxMediaCnt =clientConfDao.selectSiteMaxMediaCnt("");
 			long registerReq =clientConfDao.selectSiteRegisterReq("");
@@ -240,8 +255,11 @@ public class ClientConfServiceImpl implements ClientConfService {
 				vo.setPollingTime(String.valueOf(pollingTime));
 				vo.setTrialCount(String.valueOf(trialCount));
 				vo.setLockTime(String.valueOf(lockTime));
+				vo.setAdminLoginTrialCount(String.valueOf(adminLoginTrialCount));
+				vo.setAdminLoginLockTime(String.valueOf(adminLoginLockTime));
 				vo.setPasswordRule(passwordRule);
 				vo.setEnableDuplicateLogin(String.valueOf(enableDuplicateLogin));
+				vo.setEnableOtpLogin(String.valueOf(enableOtpLogin));
 				vo.setMaxMediaCnt(String.valueOf(maxMediaCnt));
 				vo.setRegisterReq(String.valueOf(registerReq));
 				vo.setDeleteReq(String.valueOf(deleteReq));

@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.ObjectUtils;
+import kr.gooroom.gpms.config.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +49,6 @@ import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.config.service.CtrlItemVO;
-import kr.gooroom.gpms.config.service.CtrlMstService;
-import kr.gooroom.gpms.config.service.CtrlPropVO;
 import kr.gooroom.gpms.user.service.AdminUserService;
 import kr.gooroom.gpms.user.service.AdminUserVO;
 

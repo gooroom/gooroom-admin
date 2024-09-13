@@ -70,6 +70,15 @@ public class AccountController {
 					mv.addObject("force", "1");
 				} else if (GPMSConstants.ERR_LOGIN_ETC.equalsIgnoreCase(errorCode[0])) {
 					mv.addObject("msg", MessageSourceHelper.getMessage("system.login.error"));
+				} else if (GPMSConstants.ERR_LOGIN_LOCK.equalsIgnoreCase(errorCode[0])) {
+					mv.addObject("msg", "계정이 잠겼습니다.");
+					mv.addObject("msg2", errorCode[1] + "분 후 다시 로그인해주세요.");
+				} else if (GPMSConstants.ERR_LOGIN_PASSWORD_TRIAL.equalsIgnoreCase(errorCode[0])) {
+					mv.addObject("msg", "비밀번호가 일치하지 않습니다. " + "(" + errorCode[1] + "/" + errorCode[2] + ")");
+					mv.addObject("msg2", MessageSourceHelper.getMessage("system.login.login.trial2", (errorCode[2])));
+				} else if (GPMSConstants.ERR_LOGIN_OUT_OF_PASSWORD_TRIAL.equalsIgnoreCase(errorCode[0])) {
+					mv.addObject("msg", "비밀번호가 일치하지 않습니다.");
+					mv.addObject("msg2", "모든 로그인 시도 횟수를 소모했습니다.");
 				}
 			} else {
 				mv.setViewName("/");

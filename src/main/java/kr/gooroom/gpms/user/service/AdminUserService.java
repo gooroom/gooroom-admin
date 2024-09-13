@@ -161,4 +161,5 @@ public interface AdminUserService {
 	 */
 	ResultVO getAuthority(String adminId, String adminRule)  throws Exception;
 
+	StatusVO updateOtpSecret(String adminId, String secret) throws Exception;
 }

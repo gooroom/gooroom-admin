@@ -31,8 +31,8 @@ public class SiteInitializer {
             long reCnt = siteMngDao.updateSiteMngData(siteMngVO);
             if (reCnt > 0) {
                 System.out.println("=====Success GPMS Site Init========");
-                logger.debug("update site register code in SiteInitializer : {}, {}", GPMSConstants.CODE_UPDATE,
-                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SUCCESS));
+//                logger.debug("update site register code in SiteInitializer : {}, {}", GPMSConstants.CODE_UPDATE,
+//                        MessageSourceHelper.getMessage(GPMSConstants.MSG_SUCCESS));
             } else {
                 logger.error("error in SiteInitializer : {}, {}, {}", GPMSConstants.CODE_UPDATE,
                         MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), "site register code update err");

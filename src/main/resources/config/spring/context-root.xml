@@ -81,7 +81,6 @@
 	<bean id="sqlSessionMeta" class="org.mybatis.spring.SqlSessionTemplate">
 		<constructor-arg ref="sqlSessionFactoryMeta" />
 	</bean>
-
 	<!-- org.springframework.jdbc.datasource.DataSourceTransactionManager -->
 	<bean id="transactionManagerMeta"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

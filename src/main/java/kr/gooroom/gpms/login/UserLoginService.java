@@ -8,6 +8,7 @@ import java.util.List;
 import jakarta.annotation.Resource;
 
 import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.config.service.impl.ClientConfDAO;
 import kr.gooroom.gpms.ptgr.service.impl.PortableDAO;
 import kr.gooroom.gpms.user.service.UserVO;
 import kr.gooroom.gpms.user.service.impl.UserDAO;
@@ -36,6 +37,9 @@ public class UserLoginService implements UserDetailsService {
 	@Resource(name = "portableDAO")
 	private PortableDAO portableDAO;
 
+	@Resource(name = "clientConfDAO")
+	private ClientConfDAO clientConfDAO;
+
 	@Override
 	public User loadUserByUsername(String username) throws UsernameNotFoundException {
 
@@ -46,7 +50,7 @@ public class UserLoginService implements UserDetailsService {
 			options.put("isAuth", "yes");
 
 			vo = adminUserDao.selectAdminUserData(options);
-			
+
 //			if (resultVO != null && resultVO.getData() != null && resultVO.getData().length > 0) {
 //				vo = (UserVO) resultVO.getData()[0];
 //			}
@@ -124,9 +128,18 @@ public class UserLoginService implements UserDetailsService {
 		if (user == null) {
 			user = new User(vo);
 			user.setAuthorities(roles);
+			// FIXME : ClientConf fetch 안전성 검토
+			try {
+				if ((clientConfDAO.selectSiteLoginOtpEnable("") == 1)) {
+					user.setOtpEnabled(true);
+				} else {
+					user.setOtpEnabled(false);
+				}
+			} catch (SQLException e) {
+				user.setOtpEnabled(false);
+			}
 		}
 
 		return user;
 	}
-
 }

@@ -37,11 +37,19 @@
         font-weight: bold;
         font-size: 13px;
     }
-    
+
     .sysmsg {
-        padding-top: 4px;
+        padding-top: 7px;
         margin-top: 0px;
     	margin-bottom: 20px;
+        color: #d53333;
+        font-weight: bold;
+        font-size: 13px;
+    }
+
+    .sysmsg2 {
+        margin-top: 3px;
+        margin-bottom: 20px;
         color: #d53333;
         font-weight: bold;
         font-size: 13px;
@@ -141,7 +149,8 @@
     @media (max-width: 600px) {
         .main {
             border-radius: 0px;
-        }  
+        }
+    }
   
   </style>
 </head>
@@ -150,7 +159,12 @@
   <div class="main">
     <p class="sign" align="center">GPMS</p>
 <%--    <p class="version" align="center">v2.0</p>--%>
+<% if(request.getAttribute("msg2") != null) { %>
+        <p class="sysmsg" align="center">${msg}</p>
+        <p class="sysmsg" align="center">${msg2}</p>
+<% } else { %>
     <p class="sysmsg" align="center">${msg}</p>
+<% } %>
     <form name='f' action="login" method='POST' onSubmit="gr_encoding()">
 		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 		<input type="hidden" name="userPw" />
@@ -170,9 +184,7 @@
 		} else {
 %>			
 		<input class="submit" name="submit" type="submit" value="Sign in" />
-<%
-		}
-%>			
+<% } %>
 		<p class="cont">Gooroom Platform Management Server</p>
 	</form>            
     </div>
@@ -186,5 +198,3 @@
 	}
 </script>
 </html>
-
-

@@ -68,6 +68,14 @@ public class AdminUserVO implements Serializable {
 	private String dupLoginTryIp;
 	private Date dupLoginTryDate;
 
+	private int loginTrial;
+	private Date loginTrialDate;
+	private	int loginElapsedTime;
+
+	private int otpLoginTrial;
+
+	private String secret;
+	private int secretSaved;
 	
 	public AdminUserVO() {
 
@@ -289,5 +297,45 @@ public class AdminUserVO implements Serializable {
 
 	public void setIsPortableAdmin(String isPortableAdmin) {
 		this.isPortableAdmin = isPortableAdmin;
+	}
+
+	public void setSecret(String secret) {
+		this.secret = secret;
+	}
+
+	public String getSecret() {
+		return secret;
+	}
+
+	public int getLoginTrial() {
+		return loginTrial;
+	}
+
+	public void setLoginTrial(int loginTrial) {
+		this.loginTrial = loginTrial;
+	}
+
+	public int getLoginElapsedTime() {
+		return loginElapsedTime;
+	}
+
+	public void setLoginElapsedTime(int loginElapsedTime) {
+		this.loginElapsedTime = loginElapsedTime;
+	}
+
+	public Date getLoginTrialDate() {
+		return loginTrialDate;
+	}
+
+	public void setLoginTrialDate(Date loginTrialDate) {
+		this.loginTrialDate = loginTrialDate;
+	}
+
+	public int getOtpLoginTrial() {
+		return otpLoginTrial;
+	}
+
+	public int getSecretSaved() {
+		return secretSaved;
 	}
 }

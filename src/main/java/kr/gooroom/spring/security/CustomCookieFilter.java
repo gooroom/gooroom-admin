@@ -14,7 +14,7 @@ public class CustomCookieFilter extends GenericFilterBean {
 
 	@Override
     public void doFilter(ServletRequest request,  ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletResponse resp = (HttpServletResponse)response;
+        HttpServletResponse resp = (HttpServletResponse) response;
         resp.setHeader("Set-Cookie", "SameSite=Lax");
         chain.doFilter(request, response);
     }

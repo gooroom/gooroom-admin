@@ -39,8 +39,11 @@ public class SiteConfVO implements Serializable {
 	private String serverVersion;
 	private String trialCount;
 	private String lockTime;
+	private String adminLoginTrialCount;
+	private String adminLoginLockTime;
 	private String passwordRule;
 	private String enableDuplicateLogin;
+	private String enableOtpLogin;
 
 	private String maxMediaCnt;
 	private String registerReq;
@@ -48,7 +51,6 @@ public class SiteConfVO implements Serializable {
 
 	private Date modDate;
 	private String modUserId;
-
 
 	public String getSiteId() {
 		return siteId;
@@ -96,6 +98,22 @@ public class SiteConfVO implements Serializable {
 
 	public void setLockTime(String lockTime) {
 		this.lockTime = lockTime;
+	}
+
+	public String getAdminLoginTrialCount() {
+		return adminLoginTrialCount;
+	}
+
+	public void setAdminLoginTrialCount(String adminLoginTrialCount) {
+		this.adminLoginTrialCount = adminLoginTrialCount;
+	}
+
+	public String getAdminLoginLockTime() {
+		return adminLoginLockTime;
+	}
+
+	public void setAdminLoginLockTime(String adminLoginLockTime) {
+		this.adminLoginLockTime = adminLoginLockTime;
 	}
 
 	public String getPasswordRule() {
@@ -154,4 +172,11 @@ public class SiteConfVO implements Serializable {
 		this.deleteReq = deleteReq;
 	}
 
+	public void setEnableOtpLogin(String enableOtpLogin) {
+		this.enableOtpLogin = enableOtpLogin;
+	}
+
+	public String getEnableOtpLogin() {
+		return enableOtpLogin;
+	}
 }

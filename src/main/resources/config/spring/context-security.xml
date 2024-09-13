@@ -22,14 +22,20 @@
 	<http pattern="/portable/updateImageList*" security="none" />
 
 	<http pattern="/samples/**" security="none" />	
- 
-	<http auto-config="true" use-expressions="true" disable-url-rewriting="true" >
-		
-		<access-denied-handler error-page="/login?s=fail&amp;e=E21" />
+
+	<!-- <http auto-config="true" use-expressions="true" disable-url-rewriting="true" access-decision-manager-ref="accessDecisionManager"> -->
+	<http auto-config="true" use-expressions="true" disable-url-rewriting="true">
+<!--	<http auto-config="true" use-expressions="true" disable-url-rewriting="true">-->
+
+<!--		<access-denied-handler error-page="/login?s=fail&amp;e=E21" />-->
+<!--		<access-denied-handler error-page="/otp/login?s=fail&amp;e=E21" />-->
+		<access-denied-handler ref="customAccessDeniedHandler" />
 		
 		<csrf disabled="true" />
  
 		<intercept-url pattern="/login*" access="hasRole('ROLE_ANONYMOUS')" />
+		<intercept-url pattern="/otp/**" access="hasRole('ROLE_ADMIN')" />
+<!--		<intercept-url pattern="/totp-login*" access="hasRole('ROLE_ADMIN', 'ROLE_SUPER')" />-->
 		<intercept-url pattern="/refuse*" access="hasRole('ROLE_ANONYMOUS')" />
 		<intercept-url pattern="/v1/**" access="hasRole('ROLE_ANONYMOUS')" />
 		<intercept-url pattern="/testtr*" access="hasRole('ROLE_ANONYMOUS')" />
@@ -41,21 +47,27 @@
 		<intercept-url pattern="/**" access="hasAnyRole('ROLE_SUPER', 'ROLE_ADMIN', 'ROLE_PART', 'ROLE_USER')" />
 
  		<custom-filter after="BASIC_AUTH_FILTER" ref="customCookieFilter" />
- 		 
+
 		<custom-filter ref="requestContextFilter" before="FORM_LOGIN_FILTER" />
+		<custom-filter ref="otpAuthenticationFilter" after="FORM_LOGIN_FILTER" />
+		<!--					default-target-url="/otpLogin"-->
 		<form-login login-page="/login" 
-					username-parameter="userId" 
-					password-parameter="userPw"		
-					default-target-url="/" 
+					username-parameter="userId"
+					password-parameter="userPw"
 					authentication-failure-handler-ref="customAuthenticationFailureHandler"
 					authentication-success-handler-ref="customAuthenticationSuccessHandler"
 					always-use-default-target="true"
 					/>
  		
  		<logout invalidate-session="true" logout-url="/logout" success-handler-ref="customLogoutSuccessHandler" />
-		
-		<custom-filter ref="ajaxTimeoutRedirectFilter" after="EXCEPTION_TRANSLATION_FILTER"/>	
 
+		<!-- Exception Translation Filter handles AccessDeniedException through AccessDeniedHandler -->
+		<custom-filter ref="mfaAuthorizationFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
+		<!-- Also handles AccessDeniedException so, -->
+		<custom-filter ref="ajaxTimeoutRedirectFilter" before="FILTER_SECURITY_INTERCEPTOR"/>
+		<!-- <custom-filter ref="ajaxTimeoutRedirectFilter" after="EXCEPTION_TRANSLATION_FILTER"/> -->
+
+		<custom-filter ref="GPMSFilter" after="SWITCH_USER_FILTER"/>
 		<session-management invalid-session-url="/login">
     		<concurrency-control session-registry-alias="sessionRegistry" />
 		</session-management>
@@ -64,19 +76,54 @@
 	
 	<context:component-scan base-package="kr.gooroom" />
 	<context:annotation-config />
-	
+
 	<!-- ajax 세션처리를 위한 필터 선언 -->
 	<beans:bean id="ajaxTimeoutRedirectFilter" class="kr.gooroom.spring.security.AjaxTimeoutRedirectFilter">
-    	<beans:property name="customSessionExpiredErrorCode" value="944"/>
+		<beans:property name="customSessionExpiredErrorCode" value="944"/>
 	</beans:bean>
-	
+
+	<!-- 2차 인증 처리를 위한 필터 선언 -->
+	<beans:bean id="mfaAuthorizationManager" class="kr.gooroom.gpms.login.MfaAuthorizationManager" />
+	<beans:bean id="mfaAuthorizationFilter" class="kr.gooroom.spring.security.MfaAuthorizationFilter">
+		<beans:constructor-arg name="mfaAuthorizationManager" ref="mfaAuthorizationManager" />
+	</beans:bean>
+
+	<!-- Affirmative 방식으로 변경(Multi-factor 로그인) -->
+	<!-- <beans:bean id="accessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased">
+		<beans:constructor-arg>
+			<beans:list>
+				<beans:bean class="org.springframework.security.web.access.expression.WebExpressionVoter"/>
+				<beans:ref bean="mfaAccessDecisionVoter"/>
+				<beans:bean class="org.springframework.security.access.vote.RoleVoter"/>
+				<beans:bean class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+			</beans:list>
+		</beans:constructor-arg>
+	</beans:bean> -->
+
+	<!-- AccessDeniedHandler 빈 등록 -->
+	<beans:bean id="customAccessDeniedHandler" class="kr.gooroom.gpms.login.CustomAccessDeniedHandler"/>
+
+	<!-- 메서드 보안 설정 활성화(NOT YET) -->
+	<!--	<global-method-security pre-post-annotations="enabled">-->
+	<!--		<expression-handler ref="expressionHandler"/>-->
+	<!--	</global-method-security>-->
+
 	<beans:bean id="customCookieFilter" class="kr.gooroom.spring.security.CustomCookieFilter"/>
 	
 	<beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 	
 	<beans:bean id="requestContextFilter" class="org.springframework.web.filter.RequestContextFilter" />
-	
+
+	<beans:bean id="otpAuthenticationSuccessHandler" class="kr.gooroom.gpms.totp.OtpAuthenticationSuccessHandler" />
+	<beans:bean id="otpAuthenticationFailureHandler" class="kr.gooroom.gpms.totp.OtpAuthenticationFailureHandler" />
+	<beans:bean id="otpAuthenticationFilter" class="kr.gooroom.spring.security.OtpAuthenticationFilter">
+		<beans:property name="otpAuthenticationSuccessHandler" ref="otpAuthenticationSuccessHandler"></beans:property>
+		<beans:property name="otpAuthenticationFailureHandler" ref="otpAuthenticationFailureHandler"></beans:property>
+		<beans:property name="authenticationManager" ref="authenticationManager"/>
+	</beans:bean>
+
 	<beans:bean id="customAuthenticationProvider" class="kr.gooroom.gpms.login.CustomAuthenticationProvider" />
+	<beans:bean id="otpAuthenticationProvider" class="kr.gooroom.gpms.login.OtpAuthenticationProvider" />
 	<beans:bean id="userLoginService" class="kr.gooroom.gpms.login.UserLoginService" />
 	<beans:bean id="customAuthenticationFailureHandler" class="kr.gooroom.gpms.login.CustomAuthenticationFailureHandler" />
 	<beans:bean id="customAuthenticationSuccessHandler" class="kr.gooroom.gpms.login.CustomAuthenticationSuccessHandler" />
@@ -92,6 +139,8 @@
     <authentication-manager alias="authenticationManager">
     	<authentication-provider ref="customAuthenticationProvider">
         </authentication-provider>
+		<authentication-provider ref="otpAuthenticationProvider">
+		</authentication-provider>
     </authentication-manager>
 
 </beans:beans>

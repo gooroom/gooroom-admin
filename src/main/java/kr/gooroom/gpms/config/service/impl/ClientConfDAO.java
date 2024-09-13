@@ -195,6 +195,16 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	}
 
 	/**
+	 * response whether enable otp login
+	 *
+	 * @return long total count number.
+	 * @throws SQLException
+	 */
+	public long selectSiteLoginOtpEnable(String siteId) throws SQLException {
+		return sqlSessionMeta.selectOne("selectSiteLoginOtpEnable", siteId);
+	}
+
+	/**
 	 * response whether max media cnt
 	 *
 	 * @return long total count number.
@@ -220,6 +230,26 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 */
 	public long selectSiteDeleteReq(String siteId) {
 		return sqlSessionMeta.selectOne("selectSiteDeleteReq", siteId);
+	}
+
+	/**
+	 * response whether delete req
+	 *
+	 * @return long total count number.
+	 * @throws SQLException
+	 */
+	public long selectSiteAdminLoginTrialCount(String siteId) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("selectSiteAdminLoginTrialCount", siteId);
+	}
+
+	/**
+	 * response whether delete req
+	 *
+	 * @return long total count number.
+	 * @throws SQLException
+	 */
+	public long selectSiteAdminLoginLockTime(String siteId) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("selectSiteAdminLoginLockTime", siteId);
 	}
 
 	/**
@@ -276,6 +306,19 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	public long updateLoginTrialInUser(HashMap<String, Object> map) throws SQLException {
 
 		return sqlSessionMeta.update("updateLoginTrialInUser", map);
+
+	}
+
+	/**
+	 * update login trial count in admin mstr
+	 *
+	 * @param map HashMap
+	 * @return long data update result count.
+	 * @throws SQLException
+	 */
+	public long updateLoginTrialInAdmin(HashMap<String, Object> map) throws SQLException {
+
+		return (long) sqlSessionMeta.update("updateLoginTrialInAdmin", map);
 
 	}
 }

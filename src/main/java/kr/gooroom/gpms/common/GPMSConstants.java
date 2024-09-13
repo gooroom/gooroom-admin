@@ -131,9 +131,22 @@ public class GPMSConstants {
 	public static final String ERR_LOGIN_PASSWORD = "E01";
 	public static final String ERR_LOGIN_USER = "E02";
 	public static final String ERR_LOGIN_ACCOUNT = "E03";
+	public static final String ERR_LOGIN_PASSWORD_TRIAL = "E04";
+	public static final String ERR_LOGIN_OUT_OF_PASSWORD_TRIAL = "E05";
+	public static final String ERR_LOGIN_LOCK = "E06";
 	public static final String ERR_LOGIN_DENIED = "E21";
 	public static final String ERR_LOGIN_DUPLICATE = "E22";
+	public static final String ERR_LOGIN_TRIAL= "E23";
 	public static final String ERR_LOGIN_ETC = "E99";
+
+	// GPMS OTP LOGIN
+	public static final String OTP_LOGIN_ALLOWED_TIME_DRIFT = "1";
+
+	// GPMS OTP LOGIN ERROR CODE
+	public static final String ERR_OTP_LOGIN_USERCODE = "E11";
+	public static final String ERR_OTP_LOGIN_USERNAME_NOT_FOUND = "E12";
+	public static final String ERR_OTP_LOGIN_TRIAL = "E13";
+	public static final String ERR_OTP_LOGIN_TRIAL_EXCEEDED = "E14";
 
 	//
 	public static final String STS_SERVICE_RUN = "STAT010";

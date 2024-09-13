@@ -566,7 +566,6 @@ public class AdminUserServiceImpl implements AdminUserService {
 		StatusVO statusVO = new StatusVO();
 		
 		try {
-			
 			long reCnt = adminUserDao.updateLoginTrialData(LoginInfoHelper.getUserId());
 			
 			if (reCnt > 0) {
@@ -666,5 +665,23 @@ public class AdminUserServiceImpl implements AdminUserService {
 
 		return resultVO;
 	}
-	
+
+	@Override
+	public StatusVO updateOtpSecret(String adminId, String secret) throws Exception {
+		StatusVO statusVO = new StatusVO();
+		try {
+			long result = adminUserDao.insertOrUpdateAdminSecret(adminId, secret);
+			if (result > 0) {
+				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+						MessageSourceHelper.getMessage("gcsp.result.update"));
+			} else {
+				throw new SQLException();
+			}
+		} catch	(Exception e) {
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATEERROR,
+					MessageSourceHelper.getMessage("job.result.noupdate"));
+		}
+
+		return statusVO;
+	}
 }
