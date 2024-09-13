@@ -372,4 +372,6 @@ public class GPMSConstants {
 	public static final String CTRL_ITEM_AUDIO_VIDEO = "AudioVideo";
 	public static final String CTRL_ITEM_GRAPHICS = "Graphics";
 
+	//installedPath
+	public static final String GPMS_INSTALL_PATH = prop.getProperty("gooroom.gpms.install.path");
 }
