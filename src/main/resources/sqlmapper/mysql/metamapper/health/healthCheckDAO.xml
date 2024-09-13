@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HealthCheckDAO">
+    <resultMap type="gpmsHealthCheckVO" id="gpmsHealthCheckVO">
+        <result property="id" column="ID" />
+        <result property="httpStatus" column="HTTP_STATUS" />
+        <result property="status" column="STATUS" />
+        <result property="serverName" column="SERVER_NAME" />
+        <result property="releaseName" column="RELEASE_NAME" />
+        <result property="url" column="URL" />
+        <result property="register" column="REGISTER" />
+        <result property="schedule" column="SCHEDULE" />
+        <result property="createdDateTime" jdbcType="TIMESTAMP" javaType="java.util.Date" column="CREATED_DATE_TIME" />
+        <result property="updatedDateTime" jdbcType="TIMESTAMP" javaType="java.util.Date" column="UPDATED_DATE_TIME" />
+        <result property="target" column="TARGET" />
+        <result property="sid" column="SID" />
+        <result property="username" column="USERNAME" />
+        <result property="password" column="PASSWORD" />
+        <result property="pkey" column="PKEY" />
+        <result property="psalt" column="PSALT" />
+        <result property="connection" column="CONNECTION" />
+        <result property="dbType" column="DB_TYPE"/>
+        <result property="port" column="PORT"/>
+        <result property="dist" column="DIST"/>
+
+        <collection property="dbCheckItems" ofType="kr.gooroom.gpms.health.service.GPMSHealthCheckVO$DbCheckItemsVO">
+            <result property="dbCheckItemId" column="DB_CHECK_ITEM_ID"/>
+            <result property="parentId" column="PARENT_ID"/>
+            <result property="itemName" column="ITEM_NAME"/>
+            <result property="checkQuery" column="CHECK_QUERY"/>
+            <result property="createdDateTime" jdbcType="TIMESTAMP" javaType="java.util.Date" column="CREATED_DATE_TIME" />
+            <result property="updatedDateTime" jdbcType="TIMESTAMP" javaType="java.util.Date" column="UPDATED_DATE_TIME" />
+            <result property="result" column="RESULT"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectHealthCheckServerList" parameterType="String" resultMap="gpmsHealthCheckVO">
+		SELECT A.ID
+            , A.TARGET
+            , A.URL
+            , A.SERVER_NAME
+            , A.SCHEDULE
+            , A.NOTE
+            , A.STATUS
+            , A.HTTP_STATUS
+            , A.DB_TYPE
+            , A.CONNECTION
+            , A.DIST
+            , A.CREATED_DATE_TIME
+            , A.UPDATED_DATE_TIME
+            , B.DB_CHECK_ITEM_ID
+            , B.PARENT_ID
+            , B.ITEM_NAME
+            , B.CHECK_QUERY
+            , B.RESULT
+            , B.CREATED_DATE_TIME
+        FROM HEALTH_CHECK_SERVER_LIST A
+        LEFT JOIN HEALTH_CHECK_DB_ITEMS B 
+            ON A.ID = B.PARENT_ID
+        <where>
+            <if test="target != null">
+                TARGET = #{target}
+            </if>
+        </where>
+        ORDER BY A.CREATED_DATE_TIME DESC
+	</select>
+
+    <insert id="insertHealthServer" parameterType="gpmsHealthCheckVO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO HEALTH_CHECK_SERVER_LIST
+            ( URL
+            , SERVER_NAME
+            , CREATED_DATE_TIME
+            , STATUS
+            , HTTP_STATUS
+            , NOTE
+            , SCHEDULE
+            , SID
+            , USERNAME
+            , PASSWORD
+            , PKEY
+            , PSALT
+            , DB_TYPE
+            , PORT
+            , DIST
+            , TARGET)
+        VALUES(
+             #{url}
+            , #{serverName}
+            , now()
+            , #{status}
+            , #{httpStatus}
+            , #{note}
+            , #{schedule}
+            , #{sid}
+            , #{username}
+            , #{password}
+            , #{pkey}
+            , #{psalt}
+            , #{dbType}
+            , #{port}
+            , #{dist}
+            , #{target})  
+    </insert>
+
+    <delete id="deleteHealthServer" parameterType="gpmsHealthCheckVO">
+        DELETE FROM HEALTH_CHECK_SERVER_LIST
+        WHERE ID = #{id}
+    </delete>
+
+    <select id="selectHealthCheckServerByURL" parameterType="java.util.Map" resultMap="gpmsHealthCheckVO">
+		SELECT A.ID
+            , A.URL
+            , A.SERVER_NAME
+            , A.CREATED_DATE_TIME
+            , A.STATUS
+            , A.HTTP_STATUS
+            , A.NOTE
+            , A.SCHEDULE
+            , A.SID
+            , A.USERNAME
+            , A.PASSWORD
+            , A.PKEY
+            , A.PSALT
+            , A.TARGET
+            , A.PORT
+            , A.DIST
+            , A.DB_TYPE
+            , B.DB_CHECK_ITEM_ID
+            , B.ITEM_NAME
+            , B.CHECK_QUERY
+            , B.RESULT
+            , B.CREATED_DATE_TIME
+        FROM HEALTH_CHECK_SERVER_LIST A
+        LEFT JOIN HEALTH_CHECK_DB_ITEMS B 
+            ON A.ID = B.PARENT_ID
+        WHERE A.URL = #{url}
+        <if test="dist != null">
+            And DIST = #{dist}
+        </if>
+	</select>
+
+    <update id="updateServerHealth" parameterType="gpmsHealthCheckVO">    
+        UPDATE HEALTH_CHECK_SERVER_LIST
+        SET STATUS = #{status}
+            , HTTP_STATUS = #{httpStatus}
+            , CONNECTION = #{connection}
+            , UPDATED_DATE_TIME = now()
+        WHERE URL = #{url}
+        <if test="id != null">
+            And ID = #{id}
+        </if>
+    </update>
+
+    <update id="updateDbItemResult" parameterType="kr.gooroom.gpms.health.service.GPMSHealthCheckVO$DbCheckItemsVO">    
+        UPDATE HEALTH_CHECK_DB_ITEMS
+        SET RESULT = #{result}
+            , UPDATED_DATE_TIME = now()
+        WHERE DB_CHECK_ITEM_ID = #{dbCheckItemId}
+    </update>
+
+    <insert id="insertDbCheckItem" parameterType="kr.gooroom.gpms.health.service.GPMSHealthCheckVO$DbCheckItemsVO">
+        INSERT INTO HEALTH_CHECK_DB_ITEMS
+            ( PARENT_ID
+            , ITEM_NAME
+            , CHECK_QUERY
+            , RESULT
+            , CREATED_DATE_TIME
+            )
+        VALUES(
+             #{parentId}
+            , #{itemName}
+            , #{checkQuery}
+            , #{result}
+            , now()
+            )  
+    </insert>
+</mapper>

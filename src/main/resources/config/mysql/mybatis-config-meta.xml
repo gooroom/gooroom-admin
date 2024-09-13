@@ -101,6 +101,7 @@
 		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableImageViewVO" alias="portableImageViewVO" />
 
 		<typeAlias type="kr.gooroom.gpms.health.service.GPMSModuleHealthVO" alias="gpmsModuleHealthVO" />
+		<typeAlias type="kr.gooroom.gpms.health.service.GPMSHealthCheckVO" alias="gpmsHealthCheckVO" />
 	</typeAliases>
 	
 </configuration>
