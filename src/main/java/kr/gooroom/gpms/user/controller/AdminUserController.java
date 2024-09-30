@@ -315,7 +315,12 @@ public class AdminUserController {
 			paramVO.setDeptCds(new ArrayList<>(Arrays.asList(deptInfoList)));
 		}
 
-		paramVO.setSecretSaved(Integer.parseInt(req.getParameter("secretSaved")));
+		String initSecretSaved = req.getParameter("initSecretSaved");
+		if(initSecretSaved != null && Integer.parseInt(initSecretSaved) == 1) {
+			paramVO.setSecretSaved(0);
+		} else if (initSecretSaved != null && Integer.parseInt(initSecretSaved) == 0) {
+			paramVO.setSecretSaved(1);
+		}
 
 		ResultVO resultVO = new ResultVO();
 		try {
