@@ -67,7 +67,7 @@ public class TotpController  {
                 if (GPMSConstants.ERR_LOGIN_DENIED.equalsIgnoreCase(errorCode[0])) {
                     mv.addObject("msg", "ERR_LOGIN_DENIED");
                 } else if (GPMSConstants.ERR_OTP_LOGIN_TRIAL.equalsIgnoreCase(errorCode[0])) {
-                    mv.addObject("msg", "비밀번호가 일치하지 않습니다. " + "(" + errorCode[1] + "/" + errorCode[2] + ")");
+                    mv.addObject("msg", "OTP 코드가 일치하지 않습니다. " + "(" + errorCode[1] + "/" + errorCode[2] + ")");
                     mv.addObject("msg2", MessageSourceHelper.getMessage("system.login.login.trial2", (errorCode[2])));
                 } else if (GPMSConstants.ERR_OTP_LOGIN_TRIAL_EXCEEDED.equalsIgnoreCase(errorCode[0])) {
                     mv.addObject("msg", "ERR_OTP_LOGIN_TRIAL_EXCEEDED");
