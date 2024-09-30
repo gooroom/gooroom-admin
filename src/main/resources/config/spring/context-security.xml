@@ -68,6 +68,7 @@
 		<!-- <custom-filter ref="ajaxTimeoutRedirectFilter" after="EXCEPTION_TRANSLATION_FILTER"/> -->
 
 		<custom-filter ref="GPMSFilter" after="SECURITY_CONTEXT_FILTER"/>
+
 		<session-management invalid-session-url="/login">
     		<concurrency-control session-registry-alias="sessionRegistry" />
 		</session-management>

@@ -338,4 +338,8 @@ public class AdminUserVO implements Serializable {
 	public int getSecretSaved() {
 		return secretSaved;
 	}
+
+	public void setSecretSaved(int sercretSaved) {
+		this.secretSaved = sercretSaved;
+	}
 }

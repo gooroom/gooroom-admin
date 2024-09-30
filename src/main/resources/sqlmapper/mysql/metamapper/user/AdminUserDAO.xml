@@ -206,7 +206,7 @@
   			</if>
 			ADMIN_TP = #{adminTp},
 			MOD_USER_ID = #{modUserId},
-			MOD_DT = now() 
+			MOD_DT = now()
 		WHERE
 			ADMIN_ID = #{adminId}
 	</update>

@@ -16,6 +16,19 @@
 
 package kr.gooroom.gpms.user.service.impl;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
 import jakarta.annotation.Resource;
 import kr.gooroom.gpms.account.service.ActHistoryVO;
 import kr.gooroom.gpms.common.GPMSConstants;
@@ -26,18 +39,6 @@ import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.user.service.AdminUserService;
 import kr.gooroom.gpms.user.service.AdminUserVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
-
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * administrator user management service implements class
@@ -137,6 +138,11 @@ public class AdminUserServiceImpl implements AdminUserService {
 
 			String adminPw =  adminUserVO.getAdminPw();
 			adminUserVO.setAdminPw(passwordEncoder.encode(adminPw));
+
+			HashMap<String, Object> options = new HashMap<>();
+			options.put("adminId", adminUserVO.getAdminId());
+			options.put("isSaved", adminUserVO.getSecretSaved());
+			adminUserDao.updateOtpSecretSaved(options);
 
 			long reCnt = adminUserDao.updateAdminUserData(adminUserVO);
 			if (reCnt > 0) {

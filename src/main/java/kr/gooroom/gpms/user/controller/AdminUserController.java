@@ -24,12 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.ObjectUtils;
-import kr.gooroom.gpms.config.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.StringUtil;
 import org.slf4j.Logger;
@@ -44,12 +39,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
+import kr.gooroom.gpms.config.service.CtrlItemVO;
+import kr.gooroom.gpms.config.service.CtrlMstService;
+import kr.gooroom.gpms.config.service.CtrlPropVO;
 import kr.gooroom.gpms.user.service.AdminUserService;
 import kr.gooroom.gpms.user.service.AdminUserVO;
 
@@ -313,6 +314,8 @@ public class AdminUserController {
 		if (deptInfoList != null && deptInfoList.length > 0) {
 			paramVO.setDeptCds(new ArrayList<>(Arrays.asList(deptInfoList)));
 		}
+
+		paramVO.setSecretSaved(Integer.parseInt(req.getParameter("secretSaved")));
 
 		ResultVO resultVO = new ResultVO();
 		try {
