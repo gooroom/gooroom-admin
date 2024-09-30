@@ -46,6 +46,7 @@
             , A.DB_TYPE
             , A.CONNECTION
             , A.DIST
+            , A.SID
             , A.CREATED_DATE_TIME
             , A.UPDATED_DATE_TIME
             , B.DB_CHECK_ITEM_ID
