@@ -67,7 +67,6 @@ public class GPMSModuleHealthServiceImpl implements GPMSMoudleHealthService {
 
     // second
     private static final int SCRIPT_WAIT_TIME = 3;
-    private static final int OFFSET_TIME = 9;
     private static final int REFRESH_RATE = 10;
 
     private static final String DEFAULT_SHELL = "/bin/bash";
@@ -231,7 +230,7 @@ public class GPMSModuleHealthServiceImpl implements GPMSMoudleHealthService {
 
         for (String[] cmd : cmdList) {
             ScriptResult scriptResult = runScript(cmd);
-            if (!scriptResult.success) {
+            if (!moduleActionType.equals(GPMSModuleActionType.RESTART) && !scriptResult.success) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                         MessageSourceHelper.getMessage(GPMSConstants.MSG_FAIL));
                 return statusVO;
