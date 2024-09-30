@@ -22,11 +22,11 @@ public class HealthCheckQueryMap {
 
         // Threads connected
         healthCheckQueries.put("Threads connected", 
-            "SHOW STATUS LIKE 'Threads_connected';");
+            "SELECT VARIABLE_VALUE FROM information_schema.GLOBAL_STATUS WHERE VARIABLE_NAME = 'Threads_connected';");
 
         // Aborted connects
         healthCheckQueries.put("Aborted connects", 
-            "SHOW STATUS LIKE 'Aborted_connects';");
+            "SELECT VARIABLE_VALUE FROM information_schema.GLOBAL_STATUS WHERE VARIABLE_NAME = 'Aborted_connects';");
     }
 
     public static Map<String, String> getHealthCheckQueries() {
