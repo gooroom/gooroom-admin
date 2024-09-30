@@ -80,7 +80,7 @@ public class TargetNoticeController {
 	public ResponseEntity<TargetNoticeResponseModel> getNoticeByTarget(
 			@RequestAttribute(value = "CLIENT_ID") String clientId,
 			@RequestAttribute(value = "USER_ID", required = false) String userId,
-			@PathVariable String noticePublishId) {
+			@PathVariable("noticePublishId") String noticePublishId) {
 
 		logger.debug("REST request to get Notice : {}, {}, {}", clientId, userId, noticePublishId);
 
@@ -102,7 +102,7 @@ public class TargetNoticeController {
 	@ResponseBody
 	public ResponseEntity<Map<String, Integer>> getPageNumberOfNoticeByTarget(
 			@RequestAttribute(value = "CLIENT_ID") String clientId,
-			@RequestAttribute(value = "USER_ID", required = false) String userId, @PathVariable String noticePublishId,
+			@RequestAttribute(value = "USER_ID", required = false) String userId, @PathVariable("noticePublishId") String noticePublishId,
 			@PageableDefault(sort = "openDt", direction = Direction.DESC) Pageable pageable) {
 
 		logger.debug("REST request to get PageNumber of notice : {}, {}, {}", clientId, userId, noticePublishId);
