@@ -293,7 +293,7 @@
                         <input class="authInput" name="authInput" type="password" maxlength="1" pattern="[0-9]" tabIndex="6" required>
                     </div>
                      <p class="sysmsg" align="center">${msg}</p>
-                    <button class="submit" type="submit">등록</button>
+                    <button class="submit" type="submit">확인</button>
                 </form>
             </div>
         </div>
