@@ -23,10 +23,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -664,4 +664,22 @@ public class AdminUserController {
 		return resultVO;
 	}
 
+	@PostMapping(value = "/updateAdminLoginTrialCount")
+	public @ResponseBody ResultVO updateAdminLoginTrialCount(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+		ResultVO resultVO = new ResultVO();
+		try {
+			String adminId = req.getParameter("adminId");
+			Map<String, Object> options = new HashMap<>();
+			options.put("admin_id", adminId);
+			StatusVO status = adminUserService.updateAdminLoginTrialCount(adminId);
+			resultVO.setStatus(status);
+		} catch (Exception ex) {
+			logger.error("error in updateAdminLoginTrialCount : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+		}
+
+		return resultVO;
+	}
 }

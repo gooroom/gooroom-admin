@@ -6,6 +6,7 @@ import java.util.Base64.Encoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -78,8 +79,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 					throw new LoginTrialException((new StringBuffer(GPMSConstants.ERR_LOGIN_LOCK))
 							.append(";").append(remainingUnlockTime > 0 ? remainingUnlockTime : 0).toString());
 				} else {
-					HashMap<String, Object> paramMap = new HashMap<String, Object>();
-					paramMap.put("loginId", username);
+					Map<String, Object> paramMap = new HashMap<String, Object>();
+					paramMap.put("adminId", username);
 					adminUserDao.updateLoginTrialInit(paramMap);
 					int adminLoginTrialCount = adminUserDao.selectAdminLoginTrialCount("");
 					adminUserVO.setLoginTrial(adminLoginTrialCount);

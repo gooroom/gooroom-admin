@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +54,9 @@ public class OtpAuthenticationSuccessHandler implements AuthenticationSuccessHan
             request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
 
             // init login trial time
-            HashMap<String, Object> trialParams = new HashMap<String, Object>();
-            trialParams.put("adminId", authentication.getName());
-            adminUserDao.updateOtpLoginTrialInit(trialParams);
+            Map<String, Object> options = new HashMap<>();
+            options.put("adminId", authentication.getName());
+            adminUserDao.updateOtpLoginTrialInit(options);
 
             // update renew QR when login succeeded
             HashMap<String, Object> savedParams = new HashMap<>();

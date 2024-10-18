@@ -89,7 +89,10 @@
 		       IFNULL(AR.USER_ADMIN, 0) ISUSERADMIN,
 		       IFNULL(AR.DESKTOP_ADMIN, 0) ISDESKTOPADMIN,
 		       IFNULL(AR.NOTICE_ADMIN, 0) ISNOTICEADMIN,
-			   IFNULL(AR.PORTABLE_ADMIN, 0) ISPORTABLEADMIN
+			   IFNULL(AR.PORTABLE_ADMIN, 0) ISPORTABLEADMIN,
+
+			   IFNULL(AM.LOGIN_TRIAL, 0) LOGIN_TRIAL,
+			   IFNULL(AM.OTP_LOGIN_TRIAL, 0) OTP_LOGIN_TRIAL
 
 		FROM ADMIN_MSTR AM
 		     LEFT JOIN
@@ -333,13 +336,23 @@
 		WHERE ADMIN_ID=#{adminId}
 	</update>
 
+	<!-- 관리자 접속 정보에 중복 접속 요청 정보 삭제 -->
+	<update id="updateAdminLoginTrialCount" parameterType="string">
+		UPDATE ADMIN_MSTR 
+			SET LOGIN_TRIAL = (SELECT ADMIN_LOGIN_TRIAL_COUNT FROM SITE_MSTR 1),
+			OTP_LOGIN_TRIAL = (SELECT ADMIN_LOGIN_TRIAL_COUNT FROM SITE_MSTR 1)
+		WHERE ADMIN_ID = #{adminId}
+	</update>
+
 	<!--
 		================================== LOGIN TRIAL ==================================
 	-->
 
 	<!-- LOGIN TRIAL 초기화 -->
 	<update id="updateLoginTrialInit" parameterType="hashmap">
-		UPDATE ADMIN_MSTR SET LOGIN_TRIAL = (SELECT ADMIN_LOGIN_TRIAL_COUNT FROM SITE_MSTR LIMIT 1)
+		UPDATE ADMIN_MSTR 
+			SET LOGIN_TRIAL = (SELECT ADMIN_LOGIN_TRIAL_COUNT FROM SITE_MSTR LIMIT 1)
+		WHERE ADMIN_ID = #{adminId}
 	</update>
 
 	<!-- LOGIN TRIAL 조회 -->
@@ -366,7 +379,9 @@
 
 	<!-- OTP LOGIN TRIAL 초기화 -->
 	<update id="updateOtpLoginTrialInit" parameterType="hashmap">
-		UPDATE ADMIN_MSTR SET OTP_LOGIN_TRIAL = (SELECT ADMIN_LOGIN_TRIAL_COUNT FROM SITE_MSTR LIMIT 1)
+		UPDATE ADMIN_MSTR 
+			SET OTP_LOGIN_TRIAL = (SELECT ADMIN_LOGIN_TRIAL_COUNT FROM SITE_MSTR LIMIT 1)
+		WHERE ADMIN_ID = #{adminId}
 	</update>
 
 	<!-- OTP LOGIN TRIAL  업데이트 -->
@@ -381,6 +396,7 @@
 	<select id="selectOtpSecretSaved" parameterType="String">
 		SELECT SECRET_SAVED FROM ADMIN_MSTR WHERE ADMIN_ID=#{adminId}
 	</select>
+
 	<!--
 		================================== FROM SITE_MSTR ==================================
 	-->

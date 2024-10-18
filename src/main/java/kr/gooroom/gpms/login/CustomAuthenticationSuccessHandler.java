@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +45,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
 		try {
 			// initialize 
-			HashMap<String, Object> paramMap = new HashMap<String, Object>();
-			paramMap.put("loginId", authentication.getName());
+			Map<String, Object> paramMap = new HashMap<String, Object>();
+			paramMap.put("adminId", authentication.getName());
 			adminUserDao.updateLoginTrialInit(paramMap);	
 			adminUserDao.updateOtpLoginTrialInit(paramMap);
 		} catch (SQLException e) {

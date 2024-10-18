@@ -95,6 +95,15 @@ public interface AdminUserService {
 	StatusVO updateAdminUserData(AdminUserVO adminUserVO) throws Exception;
 
 	/**
+	 * modify administrator user login trial data
+	 * 
+	 * @param adminUserVO AdminUserVO data bean
+	 * @return StatusVO result status
+	 * @throws Exception
+	 */
+	StatusVO updateAdminLoginTrialCount(String adminId) throws Exception;
+
+	/**
 	 * modify current administrator user information data (pollingCycle)
 	 * 
 	 * @param adminUserVO AdminUserVO data bean

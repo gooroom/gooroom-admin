@@ -19,6 +19,7 @@ package kr.gooroom.gpms.user.service.impl;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -572,7 +573,7 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * @return long data update result count.
 	 * @throws SQLException
 	 */
-	public long updateLoginTrialInit(HashMap<String, Object> map) throws SQLException {
+	public long updateLoginTrialInit(Map<String, Object> map) throws SQLException {
 		return (long) sqlSessionMeta.update("updateLoginTrialInit", map);
 	}
 
@@ -618,7 +619,7 @@ public class AdminUserDAO extends SqlSessionMetaDAO {
 	 * @return long data update result count.
 	 * @throws SQLException
 	 */
-	public long updateOtpLoginTrialInit(HashMap<String, Object> map) throws SQLException {
+	public long updateOtpLoginTrialInit(Map<String, Object> map) throws SQLException {
 		return (long) sqlSessionMeta.update("updateOtpLoginTrialInit", map);
 	}
 }

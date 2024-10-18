@@ -19,6 +19,7 @@ package kr.gooroom.gpms.user.service.impl;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,6 +167,33 @@ public class AdminUserServiceImpl implements AdminUserService {
 			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
+		return statusVO;
+	}
+
+	/**
+	 * modify administrator user information data with divided rules.
+	 * 
+	 * @param adminUserVO AdminUserVO data bean
+	 * @return StatusVO result status
+	 * @throws Exception
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
+	public StatusVO updateAdminLoginTrialCount(String adminId) throws Exception {
+		StatusVO statusVO = new StatusVO();
+		try {
+			Map<String, Object> options = new HashMap<>();
+			options.put("adminId", adminId);
+			//TODO : update login trial 통합 API 사용
+			adminUserDao.updateLoginTrialInit(options);
+			adminUserDao.updateOtpLoginTrialInit(options);
+		} catch (Exception ex) {
+			logger.error("error in updateAdminLoginTrialCount : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+		}
+
 		return statusVO;
 	}
 
