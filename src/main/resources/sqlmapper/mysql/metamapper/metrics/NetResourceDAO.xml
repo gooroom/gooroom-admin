@@ -4,13 +4,21 @@
 <mapper namespace="NetResourceDAO">
 
     <resultMap type="NetResourceVO" id="netResourceData" extends="ResourceMetricsDAO.resourceMetricsData">
-        <result property="recv" column="IpExtInOctets"/>
-        <result property="sent" column="IpExtOutOctets"/>
+        <result property="bytes_recv" column="bytes_recv"/>
+        <result property="bytes_sent" column="bytes_sent"/>
         <result property="netInterface" column="INTERFACE"/>
+        <!-- columns : sum of recv_bytes for interfaces -->
+        <result property="recv" column="total_bytes_recv"/>
+        <result property="sent" column="total_bytes_sent"/>
     </resultMap>
 
     <select id="selectNetResourceList" parameterType="hashMap" resultMap="netResourceData">
-        SELECT DISTINCT insertion_timestamp, IpExtInOctets, IpExtOutOctets FROM NSTAT n
+        SELECT
+            insertion_timestamp,
+            SUM(bytes_recv) AS total_bytes_recv,
+            SUM(bytes_sent) AS total_bytes_sent
+        FROM NET
+        GROUP BY insertion_timestamp
         ORDER BY insertion_timestamp DESC
         LIMIT 60
     </select>

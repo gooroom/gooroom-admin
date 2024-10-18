@@ -1,6 +1,8 @@
 package kr.gooroom.gpms.metrics.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +44,8 @@ public class ResourceMetricsServiceImpl implements ResourceMetricsService {
                 case "mem":
                     resultVO = readMetrics(memResourceDAO);
                     break;
-                case "net":
+                case "net_recv":
+                case "net_sent":
                     resultVO = readMetrics(netResourceDAO);
                     break;
                 case "disk":
@@ -55,7 +58,7 @@ public class ResourceMetricsServiceImpl implements ResourceMetricsService {
                     break;
             }
         } catch (Exception ex) {
-            logger.error("Error in readResourceMetrics: {}", ex.toString());
+            logger.error("Error in readNetResourceMetrics: {}", ex.toString());
             resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
         }
@@ -70,14 +73,12 @@ public class ResourceMetricsServiceImpl implements ResourceMetricsService {
             if (re != null && !re.isEmpty()) {
                 try {
                     ResourceMetricsVO[] row = re.toArray(new ResourceMetricsVO[0]);
-
-                    logger.info("cpu resource array data : {}", row);
+                    logger.info("resource array data : {}", row);
                     resultVO.setData(row);
                 } catch (Exception ex) {
                     resultVO.setData(new Object[0]);
                     resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR, "Casting Error"));
                 }
-
             } else {
                 resultVO.setData(new Object[0]);
                 resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
