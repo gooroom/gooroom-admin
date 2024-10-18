@@ -39,7 +39,7 @@ public class CustomLogoutSuccessHandler extends AbstractAuthenticationTargetUrlR
 
 		String reqURL = LogUtil.getURLString(request);
 		String actType = LogUtil.getActType(reqURL);
-		String actTarget = LogUtil.getTarget(reqURL);
+		String actTarget = LogUtil.getTarget(httpsServletRequest,httpServletResponse);
 		String connectedIP = request.getRemoteAddr();
 		String actData = LogUtil.getActData(httpsServletRequest, httpServletResponse);
 		boolean isSuccess = httpServletResponse.getStatusCode() < 400 ? true : false;

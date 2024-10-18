@@ -93,10 +93,23 @@ public class LogUtil {
 		return "ETC";
 	}
 
-	public static String getTarget(String url) {
-		String lowerCaseUrl = url.toLowerCase();
-		return Arrays.stream(targetList).filter(target -> lowerCaseUrl.contains(target[0]))
+	public static String getTarget(ContentCachingRequestWrapper req, CustomHttpServletResponseWrapper res) {
+		String lowerCaseUrl = getURLString(req);
+		String targetName = Arrays.stream(targetList).filter(target -> lowerCaseUrl.contains(target[0]))
 				.map(target -> target[1]).findFirst().orElse("");
+	
+		if(targetName.equals("Module") && req.getMethod().equals("POST")){
+			try{
+				String actData = getActData(req, res);
+				JsonNode node = objectMapper.readTree(actData);
+				return node.get("request").get("moduleType").asText();
+			}
+			catch(Exception e){
+				return "Module";
+			}
+		}
+
+		return targetName;
 	}
 
 	public static String getActData(ContentCachingRequestWrapper req, CustomHttpServletResponseWrapper res) {

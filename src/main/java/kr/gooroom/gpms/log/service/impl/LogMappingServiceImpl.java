@@ -39,7 +39,7 @@ public class LogMappingServiceImpl implements LogMappingService {
 		}
 
 		String actType = LogUtil.getActType(reqURL);
-		String actTarget = LogUtil.getTarget(reqURL);
+		String actTarget = LogUtil.getTarget(req,res);
 		String connectedIP = req.getRemoteAddr();
 
 		String adminId = getAdminID(req, reqURL);
