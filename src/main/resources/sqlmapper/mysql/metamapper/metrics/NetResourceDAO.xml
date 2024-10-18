@@ -8,18 +8,27 @@
         <result property="bytes_sent" column="bytes_sent"/>
         <result property="netInterface" column="INTERFACE"/>
         <!-- columns : sum of recv_bytes for interfaces -->
-        <result property="recv" column="total_bytes_recv"/>
-        <result property="sent" column="total_bytes_sent"/>
+        <result property="recv" column="diff_bytes_recv"/>
+        <result property="sent" column="diff_bytes_sent"/>
     </resultMap>
 
     <select id="selectNetResourceList" parameterType="hashMap" resultMap="netResourceData">
         SELECT
             insertion_timestamp,
-            SUM(bytes_recv) AS total_bytes_recv,
+            total_bytes_recv,
+            total_bytes_sent,
+            COALESCE(total_bytes_recv - LAG(total_bytes_recv) OVER (ORDER BY insertion_timestamp), 0) AS diff_bytes_recv,
+            COALESCE(total_bytes_sent - LAG(total_bytes_sent) OVER (ORDER BY insertion_timestamp), 0) AS diff_bytes_sent
+        FROM (
+            SELECT
+                insertion_timestamp,
+                SUM(bytes_recv) AS total_bytes_recv,
             SUM(bytes_sent) AS total_bytes_sent
-        FROM NET
-        GROUP BY insertion_timestamp
+            FROM net
+            WHERE interface IN ('eno1', 'docker0')
+            GROUP BY insertion_timestamp
+        ) AS subquery
         ORDER BY insertion_timestamp DESC
-        LIMIT 60
+        LIMIT 60;
     </select>
 </mapper>
