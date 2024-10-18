@@ -315,20 +315,29 @@ public class HealthCheckServiceImpl implements HealthCheckService{
 
     // 커넥션 생성 및 유효성 검증
     private Connection createAndValidateConnection(String dbType, String jdbcUrl, String username, String password, GPMSHealthCheckVO vo) throws Exception {
-        Connection connection = connectionValidator.createConnection(dbType, jdbcUrl, username, password);
-        if (connectionValidator.validateConnection(connection)) {
-            if (vo != null) {
-                vo.setConnection("SUCCESS");
-                healthCheckDAO.updateServerHealth(vo);
+        try{
+            Connection connection = connectionValidator.createConnection(dbType, jdbcUrl, username, password);
+            if (connectionValidator.validateConnection(connection)) {
+                if (vo != null) {
+                    vo.setConnection("SUCCESS");
+                    healthCheckDAO.updateServerHealth(vo);
+                }
+            } else {
+                if (vo != null) {
+                    vo.setConnection("FAIL");
+                    healthCheckDAO.updateServerHealth(vo);
+                }
+                throw new Exception("DB 헬스체크 실패: 유효하지 않은 연결");
             }
-        } else {
+            return connection;
+        }catch(Exception e){
             if (vo != null) {
                 vo.setConnection("FAIL");
                 healthCheckDAO.updateServerHealth(vo);
             }
             throw new Exception("DB 헬스체크 실패: 유효하지 않은 연결");
         }
-        return connection;
+        
     }
 
     private void scheduleRepoCheck(String url, String dist, long min) {
