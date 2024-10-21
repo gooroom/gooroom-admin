@@ -18,8 +18,8 @@
             insertion_timestamp,
             total_bytes_recv,
             total_bytes_sent,
-            (total_bytes_recv + COALESCE(total_bytes_recv - LAG(total_bytes_recv) OVER (ORDER BY insertion_timestamp), 0)) AS diff_bytes_recv,
-            (total_bytes_sent + COALESCE(total_bytes_sent - LAG(total_bytes_sent) OVER (ORDER BY insertion_timestamp), 0)) AS diff_bytes_sent
+            COALESCE(total_bytes_recv - LAG(total_bytes_recv) OVER (ORDER BY insertion_timestamp), 0) AS diff_bytes_recv,
+            COALESCE(total_bytes_sent - LAG(total_bytes_sent) OVER (ORDER BY insertion_timestamp), 0) AS diff_bytes_sent
         FROM (
             SELECT
                 insertion_timestamp,
