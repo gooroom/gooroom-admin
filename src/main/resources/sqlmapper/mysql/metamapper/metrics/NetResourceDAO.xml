@@ -18,15 +18,14 @@
             insertion_timestamp,
             total_bytes_recv,
             total_bytes_sent,
-            COALESCE(total_bytes_recv - LAG(total_bytes_recv) OVER (ORDER BY insertion_timestamp), 0) AS diff_bytes_recv,
-            COALESCE(total_bytes_sent - LAG(total_bytes_sent) OVER (ORDER BY insertion_timestamp), 0) AS diff_bytes_sent
+            (total_bytes_recv + COALESCE(total_bytes_recv - LAG(total_bytes_recv) OVER (ORDER BY insertion_timestamp), 0)) AS diff_bytes_recv,
+            (total_bytes_sent + COALESCE(total_bytes_sent - LAG(total_bytes_sent) OVER (ORDER BY insertion_timestamp), 0)) AS diff_bytes_sent
         FROM (
             SELECT
                 insertion_timestamp,
                 SUM(bytes_recv) AS total_bytes_recv,
-            SUM(bytes_sent) AS total_bytes_sent
+                SUM(bytes_sent) AS total_bytes_sent
             FROM RESOURCE_METRICS_NET
-            WHERE interface IN ('eno1', 'docker0')
             GROUP BY insertion_timestamp
         ) AS subquery
         ORDER BY insertion_timestamp DESC
