@@ -12,6 +12,7 @@
         <result property="sent" column="diff_bytes_sent"/>
     </resultMap>
 
+    <!-- TODO : Replace Sub Query -->
     <select id="selectNetResourceList" parameterType="hashMap" resultMap="netResourceData">
         SELECT
             insertion_timestamp,
@@ -24,7 +25,7 @@
                 insertion_timestamp,
                 SUM(bytes_recv) AS total_bytes_recv,
             SUM(bytes_sent) AS total_bytes_sent
-            FROM net
+            FROM RESOURCE_METRICS_NET
             WHERE interface IN ('eno1', 'docker0')
             GROUP BY insertion_timestamp
         ) AS subquery

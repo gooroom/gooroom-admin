@@ -7,7 +7,7 @@
     </resultMap>
 
     <select id="selectCpuResourceList" parameterType="hashMap" resultMap="cpuResourceData">
-        SELECT DISTINCT insertion_timestamp, USAGE_IDLE FROM CPU
+        SELECT DISTINCT insertion_timestamp, USAGE_IDLE FROM RESOURCE_METRICS_CPU
         WHERE CPU = "cpu-total"
         ORDER BY insertion_timestamp DESC
         LIMIT 60

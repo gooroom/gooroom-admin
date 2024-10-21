@@ -8,7 +8,7 @@
     </resultMap>
 
     <select id="selectMemResourceList" parameterType="hashMap" resultMap="memResourceData">
-        SELECT DISTINCT insertion_timestamp, USED_PERCENT FROM MEM
+        SELECT DISTINCT insertion_timestamp, USED_PERCENT FROM RESOURCE_METRICS_MEM
         ORDER BY insertion_timestamp DESC
         LIMIT 60
     </select>
