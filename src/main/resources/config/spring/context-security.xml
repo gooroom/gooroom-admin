@@ -34,7 +34,7 @@
 		<csrf disabled="true" />
  
 		<intercept-url pattern="/login*" access="hasRole('ROLE_ANONYMOUS')" />
-		<intercept-url pattern="/otp/**" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/otp/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_PART')" />
 <!--		<intercept-url pattern="/totp-login*" access="hasRole('ROLE_ADMIN', 'ROLE_SUPER')" />-->
 		<intercept-url pattern="/refuse*" access="hasRole('ROLE_ANONYMOUS')" />
 		<intercept-url pattern="/v1/**" access="hasRole('ROLE_ANONYMOUS')" />

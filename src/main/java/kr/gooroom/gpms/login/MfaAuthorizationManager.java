@@ -30,7 +30,7 @@ public class MfaAuthorizationManager implements AuthorizationManager<HttpServlet
 
                 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
                 for (GrantedAuthority grantedAuthority : authorities) {
-                    if (grantedAuthority.getAuthority().equals("ROLE_ADMIN")) {
+                    if (grantedAuthority.getAuthority().equals("ROLE_ADMIN") || grantedAuthority.getAuthority().equals("ROLE_PART")) {
                         // ROLE_ADMIN
                         if(customAuthenticationToken.getIsOtpEnabled()) {
                             String requestUrl = request.getRequestURI();

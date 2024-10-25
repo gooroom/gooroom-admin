@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -129,7 +130,15 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 				return "/home";
 			}
 		} else if (isPartAdmin) {
-			return "/part";
+			try {
+				if(clientConfDAO.selectSiteLoginOtpEnable("") == 1) {
+					return "/otp/login";
+				} else {
+					return "/part";
+				}
+			} catch (SQLException e) {
+				return "/part";
+			}
 		} else if (isUser) {
 			return "/user";
 		} else {
