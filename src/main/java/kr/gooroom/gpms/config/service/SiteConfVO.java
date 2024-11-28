@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.config.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,9 +28,10 @@ import java.util.Date;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class SiteConfVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = 8570945303909301686L;
 	private String siteId;
 	private String siteName;
 
@@ -37,8 +39,11 @@ public class SiteConfVO implements Serializable {
 	private String serverVersion;
 	private String trialCount;
 	private String lockTime;
+	private String adminLoginTrialCount;
+	private String adminLoginLockTime;
 	private String passwordRule;
 	private String enableDuplicateLogin;
+	private String enableOtpLogin;
 
 	private String maxMediaCnt;
 	private String registerReq;
@@ -46,7 +51,6 @@ public class SiteConfVO implements Serializable {
 
 	private Date modDate;
 	private String modUserId;
-
 
 	public String getSiteId() {
 		return siteId;
@@ -94,6 +98,22 @@ public class SiteConfVO implements Serializable {
 
 	public void setLockTime(String lockTime) {
 		this.lockTime = lockTime;
+	}
+
+	public String getAdminLoginTrialCount() {
+		return adminLoginTrialCount;
+	}
+
+	public void setAdminLoginTrialCount(String adminLoginTrialCount) {
+		this.adminLoginTrialCount = adminLoginTrialCount;
+	}
+
+	public String getAdminLoginLockTime() {
+		return adminLoginLockTime;
+	}
+
+	public void setAdminLoginLockTime(String adminLoginLockTime) {
+		this.adminLoginLockTime = adminLoginLockTime;
 	}
 
 	public String getPasswordRule() {
@@ -152,4 +172,11 @@ public class SiteConfVO implements Serializable {
 		this.deleteReq = deleteReq;
 	}
 
+	public void setEnableOtpLogin(String enableOtpLogin) {
+		this.enableOtpLogin = enableOtpLogin;
+	}
+
+	public String getEnableOtpLogin() {
+		return enableOtpLogin;
+	}
 }

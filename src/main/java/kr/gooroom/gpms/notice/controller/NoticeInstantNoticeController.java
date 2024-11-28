@@ -3,11 +3,11 @@ package kr.gooroom.gpms.notice.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -66,8 +66,8 @@ public class NoticeInstantNoticeController {
 		// << paging >>
 		String paramOrderColumn = req.getParameter("orderColumn");
 		String paramOrderDir = req.getParameter("orderDir");
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 
 		options.put("paramOrderColumn", "NOTICE_INSTANT_ALARM_ID");
 		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
@@ -94,5 +94,5 @@ public class NoticeInstantNoticeController {
 		}
 
 		return resultVO;
-	};
+	}
 }

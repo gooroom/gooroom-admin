@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.config.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,9 +28,10 @@ import java.util.Date;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class MgServerConfVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = -8764222264388202756L;
 	private String kmIp;
 	private String kmUrl;
 
@@ -45,8 +47,11 @@ public class MgServerConfVO implements Serializable {
 	private String pollingTime;
 	private String trialCount;
 	private String lockTime;
+	private String adminLoginTrialCount;
+	private String adminLoginLockTime;
 	private String passwordRule;
 	private String enableDuplicateLogin;
+	private String enableOtpLogin;
 
 	private String maxMediaCnt;
 	private String registerReq;
@@ -135,6 +140,22 @@ public class MgServerConfVO implements Serializable {
 		this.trialCount = trialCount;
 	}
 
+	public String getAdminLoginTrialCount() {
+		return adminLoginTrialCount;
+	}
+
+	public void setAdminLoginTrialCount(String adminLoginTrialCount) {
+		this.adminLoginTrialCount = adminLoginTrialCount;
+	}
+
+	public String getAdminLoginLockTime() {
+		return adminLoginLockTime;
+	}
+
+	public void setAdminLoginLockTime(String adminLoginLockTime) {
+		this.adminLoginLockTime = adminLoginLockTime;
+	}
+
 	public String getLockTime() {
 		return lockTime;
 	}
@@ -153,6 +174,14 @@ public class MgServerConfVO implements Serializable {
 
 	public String getEnableDuplicateLogin() {
 		return enableDuplicateLogin;
+	}
+
+	public void setEnableOtpLogin(String enableOtpLogin) {
+		this.enableOtpLogin = enableOtpLogin;
+	}
+
+	public String getEnableOtpLogin() {
+		return enableOtpLogin;
 	}
 
 	public void setEnableDuplicateLogin(String enableDuplicateLogin) {
@@ -198,5 +227,4 @@ public class MgServerConfVO implements Serializable {
 	public void setModUserId(String modUserId) {
 		this.modUserId = modUserId;
 	}
-
 }

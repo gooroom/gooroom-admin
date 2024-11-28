@@ -65,7 +65,7 @@ public class ClientLogDAO extends SqlSessionMetaDAO {
 	/**
 	 * response general log list data paged
 	 * 
-	 * @param param Map parameter
+	 * @param options Hashmap<String, Object>
 	 * @return ClientLogVO list
 	 * 
 	 */
@@ -86,10 +86,9 @@ public class ClientLogDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectGeneralLogTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectGeneralLogTotalCount", options);
+	public long selectGeneralLogTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectGeneralLogTotalCount", options);
 	}
 
 	/**
@@ -97,10 +96,9 @@ public class ClientLogDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectGeneralLogFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectGeneralLogFilteredCount", options);
+	public long selectGeneralLogFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectGeneralLogFilteredCount", options);
 	}
 
 	/**
@@ -127,10 +125,9 @@ public class ClientLogDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectSecurityLogTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectSecurityLogTotalCount", options);
+	public long selectSecurityLogTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectSecurityLogTotalCount", options);
 	}
 
 	/**
@@ -138,10 +135,9 @@ public class ClientLogDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectSecurityLogFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectSecurityLogFilteredCount", options);
+	public long selectSecurityLogFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectSecurityLogFilteredCount", options);
 	}
 
 	/**
@@ -149,10 +145,9 @@ public class ClientLogDAO extends SqlSessionMetaDAO {
 	 *
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long deleteUserClientUseHist(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteUserClientUseHist", options);
+	public long deleteUserClientUseHist(HashMap<String, Object> options) {
+		return sqlSessionMeta.delete("deleteUserClientUseHist", options);
 	}
 
 }

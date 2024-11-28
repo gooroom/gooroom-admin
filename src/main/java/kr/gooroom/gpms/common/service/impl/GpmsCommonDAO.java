@@ -49,11 +49,10 @@ public class GpmsCommonDAO extends SqlSessionMetaDAO {
 	 * server ip, server url.
 	 *
 	 * @return ServerAddrInfoVO server address information data bean
-	 * @throws SQLException
 	 */
-	public ServerAddrInfoVO getGpmsServersInfo() throws SQLException {
+	public ServerAddrInfoVO getGpmsServersInfo() {
 
-		ServerAddrInfoVO re = null;
+		ServerAddrInfoVO re;
 		try {
 			re = sqlSessionMeta.selectOne("selectServerAddrInfo");
 		} catch (Exception ex) {
@@ -74,10 +73,9 @@ public class GpmsCommonDAO extends SqlSessionMetaDAO {
 	 * @param accessIp string network access ip information
 	 * @param userId   string user id
 	 * @return long query result count
-	 * @throws SQLException
 	 */
-	public long createUserActLogHistory(String actType, String actItem, String actData, String accessIp, String userId)
-			throws SQLException {
+	public long createUserActLogHistory(String actType, String actItem, String actData, String accessIp, String userId,
+			String actTarget, boolean isSuccess) {
 
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("actType", actType);
@@ -85,8 +83,10 @@ public class GpmsCommonDAO extends SqlSessionMetaDAO {
 		map.put("actData", actData);
 		map.put("accessIp", accessIp);
 		map.put("userId", userId);
+		map.put("actTarget", actTarget);
+		map.put("isSuccess", String.valueOf(isSuccess));
 
-		return (long) sqlSessionMeta.insert("insertUserActLogHistory", map);
+		return sqlSessionMeta.insert("insertUserActLogHistory", map);
 	}
 
 	/**
@@ -95,14 +95,12 @@ public class GpmsCommonDAO extends SqlSessionMetaDAO {
 	 * GPMS, GLM, GKM, GRM.
 	 * 
 	 * @return String list of query result
-	 * @throws SQLException
 	 */
-	public List<String> selectGpmsAvailableNetwork() throws SQLException {
+	public List<String> selectGpmsAvailableNetwork() {
 		List<String> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectGpmsAvailableNetwork");
 		} catch (Exception ex) {
-			re = null;
 			logger.error("error in selectGpmsAvailableNetwork : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
@@ -113,14 +111,12 @@ public class GpmsCommonDAO extends SqlSessionMetaDAO {
 	 * response available ip for GPMS by admin id.
 	 * 
 	 * @return String list of query result
-	 * @throws SQLException
 	 */
-	public List<String> selectGpmsAvailableNetworkByAdminId(String userId) throws SQLException {
+	public List<String> selectGpmsAvailableNetworkByAdminId(String userId) {
 		List<String> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectGpmsAvailableNetworkByAdminId", userId);
 		} catch (Exception ex) {
-			re = null;
 			logger.error("error in selectGpmsAvailableNetworkByAdminId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
@@ -136,7 +132,7 @@ public class GpmsCommonDAO extends SqlSessionMetaDAO {
 	 */
 	public long insertFileInfo(FileVO vo) throws SQLException {
 
-		return (long) sqlSessionMeta.insert("insertFileInfo", vo);
+		return sqlSessionMeta.insert("insertFileInfo", vo);
 
 	}
 

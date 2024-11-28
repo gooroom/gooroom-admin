@@ -56,7 +56,7 @@
 	
 	<insert id="insertUserActLogHistory" parameterType="hashMap">
 		INSERT INTO LOG_ADMIN_ACT
-			(LOG_SEQ, ACT_TP, ACT_ITEM, ACT_DATA, ACCESS_IP, ACT_USER_ID, ACT_DT)
+			(LOG_SEQ, ACT_TP, ACT_ITEM, ACT_DATA, ACCESS_IP, ACT_USER_ID, ACT_TARGET, IS_SUCCESS, ACT_DT)
 		VALUES (
 			(SELECT GRNEXTVAL('LOGADMIN_SEQ')),
 			#{actType},
@@ -64,6 +64,8 @@
 			#{actData},
 			#{accessIp},
 			#{userId},
+			#{actTarget},		
+			#{isSuccess},	
 			now())
 	</insert>
 

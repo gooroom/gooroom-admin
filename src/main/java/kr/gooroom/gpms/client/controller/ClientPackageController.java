@@ -16,31 +16,11 @@
 
 package kr.gooroom.gpms.client.controller;
 
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import kr.gooroom.gpms.client.service.ClientPackageService;
 import kr.gooroom.gpms.client.service.ClientService;
 import kr.gooroom.gpms.client.service.ClientVO;
@@ -53,6 +33,24 @@ import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.job.nodes.Job;
 import kr.gooroom.gpms.job.service.JobService;
 import kr.gooroom.gpms.job.service.JobVO;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Handles requests for the client package management process.
@@ -96,14 +94,14 @@ public class ClientPackageController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = null;
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
 
 		// << paging >>
-		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+		options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 		// << ordering >>
 		String paramOrderColumn = req.getParameter("orderColumn");
@@ -157,16 +155,16 @@ public class ClientPackageController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = null;
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
 		options.put("clientId", req.getParameter("clientId"));
-		options.put("isFiltered", StringUtils.defaultString(req.getParameter("isFiltered"), "false"));
+		options.put("isFiltered", ObjectUtils.defaultIfNull(req.getParameter("isFiltered"), "false"));
 
 		// << paging >>
-		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+		options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 		// << ordering >>
 		String paramOrderColumn = req.getParameter("orderColumn");
@@ -210,10 +208,255 @@ public class ClientPackageController {
 	}
 
 	/**
+	 * generate package list data.
+	 *
+	 * @param req   HttpServletRequest
+	 * @param res   HttpServletResponse
+	 * @param model ModelMap
+	 * @return ResultVO result data bean
+	 *
+	 */
+	@PostMapping(value = "/readPackageSpecListPagedInClient")
+	public @ResponseBody ResultPagingVO readPackageSpecListPagedInClient(HttpServletRequest req, HttpServletResponse res,
+																	 ModelMap model) {
+
+		ResultPagingVO resultVO = null;
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		// << options >>
+		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
+		options.put("clientId", req.getParameter("clientId"));
+		options.put("isFiltered", StringUtils.defaultString(req.getParameter("isFiltered"), "false"));
+
+		// << paging >>
+		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+
+		// << ordering >>
+		String paramOrderColumn = req.getParameter("orderColumn");
+		String paramOrderDir = req.getParameter("orderDir");
+		if ("chClientId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "CLIENT_ID");
+		} else if ("chPackageId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ID");
+		} else if ("chPackageArch".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ARCH");
+		} else if ("chInstallVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "INSTALL_VER");
+		} else if ("chSpec".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "SPEC");
+		} else if ("chLicense".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "LICENSE");
+		} else if ("chPackageLastVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_LAST_VER");
+		} else {
+			options.put("paramOrderColumn", "PACKAGE_ID");
+		}
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
+
+		try {
+			resultVO = clientPackageService.readPackageSpecListPagedInClient(options);
+			resultVO.setDraw(String.valueOf(req.getParameter("page")));
+			resultVO.setOrderColumn(paramOrderColumn);
+			resultVO.setOrderDir(paramOrderDir);
+			resultVO.setRowLength(String.valueOf(options.get("paramLength")));
+		} catch (Exception ex) {
+			logger.error("error in readPackageListPagedInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+
+	/**
+	 * generate package list data.
+	 *
+	 * @param req   HttpServletRequest
+	 * @param res   HttpServletResponse
+	 * @param model ModelMap
+	 * @return ResultVO result data bean
+	 *
+	 */
+	@PostMapping(value = "/readPackageSpecList")
+	public @ResponseBody ResultPagingVO readPackageSpecList(HttpServletRequest req, HttpServletResponse res,
+																				 ModelMap model) {
+
+		ResultPagingVO resultVO = null;
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		try {
+			resultVO = clientPackageService.readPackageSpecList(options);
+		} catch (Exception ex) {
+			logger.error("error in readPackageListPagedInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
+	 * generate package list data.
+	 *
+	 * @param req   HttpServletRequest
+	 * @param res   HttpServletResponse
+	 * @param model ModelMap
+	 * @return ResultVO result data bean
+	 *
+	 */
+	@PostMapping(value = "/readpackageSpecListPagedInVersionCompare")
+	public @ResponseBody ResultPagingVO readpackageSpecListPagedInVersionCompare(HttpServletRequest req, HttpServletResponse res,
+																		 ModelMap model) {
+
+		ResultPagingVO resultVO = null;
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		// << options >>
+		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
+		options.put("version1", req.getParameter("version1"));
+		options.put("version2", req.getParameter("version2"));
+		options.put("isFiltered", StringUtils.defaultString(req.getParameter("isFiltered"), "false"));
+
+		// << paging >>
+		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+
+		// << ordering >>
+		String paramOrderColumn = req.getParameter("orderColumn");
+		String paramOrderDir = req.getParameter("orderDir");
+		if ("chClientId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "CLIENT_ID");
+		} else if ("chPackageId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ID");;
+		} else if ("chV1Ver".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "V1_VER");
+		} else if ("chV1License".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "V1_LICENSE");
+		} else if ("chV2Ver".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "V2_VER");
+		} else if ("chV2License".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "V2_LICENSE");
+		} else if ("chPackageArch".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ARCH");
+		} else if ("chInstallVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "INSTALL_VER");
+		} else if ("chPackageLastVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_LAST_VER");
+		} else {
+			options.put("paramOrderColumn", "PACKAGE_ID");
+		}
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
+
+		try {
+			resultVO = clientPackageService.readPackageSpecListCompare(options);
+			resultVO.setDraw(String.valueOf(req.getParameter("page")));
+			resultVO.setOrderColumn(paramOrderColumn);
+			resultVO.setOrderDir(paramOrderDir);
+			resultVO.setRowLength(String.valueOf(options.get("paramLength")));
+		} catch (Exception ex) {
+			logger.error("error in readPackageListPagedInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
+	 * generate package list data.
+	 *
+	 * @param req   HttpServletRequest
+	 * @param res   HttpServletResponse
+	 * @param model ModelMap
+	 * @return ResultVO result data bean
+	 *
+	 */
+	@PostMapping(value = "/readpackageSpecListPagedInVersion")
+	public @ResponseBody ResultPagingVO readpackageSpecListPagedInVersion(HttpServletRequest req, HttpServletResponse res,
+																		 ModelMap model) {
+
+		ResultPagingVO resultVO = null;
+		HashMap<String, Object> options = new HashMap<String, Object>();
+
+		// << options >>
+		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
+		options.put("version", req.getParameter("version"));
+		options.put("isFiltered", StringUtils.defaultString(req.getParameter("isFiltered"), "false"));
+
+		// << paging >>
+		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+
+		// << ordering >>
+		String paramOrderColumn = req.getParameter("orderColumn");
+		String paramOrderDir = req.getParameter("orderDir");
+		if ("chClientId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "CLIENT_ID");
+		} else if ("chPackageId".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ID");
+		} else if ("chPackageArch".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_ARCH");
+		} else if ("chInstallVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "INSTALL_VER");
+		} else if ("supplier".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "SUPPLIER");
+		} else if ("license".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "LICENSE");
+		} else if ("chPackageLastVer".equalsIgnoreCase(paramOrderColumn)) {
+			options.put("paramOrderColumn", "PACKAGE_LAST_VER");
+		} else {
+			options.put("paramOrderColumn", "PACKAGE_ID");
+		}
+
+		if ("DESC".equalsIgnoreCase(paramOrderDir)) {
+			options.put("paramOrderDir", "DESC");
+		} else {
+			options.put("paramOrderDir", "ASC");
+		}
+
+		try {
+			resultVO = clientPackageService.readpackageSpecListPagedInVersion(options);
+			resultVO.setDraw(String.valueOf(req.getParameter("page")));
+			resultVO.setOrderColumn(paramOrderColumn);
+			resultVO.setOrderDir(paramOrderDir);
+			resultVO.setRowLength(String.valueOf(options.get("paramLength")));
+		} catch (Exception ex) {
+			logger.error("error in readPackageListPagedInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
 	 * create job for update packages
 	 * 
-	 * @param groupId    string target group id
-	 * @param clientId   string target client id
+	 * @param groupIds    string target group id
 	 * @param packageIds string array package id array.
 	 * @return ResultVO result data bean
 	 *
@@ -221,7 +464,7 @@ public class ClientPackageController {
 	@PostMapping(value = "/updatePackageInGroup")
 	public @ResponseBody ResultVO updatePackageInGroup(
 			@RequestParam(value = "groupIds", required = false) String groupIds,
-			@RequestParam(value = "packageIds", required = true) String packageIds) {
+			@RequestParam(value = "packageIds") String packageIds) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -232,8 +475,7 @@ public class ClientPackageController {
 			jobs[1] = Job.generateJob("package", "update_package_version_to_server");
 
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
@@ -241,13 +483,6 @@ public class ClientPackageController {
 
 			} catch (Exception jsonex) {
 				logger.error("ClientPackageController.updatePackageInGroup (make json) Exception occurred. ", jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 
 			JobVO jobVO = new JobVO();
@@ -256,14 +491,14 @@ public class ClientPackageController {
 			jobVO.setRegUserId(LoginInfoHelper.getUserId());
 
 			// setup target data
-			ArrayList<String> clientList = new ArrayList<String>();
+			ArrayList<String> clientList = new ArrayList<>();
 			if (groupIds != null && groupIds.length() > 0) {
 				String[] groupIdArray = groupIds.split(",");
-				for (int m = 0; m < groupIdArray.length; m++) {
-					ResultVO clientResultVO = clientService.getClientListInGroup(groupIdArray[m]);
+				for (String s : groupIdArray) {
+					ResultVO clientResultVO = clientService.getClientListInGroup(s);
 					ClientVO[] clients = (ClientVO[]) clientResultVO.getData();
-					for (int i = 0; i < clients.length; i++) {
-						clientList.add(clients[i].getClientId());
+					for (ClientVO client : clients) {
+						clientList.add(client.getClientId());
 					}
 				}
 			}
@@ -278,10 +513,8 @@ public class ClientPackageController {
 		} catch (Exception ex) {
 			logger.error("error in updatePackageInGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -299,8 +532,8 @@ public class ClientPackageController {
 	@PostMapping(value = "/deletePackageInClient")
 	public @ResponseBody ResultVO deletePackageInClient(
 			@RequestParam(value = "groupId", required = false) String groupId,
-			@RequestParam(value = "clientId", required = true) String clientId,
-			@RequestParam(value = "packageIds", required = true) String packageIds) {
+			@RequestParam(value = "clientId") String clientId,
+			@RequestParam(value = "packageIds") String packageIds) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -312,8 +545,7 @@ public class ClientPackageController {
 			jobs[1] = Job.generateJob("package", "update_package_version_to_server");
 
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
@@ -321,13 +553,6 @@ public class ClientPackageController {
 
 			} catch (Exception jsonex) {
 				logger.error("ClientPackageController.deletePackageInClient (make json) Exception occurred. ", jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 
 			JobVO jobVO = new JobVO();
@@ -356,10 +581,8 @@ public class ClientPackageController {
 		} catch (Exception ex) {
 			logger.error("error in deletePackageInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -388,8 +611,7 @@ public class ClientPackageController {
 			jobs[1] = Job.generateJob("package", "update_package_version_to_server");
 
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
@@ -398,13 +620,6 @@ public class ClientPackageController {
 			} catch (Exception jsonex) {
 				logger.error("ClientPackageController.createPackageAllUpgrade (make json) Exception occurred. ",
 						jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 
 			JobVO jobVO = new JobVO();
@@ -413,22 +628,22 @@ public class ClientPackageController {
 			jobVO.setRegUserId(LoginInfoHelper.getUserId());
 
 			// setup target data
-			ArrayList<String> clientList = new ArrayList<String>();
+			ArrayList<String> clientList = new ArrayList<>();
 			if (groupId != null && groupId.length() > 0) {
 				String[] groupIdArray = groupId.split(",");
-				for (int m = 0; m < groupIdArray.length; m++) {
-					ResultVO clientResultVO = clientService.getClientListInGroup(groupIdArray[m]);
+				for (String s : groupIdArray) {
+					ResultVO clientResultVO = clientService.getClientListInGroup(s);
 					ClientVO[] clients = (ClientVO[]) clientResultVO.getData();
-					for (int i = 0; i < clients.length; i++) {
-						clientList.add(clients[i].getClientId());
+					for (ClientVO client : clients) {
+						clientList.add(client.getClientId());
 					}
 				}
 			}
 			if (clientId != null && clientId.length() > 0) {
 				String[] clientIdArray = clientId.split(",");
-				for (int m = 0; m < clientIdArray.length; m++) {
-					if (!(clientList.contains(clientIdArray[m]))) {
-						clientList.add(clientIdArray[m]);
+				for (String s : clientIdArray) {
+					if (!(clientList.contains(s))) {
+						clientList.add(s);
 					}
 				}
 			}
@@ -443,10 +658,8 @@ public class ClientPackageController {
 		} catch (Exception ex) {
 			logger.error("error in createPackageAllUpgrade : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -462,8 +675,8 @@ public class ClientPackageController {
 	 */
 	@PostMapping(value = "/createMainPackageUpgrade")
 	public @ResponseBody ResultVO createMainPackageUpgrade(
-			@RequestParam(value = "clientId", required = true) String clientId,
-			@RequestParam(value = "groupId", required = true) String groupId) {
+			@RequestParam(value = "clientId") String clientId,
+			@RequestParam(value = "groupId") String groupId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -475,8 +688,7 @@ public class ClientPackageController {
 			jobs[1] = Job.generateJob("package", "update_package_version_to_server");
 
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
@@ -485,13 +697,6 @@ public class ClientPackageController {
 			} catch (Exception jsonex) {
 				logger.error("ClientPackageController.createMainPackageUpgrade (make json) Exception occurred. ",
 						jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 
 			JobVO jobVO = new JobVO();
@@ -520,10 +725,8 @@ public class ClientPackageController {
 		} catch (Exception ex) {
 			logger.error("error in createMainPackageUpgrade : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -549,8 +752,7 @@ public class ClientPackageController {
 			jobs[0] = Job.generateJob("package", "insert_all_packages_to_server");
 
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
@@ -558,13 +760,6 @@ public class ClientPackageController {
 
 			} catch (Exception jsonex) {
 				logger.error("ClientPackageController.updateTotalPackage (make json) Exception occurred. ", jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 
 			JobVO jobVO = new JobVO();
@@ -573,8 +768,7 @@ public class ClientPackageController {
 			jobVO.setRegUserId(LoginInfoHelper.getUserId());
 
 			// setup target data
-			String[] clientArray = null;
-			clientArray = new String[1];
+			String[] clientArray = new String[1];
 			if (clientId == null || clientId.length() < 1) {
 				// select one client id in online clients randomly.
 				ResultVO clients = clientService.getClientListInOnline();
@@ -597,10 +791,8 @@ public class ClientPackageController {
 		} catch (Exception ex) {
 			logger.error("error in updateTotalPackage : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -628,7 +820,7 @@ public class ClientPackageController {
 		String paramLength = req.getParameter("length");
 		String paramDraw = req.getParameter("draw");
 
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		options.put("searchKey", searchKey);
 
@@ -668,8 +860,7 @@ public class ClientPackageController {
 	/**
 	 * create job for all upgrade package for client
 	 * 
-	 * @param clientId string target client id
-	 * @param groupId  string target group id
+	 * @param clientIds string target client id
 	 * @return ResultVO result data bean
 	 *
 	 */
@@ -687,23 +878,15 @@ public class ClientPackageController {
 			jobs[1] = Job.generateJob("package", "update_package_version_to_server");
 	
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
 				jsonStr = outputWriter.toString();
-	
+
 			} catch (Exception jsonex) {
 				logger.error("ClientPackageController.createTotalPackageUpgradeForClient (make json) Exception occurred. ",
 						jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 	
 			JobVO jobVO = new JobVO();
@@ -712,12 +895,12 @@ public class ClientPackageController {
 			jobVO.setRegUserId(LoginInfoHelper.getUserId());
 	
 			// setup target data
-			ArrayList<String> clientList = new ArrayList<String>();
+			ArrayList<String> clientList = new ArrayList<>();
 			if (clientIds != null && clientIds.length() > 0) {
 				String[] clientIdArray = clientIds.split(",");
-				for (int m = 0; m < clientIdArray.length; m++) {
-					if (!(clientList.contains(clientIdArray[m]))) {
-						clientList.add(clientIdArray[m]);
+				for (String s : clientIdArray) {
+					if (!(clientList.contains(s))) {
+						clientList.add(s);
 					}
 				}
 			}
@@ -732,10 +915,8 @@ public class ClientPackageController {
 		} catch (Exception ex) {
 			logger.error("error in createTotalPackageUpgradeForClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 	
 		return resultVO;
@@ -744,8 +925,7 @@ public class ClientPackageController {
 	/**
 	 * create job for all upgrade package for group
 	 * 
-	 * @param clientId string target client id
-	 * @param groupId  string target group id
+	 * @param groupIds  string target group id
 	 * @return ResultVO result data bean
 	 *
 	 */
@@ -763,23 +943,15 @@ public class ClientPackageController {
 			jobs[1] = Job.generateJob("package", "update_package_version_to_server");
 	
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
 				jsonStr = outputWriter.toString();
-	
+
 			} catch (Exception jsonex) {
 				logger.error("ClientPackageController.createTotalPackageUpgradeForGroup (make json) Exception occurred. ",
 						jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 	
 			JobVO jobVO = new JobVO();
@@ -788,15 +960,15 @@ public class ClientPackageController {
 			jobVO.setRegUserId(LoginInfoHelper.getUserId());
 	
 			// setup target data
-			ArrayList<String> clientList = new ArrayList<String>();
+			ArrayList<String> clientList = new ArrayList<>();
 			if (groupIds != null && groupIds.length() > 0) {
 				String[] groupIdArray = groupIds.split(",");
-				for (int m = 0; m < groupIdArray.length; m++) {
-					ResultVO clientResultVO = clientService.getClientListInGroup(groupIdArray[m]);
-					if(GPMSConstants.MSG_SUCCESS.equals(clientResultVO.getStatus().getResult())) {
+				for (String s : groupIdArray) {
+					ResultVO clientResultVO = clientService.getClientListInGroup(s);
+					if (GPMSConstants.MSG_SUCCESS.equals(clientResultVO.getStatus().getResult())) {
 						ClientVO[] clients = (ClientVO[]) clientResultVO.getData();
-						for (int i = 0; i < clients.length; i++) {
-							clientList.add(clients[i].getClientId());
+						for (ClientVO client : clients) {
+							clientList.add(client.getClientId());
 						}
 					}
 				}
@@ -816,10 +988,8 @@ public class ClientPackageController {
 		} catch (Exception ex) {
 			logger.error("error in createTotalPackageUpgradeForGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 	
 		return resultVO;
@@ -828,8 +998,7 @@ public class ClientPackageController {
 	/**
 	 * create job for update packages
 	 * 
-	 * @param groupId    string target group id
-	 * @param clientId   string target client id
+	 * @param clientIds   string target client id
 	 * @param packageIds string array package id array.
 	 * @return ResultVO result data bean
 	 *
@@ -837,7 +1006,7 @@ public class ClientPackageController {
 	@PostMapping(value = "/updatePackageInClient")
 	public @ResponseBody ResultVO updatePackageInClient(
 			@RequestParam(value = "clientIds", required = false) String clientIds,
-			@RequestParam(value = "packageIds", required = true) String packageIds) {
+			@RequestParam(value = "packageIds") String packageIds) {
 	
 		ResultVO resultVO = new ResultVO();
 	
@@ -848,22 +1017,14 @@ public class ClientPackageController {
 			jobs[1] = Job.generateJob("package", "update_package_version_to_server");
 	
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
 				jsonStr = outputWriter.toString();
-	
+
 			} catch (Exception jsonex) {
 				logger.error("ClientPackageController.updatePackageInClient (make json) Exception occurred. ", jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 	
 			JobVO jobVO = new JobVO();
@@ -872,12 +1033,12 @@ public class ClientPackageController {
 			jobVO.setRegUserId(LoginInfoHelper.getUserId());
 	
 			// setup target data
-			ArrayList<String> clientList = new ArrayList<String>();
+			ArrayList<String> clientList = new ArrayList<>();
 			if (clientIds != null && clientIds.length() > 0) {
 				String[] clientIdArray = clientIds.split(",");
-				for (int m = 0; m < clientIdArray.length; m++) {
-					if (!(clientList.contains(clientIdArray[m]))) {
-						clientList.add(clientIdArray[m]);
+				for (String s : clientIdArray) {
+					if (!(clientList.contains(s))) {
+						clientList.add(s);
 					}
 				}
 			}
@@ -892,10 +1053,8 @@ public class ClientPackageController {
 		} catch (Exception ex) {
 			logger.error("error in updatePackageInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 	
 		return resultVO;

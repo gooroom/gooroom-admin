@@ -19,17 +19,18 @@ package kr.gooroom.gpms.user.service.impl;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import jakarta.annotation.Resource;
 import kr.gooroom.gpms.account.service.ActHistoryVO;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
@@ -56,7 +57,10 @@ public class AdminUserServiceImpl implements AdminUserService {
 	@Resource(name = "adminUserDAO")
 	private AdminUserDAO adminUserDao;
 
-	private String[][] RULEINFOS = { { "client_admin", "client_admin", "isClientAdmin" },
+	@Autowired
+	private Pbkdf2PasswordEncoder passwordEncoder;
+
+	private final String[][] RULEINFOS = { { "client_admin", "client_admin", "isClientAdmin" },
 			{ "user_admin", "user_admin", "isUserAdmin" }, { "desktop_admin", "desktop_admin", "isDesktopAdmin" }, 
 			{ "notice_admin", "notice_admin", "isNoticeAdmin" },{ "portable_admin", "portable_admin", "isPortableAdmin" }};
 
@@ -64,8 +68,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 	private void saveClientConfiguration(AdminUserVO adminUserVO) throws SQLException {
 		long cnt = -1;
 		// save client configuration information
-		for (int i = 0; i < RULEINFOS.length; i++) {
-			String[] items = RULEINFOS[i];
+		for (String[] items : RULEINFOS) {
 			cnt = adminUserDao.insertOrUpdateAdminRule(adminUserVO.getAdminId(), items[0], items[1],
 					adminUserVO.getValueByString(items[2]), LoginInfoHelper.getUserId());
 
@@ -81,7 +84,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 			cnt = -1;
 			for (int i = 0; i < adminUserVO.getConnIps().size(); i++) {
 				cnt = adminUserDao.insertAdminUserConnIp(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-						(String) adminUserVO.getConnIps().get(i));
+						adminUserVO.getConnIps().get(i));
 				if (cnt < 0) {
 					throw new SQLException();
 				}
@@ -95,7 +98,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 			cnt = -1;
 			for (int i = 0; i < adminUserVO.getGrpIds().size(); i++) {
 				cnt = adminUserDao.insertAdminUserGrpId(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-						(String) adminUserVO.getGrpIds().get(i));
+						adminUserVO.getGrpIds().get(i));
 				if (cnt < 0) {
 					throw new SQLException();
 				}
@@ -109,7 +112,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 			cnt = -1;
 			for (int i = 0; i < adminUserVO.getDeptCds().size(); i++) {
 				cnt = adminUserDao.insertAdminUserDeptCd(adminUserVO.getAdminId(), adminUserVO.getRegUserId(),
-						(String) adminUserVO.getDeptCds().get(i));
+						adminUserVO.getDeptCds().get(i));
 				if (cnt < 0) {
 					throw new SQLException();
 				}
@@ -122,7 +125,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 	/**
 	 * modify administrator user information data with divided rules.
 	 * 
-	 * @param vo AdminUserVO data bean
+	 * @param adminUserVO AdminUserVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -133,6 +136,15 @@ public class AdminUserServiceImpl implements AdminUserService {
 		try {
 			adminUserVO.setModUserId(LoginInfoHelper.getUserId());
 			adminUserVO.setRegUserId(LoginInfoHelper.getUserId());
+
+			String adminPw =  adminUserVO.getAdminPw();
+			adminUserVO.setAdminPw(passwordEncoder.encode(adminPw));
+
+			HashMap<String, Object> options = new HashMap<>();
+			options.put("adminId", adminUserVO.getAdminId());
+			options.put("isSaved", adminUserVO.getSecretSaved());
+			adminUserDao.updateOtpSecretSaved(options);
+
 			long reCnt = adminUserDao.updateAdminUserData(adminUserVO);
 			if (reCnt > 0) {
 				saveClientConfiguration(adminUserVO);
@@ -145,32 +157,54 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in updateAdminUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in updateAdminUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
+		return statusVO;
+	}
+
+	/**
+	 * modify administrator user information data with divided rules.
+	 * 
+	 * @param adminUserVO AdminUserVO data bean
+	 * @return StatusVO result status
+	 * @throws Exception
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
+	public StatusVO updateAdminLoginTrialCount(String adminId) throws Exception {
+		StatusVO statusVO = new StatusVO();
+		try {
+			Map<String, Object> options = new HashMap<>();
+			options.put("adminId", adminId);
+			//TODO : update login trial 통합 API 사용
+			adminUserDao.updateLoginTrialInit(options);
+			adminUserDao.updateOtpLoginTrialInit(options);
+		} catch (Exception ex) {
+			logger.error("error in updateAdminLoginTrialCount : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
+		}
+
 		return statusVO;
 	}
 
 	/**
 	 * modify current administrator user information data (pollingCycle)
 	 * 
-	 * @param vo AdminUserVO data bean
+	 * @param adminUserVO AdminUserVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO setCurrentAdminUserData(AdminUserVO adminUserVO) throws Exception {
+	public StatusVO setCurrentAdminUserData(AdminUserVO adminUserVO) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			adminUserVO.setAdminId(LoginInfoHelper.getUserId());
@@ -186,10 +220,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (Exception ex) {
 			logger.error("error in setCurrentAdminUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
@@ -197,12 +229,11 @@ public class AdminUserServiceImpl implements AdminUserService {
 	/**
 	 * delete administrator user information data
 	 * 
-	 * @param vo AdminUserVO data bean
+	 * @param adminUserVO AdminUserVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO deleteAdminUserData(AdminUserVO adminUserVO) throws Exception {
+	public StatusVO deleteAdminUserData(AdminUserVO adminUserVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -220,10 +251,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (Exception ex) {
 			logger.error("error in deleteAdminUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -233,15 +262,14 @@ public class AdminUserServiceImpl implements AdminUserService {
 	 * generate administrator user list data
 	 * 
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readAdminUserList() throws Exception {
+	public ResultVO readAdminUserList() {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<AdminUserVO> re = adminUserDao.selectAdminUserList();
 			if (re != null && re.size() > 0) {
-				AdminUserVO[] row = re.stream().toArray(AdminUserVO[]::new);
+				AdminUserVO[] row = re.toArray(AdminUserVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -254,10 +282,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (Exception ex) {
 			logger.error("error in readAdminUserList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -267,10 +293,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 	 * 
 	 * @param options HashMap data bean
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getAdminUserListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getAdminUserListPaged(HashMap<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 
 		try {
@@ -289,9 +314,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 						obj.setStatus(MessageSourceHelper.getMessage("user.status.delete"));
 					}
 					return obj;
-				}).collect(Collectors.toList());
+				}).toList();
 
-				AdminUserVO[] row = result.stream().toArray(AdminUserVO[]::new);
+				AdminUserVO[] row = result.toArray(AdminUserVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -308,10 +333,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (Exception ex) {
 			logger.error("error in getAdminUserListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -322,10 +345,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 	 * 
 	 * @param adminId string user id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isExistAdminUserId(String adminId) throws Exception {
+	public StatusVO isExistAdminUserId(String adminId) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -344,10 +366,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (Exception ex) {
 			logger.error("error in isExistAdminUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -356,7 +376,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 	/**
 	 * create new administrator user data
 	 * 
-	 * @param  AdminUserVO data bean
+	 * @param  adminUserVO AdminUserVO data bean
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -369,6 +389,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 			adminUserVO.setModUserId(LoginInfoHelper.getUserId());
 			adminUserVO.setRegUserId(LoginInfoHelper.getUserId());
 			adminUserVO.setStatus(GPMSConstants.STS_NORMAL_USER);
+
+			String hashedPassword = passwordEncoder.encode(adminUserVO.getAdminPw());
+			adminUserVO.setAdminPw(hashedPassword);
 
 			long reCnt = adminUserDao.createAdminUser(adminUserVO);
 			if (reCnt > 0) {
@@ -383,19 +406,15 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in createAdminUser : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in createAdminUser : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -406,15 +425,14 @@ public class AdminUserServiceImpl implements AdminUserService {
 	 * 
 	 * @param adminId string user id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO selectAdminUserData(String adminId) throws Exception {
+	public ResultVO selectAdminUserData(String adminId) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
-			HashMap<String, Object> options = new HashMap<String, Object>();
+			HashMap<String, Object> options = new HashMap<>();
 			options.put("adminId", adminId);
 
 			AdminUserVO re = adminUserDao.selectAdminUserData(options);
@@ -439,10 +457,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (Exception ex) {
 			logger.error("error in selectAdminUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -454,38 +470,34 @@ public class AdminUserServiceImpl implements AdminUserService {
 	 * @param adminId string user id
 	 * @param adminPw string user password
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getAdminUserAuthAndInfo(String adminId, String adminPw) throws Exception {
+	public ResultVO getAdminUserAuthAndInfo(String adminId, String adminPw) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
-
-			AdminUserVO re = adminUserDao.selectAdminUserAuthAndInfo(adminId, adminPw);
-
+			AdminUserVO re = adminUserDao.selectAdminUserAuthAndInfo(adminId);
 			if (re != null) {
-				AdminUserVO[] row = new AdminUserVO[1];
-				row[0] = re;
-				resultVO.setData(row);
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
-
-			} else {
-				Object[] o = new Object[0];
-				resultVO.setData(o);
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
-						MessageSourceHelper.getMessage("system.common.noselectdata")));
+				if (passwordEncoder.matches(adminPw, re.getAdminPw())) {
+					AdminUserVO[] row = new AdminUserVO[1];
+					row[0] = re;
+					resultVO.setData(row);
+					resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+							MessageSourceHelper.getMessage("system.common.selectdata")));
+					return resultVO;
+				}
 			}
 
+			Object[] o = new Object[0];
+			resultVO.setData(o);
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+					MessageSourceHelper.getMessage("system.common.noselectdata")));
 		} catch (Exception ex) {
 			logger.error("error in getAdminUserAuthAndInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -498,10 +510,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getAdminActListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getAdminActListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -511,7 +522,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 			long filteredCount = adminUserDao.selectAdminActListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				ActHistoryVO[] row = re.stream().toArray(ActHistoryVO[]::new);
+				ActHistoryVO[] row = re.toArray(ActHistoryVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -527,10 +538,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (Exception ex) {
 			logger.error("error in getAdminActListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -543,10 +552,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 	 * 
 	 * @param options HashMap data bean
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getAdminRecordListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getAdminRecordListPaged(HashMap<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 
 		try {
@@ -555,7 +563,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 			long filteredCount = adminUserDao.selectAdminRecordListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				ActHistoryVO[] row = re.stream().toArray(ActHistoryVO[]::new);
+				ActHistoryVO[] row = re.toArray(ActHistoryVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -572,10 +580,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (Exception ex) {
 			logger.error("error in getAdminRecordListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -594,7 +600,6 @@ public class AdminUserServiceImpl implements AdminUserService {
 		StatusVO statusVO = new StatusVO();
 		
 		try {
-			
 			long reCnt = adminUserDao.updateLoginTrialData(LoginInfoHelper.getUserId());
 			
 			if (reCnt > 0) {
@@ -607,19 +612,15 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in updateLoginTrialData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in updateLoginTrialData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
@@ -629,19 +630,18 @@ public class AdminUserServiceImpl implements AdminUserService {
 	 *
 	 * @param adminId string user id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getAdminUserInfo(String adminId) throws Exception {
+	public ResultVO getAdminUserInfo(String adminId) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
 			AdminUserVO re = adminUserDao.selectAdminUserInfo(adminId);
 
+			Object[] o = new Object[0];
+			resultVO.setData(o);
 			if (re != null) {
-				Object[] o = new Object[0];
-				resultVO.setData(o);
 				if (!re.getAdminTp().equalsIgnoreCase("S")) {
 					resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
 							MessageSourceHelper.getMessage("admin.result.noinsert")));
@@ -650,8 +650,6 @@ public class AdminUserServiceImpl implements AdminUserService {
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
-				Object[] o = new Object[0];
-				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
 						MessageSourceHelper.getMessage("system.common.noselectdata")));
 			}
@@ -659,10 +657,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (Exception ex) {
 			logger.error("error in selectAdminUserInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -675,24 +671,21 @@ public class AdminUserServiceImpl implements AdminUserService {
 	 * @param adminId string adminId
 	 * @param adminRule String adminRule
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getAuthority(String adminId, String adminRule) throws Exception {
+	public ResultVO getAuthority(String adminId, String adminRule) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
 			AdminUserVO re = adminUserDao.selectAdminUserAuthority(adminId, adminRule);
 
+			Object[] o = new Object[0];
+			resultVO.setData(o);
 			if (re != null) {
-				Object[] o = new Object[0];
-				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
-				Object[] o = new Object[0];
-				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
 						MessageSourceHelper.getMessage("system.common.noselectdata")));
 			}
@@ -700,13 +693,29 @@ public class AdminUserServiceImpl implements AdminUserService {
 		} catch (Exception ex) {
 			logger.error("error in getAuthority : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
 	}
-	
+
+	@Override
+	public StatusVO updateOtpSecret(String adminId, String secret) throws Exception {
+		StatusVO statusVO = new StatusVO();
+		try {
+			long result = adminUserDao.insertOrUpdateAdminSecret(adminId, secret);
+			if (result > 0) {
+				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
+						MessageSourceHelper.getMessage("gcsp.result.update"));
+			} else {
+				throw new SQLException();
+			}
+		} catch	(Exception e) {
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_UPDATEERROR,
+					MessageSourceHelper.getMessage("job.result.noupdate"));
+		}
+
+		return statusVO;
+	}
 }

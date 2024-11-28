@@ -1,13 +1,12 @@
 package kr.gooroom.gpms.dept.service;
 
-import java.util.HashMap;
-import java.util.List;
-
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @Class Name : UserService.java
@@ -19,7 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * @version 1.0
  * @see
  * 
- * 		Copyright (C) All right reserved.
+ * @	Copyright (C) All right reserved.
  */
 
 public interface DeptService {
@@ -63,7 +62,7 @@ public interface DeptService {
 	/**
 	 * 조직 정보 수정
 	 * 
-	 * @param DeptVO
+	 * @param deptVO DeptVO
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -72,7 +71,7 @@ public interface DeptService {
 	/**
 	 * 하위 조직 만료일 정보 수정
 	 * 
-	 * @param DeptVO
+	 * @param deptVO DeptVO
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -81,7 +80,6 @@ public interface DeptService {
 	/**
 	 * 여러조직 정책정보 일괄수정
 	 * 
-	 * @param DeptVO
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -91,7 +89,9 @@ public interface DeptService {
 	/**
 	 * 조직 연동 설정 수정
 	 * 
-	 * @param DeptVO
+	 * @param deptCd DeptVO
+	 * @param cfgId string
+	 * @param confType string
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -100,7 +100,7 @@ public interface DeptService {
 	/**
 	 * 조직 아이디 중복 검사
 	 * 
-	 * @param String deptCd
+	 * @param deptCd string
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -109,8 +109,8 @@ public interface DeptService {
 	/**
 	 * 조직 이름 중복 검사 by parent deptCd
 	 * 
-	 * @param String parentDeptCd
-	 * @param String deptName
+	 * @param parentDeptCd string
+	 * @param deptName string
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -119,8 +119,8 @@ public interface DeptService {
 	/**
 	 * 조직 이름 중복 검사 by deptCd
 	 * 
-	 * @param String deptCd
-	 * @param String deptName
+	 * @param deptCd string
+	 * @param deptName string
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -129,7 +129,7 @@ public interface DeptService {
 	/**
 	 * 신규 조직 정보 등록
 	 * 
-	 * @param DeptVO
+	 * @param deptVO DeptVO
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -138,7 +138,7 @@ public interface DeptService {
 	/**
 	 * 하위 포함하여 조직 정보 삭제
 	 * 
-	 * @param String deptCd
+	 * @param deptCd string
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -156,7 +156,7 @@ public interface DeptService {
 	/**
 	 * 하위 포함하여 조직을 미허용으로 수정
 	 * 
-	 * @param String deptCd
+	 * @param deptCd string
 	 * @return StatusVO
 	 * @throws Exception
 	 */

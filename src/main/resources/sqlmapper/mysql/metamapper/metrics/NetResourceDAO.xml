@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NetResourceDAO">
+
+    <resultMap type="NetResourceVO" id="netResourceData" extends="ResourceMetricsDAO.resourceMetricsData">
+        <result property="bytes_recv" column="bytes_recv"/>
+        <result property="bytes_sent" column="bytes_sent"/>
+        <result property="netInterface" column="INTERFACE"/>
+        <!-- columns : sum of recv_bytes for interfaces -->
+        <result property="recv" column="diff_bytes_recv"/>
+        <result property="sent" column="diff_bytes_sent"/>
+    </resultMap>
+
+    <!-- TODO : Replace Sub Query -->
+    <select id="selectNetResourceList" parameterType="hashMap" resultMap="netResourceData">
+        SELECT
+            insertion_timestamp,
+            total_bytes_recv,
+            total_bytes_sent,
+            COALESCE(total_bytes_recv - LAG(total_bytes_recv) OVER (ORDER BY insertion_timestamp), 0) AS diff_bytes_recv,
+            COALESCE(total_bytes_sent - LAG(total_bytes_sent) OVER (ORDER BY insertion_timestamp), 0) AS diff_bytes_sent
+        FROM (
+            SELECT
+                insertion_timestamp,
+                SUM(bytes_recv) AS total_bytes_recv,
+                SUM(bytes_sent) AS total_bytes_sent
+            FROM RESOURCE_METRICS_NET
+            GROUP BY insertion_timestamp
+        ) AS subquery
+        ORDER BY insertion_timestamp DESC
+        LIMIT 60;
+    </select>
+</mapper>

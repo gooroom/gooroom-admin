@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import kr.gooroom.gpms.common.controller.GRFileHandleException;
 import kr.gooroom.gpms.common.service.impl.GpmsCommonDAO;
@@ -178,7 +178,7 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 
 				List<FileVO> icons = themeVO.getThemeIcons();
 				for (FileVO vo : icons) {
-					HashMap<String, String> param = new HashMap<String, String>();
+					HashMap<String, String> param = new HashMap<>();
 					param.put("themeId", themeVO.getThemeId());
 					param.put("appNm", vo.getFileEtcInfo());
 					param.put("fileNo", vo.getFileNo());
@@ -376,7 +376,7 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 			if (reCnt > 0) {
 				List<FileVO> icons = themeVO.getThemeIcons();
 				for (FileVO vo : icons) {
-					HashMap<String, String> param = new HashMap<String, String>();
+					HashMap<String, String> param = new HashMap<>();
 					param.put("themeId", themeVO.getThemeId());
 					param.put("appNm", vo.getFileEtcInfo());
 					param.put("fileNo", vo.getFileNo());
@@ -422,10 +422,9 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 	 * response theme list data
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getThemeList() throws Exception {
+	public ResultVO getThemeList() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -435,7 +434,7 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 
 			if (re != null && re.size() > 0) {
 
-				ThemeVO[] row = re.stream().toArray(ThemeVO[]::new);
+				ThemeVO[] row = re.toArray(ThemeVO[]::new);
 
 				// create theme url by filepath and filename
 				for (ThemeVO vo : row) {
@@ -458,10 +457,8 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 
 			logger.error("error in getThemeList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -472,10 +469,9 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 	 * response theme list data for paging
 	 * 
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getThemeListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getThemeListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 		try {
@@ -484,7 +480,7 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 			long filteredCount = themeMngDAO.selectThemeListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				ThemeVO[] row = re.stream().toArray(ThemeVO[]::new);
+				ThemeVO[] row = re.toArray(ThemeVO[]::new);
 				// create theme url by filepath and filename
 				for (ThemeVO vo : row) {
 					vo.setWallpaperUrl(CommonUtils.createIconUrlPath() + vo.getWallpaperFileNm());
@@ -504,10 +500,8 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 		} catch (Exception ex) {
 			logger.error("error in getThemeListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -518,10 +512,9 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 	 * 
 	 * @param options String theme id , ICON_ADDRESS
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getThemeData(HashMap<String, Object> options) throws Exception {
+	public ResultVO getThemeData(HashMap<String, Object> options) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -550,10 +543,8 @@ public class ThemeMngServiceImpl implements ThemeMngService {
 
 			logger.error("error in getThemeData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;

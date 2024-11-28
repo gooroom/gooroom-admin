@@ -24,7 +24,6 @@ package kr.gooroom.gpms.common.controller;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class GRFileHandleException extends RuntimeException {
 
 	public GRFileHandleException(String message) {

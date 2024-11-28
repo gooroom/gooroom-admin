@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="GPMSModuleHealthDAO">
+    <resultMap type="gpmsModuleHealthVO" id="gpmsModuleInfo">
+		<id property="moduleType" column="SERVICE_NM" />
+		<result property="lastActivatedTime" jdbcType="TIMESTAMP" javaType="java.util.Date" column="LAST_HEALTH_TIME" />
+		<result property="moduleActionType" column="LAST_COMMAND"/>
+	</resultMap>
+
+	<select id="selectGPMSModuleHealth" parameterType="String" resultMap="gpmsModuleInfo">
+		SELECT *
+		FROM HEALTH_GPMS_SERVICES
+		WHERE SERVICE_NM = #{moduleType}
+	</select>
+
+	<update id="updateLastModuleCommand" parameterType="hashmap">
+		UPDATE HEALTH_GPMS_SERVICES SET
+		LAST_COMMAND = #{lastCommand ,jdbcType=VARCHAR}
+		WHERE SERVICE_NM = #{moduleType, jdbcType=VARCHAR}
+	</update>
+</mapper>

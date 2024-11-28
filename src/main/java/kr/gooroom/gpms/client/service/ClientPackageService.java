@@ -49,6 +49,43 @@ public interface ClientPackageService {
 	ResultPagingVO readPackageListPagedInClient(HashMap<String, Object> options) throws Exception;
 
 	/**
+	 * generate package list data in client
+	 *
+	 * @param options HashMap<String, Object> option data
+	 * @return ResultPagingVO bean for package data result
+	 * @throws Exception
+	 */
+	ResultPagingVO readPackageSpecListPagedInClient(HashMap<String, Object> options) throws Exception;
+
+	/**
+	 * generate package list data in spec
+	 *
+	 * @param options HashMap<String, Object> option data
+	 * @return ResultPagingVO bean for package data result
+	 * @throws Exception
+	 */
+	ResultPagingVO readPackageSpecList(HashMap<String, Object> options) throws Exception;
+
+
+	/**
+	 * generate package list data in spec
+	 *
+	 * @param options HashMap<String, Object> option data
+	 * @return ResultPagingVO bean for package data result
+	 * @throws Exception
+	 */
+	ResultPagingVO readPackageSpecListCompare(HashMap<String, Object> options) throws Exception;
+
+	/**
+	 * generate package list data in client
+	 *
+	 * @param options HashMap<String, Object> option data
+	 * @return ResultPagingVO bean for package data result
+	 * @throws Exception
+	 */
+	ResultPagingVO readpackageSpecListPagedInVersion(HashMap<String, Object> options) throws Exception;
+
+	/**
 	 * generate total package list data
 	 * 
 	 * @param options HashMap<String, Object> option data

@@ -19,7 +19,7 @@ package kr.gooroom.gpms.mng.service.impl;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -199,10 +199,9 @@ public class WallpaperMngServiceImpl implements WallpaperMngService {
 	 * response wallpaper list data by group id
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getWallpaperList() throws Exception {
+	public ResultVO getWallpaperList() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -212,7 +211,7 @@ public class WallpaperMngServiceImpl implements WallpaperMngService {
 
 			if (re != null && re.size() > 0) {
 
-				WallpaperVO[] row = re.stream().toArray(WallpaperVO[]::new);
+				WallpaperVO[] row = re.toArray(WallpaperVO[]::new);
 
 				// create wallpaper url by filepath and filename
 				for (WallpaperVO vo : row) {
@@ -235,10 +234,8 @@ public class WallpaperMngServiceImpl implements WallpaperMngService {
 
 			logger.error("error in getWallpaperList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -250,10 +247,9 @@ public class WallpaperMngServiceImpl implements WallpaperMngService {
 	 * 
 	 * @param wallpaperId String wallpaper id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getWallpaperData(String wallpaperId) throws Exception {
+	public ResultVO getWallpaperData(String wallpaperId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -280,10 +276,8 @@ public class WallpaperMngServiceImpl implements WallpaperMngService {
 
 			logger.error("error in getWallpaperData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;

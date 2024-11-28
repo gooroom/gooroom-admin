@@ -18,12 +18,11 @@ package kr.gooroom.gpms.common.service.impl;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.Resource;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.GpmsCommonService;
 import kr.gooroom.gpms.common.service.ResultVO;
@@ -58,21 +57,21 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 	 * @param accessIp string network access ip information
 	 * @param userId   string user id
 	 * @return StatusVO result status data
-	 * @throws Exception
 	 */
 	@Override
 	public StatusVO createUserActLogHistory(String actType, String actItem, String actData, String accessIp,
-			String userId) throws Exception {
+			String userId, String actTarget, boolean isSuccess) {
 
 		StatusVO statusVO = new StatusVO();
 
 		try {
 
-			long reCnt = gpmsCommonDAO.createUserActLogHistory(actType, actItem, actData, accessIp, userId);
+			long reCnt = gpmsCommonDAO.createUserActLogHistory(actType, actItem, actData, accessIp, userId, actTarget,
+					isSuccess);
 
 			if (reCnt > 0) {
-				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata"));
+				// statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+				// 		MessageSourceHelper.getMessage("system.common.selectdata"));
 			} else {
 				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
 						MessageSourceHelper.getMessage("system.common.noselectdata"));
@@ -95,10 +94,9 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 	 * GPMS, GLM, GKM, GRM.
 	 * 
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getGpmsServersInfo() throws Exception {
+	public ResultVO getGpmsServersInfo() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -110,8 +108,8 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 				ServerAddrInfoVO[] row = new ServerAddrInfoVO[1];
 				row[0] = re;
 				resultVO.setData(row);
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
+				// resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+				// 		MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
 				Object[] o = new Object[0];
 				resultVO.setData(o);
@@ -135,10 +133,9 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 	 * response available network ip information.
 	 * 
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getGpmsAvailableNetwork() throws Exception {
+	public ResultVO getGpmsAvailableNetwork() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -147,10 +144,10 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 			List<String> re = gpmsCommonDAO.selectGpmsAvailableNetwork();
 
 			if (re != null && re.size() > 0) {
-				String[] row = re.stream().toArray(String[]::new);
+				String[] row = re.toArray(String[]::new);
 				resultVO.setData(row);
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
+				// resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+				// 		MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
 				Object[] o = new Object[0];
 				resultVO.setData(o);
@@ -173,18 +170,17 @@ public class GpmsCommonServiceImpl implements GpmsCommonService {
 	 * response available network ip information by admin id
 	 * 
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getGpmsAvailableNetworkByAdminId(String adminId) throws Exception {
+	public ResultVO getGpmsAvailableNetworkByAdminId(String adminId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<String> re = gpmsCommonDAO.selectGpmsAvailableNetworkByAdminId(adminId);
 			if (re != null && re.size() > 0) {
-				String[] row = re.stream().toArray(String[]::new);
+				String[] row = re.toArray(String[]::new);
 				resultVO.setData(row);
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
-						MessageSourceHelper.getMessage("system.common.selectdata")));
+				// resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+				// 		MessageSourceHelper.getMessage("system.common.selectdata")));
 			} else {
 				Object[] o = new Object[0];
 				resultVO.setData(o);

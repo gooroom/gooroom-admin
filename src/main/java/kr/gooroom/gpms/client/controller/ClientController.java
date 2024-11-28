@@ -22,10 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +39,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import kr.gooroom.gpms.client.service.ClientService;
 import kr.gooroom.gpms.client.service.ClientVO;
 import kr.gooroom.gpms.common.GPMSConstants;
@@ -50,7 +50,6 @@ import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.config.service.CtrlMstService;
 import kr.gooroom.gpms.job.nodes.Job;
 import kr.gooroom.gpms.job.service.JobService;
 import kr.gooroom.gpms.job.service.JobVO;
@@ -74,17 +73,12 @@ public class ClientController {
 	@Resource(name = "jobService")
 	private JobService jobService;
 
-	@Resource(name = "ctrlMstService")
-	private CtrlMstService ctrlMstService;
-
 	/**
 	 * initialize binder for date format
 	 * <p>
 	 * ex) date format : 2017-10-04
 	 * 
 	 * @param binder WebDataBinder
-	 * @return void
-	 * 
 	 */
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
@@ -107,17 +101,13 @@ public class ClientController {
 
 		ResultVO resultVO = new ResultVO();
 		try {
-
 			StatusVO status = clientService.updateClientInfo(paramVO);
 			resultVO.setStatus(status);
-
 		} catch (Exception ex) {
 			logger.error("error in updateClientInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -142,7 +132,7 @@ public class ClientController {
 		String groupId = req.getParameter("groupId");
 		String searchKey = req.getParameter("searchKey");
 
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		if ("REVOKED".equalsIgnoreCase(clientType)) {
 			// revoked client list
@@ -165,8 +155,8 @@ public class ClientController {
 			options.put("groupId", "");
 		} else {
 			String[] groups = groupId.split(",");
-			for (int i = 0; i < groups.length; i++) {
-				if ((GPMSConstants.DEFAULT_GROUPID).equals(groups[i])) {
+			for (String group : groups) {
+				if ((GPMSConstants.DEFAULT_GROUPID).equals(group)) {
 					options.put("hasDefaultGroup", "Y");
 				}
 			}
@@ -257,7 +247,7 @@ public class ClientController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = null;
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		String clientType = req.getParameter("clientType");
@@ -307,8 +297,8 @@ public class ClientController {
 		options.put("searchKey", searchKey);
 
 		// << paging >>
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -380,18 +370,18 @@ public class ClientController {
 	public @ResponseBody ResultPagingVO readClientListForGroups(HttpServletRequest req, HttpServletResponse res,
 			ModelMap model) {
 
-		ResultPagingVO resultVO = null;
+		ResultPagingVO resultVO = new ResultPagingVO();
 
 		// selected group id
 		String groupId = req.getParameter("groupId");
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		if (groupId == null || groupId.length() < 1) {
 			options.put("groupId", "");
 		} else {
 			String[] groups = groupId.split(",");
-			for (int i = 0; i < groups.length; i++) {
-				if ((GPMSConstants.DEFAULT_GROUPID).equals(groups[i])) {
+			for (String group : groups) {
+				if ((GPMSConstants.DEFAULT_GROUPID).equals(group)) {
 					options.put("hasDefaultGroup", "Y");
 				}
 			}
@@ -399,16 +389,12 @@ public class ClientController {
 		}
 
 		try {
-
 			resultVO = clientService.selectClientListForGroups(options);
-
 		} catch (Exception ex) {
 			logger.error("error in readClientListForGroups : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -427,9 +413,9 @@ public class ClientController {
 	public @ResponseBody ResultPagingVO readOnlineClientList(HttpServletRequest req, HttpServletResponse res,
 			ModelMap model) {
 
-		ResultPagingVO resultVO = null;
+		ResultPagingVO resultVO = new ResultPagingVO();
 
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 		options.put("isOnline", "1");
 
 		String paramOrderColumn = req.getParameter("columns[" + req.getParameter("order[0][column]") + "][data]");
@@ -489,10 +475,8 @@ public class ClientController {
 		} catch (Exception ex) {
 			logger.error("error in readOnlineClientList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -511,17 +495,15 @@ public class ClientController {
 	public @ResponseBody ResultVO readClientStatusForDashboard(HttpServletRequest req, HttpServletResponse res,
 			ModelMap model) {
 
-		ResultVO resultVO = null;
+		ResultVO resultVO = new ResultVO();
 
 		try {
 			resultVO = clientService.getClientStatusSummary();
 		} catch (Exception ex) {
 			logger.error("error in readClientStatusForDashboard : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -536,7 +518,7 @@ public class ClientController {
 	 */
 	@PostMapping(value = "/readClientListForAddingGroup")
 	public @ResponseBody ResultVO readClientListForAddingGroup(
-			@RequestParam(value = "groupId", required = true) String groupId) {
+			@RequestParam(value = "groupId") String groupId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -546,10 +528,8 @@ public class ClientController {
 		} catch (Exception ex) {
 			logger.error("error in readClientListForAddingGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -562,7 +542,7 @@ public class ClientController {
 	 * 
 	 */
 	@PostMapping(value = "/readClientInfo")
-	public @ResponseBody ResultVO readClientInfo(@RequestParam(value = "clientId", required = true) String clientId) {
+	public @ResponseBody ResultVO readClientInfo(@RequestParam(value = "clientId") String clientId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -572,10 +552,8 @@ public class ClientController {
 		} catch (Exception ex) {
 			logger.error("error in readClientInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -589,7 +567,7 @@ public class ClientController {
 	 * 
 	 */
 	@PostMapping(value = "/isDupClientId")
-	public @ResponseBody ResultVO isDupClientId(@RequestParam(value = "clientId", required = true) String clientId) {
+	public @ResponseBody ResultVO isDupClientId(@RequestParam(value = "clientId") String clientId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -600,10 +578,8 @@ public class ClientController {
 		} catch (Exception ex) {
 			logger.error("error in isDupClientId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -621,27 +597,26 @@ public class ClientController {
 	 * 
 	 */
 	@PostMapping(value = "/readClientStatusList")
-	public String readClientStatusList(HttpServletRequest req, HttpServletResponse res, ModelMap model)
-			throws Exception {
+	public String readClientStatusList(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
 		StatusVO statusVO = new StatusVO();
 		statusVO.setResult(GPMSConstants.MSG_SUCCESS);
 
-		ArrayList<HashMap<String, String>> resultList = new ArrayList<HashMap<String, String>>();
+		ArrayList<HashMap<String, String>> resultList = new ArrayList<>();
 
-		HashMap<String, String> hm = new HashMap<String, String>();
+		HashMap<String, String> hm = new HashMap<>();
 		hm.put("statusCode", GPMSConstants.STS_INITIALIZE);
 		hm.put("statusName", MessageSourceHelper.getMessage("client.status.init"));
 		resultList.add(hm);
-		hm = new HashMap<String, String>();
+		hm = new HashMap<>();
 		hm.put("statusCode", GPMSConstants.STS_USABLE);
 		hm.put("statusName", MessageSourceHelper.getMessage("client.status.use"));
 		resultList.add(hm);
-		hm = new HashMap<String, String>();
+		hm = new HashMap<>();
 		hm.put("statusCode", GPMSConstants.STS_REVOKED);
 		hm.put("statusName", MessageSourceHelper.getMessage("client.status.revoked"));
 		resultList.add(hm);
-		hm = new HashMap<String, String>();
+		hm = new HashMap<>();
 		hm.put("statusCode", GPMSConstants.STS_EXPIRE);
 		hm.put("statusName", MessageSourceHelper.getMessage("client.status.expire"));
 		resultList.add(hm);
@@ -663,7 +638,7 @@ public class ClientController {
 	 */
 	@PostMapping(value = "/updateClientCertToRevoke")
 	public @ResponseBody ResultVO updateClientCertToRevoke(HttpServletRequest req, HttpServletResponse res,
-			ModelMap model) throws Exception {
+			ModelMap model) {
 
 		String clientId = req.getParameter("clientId");
 
@@ -676,10 +651,8 @@ public class ClientController {
 		} catch (Exception ex) {
 			logger.error("error in updateClientCertToRevoke : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -699,7 +672,7 @@ public class ClientController {
 	 */
 	@PostMapping(value = "/deleteClientsCertToRevoke")
 	public @ResponseBody ResultVO deleteClientsCertToRevoke(HttpServletRequest req, HttpServletResponse res,
-			ModelMap model) throws Exception {
+			ModelMap model) {
 
 		String clientIds = req.getParameter("clientIds");
 
@@ -709,10 +682,10 @@ public class ClientController {
 		int totalCnt = clients.length;
 		int successCnt = 0;
 		int failCnt = 0;
-		for (int i = 0; i < totalCnt; i++) {
+		for (String client : clients) {
 
 			try {
-				StatusVO status = clientService.revokeClientCertificate(clients[i]);
+				StatusVO status = clientService.revokeClientCertificate(client);
 				// compare result
 				if (GPMSConstants.MSG_SUCCESS.equalsIgnoreCase(status.getResult())) {
 					successCnt++;
@@ -728,10 +701,10 @@ public class ClientController {
 		if (totalCnt == successCnt) {
 			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
 					MessageSourceHelper.getMessage("client.result.deleted")));
-		} else if (totalCnt > 0 && successCnt == 0) {
+		} else if (successCnt == 0) {
 			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
 					MessageSourceHelper.getMessage("client.result.nodeleted")));
-		} else if (totalCnt > 0 && successCnt > 0 && failCnt > 0) {
+		} else if (successCnt > 0 && failCnt > 0) {
 			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
 					MessageSourceHelper.getMessage("client.result.subdeleted")));
 		}
@@ -770,10 +743,8 @@ public class ClientController {
 		} catch (Exception ex) {
 			logger.error("error in readClientListInGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -792,7 +763,7 @@ public class ClientController {
 	public @ResponseBody ResultPagingVO readViolatedClientList(HttpServletRequest req, HttpServletResponse res,
 			ModelMap model) {
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 		try {
 
 			// << options >>
@@ -803,8 +774,8 @@ public class ClientController {
 			// << paging >>
 			String paramOrderColumn = req.getParameter("orderColumn");
 			String paramOrderDir = req.getParameter("orderDir");
-			String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-			String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+			String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+			String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 
 			if ("chAAAAA".equalsIgnoreCase(paramOrderColumn)) {
 				options.put("paramOrderColumn", "CLIENT_ID");
@@ -832,10 +803,8 @@ public class ClientController {
 		} catch (Exception ex) {
 			logger.error("error in readViolatedClientList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -858,10 +827,8 @@ public class ClientController {
 		} catch (Exception ex) {
 			logger.error("error in readViolatedClientCount : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -886,8 +853,7 @@ public class ClientController {
 			jobs[0] = Job.generateJob("log", "clear_security_alarm");
 
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
@@ -895,13 +861,6 @@ public class ClientController {
 
 			} catch (Exception jsonex) {
 				logger.error("ClientController.createResetViolatedClient (make json) Exception occurred. ", jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 
 			JobVO jobVO = new JobVO();
@@ -921,10 +880,8 @@ public class ClientController {
 		} catch (Exception ex) {
 			logger.error("error in createResetViolatedClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -952,10 +909,8 @@ public class ClientController {
 		} catch (Exception ex) {
 			logger.error("error in readUpdatePackageClientList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;

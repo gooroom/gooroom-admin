@@ -19,8 +19,9 @@ package kr.gooroom.gpms.client.service.impl;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
+import kr.gooroom.gpms.client.service.ClientPackageSpecVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,6 @@ import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.job.service.impl.JobDAO;
 
 /**
  * Client management service implement class
@@ -49,18 +49,14 @@ public class ClientPackageServiceImpl implements ClientPackageService {
 	@Resource(name = "clientPackageDAO")
 	private ClientPackageDAO clientPackageDAO;
 
-	@Resource(name = "jobDAO")
-	private JobDAO jobDAO;
-
 	/**
 	 * generate total package list data
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO bean for package data result
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO readTotalPackageListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO readTotalPackageListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -71,8 +67,95 @@ public class ClientPackageServiceImpl implements ClientPackageService {
 			long packageFiltered = clientPackageDAO.selectTotalPackageListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
+				ClientPackageVO[] row = re.toArray(ClientPackageVO[]::new);
+				resultVO.setData(row);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("system.common.selectdata")));
 
-				ClientPackageVO[] row = re.stream().toArray(ClientPackageVO[]::new);
+				resultVO.setRecordsTotal(String.valueOf(packageCount));
+				resultVO.setRecordsFiltered(String.valueOf(packageFiltered));
+
+			} else {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.noselectdata")));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in readTotalPackageListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+		}
+
+		return resultVO;
+	}
+
+	/**
+	 * generate package list data in client
+	 * 
+	 * @param options HashMap<String, Object> option data
+	 * @return ResultPagingVO bean for package data result
+	 */
+	@Override
+	public ResultPagingVO readPackageListPagedInClient(HashMap<String, Object> options) {
+
+		ResultPagingVO resultVO = new ResultPagingVO();
+
+		try {
+
+			List<ClientPackageVO> re = clientPackageDAO.selectClientPackageListPaged(options);
+			long packageCount = clientPackageDAO.selectClientPackageListTotalCount(options);
+			long packageFiltered = clientPackageDAO.selectClientPackageListFilteredCount(options);
+
+			if (re != null && re.size() > 0) {
+				ClientPackageVO[] row = re.toArray(ClientPackageVO[]::new);
+				resultVO.setData(row);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("system.common.selectdata")));
+
+				resultVO.setRecordsTotal(String.valueOf(packageCount));
+				resultVO.setRecordsFiltered(String.valueOf(packageFiltered));
+
+			} else {
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.noselectdata")));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in readPackageListInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+		}
+
+		return resultVO;
+	}
+
+	/**
+	 * generate package list data in client
+	 *
+	 * @param options HashMap<String, Object> option data
+	 * @return ResultPagingVO bean for package data result
+	 * @throws Exception
+	 */
+	@Override
+	public ResultPagingVO readPackageSpecListPagedInClient(HashMap<String, Object> options) throws Exception {
+
+		ResultPagingVO resultVO = new ResultPagingVO();
+
+		try {
+
+			List<ClientPackageSpecVO> re = clientPackageDAO.selectClientPackageSpecListPaged(options);
+ 			long packageCount = clientPackageDAO.selectClientPackageSpecListTotalCount(options);
+			long packageFiltered = clientPackageDAO.selectClientPackageSpecListFilteredCount(options);
+
+			if (re != null && re.size() > 0) {
+
+				ClientPackageSpecVO[] row = re.stream().toArray(ClientPackageSpecVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -89,7 +172,7 @@ public class ClientPackageServiceImpl implements ClientPackageService {
 			}
 
 		} catch (Exception ex) {
-			logger.error("error in readTotalPackageListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+			logger.error("error in readPackageListInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 			if (resultVO != null) {
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
@@ -102,25 +185,113 @@ public class ClientPackageServiceImpl implements ClientPackageService {
 
 	/**
 	 * generate package list data in client
-	 * 
+	 *
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO bean for package data result
 	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO readPackageListPagedInClient(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO readPackageSpecList(HashMap<String, Object> options) throws Exception {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
 		try {
 
-			List<ClientPackageVO> re = clientPackageDAO.selectClientPackageListPaged(options);
-			long packageCount = clientPackageDAO.selectClientPackageListTotalCount(options);
-			long packageFiltered = clientPackageDAO.selectClientPackageListFilteredCount(options);
+			List<ClientPackageSpecVO> re = clientPackageDAO.selectPackageSpecList(options);
+
+			if (re != null && re.size() > 0) {
+				ClientPackageSpecVO[] row = re.stream().toArray(ClientPackageSpecVO[]::new);
+				resultVO.setData(row);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("system.common.selectdata")));
+			} else {
+
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.noselectdata")));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in readPackageListInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+
+	/**
+	 * generate package list data in client
+	 *
+	 * @param options HashMap<String, Object> option data
+	 * @return ResultPagingVO bean for package data result
+	 * @throws Exception
+	 */
+	@Override
+	public ResultPagingVO readPackageSpecListCompare(HashMap<String, Object> options) throws Exception {
+
+		ResultPagingVO resultVO = new ResultPagingVO();
+
+		try {
+
+			List<ClientPackageSpecVO> re = clientPackageDAO.selectPackageSpecListVersionComparePaged(options);
+			long packageCount = clientPackageDAO.selectVersionComparePackageSpecListTotalCount(options);
+			long packageFiltered = clientPackageDAO.selectVersionComparePackageSpecListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
 
-				ClientPackageVO[] row = re.stream().toArray(ClientPackageVO[]::new);
+				ClientPackageSpecVO[] row = re.stream().toArray(ClientPackageSpecVO[]::new);
+				resultVO.setData(row);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
+						MessageSourceHelper.getMessage("system.common.selectdata")));
+
+				resultVO.setRecordsTotal(String.valueOf(packageCount));
+				resultVO.setRecordsFiltered(String.valueOf(packageFiltered));
+
+			} else {
+
+				Object[] o = new Object[0];
+				resultVO.setData(o);
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
+						MessageSourceHelper.getMessage("system.common.noselectdata")));
+			}
+
+		} catch (Exception ex) {
+			logger.error("error in readPackageListInClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
+			if (resultVO != null) {
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
+			}
+		}
+
+		return resultVO;
+	}
+	/**
+	 * generate package list data in client
+	 *
+	 * @param options HashMap<String, Object> option data
+	 * @return ResultPagingVO bean for package data result
+	 * @throws Exception
+	 */
+	@Override
+	public ResultPagingVO readpackageSpecListPagedInVersion(HashMap<String, Object> options) throws Exception {
+
+		ResultPagingVO resultVO = new ResultPagingVO();
+
+		try {
+
+			List<ClientPackageSpecVO> re = clientPackageDAO.selectVersionPackageSpecListPaged(options);
+			long packageCount = clientPackageDAO.selectVersionPackageSpecListTotalCount(options);
+			long packageFiltered = clientPackageDAO.selectVersionPackageSpecListFilteredCount(options);
+
+			if (re != null && re.size() > 0) {
+
+				ClientPackageSpecVO[] row = re.stream().toArray(ClientPackageSpecVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -153,10 +324,9 @@ public class ClientPackageServiceImpl implements ClientPackageService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO bean for package data result
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO readTotalPackageList(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO readTotalPackageList(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -167,8 +337,7 @@ public class ClientPackageServiceImpl implements ClientPackageService {
 			long packageFiltered = clientPackageDAO.selectTotalPackageFiltered(options);
 
 			if (re != null && re.size() > 0) {
-
-				ClientPackageVO[] row = re.stream().toArray(ClientPackageVO[]::new);
+				ClientPackageVO[] row = re.toArray(ClientPackageVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -177,7 +346,6 @@ public class ClientPackageServiceImpl implements ClientPackageService {
 				resultVO.setRecordsFiltered(String.valueOf(packageFiltered));
 
 			} else {
-
 				Object[] o = new Object[0];
 				resultVO.setData(o);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SELECTERROR,
@@ -187,10 +355,8 @@ public class ClientPackageServiceImpl implements ClientPackageService {
 		} catch (Exception ex) {
 			logger.error("error in readTotalPackageList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;

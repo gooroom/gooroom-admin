@@ -24,9 +24,8 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param
 	 * @return DeptVO
-	 * @throws Exception
 	 */
-	public DeptVO selectRootChildrenDeptInfo() throws SQLException {
+	public DeptVO selectRootChildrenDeptInfo() {
 		DeptVO re = null;
 		try {
 			re = sqlSessionMeta.selectOne("selectRootChildrenDeptInfo");
@@ -41,9 +40,8 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param
 	 * @return List<DeptVO>
-	 * @throws Exception
 	 */
-	public List<DeptVO> selectChildrenDeptList(HashMap<String, Object> map) throws SQLException {
+	public List<DeptVO> selectChildrenDeptList(HashMap<String, Object> map) {
 		List<DeptVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectChildrenDeptList", map);
@@ -58,9 +56,8 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param
 	 * @return List<DeptVO>
-	 * @throws Exception
 	 */
-	public List<DeptVO> selectChildrenDeptListByAdmin(HashMap<String, Object> map) throws SQLException {
+	public List<DeptVO> selectChildrenDeptListByAdmin(HashMap<String, Object> map) {
 		List<DeptVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectChildrenDeptListByAdmin", map);
@@ -75,9 +72,8 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param
 	 * @return List<DeptVO>
-	 * @throws Exception
 	 */
-	public List<DeptVO> selectAllChildrenDeptList(String deptCd) throws SQLException {
+	public List<DeptVO> selectAllChildrenDeptList(String deptCd) {
 
 		List<DeptVO> re = null;
 		try {
@@ -100,7 +96,7 @@ public class DeptDAO extends SqlSessionMetaDAO {
 
 		List<DeptVO> re = null;
 		try {
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("deptCds", deptCds);
 			re = sqlSessionMeta.selectList("selectAllChildrenDeptListByParents", map);
 		} catch (Exception ex) {
@@ -113,36 +109,33 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	/**
 	 * 조직 정보 수정
 	 * 
-	 * @param DeptVO
+	 * @param vo DeptVD
 	 * @return long
-	 * @throws Exception
 	 */
-	public long updateDeptData(DeptVO vo) throws SQLException {
-		return (long) sqlSessionMeta.update("updateDeptData", vo);
+	public long updateDeptData(DeptVO vo) {
+		return sqlSessionMeta.update("updateDeptData", vo);
 	}
 
 	/**
 	 * 하위 조직 만료일 정보 수정
 	 * 
-	 * @param DeptVO
+	 * @param vo DeptVO
 	 * @return long
-	 * @throws Exception
 	 */
-	public long updateChildrenDeptExpireData(DeptVO vo) throws SQLException {
-		return (long) sqlSessionMeta.update("updateChildrenDeptExpireData", vo);
+	public long updateChildrenDeptExpireData(DeptVO vo) {
+		return sqlSessionMeta.update("updateChildrenDeptExpireData", vo);
 	}
 
 	/**
 	 * 조직 아이디 존재 여부 확인
 	 * 
-	 * @param String deptCd
+	 * @param deptCd String
 	 * @return boolean
-	 * @throws Exception
 	 */
-	public boolean isExistDeptCd(String deptCd) throws SQLException {
+	public boolean isExistDeptCd(String deptCd) {
 		boolean re = true;
 		try {
-			re = ((Boolean) sqlSessionMeta.selectOne("isExistDeptCd", deptCd)).booleanValue();
+			re = sqlSessionMeta.selectOne("isExistDeptCd", deptCd);
 		} catch (Exception ex) {
 			re = true;
 		}
@@ -155,16 +148,15 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * @param parentDeptCd string parent dept cd
 	 * @param deptName string dept name
 	 * @return boolean Boolean value
-	 * @throws SQLException
 	 */
-	public boolean isExistDeptNameByParentCd(String parentDeptCd, String deptName) throws SQLException {
+	public boolean isExistDeptNameByParentCd(String parentDeptCd, String deptName) {
 		boolean re = true;
 		try {
 			if (parentDeptCd != null && parentDeptCd.length() > 0) {
-				HashMap<String, Object> map = new HashMap<String, Object>();
+				HashMap<String, Object> map = new HashMap<>();
 				map.put("parentDeptCd", parentDeptCd);
 				map.put("deptName", deptName);
-				re = ((Boolean) sqlSessionMeta.selectOne("isExistDeptNameByParentCd", map)).booleanValue();
+				re = sqlSessionMeta.selectOne("isExistDeptNameByParentCd", map);
 			}
 		} catch (Exception ex) {
 			re = true;
@@ -177,19 +169,18 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	/**
 	 * 같은 조직 하위에 조직이 중복 되었는지 확인 
 	 * 
-	 * @param parentDeptCd string parent dept cd
+	 * @param deptCd string
 	 * @param deptName string dept name
 	 * @return boolean Boolean value
-	 * @throws SQLException
 	 */
-	public boolean isExistDeptNameByDeptCd(String deptCd, String deptName) throws SQLException {
+	public boolean isExistDeptNameByDeptCd(String deptCd, String deptName) {
 		boolean re = true;
 		try {
 			if (deptCd != null && deptCd.length() > 0) {
-				HashMap<String, Object> map = new HashMap<String, Object>();
+				HashMap<String, Object> map = new HashMap<>();
 				map.put("deptCd", deptCd);
 				map.put("deptName", deptName);
-				re = ((Boolean) sqlSessionMeta.selectOne("isExistDeptNameByDeptCd", map)).booleanValue();
+				re = sqlSessionMeta.selectOne("isExistDeptNameByDeptCd", map);
 			}
 		} catch (Exception ex) {
 			re = true;
@@ -203,45 +194,41 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	/**
 	 * 조직정보 신규 등록 - 파일로 등록
 	 * 
-	 * @param DeptVO
+	 * @param vo DeptVO
 	 * @return long
-	 * @throws Exception
 	 */
-	public long createDeptRawData(DeptVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertDeptRawData", vo);
+	public long createDeptRawData(DeptVO vo) {
+		return sqlSessionMeta.insert("insertDeptRawData", vo);
 	}
 
 	/**
 	 * 조직정보 신규 등록
 	 * 
-	 * @param DeptVO
+	 * @param vo DeptVO
 	 * @return long
-	 * @throws Exception
 	 */
-	public long createDeptMaster(DeptVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertDeptMaster", vo);
+	public long createDeptMaster(DeptVO vo) {
+		return sqlSessionMeta.insert("insertDeptMaster", vo);
 	}
 
 	/**
 	 * 하위 포함하여 조직을 미허용으로 수정
 	 * 
-	 * @param DeptVO
+	 * @param vo DeptVO
 	 * @return long
-	 * @throws Exception
 	 */
-	public long updateDeptUnusedWithChildren(DeptVO vo) throws SQLException {
-		return (long) sqlSessionMeta.update("updateDeptUnusedWithChildren", vo);
+	public long updateDeptUnusedWithChildren(DeptVO vo) {
+		return sqlSessionMeta.update("updateDeptUnusedWithChildren", vo);
 	}
 
 	/**
 	 * 하위 포함하여 조직 정보 삭제
 	 * 
-	 * @param DeptVO
+	 * @param vo DeptVO
 	 * @return long
-	 * @throws Exception
 	 */
-	public long deleteDeptWithChildren(DeptVO vo) throws SQLException {
-		return (long) sqlSessionMeta.update("deleteDeptWithChildren", vo);
+	public long deleteDeptWithChildren(DeptVO vo) {
+		return sqlSessionMeta.update("deleteDeptWithChildren", vo);
 	}
 
 	/**
@@ -252,18 +239,16 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * @param configId  string configuration id
 	 * @param configTp  string configuration type
 	 * @return long query result count
-	 * @throws SQLException
 	 */
-	public long insertOrUpdateConfigWithDept(String deptCd, String regUserId, String configId, String configTp)
-			throws SQLException {
+	public long insertOrUpdateConfigWithDept(String deptCd, String regUserId, String configId, String configTp) {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("deptCd", deptCd);
 		map.put("regUserId", regUserId);
 		map.put("configId", configId);
 		map.put("configTp", configTp);
 
-		return (long) sqlSessionMeta.update("insertOrUpdateConfigWithDept", map);
+		return sqlSessionMeta.update("insertOrUpdateConfigWithDept", map);
 	}
 	
 	/**
@@ -272,16 +257,14 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * @param deptCd    string target dept cd
 	 * @param regUserId string administrator user id
 	 * @return long query result count
-	 * @throws SQLException
 	 */
-	public long insertDeptInAdminRelation(String deptCd, String regUserId)
-			throws SQLException {
+	public long insertDeptInAdminRelation(String deptCd, String regUserId) {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("deptCd", deptCd);
 		map.put("regUserId", regUserId);
 
-		return (long) sqlSessionMeta.update("insertDeptInAdminRelation", map);
+		return sqlSessionMeta.update("insertDeptInAdminRelation", map);
 	}
 
 	/**
@@ -290,26 +273,24 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * @param deptCd   string target dept cd
 	 * @param configTp string configuration type
 	 * @return long query result count
-	 * @throws SQLException
 	 */
-	public long deleteConfigWithDept(String deptCd, String configTp) throws SQLException {
+	public long deleteConfigWithDept(String deptCd, String configTp) {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("deptCd", deptCd);
 		map.put("configTp", configTp);
-		return (long) sqlSessionMeta.update("deleteConfigWithDept", map);
+		return sqlSessionMeta.update("deleteConfigWithDept", map);
 	}
 
 	/**
 	 * response dept information data.
 	 * 
-	 * @param groupId string target group id
+	 * @param deptCd string
 	 * @return ClientGroupVO selected client group object
-	 * @throws SQLException
 	 */
-	public DeptVO selectDeptData(String deptCd) throws SQLException {
+	public DeptVO selectDeptData(String deptCd) {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("deptCd", deptCd);
 
 		DeptVO re = null;
@@ -329,13 +310,12 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param deptCds string target dept cd array
 	 * @return ClientGroupVO selected client group object
-	 * @throws SQLException
 	 */
-	public List<DeptVO> selectDeptNodeList(String[] deptCds) throws SQLException {
+	public List<DeptVO> selectDeptNodeList(String[] deptCds) {
 
 		List<DeptVO> re = null;
 		try {
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("deptCds", deptCds);
 			
 			re = sqlSessionMeta.selectList("selectDeptNodeList", map);
@@ -353,9 +333,8 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return DeptVO List selected dept object
-	 * @throws SQLException
 	 */
-	public List<DeptVO> selectDeptListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<DeptVO> selectDeptListPaged(HashMap<String, Object> options) {
 
 		List<DeptVO> re = null;
 		try {
@@ -375,10 +354,9 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectDeptListFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectDeptListFilteredCount", options);
+	public long selectDeptListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectDeptListFilteredCount", options);
 	}
 
 	/**
@@ -386,24 +364,22 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectDeptListTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectDeptListTotalCount", options);
+	public long selectDeptListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectDeptListTotalCount", options);
 	}
 	
 	/**
 	 * response result delete dept table all
 	 * 
 	 * @return boolean
-	 * @throws SQLException
 	 */
-	public boolean deleteDeptAll() throws SQLException {
+	public boolean deleteDeptAll() {
 		boolean reFlag = false; 
 		
-		long existRowCount = (long) sqlSessionMeta.selectOne("selectDeptALLCount");
+		long existRowCount = sqlSessionMeta.selectOne("selectDeptALLCount");
 		if(existRowCount > 0) {
-			long deleteRowCount = (long) sqlSessionMeta.delete("deleteDeptALL");
+			long deleteRowCount = sqlSessionMeta.delete("deleteDeptALL");
 			return existRowCount == deleteRowCount;			
 		} else {
 			reFlag = true;
@@ -416,19 +392,19 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * insert dept history
 	 * 
 	 * @param chgTp string
-	 * @param groupId string
+	 * @param deptCd string
 	 * @param regUserId string
 	 * @return long query result count
 	 * @throws SQLException
 	 */
 	public long createDeptHist(String chgTp, String deptCd, String regUserId) throws SQLException {
 		
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("chgTp", chgTp);
 		map.put("regUserId", regUserId);
 		map.put("deptCd", deptCd);
 		
-		return (long) sqlSessionMeta.insert("insertDeptHist", map);
+		return sqlSessionMeta.insert("insertDeptHist", map);
 	}
 	
 	/**
@@ -439,7 +415,7 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteDeptData(String deptCd) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteDeptData", deptCd);
+		return sqlSessionMeta.delete("deleteDeptData", deptCd);
 	}
 	
 	/**
@@ -450,7 +426,7 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteDeptFromRule(String deptCd) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteDeptFromRule", deptCd);
+		return sqlSessionMeta.delete("deleteDeptFromRule", deptCd);
 	}
 
 	/**
@@ -461,7 +437,7 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteDeptForAdmin(String deptCd) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteDeptForAdmin", deptCd);
+		return sqlSessionMeta.delete("deleteDeptForAdmin", deptCd);
 	}
 
 	/**
@@ -472,7 +448,7 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteDeptForNoti(String deptCd) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteDeptForNoti", deptCd);
+		return sqlSessionMeta.delete("deleteDeptForNoti", deptCd);
 	}
 	
 	/**
@@ -485,11 +461,11 @@ public class DeptDAO extends SqlSessionMetaDAO {
 	 */
 	public long updateDeptToUser(String deptCd, String[] userIds) throws SQLException {
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("deptCd", deptCd);
 		map.put("userIds", userIds);
 		map.put("modUserId", LoginInfoHelper.getUserId());
 
-		return (long) sqlSessionMeta.update("updateDeptToUser", map);
+		return sqlSessionMeta.update("updateDeptToUser", map);
 	}
 }

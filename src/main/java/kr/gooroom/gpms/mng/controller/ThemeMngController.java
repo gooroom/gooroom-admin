@@ -19,12 +19,12 @@ package kr.gooroom.gpms.mng.controller;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 
 import kr.gooroom.gpms.job.custom.CustomJobMaker;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -143,7 +143,7 @@ public class ThemeMngController {
 	 *
 	 */
 	@PostMapping(value = "/deleteThemeData")
-	public @ResponseBody ResultVO deleteThemeData(@RequestParam(value = "themeId", required = true) String themeId) {
+	public @ResponseBody ResultVO deleteThemeData(@RequestParam(value = "themeId") String themeId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -250,7 +250,7 @@ public class ThemeMngController {
 	public @ResponseBody ResultVO readThemeListPaged(HttpServletRequest req) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 		options.put("ICON_ADDRESS", CommonUtils.createIconUrlPath());
 
 		// << options >>
@@ -258,8 +258,8 @@ public class ThemeMngController {
 		options.put("searchKey", searchKey);
 
 		// << paging >>
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -308,7 +308,7 @@ public class ThemeMngController {
 	 * @param themeId String theme id. @return ResultVO result data bean. @throws
 	 */
 	@PostMapping(value = "/readThemeData")
-	public @ResponseBody ResultVO readThemeData(@RequestParam(value = "themeId", required = true) String themeId) {
+	public @ResponseBody ResultVO readThemeData(@RequestParam(value = "themeId") String themeId) {
 
 		ResultVO resultVO = new ResultVO();
 		
@@ -406,7 +406,7 @@ public class ThemeMngController {
 	 */
 	@PostMapping(value = "/deleteWallpaperData")
 	public @ResponseBody ResultVO deleteWallpaperData(
-			@RequestParam(value = "wallpaperId", required = true) String wallpaperId) {
+			@RequestParam(value = "wallpaperId") String wallpaperId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {

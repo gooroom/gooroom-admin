@@ -20,9 +20,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +84,7 @@ public class ClientRuleController {
 	public @ResponseBody HashMap<String, Object> readClientRuleByGroupId(HttpServletRequest req) {
 		
 		String groupId = req.getParameter("groupId");
-		HashMap<String, Object> hm_total = new HashMap<String, Object>();
+		HashMap<String, Object> hm_total = new HashMap<>();
 		
 		try {
 			if (groupId != null && groupId.trim().length() > 0) {

@@ -35,8 +35,6 @@ public interface FileUploadService {
 	/**
 	 * initialize method from object
 	 * 
-	 * @return void
-	 *
 	 */
 	void init();
 
@@ -44,7 +42,6 @@ public interface FileUploadService {
 	 * save file physically to specified location.
 	 * 
 	 * @param file MultipartFile file request body
-	 * @param themeId String
 	 * @return FileVO saved file data
 	 *
 	 */
@@ -93,8 +90,6 @@ public interface FileUploadService {
 	 * delete all file data.
 	 * <p>
 	 * use spring util.
-	 * 
-	 * @return void
 	 *
 	 */
 	void deleteAll();

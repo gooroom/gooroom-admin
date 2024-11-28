@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.job.custom;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -25,10 +26,10 @@ import java.io.Serializable;
  * @version 1.0
  * @since 1.8
  */
-
-@SuppressWarnings("serial")
 public class OnlineClientAndUserVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = -2149237186703581292L;
 	private String userId;
 	private String clientId;
 

@@ -16,20 +16,8 @@
 
 package kr.gooroom.gpms.client.service.impl;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
-
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
 import kr.gooroom.gpms.client.service.ClientGroupService;
 import kr.gooroom.gpms.client.service.ClientGroupVO;
 import kr.gooroom.gpms.client.service.ClientVO;
@@ -39,9 +27,17 @@ import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.config.service.CtrlMstService;
-import kr.gooroom.gpms.dept.service.DeptVO;
 import kr.gooroom.gpms.job.custom.CustomJobMaker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Client management service implement class
@@ -62,9 +58,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	@Resource(name = "clientGroupDAO")
 	private ClientGroupDAO clientGroupDao;
 
-	@Resource(name = "ctrlMstService")
-	private CtrlMstService ctrlMstService;
-	
 	@Inject
 	private CustomJobMaker jobMaker;
 
@@ -72,10 +65,9 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 * generate client group list data
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO selectClientGroupList() throws Exception {
+	public ResultVO selectClientGroupList() {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -83,7 +75,7 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 			List<ClientGroupVO> re = clientGroupDao.selectClientGroupList();
 
 			if (re != null && re.size() > 0) {
-				ClientGroupVO[] row = re.stream().toArray(ClientGroupVO[]::new);
+				ClientGroupVO[] row = re.toArray(ClientGroupVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -97,10 +89,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in selectClientGroupList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -111,10 +101,9 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 * 
 	 * @param options HashMap<String, Object>.
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getClientGroupListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getClientGroupListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -125,7 +114,7 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 			long filteredCount = clientGroupDao.selectClientGroupListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				ClientGroupVO[] row = re.stream().toArray(ClientGroupVO[]::new);
+				ClientGroupVO[] row = re.toArray(ClientGroupVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -142,10 +131,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in getClientGroupListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -156,10 +143,9 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 * 
 	 * @param groupId string target group id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readClientGroupData(String groupId) throws Exception {
+	public ResultVO readClientGroupData(String groupId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			ClientGroupVO re = clientGroupDao.selectClientGroupData(groupId);
@@ -179,10 +165,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in readClientGroupData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -193,16 +177,15 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 * 
 	 * @param groupIds string target group id array
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readClientGroupNodeList(String[] groupIds) throws Exception {
+	public ResultVO readClientGroupNodeList(String[] groupIds) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<ClientGroupVO> re = clientGroupDao.selectClientGroupNodeList(groupIds);
 			
 			if (re != null && re.size() > 0) {
-				ClientGroupVO[] row = re.stream().toArray(ClientGroupVO[]::new);
+				ClientGroupVO[] row = re.toArray(ClientGroupVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -216,10 +199,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in readClientGroupNodeList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -234,7 +215,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 */
 	@Override
 	public ClientGroupVO getClientGroupData(String groupId) throws Exception {
-
 		return clientGroupDao.selectClientGroupData(groupId);
 	}
 
@@ -253,9 +233,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		StatusVO statusVO = new StatusVO();
 
 		try {
-
 			// insert main information
-			long reCnt = 0;
+			long reCnt;
 			if (isDefault) {
 				reCnt = clientGroupDao.createDefaultClientGroup(clientGroupVO);
 			} else {
@@ -263,9 +242,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 			}
 
 			if (reCnt > 0) {
-
 				// save client configuration information
-				long cnt = -1;
+				long cnt;
 				String cfgId = clientGroupVO.getClientConfigId();
 				if (cfgId != null && cfgId.length() > 0) {
 					cnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -275,7 +253,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 					}
 				}
 
-				cnt = -1;
 				cfgId = clientGroupVO.getHostNameConfigId();
 				if (cfgId != null && cfgId.length() > 0) {
 					cnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -285,7 +262,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 					}
 				}
 
-				cnt = -1;
 				cfgId = clientGroupVO.getUpdateServerConfigId();
 				if (cfgId != null && cfgId.length() > 0) {
 					cnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -295,7 +271,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 					}
 				}
 
-				cnt = -1;
 				cfgId = clientGroupVO.getBrowserRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					cnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -305,7 +280,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 					}
 				}
 
-				cnt = -1;
 				cfgId = clientGroupVO.getMediaRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					cnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -315,7 +289,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 					}
 				}
 
-				cnt = -1;
 				cfgId = clientGroupVO.getSecurityRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					cnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -325,7 +298,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 					}
 				}
 
-				cnt = -1;
 				cfgId = clientGroupVO.getFilteredSoftwareRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					cnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -335,7 +307,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 					}
 				}
 				
-				cnt = -1;
 				cfgId = clientGroupVO.getCtrlCenterItemRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					cnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -345,7 +316,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 					}
 				}
 
-				cnt = -1;
 				cfgId = clientGroupVO.getPolicyKitRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					cnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -355,7 +325,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 					}
 				}
 
-				cnt = -1;
 				cfgId = clientGroupVO.getDesktopConfigId();
 				if (cfgId != null && cfgId.length() > 0) {
 					cnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -366,7 +335,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 				}
 				
 				// insert ADMIN_CLIENTGRP : if group's upper group id is 'CGRPDEFAULT'
-				cnt = -1;
 				if(GPMSConstants.DEFAULT_GROUPID.equals(clientGroupVO.getUprGrpId())) {
 					cnt = clientGroupDao.insertGroupInAdminRelation(clientGroupVO.getGrpId(),
 							clientGroupVO.getRegUserId());
@@ -386,10 +354,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in createClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 
 		} catch (Exception ex) {
@@ -397,10 +363,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in createClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -412,10 +376,9 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 * @param parentGrpId string parent group id
 	 * @param groupName string target group name
 	 * @return StatusVO result status object
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isExistGroupNameByParentId(String parentGrpId, String groupName) throws Exception {
+	public StatusVO isExistGroupNameByParentId(String parentGrpId, String groupName) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			boolean re = clientGroupDao.isExistGroupNameByParentId(parentGrpId, groupName);
@@ -429,10 +392,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in isExistGroupNameByParentId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
@@ -443,10 +404,9 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 * @param grpId   string target group id
 	 * @param groupName string target group name
 	 * @return StatusVO result status object
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isExistGroupNameByGroupId(String grpId, String groupName) throws Exception {
+	public StatusVO isExistGroupNameByGroupId(String grpId, String groupName) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			boolean re = clientGroupDao.isExistGroupNameByGroupId(grpId, groupName);
@@ -460,10 +420,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in isExistGroupNameByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 		return statusVO;
 	}
@@ -498,19 +456,15 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in deleteClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in deleteClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -530,7 +484,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		StatusVO statusVO = new StatusVO();
 
 		try {
-			
 			// 1. get all group id - child
 			String[] newGroupIds = groupIds;
 			List<ClientGroupVO> re = clientGroupDao.selectAllChildrenGroupListByParents(groupIds);
@@ -550,19 +503,19 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 
 			// DELETE CLIENT GROUP
 			String regUserId = LoginInfoHelper.getUserId();
-			for(int i = 0; i < newGroupIds.length; i++) {
+			for (String newGroupId : newGroupIds) {
 				// 2. insert history
-				long histRe = clientGroupDao.createClientGroupHist("DELETE", newGroupIds[i], regUserId);
-				if(histRe > 0) {
+				long histRe = clientGroupDao.createClientGroupHist("DELETE", newGroupId, regUserId);
+				if (histRe > 0) {
 					// 3. delete master
-					long mstrRe = clientGroupDao.deleteClientGroup(newGroupIds[i]);
-					if(mstrRe > 0) {
+					long mstrRe = clientGroupDao.deleteClientGroup(newGroupId);
+					if (mstrRe > 0) {
 						// 4. delete rule config
-						clientGroupDao.deleteClientGroupFromRule(newGroupIds[i]);
+						clientGroupDao.deleteClientGroupFromRule(newGroupId);
 						// 5. delete admin config
-						clientGroupDao.deleteClientGroupForAdmin(newGroupIds[i]);
+						clientGroupDao.deleteClientGroupForAdmin(newGroupId);
 						// 6. delete notify config
-						clientGroupDao.deleteClientGroupForNoti(newGroupIds[i]);
+						clientGroupDao.deleteClientGroupForNoti(newGroupId);
 					} else {
 						throw new SQLException();
 					}
@@ -571,17 +524,17 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 				}
 			}
 			
-			if(newClientIds != null && newClientIds.length > 0) {
+			if(newClientIds.length > 0) {
 				clientGroupDao.updateGroupToClient(GPMSConstants.DEFAULT_GROUPID, newClientIds);
 				if ("Y".equalsIgnoreCase(isDeleteClient)) {
-					for(int i = 0; i < newClientIds.length; i++) {
-						long revokeRe = clientDao.updateRevokeInfo(newClientIds[i], regUserId);
-						if(revokeRe < 1) {
+					for (String newClientId : newClientIds) {
+						long revokeRe = clientDao.updateRevokeInfo(newClientId, regUserId);
+						if (revokeRe < 1) {
 							throw new SQLException();
 						}
 					}
 				} else {
-					// create JOB for client client config(rule)
+					// create JOB for client config(rule)
 					ClientGroupVO defaultGroupVO = clientGroupDao.selectClientGroupData(GPMSConstants.DEFAULT_GROUPID);
 					jobMaker.createJobForGroup(newClientIds, defaultGroupVO, null);
 				}
@@ -594,19 +547,15 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in deleteClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in deleteClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -626,13 +575,11 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		StatusVO statusVO = new StatusVO();
 
 		try {
-
 			// update main(basic) information
 			long updCnt = clientGroupDao.updateClientGroup(clientGroupVO);
 
 			if (updCnt > 0) {
-
-				long chgCnt = -1;
+				long chgCnt;
 				String cfgId = clientGroupVO.getClientConfigId();
 				if (cfgId != null && cfgId.length() > 0) {
 					chgCnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -641,11 +588,10 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 						throw new SQLException();
 					}
 				} else {
-					chgCnt = clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
+					clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
 							GPMSConstants.TYPE_CLIENTCONF);
 				}
 
-				chgCnt = -1;
 				cfgId = clientGroupVO.getHostNameConfigId();
 				if (cfgId != null && cfgId.length() > 0) {
 					chgCnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -654,11 +600,10 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 						throw new SQLException();
 					}
 				} else {
-					chgCnt = clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
+					clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
 							GPMSConstants.TYPE_HOSTNAMECONF);
 				}
 
-				chgCnt = -1;
 				cfgId = clientGroupVO.getUpdateServerConfigId();
 				if (cfgId != null && cfgId.length() > 0) {
 					chgCnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -667,11 +612,10 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 						throw new SQLException();
 					}
 				} else {
-					chgCnt = clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
+					clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
 							GPMSConstants.TYPE_UPDATESERVERCONF);
 				}
 
-				chgCnt = -1;
 				cfgId = clientGroupVO.getBrowserRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					chgCnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -680,11 +624,10 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 						throw new SQLException();
 					}
 				} else {
-					chgCnt = clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
+					clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
 							GPMSConstants.TYPE_BROWSERRULE);
 				}
 
-				chgCnt = -1;
 				cfgId = clientGroupVO.getMediaRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					chgCnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -693,11 +636,10 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 						throw new SQLException();
 					}
 				} else {
-					chgCnt = clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
+					clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
 							GPMSConstants.TYPE_MEDIARULE);
 				}
 
-				chgCnt = -1;
 				cfgId = clientGroupVO.getSecurityRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					chgCnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -706,11 +648,10 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 						throw new SQLException();
 					}
 				} else {
-					chgCnt = clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
+					clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
 							GPMSConstants.TYPE_SECURITYRULE);
 				}
 
-				chgCnt = -1;
 				cfgId = clientGroupVO.getFilteredSoftwareRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					chgCnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -719,11 +660,10 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 						throw new SQLException();
 					}
 				} else {
-					chgCnt = clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
+					clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
 							GPMSConstants.TYPE_FILTEREDSOFTWARE);
 				}
 
-				chgCnt = -1;
 				cfgId = clientGroupVO.getCtrlCenterItemRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					chgCnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -732,11 +672,10 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 						throw new SQLException();
 					}
 				} else {
-					chgCnt = clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
+					clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
 							GPMSConstants.TYPE_CTRLCENTERITEMRULE);
 				}
 
-				chgCnt = -1;
 				cfgId = clientGroupVO.getPolicyKitRuleId();
 				if (cfgId != null && cfgId.length() > 0) {
 					chgCnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -745,11 +684,10 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 						throw new SQLException();
 					}
 				} else {
-					chgCnt = clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
+					clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
 							GPMSConstants.TYPE_POLICYKITRULE);
 				}
 
-				chgCnt = -1;
 				cfgId = clientGroupVO.getDesktopConfigId();
 				if (cfgId != null && cfgId.length() > 0) {
 					chgCnt = clientGroupDao.insertOrUpdateConfigWithGroup(clientGroupVO.getGrpId(),
@@ -758,7 +696,7 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 						throw new SQLException();
 					}
 				} else {
-					chgCnt = clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
+					clientGroupDao.deleteConfigWithGroup(clientGroupVO.getGrpId(),
 							GPMSConstants.TYPE_DESKTOPCONF);
 				}
 
@@ -773,19 +711,15 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in updateClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in updateClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -811,7 +745,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 			if (cnt < 1) {
 				isOk = false;
 			}
-
 			if (isOk) {
 				statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_INSERT,
 						MessageSourceHelper.getMessage("clientgroup.result.insertclient"));
@@ -823,21 +756,16 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in updateGroupToClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in updateGroupToClient : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
-
 		return statusVO;
 	}
 
@@ -845,10 +773,9 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 * check exist default client group
 	 * 
 	 * @return StatusVO result status object
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO isExistDefaultClientGroup() throws Exception {
+	public StatusVO isExistDefaultClientGroup() {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -864,10 +791,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in isExistDefaultClientGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -878,15 +803,14 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 * 
 	 * @param groupId string client group id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getOnlineClientIdsByGroupId(String groupId) throws Exception {
+	public ResultVO getOnlineClientIdsByGroupId(String groupId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<ClientVO> re = clientGroupDao.selectOnlineClientIdsByGroupId(groupId);
 			if (re != null && re.size() > 0) {
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -899,10 +823,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in getOnlineClientIdsByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -912,15 +834,14 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 * 
 	 * @param groupId string client group id
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getOnlineClientIdsByGroupList(String[] groupId) throws Exception {
+	public ResultVO getOnlineClientIdsByGroupList(String[] groupId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<ClientVO> re = clientGroupDao.selectOnlineClientIdsByGroupList(groupId);
 			if (re != null && re.size() > 0) {
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -933,10 +854,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in getOnlineClientIdsByGroupList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -946,19 +865,17 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	 * 
 	 * @param groupIds string[] client group id array
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readClientIdsByGroupIdList(String[] groupIds) throws Exception {
+	public ResultVO readClientIdsByGroupIdList(String[] groupIds) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
-
 			List<ClientVO> re = clientDao.selectClientListInGroup(groupIds);
 
 			if (re != null && re.size() > 0) {
-				ClientVO[] row = re.stream().toArray(ClientVO[]::new);
+				ClientVO[] row = re.toArray(ClientVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -972,10 +889,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in readClientIdsByGroupIdList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -984,18 +899,15 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	/**
 	 * response client group children id array
 	 * 
-	 * @param
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getChildrenClientGroupList(String grpId, String hasWithRoot) throws Exception {
+	public ResultVO getChildrenClientGroupList(String grpId, String hasWithRoot) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
-			
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("grpId", grpId);
 			
 			if(GPMSConstants.DEFAULT_GROUPID.equals(grpId) || "0".equals(grpId)) {
@@ -1007,7 +919,7 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 
 			List<ClientGroupVO> re = clientGroupDao.selectChildrenClientGroupListByAdmin(map);
 			if (re != null && re.size() > 0) {
-				ClientGroupVO[] row = re.stream().toArray(ClientGroupVO[]::new);
+				ClientGroupVO[] row = re.toArray(ClientGroupVO[]::new);
 				resultVO.setData(row);
 				
 				if(GPMSConstants.GUBUN_YES.equalsIgnoreCase(hasWithRoot)) {
@@ -1027,10 +939,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in getChildrenClientGroupList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -1039,22 +949,22 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	/**
 	 * update group rule and conf
 	 * 
-	 * @param String grpId, String cfgId, String confType
+	 * @param grpId string
+	 * @param cfgId string
+	 * @param confType string
 	 * @return StatusVO
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO updateClientGroupConf(String grpId, String cfgId, String confType) throws Exception {
+	public StatusVO updateClientGroupConf(String grpId, String cfgId, String confType) {
 		StatusVO statusVO = new StatusVO();
 		try {
-			long cnt = -1;
 			if (cfgId != null && cfgId.length() > 0) {
-				cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, LoginInfoHelper.getUserId(), cfgId, confType);
+				long cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, LoginInfoHelper.getUserId(), cfgId, confType);
 				if (cnt < 0) {
 					throw new SQLException();
 				}
 			} else {
-				cnt = clientGroupDao.deleteConfigWithGroup(grpId, confType);
+				clientGroupDao.deleteConfigWithGroup(grpId, confType);
 			}
 			statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_UPDATE,
 					MessageSourceHelper.getMessage("clientgroup.result.update"));
@@ -1070,12 +980,10 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	/**
 	 * get child group list
 	 * 
-	 * @param
 	 * @return ResultVO
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getAllChildrenGroupList(String grpId) throws Exception {
+	public ResultVO getAllChildrenGroupList(String grpId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -1084,7 +992,7 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 			List<ClientGroupVO> re = clientGroupDao.selectAllChildrenGroupList(grpId);
 
 			if (re != null && re.size() > 0) {
-				ClientGroupVO[] row = re.stream().toArray(ClientGroupVO[]::new);
+				ClientGroupVO[] row = re.toArray(ClientGroupVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -1098,10 +1006,8 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (Exception ex) {
 			logger.error("error in getAllChildrenGroupList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -1110,7 +1016,6 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 	/**
 	 * 조직 정보 수정
 	 * 
-	 * @param DeptVO
 	 * @return StatusVO
 	 * @throws Exception
 	 */
@@ -1127,125 +1032,118 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 			if (grpIds != null && grpIds.length > 0) {
 
 				String modUserId = LoginInfoHelper.getUserId();
-				for (int i = 0; i < grpIds.length; i++) {
+				for (String grpId : grpIds) {
 
-					long cnt = -1;
+					long cnt;
 					// 단말정책
 					if (clientConfigId != null && !"".equals(clientConfigId)) {
-						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpIds[i], modUserId, clientConfigId,
+						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, modUserId, clientConfigId,
 								GPMSConstants.TYPE_CLIENTCONF);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						clientGroupDao.deleteConfigWithGroup(grpIds[i], GPMSConstants.TYPE_CLIENTCONF);
+						clientGroupDao.deleteConfigWithGroup(grpId, GPMSConstants.TYPE_CLIENTCONF);
 					}
 
 					// 호스트정보
 					if (hostNameConfigId != null && !"".equals(hostNameConfigId)) {
-						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpIds[i], modUserId, hostNameConfigId,
+						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, modUserId, hostNameConfigId,
 								GPMSConstants.TYPE_HOSTNAMECONF);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						clientGroupDao.deleteConfigWithGroup(grpIds[i], GPMSConstants.TYPE_HOSTNAMECONF);
+						clientGroupDao.deleteConfigWithGroup(grpId, GPMSConstants.TYPE_HOSTNAMECONF);
 					}
 
 					// 업데이트서버정보
 					if (updateServerConfigId != null && !"".equals(updateServerConfigId)) {
-						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpIds[i], modUserId, updateServerConfigId,
+						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, modUserId, updateServerConfigId,
 								GPMSConstants.TYPE_UPDATESERVERCONF);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						clientGroupDao.deleteConfigWithGroup(grpIds[i], GPMSConstants.TYPE_UPDATESERVERCONF);
+						clientGroupDao.deleteConfigWithGroup(grpId, GPMSConstants.TYPE_UPDATESERVERCONF);
 					}
 
 					// 브라우져설정
 					if (browserRuleId != null && !"".equals(browserRuleId)) {
-						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpIds[i], modUserId, browserRuleId,
+						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, modUserId, browserRuleId,
 								GPMSConstants.TYPE_BROWSERRULE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						clientGroupDao.deleteConfigWithGroup(grpIds[i], GPMSConstants.TYPE_BROWSERRULE);
+						clientGroupDao.deleteConfigWithGroup(grpId, GPMSConstants.TYPE_BROWSERRULE);
 					}
 
-					cnt = -1;
 					// 매체제어설정
 					if (mediaRuleId != null && mediaRuleId.length() > 0) {
-						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpIds[i], modUserId, mediaRuleId,
+						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, modUserId, mediaRuleId,
 								GPMSConstants.TYPE_MEDIARULE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						clientGroupDao.deleteConfigWithGroup(grpIds[i], GPMSConstants.TYPE_MEDIARULE);
+						clientGroupDao.deleteConfigWithGroup(grpId, GPMSConstants.TYPE_MEDIARULE);
 					}
 
-					cnt = -1;
 					// 단말보안설정
 					if (securityRuleId != null && securityRuleId.length() > 0) {
-						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpIds[i], modUserId, securityRuleId,
+						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, modUserId, securityRuleId,
 								GPMSConstants.TYPE_SECURITYRULE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						cnt = clientGroupDao.deleteConfigWithGroup(grpIds[i], GPMSConstants.TYPE_SECURITYRULE);
+						clientGroupDao.deleteConfigWithGroup(grpId, GPMSConstants.TYPE_SECURITYRULE);
 					}
 
-					cnt = -1;
 					// filtered software rule
 					if (filteredSoftwareRuleId != null && filteredSoftwareRuleId.length() > 0) {
-						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpIds[i], modUserId, filteredSoftwareRuleId,
+						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, modUserId, filteredSoftwareRuleId,
 								GPMSConstants.TYPE_FILTEREDSOFTWARE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						cnt = clientGroupDao.deleteConfigWithGroup(grpIds[i], GPMSConstants.TYPE_FILTEREDSOFTWARE);
+						clientGroupDao.deleteConfigWithGroup(grpId, GPMSConstants.TYPE_FILTEREDSOFTWARE);
 					}
 
-					cnt = -1;
 					// control center item rule
 					if (ctrlCenterItemRuleId != null && ctrlCenterItemRuleId.length() > 0) {
-						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpIds[i], modUserId, ctrlCenterItemRuleId,
+						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, modUserId, ctrlCenterItemRuleId,
 								GPMSConstants.TYPE_CTRLCENTERITEMRULE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						cnt = clientGroupDao.deleteConfigWithGroup(grpIds[i], GPMSConstants.TYPE_CTRLCENTERITEMRULE);
+						clientGroupDao.deleteConfigWithGroup(grpId, GPMSConstants.TYPE_CTRLCENTERITEMRULE);
 					}
 
-					cnt = -1;
 					// policy kit rule
 					if (policyKitRuleId != null && policyKitRuleId.length() > 0) {
-						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpIds[i], modUserId, policyKitRuleId,
+						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, modUserId, policyKitRuleId,
 								GPMSConstants.TYPE_POLICYKITRULE);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						cnt = clientGroupDao.deleteConfigWithGroup(grpIds[i], GPMSConstants.TYPE_POLICYKITRULE);
+						clientGroupDao.deleteConfigWithGroup(grpId, GPMSConstants.TYPE_POLICYKITRULE);
 					}
 
-					cnt = -1;
 					// 데스크톱설정
 					if (desktopConfId != null && desktopConfId.length() > 0) {
-						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpIds[i], modUserId, desktopConfId,
+						cnt = clientGroupDao.insertOrUpdateConfigWithGroup(grpId, modUserId, desktopConfId,
 								GPMSConstants.TYPE_DESKTOPCONF);
 						if (cnt < 0) {
 							throw new SQLException();
 						}
 					} else {
-						cnt = clientGroupDao.deleteConfigWithGroup(grpIds[i], GPMSConstants.TYPE_DESKTOPCONF);
+						clientGroupDao.deleteConfigWithGroup(grpId, GPMSConstants.TYPE_DESKTOPCONF);
 					}
-
 					statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, "GRSM0000", "조직 정보가 수정되었습니다.");
 				}
 
@@ -1257,21 +1155,16 @@ public class ClientGroupServiceImpl implements ClientGroupService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in updateRuleInfoToMultiGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in updateRuleInfoToMultiGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
-
 		return statusVO;
 	}
 

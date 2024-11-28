@@ -1,7 +1,7 @@
 package kr.gooroom.gpms.common.errors;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,9 +32,6 @@ public class ExceptionTranslator implements ProblemHandling {
 	 */
 	@Override
 	public ResponseEntity<Problem> process(@Nullable ResponseEntity<Problem> entity, NativeWebRequest request) {
-		if (entity == null) {
-			return entity;
-		}
 		Problem problem = entity.getBody();
 		if (!(problem instanceof ConstraintViolationProblem || problem instanceof DefaultProblem)) {
 			return entity;

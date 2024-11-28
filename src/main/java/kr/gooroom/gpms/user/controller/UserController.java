@@ -16,28 +16,28 @@
 
 package kr.gooroom.gpms.user.controller;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.security.MessageDigest;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import kr.gooroom.gpms.client.service.ClientService;
+import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ExcelCommonService;
+import kr.gooroom.gpms.common.service.ResultPagingVO;
+import kr.gooroom.gpms.common.service.ResultVO;
+import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.CommonUtils;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
+import kr.gooroom.gpms.common.utils.MessageSourceHelper;
+import kr.gooroom.gpms.config.service.CtrlMstService;
 import kr.gooroom.gpms.dept.service.DeptService;
-import kr.gooroom.gpms.dept.service.DeptVO;
+import kr.gooroom.gpms.job.custom.CustomJobMaker;
 import kr.gooroom.gpms.user.service.UserReqService;
 import kr.gooroom.gpms.user.service.UserReqVO;
+import kr.gooroom.gpms.user.service.UserService;
+import kr.gooroom.gpms.user.service.UserVO;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,24 +45,12 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import kr.gooroom.gpms.client.service.ClientService;
-import kr.gooroom.gpms.common.GPMSConstants;
-import kr.gooroom.gpms.common.service.ResultPagingVO;
-import kr.gooroom.gpms.common.service.ResultVO;
-import kr.gooroom.gpms.common.service.StatusVO;
-import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.config.service.CtrlMstService;
-import kr.gooroom.gpms.job.custom.CustomJobMaker;
-import kr.gooroom.gpms.user.service.UserService;
-import kr.gooroom.gpms.user.service.UserVO;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Handles requests for the user management process.
@@ -131,10 +119,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in readUserList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -152,15 +138,15 @@ public class UserController {
 	public @ResponseBody ResultVO readUserListPaged(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
 		options.put("status", req.getParameter("status"));
 
 		// << paging >>
-		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+		options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 		// << ordering >>
 		String paramOrderColumn = req.getParameter("orderColumn");
@@ -194,10 +180,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in readUserListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -211,7 +195,7 @@ public class UserController {
 	 *
 	 */
 	@PostMapping(value = "/isExistUserId")
-	public @ResponseBody ResultVO isExistUserId(@RequestParam(value = "userId", required = true) String userId) {
+	public @ResponseBody ResultVO isExistUserId(@RequestParam(value = "userId") String userId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -222,10 +206,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in isExistUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -260,10 +242,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in createUser : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -272,7 +252,7 @@ public class UserController {
 	/**
 	 * create new user data with rule info
 	 * 
-	 * @param req HttpServletRequest
+	 * @param userVO UserVO
 	 * @return ResultVO result data bean
 	 *
 	 */
@@ -294,60 +274,12 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in createUserWithRule : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
 	}
-
-//    /**
-//     * append user in organization.
-//     * 
-//     * @param req HttpServletRequest
-//     * @return ResultVO result data bean
-//     *
-//     */
-//    @PostMapping(value = "/createUserInDept")
-//    public @ResponseBody ResultVO createUserInDept(HttpServletRequest req) {
-//
-//	ResultVO resultVO = new ResultVO();
-//
-//	UserVO vo = new UserVO();
-//
-//	vo.setDeptCd(req.getParameter("deptCd"));
-//	vo.setUserId(req.getParameter("userId"));
-//	vo.setUserNm(req.getParameter("userNm"));
-//	vo.setUserPasswd(req.getParameter("userPasswd"));
-//
-//	try {
-//
-//	    // check duplicate
-//	    StatusVO dupStatus = userService.isNoExistUserId(vo.getUserId());
-//
-//	    if (GPMSConstants.MSG_SUCCESS.equalsIgnoreCase(dupStatus.getResult())) {
-//
-//		StatusVO status = userService.createUserData(vo);
-//		resultVO.setStatus(status);
-//
-//	    } else {
-//
-//		resultVO.setStatus(dupStatus);
-//	    }
-//
-//	} catch (Exception ex) {
-//	    logger.error("error in createUserInDept : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
-//		    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-//	    if (resultVO != null) {
-//		resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-//			MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-//	    }
-//	}
-//
-//	return resultVO;
-//    }
 
 	/**
 	 * modify user data
@@ -369,10 +301,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in updateUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -380,12 +310,12 @@ public class UserController {
 	/**
 	 * reset user login trial count
 	 * 
-	 * @param paramVO UserVO
+	 * @param userId string
 	 * @return ResultVO result data bean
 	 *
 	 */
 	@PostMapping(value = "/updateUserLoginTrialCount")
-	public @ResponseBody ResultVO updateUserLoginTrialCount(@RequestParam(value = "userId", required = true) String userId) {
+	public @ResponseBody ResultVO updateUserLoginTrialCount(@RequestParam(value = "userId") String userId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			StatusVO status = userService.updateUserLoginTrialCount(userId);
@@ -393,10 +323,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in updateUserLoginTrialCount : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -409,7 +337,7 @@ public class UserController {
 	 *
 	 */
 	@PostMapping(value = "/deleteUserData")
-	public @ResponseBody ResultVO deleteUserData(@RequestParam(value = "userId", required = true) String userId) {
+	public @ResponseBody ResultVO deleteUserData(@RequestParam(value = "userId") String userId) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			StatusVO status = userService.deleteUserData(userId);
@@ -417,10 +345,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in deleteUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -433,7 +359,7 @@ public class UserController {
 	 *
 	 */
 	@PostMapping(value = "/readUserData")
-	public @ResponseBody ResultVO readUserData(@RequestParam(value = "userId", required = true) String userId) {
+	public @ResponseBody ResultVO readUserData(@RequestParam(value = "userId" ) String userId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -441,10 +367,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in readUserData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -458,7 +382,7 @@ public class UserController {
 	 *
 	 */
 	@PostMapping(value = "/readUserListInDept")
-	public @ResponseBody ResultVO readUserListInDept(@RequestParam(value = "deptCd", required = true) String deptCd,
+	public @ResponseBody ResultVO readUserListInDept(@RequestParam(value = "deptCd") String deptCd,
 			ModelMap model) {
 
 		ResultVO resultVO = new ResultVO();
@@ -474,10 +398,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in readUserListInDept : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -496,10 +418,9 @@ public class UserController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
-		
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
 		options.put("searchKey", searchKey);
 		options.put("status", req.getParameter("status"));
@@ -513,8 +434,8 @@ public class UserController {
 		}
 
 		// << paging >>
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -556,10 +477,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in readUserListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -583,10 +502,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in readUserListInOnline : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -601,8 +518,8 @@ public class UserController {
 	 *
 	 */
 	@PostMapping(value = "/createUsersInDept")
-	public @ResponseBody ResultVO createUsersInDept(@RequestParam(value = "deptCd", required = true) String deptCd,
-			@RequestParam(value = "users", required = true) String users, ModelMap model) {
+	public @ResponseBody ResultVO createUsersInDept(@RequestParam(value = "deptCd") String deptCd,
+			@RequestParam(value = "users") String users, ModelMap model) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -620,10 +537,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in createUsersInDept : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -637,7 +552,7 @@ public class UserController {
 	 *
 	 */
 	@PostMapping(value = "/deleteUserInDept")
-	public @ResponseBody ResultVO deleteUserInDept(@RequestParam(value = "userId", required = true) String userId,
+	public @ResponseBody ResultVO deleteUserInDept(@RequestParam(value = "userId") String userId,
 			ModelMap model) {
 
 		ResultVO resultVO = new ResultVO();
@@ -653,10 +568,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in deleteUserInDept : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -665,12 +578,12 @@ public class UserController {
 	/**
 	 * delete users data (array) from organization
 	 * 
-	 * @param userId String user id
+	 * @param users String
 	 * @return ResultVO result data bean
 	 *
 	 */
 	@PostMapping(value = "/deleteUsersInDept")
-	public @ResponseBody ResultVO deleteUsersInDept(@RequestParam(value = "users", required = true) String users,
+	public @ResponseBody ResultVO deleteUsersInDept(@RequestParam(value = "users") String users,
 			ModelMap model) {
 
 		ResultVO resultVO = new ResultVO();
@@ -685,10 +598,8 @@ public class UserController {
 		} catch (Exception ex) {
 			logger.error("error in deleteUserInDept : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -713,10 +624,10 @@ public class UserController {
 		
 		if (iterator.hasNext()) {
 			
-			String fileName = (String) iterator.next();
+			String fileName = iterator.next();
 			MultipartFile multipartFile = multipartHttpServletRequest.getFile(fileName);
 
-			List<UserVO> userList = new ArrayList<UserVO>();
+			List<UserVO> userList = new ArrayList<>();
 			List<List<String>> dataList = null;
 			try {
 
@@ -738,8 +649,8 @@ public class UserController {
 				}
 				// set deptList from resultVO
 				Object[] objs = resultVO.getData();
-				for(int i = 0; i < objs.length; i++) {
-					UserVO vo = (UserVO) objs[i];
+				for (Object obj : objs) {
+					UserVO vo = (UserVO) obj;
 					userList.add(vo);
 				}
 
@@ -753,17 +664,13 @@ public class UserController {
 
 				logger.error("error in createUesrDataFromFile : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-				if (resultVO != null) {
-					resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-							MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-				}
+				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 			}
 			
 		} else {
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						"저장할 파일이 없음"));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+				"저장할 파일이 없음"));
 		}
 
 		return resultVO;
@@ -774,7 +681,6 @@ public class UserController {
 	 * <p>
 	 * use file downloader.
 	 *
-	 * @param request HttpServletRequest
 	 * @return ResultVO result data bean.
 	 *
 	 */
@@ -808,7 +714,6 @@ public class UserController {
 	 * <p>
 	 * use file downloader.
 	 *
-	 * @param request HttpServletRequest
 	 * @return ResultVO result data bean.
 	 *
 	 */
@@ -868,7 +773,7 @@ public class UserController {
 														  ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
@@ -878,8 +783,8 @@ public class UserController {
 		// << paging >>
 		String paramOrderColumn = req.getParameter("orderColumn");
 		String paramOrderDir = req.getParameter("orderDir");
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 
 		if("chReqSeq".equals(paramOrderColumn)) {
 			options.put("paramOrderColumn", "REQ_SEQ");
@@ -929,7 +834,7 @@ public class UserController {
 	                                                    ModelMap model) {
 
 		ResultPagingVO resultVO = null;
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		try {
 			// << options >>
@@ -954,8 +859,8 @@ public class UserController {
 			options.put("toDate", toDate);
 
 			// << paging >>
-			options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-			options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+			options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+			options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 			// << order >>
 			options.put("paramOrderColumn", "REQ_SEQ");
@@ -963,10 +868,10 @@ public class UserController {
 
 			resultVO = userReqService.getUserReqActListPaged(options);
 
-			HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> fromDateHm = new HashMap<>();
 			fromDateHm.put("name", "fromDate");
 			fromDateHm.put("value", fromDate);
-			HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> toDateHm = new HashMap<>();
 			toDateHm.put("name", "toDate");
 			toDateHm.put("value", toDate);
 			resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -974,15 +879,13 @@ public class UserController {
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));
 			resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
 			resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
-			resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+			resultVO.setRowLength(ObjectUtils.defaultIfNull(req.getParameter("length"), "10"));
 
 		} catch (Exception ex) {
 			logger.error("error in readUserReqActListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;

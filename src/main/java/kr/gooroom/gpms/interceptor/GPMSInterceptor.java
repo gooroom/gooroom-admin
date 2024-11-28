@@ -17,19 +17,15 @@
 package kr.gooroom.gpms.interceptor;
 
 import java.util.Calendar;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.user.service.AdminUserService;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-
 import kr.gooroom.gpms.common.service.GpmsCommonService;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 
@@ -44,9 +40,6 @@ import kr.gooroom.gpms.common.utils.LoginInfoHelper;
  */
 
 public class GPMSInterceptor implements HandlerInterceptor {
-
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(GPMSInterceptor.class);
 
 	@Resource(name = "gpmsCommonService")
 	private GpmsCommonService gpmsCommonService;
@@ -68,26 +61,7 @@ public class GPMSInterceptor implements HandlerInterceptor {
 
 		String actItem = req.getRequestURI();
 
-		if (actItem.indexOf("/") > -1) {
-			actItem = actItem.substring(actItem.lastIndexOf("/"));
-		}
-
-		String actType = "ETC";
-		if (actItem.startsWith("/create")) {
-			actType = "I";
-		} else if (actItem.startsWith("/delete")) {
-			actType = "D";
-		} else if (actItem.startsWith("/is")) {
-			actType = "B";
-		} else if (actItem.startsWith("/page")) {
-			actType = "M";
-		} else if (actItem.startsWith("/read")) {
-			actType = "R";
-		} else if (actItem.startsWith("/update")) {
-			actType = "U";
-		}
-
-		//check Authority
+		// check Authority
 		String adminId = LoginInfoHelper.getUserId();
 		String adminRule = "";
 		if (actItem.equalsIgnoreCase("/readUserList")) {
@@ -175,23 +149,6 @@ public class GPMSInterceptor implements HandlerInterceptor {
 			}
 		}
 
-		@SuppressWarnings("unchecked")
-		Map<String, Object> paramMap = (Map<String, Object>) req.getParameterMap();
-		String actData = "";
-		if (paramMap.size() > 0) {
-			StringBuffer sb = new StringBuffer();
-			Set<String> keys = paramMap.keySet();
-			for (String key : keys) {
-				sb.append("{[").append(key).append("][").append(req.getParameter(key)).append("]}\n");
-			}
-			actData = sb.toString();
-		}
-
-		if (LoginInfoHelper.isAuthenticated()) {
-			gpmsCommonService.createUserActLogHistory(actType, actItem, actData, req.getRemoteAddr(),
-					adminId);
-		}
-
 		return true;
 	}
 
@@ -202,11 +159,9 @@ public class GPMSInterceptor implements HandlerInterceptor {
 	 * @param res     HttpServletResponse
 	 * @param handler Object
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public void postHandle(HttpServletRequest req, HttpServletResponse res, Object handler, ModelAndView modelAndView)
-			throws Exception {
+	public void postHandle(HttpServletRequest req, HttpServletResponse res, Object handler, ModelAndView modelAndView) {
 
 		// for version
 		if (modelAndView != null) {

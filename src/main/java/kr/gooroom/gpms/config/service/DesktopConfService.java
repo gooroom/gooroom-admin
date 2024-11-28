@@ -36,7 +36,9 @@ public interface DesktopConfService {
 	 * create new desktop configuration data.
 	 * 
 	 * @param desktopConfNm    String desktop configuration name.
-	 * @param desktopConfValue String desktop configuration data, json format.
+	 * @param desktopTheme String
+	 * @param appDatas String
+	 * @param adminType String
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -56,7 +58,8 @@ public interface DesktopConfService {
 	 * 
 	 * @param desktopConfId    String desktop configuration id.
 	 * @param desktopConfNm    String desktop configuration name.
-	 * @param desktopConfValue String desktop configuration data, json format.
+	 * @param desktopTheme String
+	 * @param appDatas String
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */

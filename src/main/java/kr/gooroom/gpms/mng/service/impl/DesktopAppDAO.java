@@ -47,16 +47,14 @@ public class DesktopAppDAO extends SqlSessionMetaDAO {
 	 * get desktop application list data
 	 * 
 	 * @return DesktopItemVO List selected list data
-	 * @throws Exception
 	 */
-	public List<DesktopAppVO> selectNormalAppInfoList() throws SQLException {
+	public List<DesktopAppVO> selectNormalAppInfoList() {
 		List<DesktopAppVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectNormalAppInfoList", "");
 		} catch (Exception ex) {
 			logger.error("error in selectNormalAppInfoList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 		return re;
 	}
@@ -65,19 +63,17 @@ public class DesktopAppDAO extends SqlSessionMetaDAO {
 	 * get desktop mount list data
 	 * 
 	 * @return DesktopAppVO List selected list data
-	 * @throws Exception
 	 */
-	public List<DesktopItemVO> selectDesktopMounts(String keyword, String status) throws SQLException {
+	public List<DesktopItemVO> selectDesktopMounts(String keyword, String status) {
 		List<DesktopItemVO> re = null;
 		try {
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("keyword", keyword);
 			map.put("status", status);
 			re = sqlSessionMeta.selectList("selectDesktopAppList", map);
 		} catch (Exception ex) {
 			logger.error("error in selectDesktopAppList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 		return re;
 	}
@@ -86,16 +82,14 @@ public class DesktopAppDAO extends SqlSessionMetaDAO {
 	 * get desktop application list data for paging.
 	 * 
 	 * @return DesktopAppVO List selected list data
-	 * @throws Exception
 	 */
-	public List<DesktopAppVO> selectDesktopAppListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<DesktopAppVO> selectDesktopAppListPaged(HashMap<String, Object> options) {
 		List<DesktopAppVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectDesktopAppListPaged", options);
 		} catch (Exception ex) {
 			logger.error("error in selectDesktopAppListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 		return re;
 	}
@@ -105,10 +99,9 @@ public class DesktopAppDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectDesktopAppListFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectDesktopAppListFilteredCount", options);
+	public long selectDesktopAppListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectDesktopAppListFilteredCount", options);
 	}
 
 	/**
@@ -116,10 +109,9 @@ public class DesktopAppDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectDesktopAppListTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectDesktopAppListTotalCount", options);
+	public long selectDesktopAppListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectDesktopAppListTotalCount", options);
 	}
 
 	/**
@@ -127,19 +119,15 @@ public class DesktopAppDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param desktopAppId string desktop application id.
 	 * @return DesktopAppVO selected data.
-	 * @throws Exception
 	 */
-	public DesktopAppVO selectDesktopAppData(String desktopAppId) throws SQLException {
+	public DesktopAppVO selectDesktopAppData(String desktopAppId) {
 
 		DesktopAppVO re = null;
 		try {
-
 			re = sqlSessionMeta.selectOne("selectDesktopAppData", desktopAppId);
-
 		} catch (Exception ex) {
 			logger.error("error in selectDesktopAppData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -150,10 +138,9 @@ public class DesktopAppDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo DesktopAppVO desktop application configuration data bean
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long createDesktopAppData(DesktopAppVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertDesktopAppData", vo);
+	public long createDesktopAppData(DesktopAppVO vo) {
+		return sqlSessionMeta.insert("insertDesktopAppData", vo);
 	}
 
 	/**
@@ -161,10 +148,9 @@ public class DesktopAppDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo DesktopAppVO desktop application configuration data bean
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long cloneDesktopAppData(DesktopAppVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertClonedDesktopAppData", vo);
+	public long cloneDesktopAppData(DesktopAppVO vo) {
+		return sqlSessionMeta.insert("insertClonedDesktopAppData", vo);
 	}
 
 	/**
@@ -172,12 +158,9 @@ public class DesktopAppDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo DesktopAppVO desktop application configuration data bean
 	 * @return long data delete result count.
-	 * @throws SQLException
 	 */
-	public long deleteDesktopApp(DesktopAppVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.delete("deleteDesktopAppData", vo);
-
+	public long deleteDesktopApp(DesktopAppVO vo) {
+		return sqlSessionMeta.delete("deleteDesktopAppData", vo);
 	}
 
 	/**
@@ -185,12 +168,8 @@ public class DesktopAppDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo DesktopAppVO desktop application configuration data bean
 	 * @return long data upadte result count.
-	 * @throws SQLException
 	 */
-	public long updateDesktopAppData(DesktopAppVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.update("updateDesktopAppData", vo);
-
+	public long updateDesktopAppData(DesktopAppVO vo) {
+		return sqlSessionMeta.update("updateDesktopAppData", vo);
 	}
-
 }

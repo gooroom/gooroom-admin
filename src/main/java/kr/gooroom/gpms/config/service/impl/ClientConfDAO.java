@@ -56,7 +56,7 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 
 		boolean re = true;
 		try {
-			re = ((Boolean) sqlSessionMeta.selectOne("isExistMgServerConf")).booleanValue();
+			re = sqlSessionMeta.selectOne("isExistMgServerConf");
 
 		} catch (Exception ex) {
 			logger.error("error in isExistMgServerConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -71,9 +71,8 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 * response gooroom server configuration modify history data
 	 * 
 	 * @return MgServerConfVO List include edit history
-	 * @throws SQLException
 	 */
-	public List<MgServerConfVO> getMgServerConfList() throws SQLException {
+	public List<MgServerConfVO> getMgServerConfList() {
 
 		List<MgServerConfVO> re = null;
 		try {
@@ -98,7 +97,7 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 */
 	public long createMgServerConfHist(MgServerConfVO vo) throws SQLException {
 
-		return (long) sqlSessionMeta.insert("insertMgServerConfHistory", vo);
+		return sqlSessionMeta.insert("insertMgServerConfHistory", vo);
 
 	}
 
@@ -111,7 +110,7 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 */
 	public long createMgServerConf(MgServerConfVO vo) throws SQLException {
 
-		return (long) sqlSessionMeta.insert("insertMgServerConf", vo);
+		return sqlSessionMeta.insert("insertMgServerConf", vo);
 
 	}
 
@@ -124,7 +123,7 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 */
 	public long editMgServerConf(MgServerConfVO vo) throws SQLException {
 
-		return (long) sqlSessionMeta.insert("editMgServerConf", vo);
+		return sqlSessionMeta.insert("editMgServerConf", vo);
 
 	}
 
@@ -132,9 +131,8 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 * response gooroom server configuration data
 	 * 
 	 * @return MgServerConfVO gooroom server configuration data bean
-	 * @throws SQLException
 	 */
-	public MgServerConfVO getMgServerConf() throws SQLException {
+	public MgServerConfVO getMgServerConf() {
 
 		MgServerConfVO re = null;
 		try {
@@ -144,7 +142,6 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in getMgServerConf : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -157,7 +154,7 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long selectSitePollingTime(String siteId) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectSitePollingTime", siteId);
+		return sqlSessionMeta.selectOne("selectSitePollingTime", siteId);
 	}
 
 	/**
@@ -167,37 +164,44 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long selectSiteLoginTrialCount(String siteId) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectSiteLoginTrialCount", siteId);
+		return sqlSessionMeta.selectOne("selectSiteLoginTrialCount", siteId);
 	}
 
 	/**
 	 * response login locked time
 	 * 
 	 * @return long total minutes.
-	 * @throws SQLException
 	 */
-	public long selectSiteLoginLockTime(String siteId) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectSiteLoginLockTime", siteId);
+	public long selectSiteLoginLockTime(String siteId) {
+		return sqlSessionMeta.selectOne("selectSiteLoginLockTime", siteId);
 	}
 
 	/**
 	 * response password rule config
 	 * 
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public String selectSitePasswordRule(String siteId) throws SQLException {
-		return (String) sqlSessionMeta.selectOne("selectSitePasswordRule", siteId);
+	public String selectSitePasswordRule(String siteId) {
+		return sqlSessionMeta.selectOne("selectSitePasswordRule", siteId);
 	}
 
 	/**
 	 * response whether enable duplicate login
 	 * 
 	 * @return long total count number.
+	 */
+	public long selectSiteLoginDuplicateEnable(String siteId) {
+		return sqlSessionMeta.selectOne("selectSiteLoginDuplicateEnable", siteId);
+	}
+
+	/**
+	 * response whether enable otp login
+	 *
+	 * @return long total count number.
 	 * @throws SQLException
 	 */
-	public long selectSiteLoginDuplicateEnable(String siteId) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectSiteLoginDuplicateEnable", siteId);
+	public long selectSiteLoginOtpEnable(String siteId) throws SQLException {
+		return sqlSessionMeta.selectOne("selectSiteLoginOtpEnable", siteId);
 	}
 
 	/**
@@ -207,17 +211,25 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long selectSiteMaxMediaCnt(String siteId) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectSiteMaxMediaCnt", siteId);
+		return sqlSessionMeta.selectOne("selectSiteMaxMediaCnt", siteId);
 	}
 
 	/**
 	 * response whether register req
 	 *
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectSiteRegisterReq(String siteId) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectSiteRegisterReq", siteId);
+	public long selectSiteRegisterReq(String siteId) {
+		return sqlSessionMeta.selectOne("selectSiteRegisterReq", siteId);
+	}
+
+	/**
+	 * response whether delete req
+	 *
+	 * @return long total count number.
+	 */
+	public long selectSiteDeleteReq(String siteId) {
+		return sqlSessionMeta.selectOne("selectSiteDeleteReq", siteId);
 	}
 
 	/**
@@ -226,8 +238,18 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 * @return long total count number.
 	 * @throws SQLException
 	 */
-	public long selectSiteDeleteReq(String siteId) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectSiteDeleteReq", siteId);
+	public long selectSiteAdminLoginTrialCount(String siteId) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("selectSiteAdminLoginTrialCount", siteId);
+	}
+
+	/**
+	 * response whether delete req
+	 *
+	 * @return long total count number.
+	 * @throws SQLException
+	 */
+	public long selectSiteAdminLoginLockTime(String siteId) throws SQLException {
+		return (long) sqlSessionMeta.selectOne("selectSiteAdminLoginLockTime", siteId);
 	}
 
 	/**
@@ -235,9 +257,8 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param groupId string group id
 	 * @return UserRoleVO user role data bean
-	 * @throws SQLException
 	 */
-	public ClientGroupVO selectClientConfIdByGroupId(String groupId) throws SQLException {
+	public ClientGroupVO selectClientConfIdByGroupId(String groupId) {
 
 		ClientGroupVO re = null;
 		try {
@@ -245,7 +266,6 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectClientConfIdByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -259,7 +279,7 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long createSiteConfHist(SiteConfVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertSiteConfHistory", vo);
+		return sqlSessionMeta.insert("insertSiteConfHistory", vo);
 	}
 
 	/**
@@ -271,7 +291,7 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 */
 	public long updateSiteConf(SiteConfVO vo) throws SQLException {
 
-		return (long) sqlSessionMeta.update("updateSiteConf", vo);
+		return sqlSessionMeta.update("updateSiteConf", vo);
 
 	}
 
@@ -285,7 +305,20 @@ public class ClientConfDAO extends SqlSessionMetaDAO {
 	 */
 	public long updateLoginTrialInUser(HashMap<String, Object> map) throws SQLException {
 
-		return (long) sqlSessionMeta.update("updateLoginTrialInUser", map);
+		return sqlSessionMeta.update("updateLoginTrialInUser", map);
+
+	}
+
+	/**
+	 * update login trial count in admin mstr
+	 *
+	 * @param map HashMap
+	 * @return long data update result count.
+	 * @throws SQLException
+	 */
+	public long updateLoginTrialInAdmin(HashMap<String, Object> map) throws SQLException {
+
+		return (long) sqlSessionMeta.update("updateLoginTrialInAdmin", map);
 
 	}
 }

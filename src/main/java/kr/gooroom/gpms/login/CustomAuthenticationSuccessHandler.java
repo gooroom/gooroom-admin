@@ -3,23 +3,28 @@ package kr.gooroom.gpms.login;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import kr.gooroom.gpms.common.service.impl.GpmsCommonDAO;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import kr.gooroom.gpms.config.service.impl.ClientConfDAO;
 import kr.gooroom.gpms.user.service.impl.AdminUserDAO;
 
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -29,11 +34,25 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 	@Resource(name = "adminUserDAO")
 	private AdminUserDAO adminUserDao;
 
+	@Resource(name = "clientConfDAO")
+	private ClientConfDAO clientConfDAO;
+
 	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException {
+
+		try {
+			// initialize 
+			Map<String, Object> paramMap = new HashMap<String, Object>();
+			paramMap.put("adminId", authentication.getName());
+			adminUserDao.updateLoginTrialInit(paramMap);	
+			adminUserDao.updateOtpLoginTrialInit(paramMap);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 		handle(request, response, authentication);
 
@@ -42,7 +61,10 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 		try {
 			long rePresentCnt = adminUserDao.insertAdminUserPresentData(authentication.getName(), detail.getRemoteAddress(),
 					request.getSession().getId());
-			
+
+			// 세션에 사용자 정보 저장
+			request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+
 		} catch (SQLException e) {
 			logger.error("FAIL SAVE USER PRESENT OR LOGIN LOG...");
 			// e.printStackTrace();
@@ -53,7 +75,14 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 	protected void handle(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 			throws IOException {
 
-		String targetUrl = determineTargetUrl(request, authentication);
+		String targetUrl = "";
+		try {
+			
+
+			targetUrl = determineTargetUrl(request, authentication);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		if (response.isCommitted()) {
 			logger.debug("Response has already been committed. Unable to redirect to " + targetUrl);
@@ -69,8 +98,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 		boolean isSuperAdmin = false;
 		boolean isAdmin = false;
 		boolean isPartAdmin = false;
-		
+
 		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
 		for (GrantedAuthority grantedAuthority : authorities) {
 			if (grantedAuthority.getAuthority().equals("ROLE_ADMIN")) {
 				isAdmin = true;
@@ -90,9 +120,25 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 		if (isSuperAdmin) {
 			return "/super";
 		} else if (isAdmin) {
-			return "/home";
+			try {
+				if(clientConfDAO.selectSiteLoginOtpEnable("") == 1) {
+					return "/otp/login";
+				} else {
+					return "/home";
+				}
+			} catch (SQLException e) {
+				return "/home";
+			}
 		} else if (isPartAdmin) {
-			return "/part";
+			try {
+				if(clientConfDAO.selectSiteLoginOtpEnable("") == 1) {
+					return "/otp/login";
+				} else {
+					return "/part";
+				}
+			} catch (SQLException e) {
+				return "/part";
+			}
 		} else if (isUser) {
 			return "/user";
 		} else {

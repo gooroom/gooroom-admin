@@ -20,8 +20,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,10 +66,9 @@ public class ClientMngServiceImpl implements ClientMngService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getRegKeyList(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getRegKeyList(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -81,7 +80,7 @@ public class ClientMngServiceImpl implements ClientMngService {
 
 			if (re != null && re.size() > 0) {
 
-				ClientRegKeyVO[] row = re.stream().toArray(ClientRegKeyVO[]::new);
+				ClientRegKeyVO[] row = re.toArray(ClientRegKeyVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -256,7 +255,7 @@ public class ClientMngServiceImpl implements ClientMngService {
 	/**
 	 * create profile set by reference client id, start job.
 	 * 
-	 * @param ClientProfileSetVO
+	 * @param vo ClientProfileSetVO
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -309,10 +308,9 @@ public class ClientMngServiceImpl implements ClientMngService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getProfileSetListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getProfileSetListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -324,7 +322,7 @@ public class ClientMngServiceImpl implements ClientMngService {
 
 			if (re != null && re.size() > 0) {
 
-				ClientProfileSetVO[] row = re.stream().toArray(ClientProfileSetVO[]::new);
+				ClientProfileSetVO[] row = re.toArray(ClientProfileSetVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -356,10 +354,9 @@ public class ClientMngServiceImpl implements ClientMngService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getProfilePackageListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getProfilePackageListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -371,7 +368,7 @@ public class ClientMngServiceImpl implements ClientMngService {
 
 			if (re != null && re.size() > 0) {
 
-				ClientPackageVO[] row = re.stream().toArray(ClientPackageVO[]::new);
+				ClientPackageVO[] row = re.toArray(ClientPackageVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -505,7 +502,7 @@ public class ClientMngServiceImpl implements ClientMngService {
 	/**
 	 * create new client software data
 	 * 
-	 * @param clientRegKeyVO ClientRegKeyVO data bean
+	 * @param clientSoftwareVO ClientSoftwareVO
 	 * @return StatusVO result status
 	 * @throws Exception
 	 */
@@ -651,10 +648,9 @@ public class ClientMngServiceImpl implements ClientMngService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getClientSoftwareList(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getClientSoftwareList(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -666,7 +662,7 @@ public class ClientMngServiceImpl implements ClientMngService {
 
 			if (re != null && re.size() > 0) {
 
-				ClientRegKeyVO[] row = re.stream().toArray(ClientRegKeyVO[]::new);
+				ClientSoftwareVO[] row = re.toArray(ClientSoftwareVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));

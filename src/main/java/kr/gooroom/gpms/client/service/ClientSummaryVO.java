@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.client.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -26,9 +27,10 @@ import java.io.Serializable;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class ClientSummaryVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = -6388831706862443722L;
 	private String totalCount;
 	private String onCount;
 	private String offCount;

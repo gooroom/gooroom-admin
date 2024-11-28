@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.user.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,9 +31,10 @@ import kr.gooroom.gpms.common.service.NameAndValueVO;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class AdminUserVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = 2449712698110547914L;
 	private String adminId;
 	private String adminNm;
 
@@ -66,6 +68,14 @@ public class AdminUserVO implements Serializable {
 	private String dupLoginTryIp;
 	private Date dupLoginTryDate;
 
+	private int loginTrial;
+	private Date loginTrialDate;
+	private	int loginElapsedTime;
+
+	private int otpLoginTrial;
+
+	private String secret;
+	private int secretSaved;
 	
 	public AdminUserVO() {
 
@@ -287,5 +297,49 @@ public class AdminUserVO implements Serializable {
 
 	public void setIsPortableAdmin(String isPortableAdmin) {
 		this.isPortableAdmin = isPortableAdmin;
+	}
+
+	public void setSecret(String secret) {
+		this.secret = secret;
+	}
+
+	public String getSecret() {
+		return secret;
+	}
+
+	public int getLoginTrial() {
+		return loginTrial;
+	}
+
+	public void setLoginTrial(int loginTrial) {
+		this.loginTrial = loginTrial;
+	}
+
+	public int getLoginElapsedTime() {
+		return loginElapsedTime;
+	}
+
+	public void setLoginElapsedTime(int loginElapsedTime) {
+		this.loginElapsedTime = loginElapsedTime;
+	}
+
+	public Date getLoginTrialDate() {
+		return loginTrialDate;
+	}
+
+	public void setLoginTrialDate(Date loginTrialDate) {
+		this.loginTrialDate = loginTrialDate;
+	}
+
+	public int getOtpLoginTrial() {
+		return otpLoginTrial;
+	}
+
+	public int getSecretSaved() {
+		return secretSaved;
+	}
+
+	public void setSecretSaved(int sercretSaved) {
+		this.secretSaved = sercretSaved;
 	}
 }

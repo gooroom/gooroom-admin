@@ -4,7 +4,6 @@ import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 
-import javax.xml.transform.Result;
 import java.util.HashMap;
 
 public interface UserReqService {
@@ -45,7 +44,7 @@ public interface UserReqService {
      * @return ResultPagingVO result data bean
      * @throws Exception
      */
-    public ResultPagingVO getUserReqActListPaged(HashMap<String, Object> options) throws Exception;
+    ResultPagingVO getUserReqActListPaged(HashMap<String, Object> options) throws Exception;
 
     /**
      * 사용자 USB 등록/삭제 요청 승인

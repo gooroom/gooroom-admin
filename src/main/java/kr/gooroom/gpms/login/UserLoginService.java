@@ -5,9 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import kr.gooroom.gpms.common.GPMSConstants;
+import kr.gooroom.gpms.config.service.impl.ClientConfDAO;
 import kr.gooroom.gpms.ptgr.service.impl.PortableDAO;
 import kr.gooroom.gpms.user.service.UserVO;
 import kr.gooroom.gpms.user.service.impl.UserDAO;
@@ -36,17 +37,20 @@ public class UserLoginService implements UserDetailsService {
 	@Resource(name = "portableDAO")
 	private PortableDAO portableDAO;
 
+	@Resource(name = "clientConfDAO")
+	private ClientConfDAO clientConfDAO;
+
 	@Override
 	public User loadUserByUsername(String username) throws UsernameNotFoundException {
 
 		AdminUserVO vo = new AdminUserVO();
 		try {
-			HashMap<String, Object> options = new HashMap<String, Object>();
+			HashMap<String, Object> options = new HashMap<>();
 			options.put("adminId", username);			
 			options.put("isAuth", "yes");
 
 			vo = adminUserDao.selectAdminUserData(options);
-			
+
 //			if (resultVO != null && resultVO.getData() != null && resultVO.getData().length > 0) {
 //				vo = (UserVO) resultVO.getData()[0];
 //			}
@@ -56,42 +60,50 @@ public class UserLoginService implements UserDetailsService {
 //		vo.setLoginId("admin");
 //		vo.setUserPasswd("c7c6b155bd5dc4a8ac54b1a7a54a81c11abcf3ee1760c3b35dfddb7e1a9d1b65");
 		
-		List<Role> roles = new ArrayList<Role>();
+		List<Role> roles = new ArrayList<>();
 		if(vo != null) {
 			switch (vo.getAdminTp()) {
-			case "S":
-				roles.add(new Role("ROLE_SUPER"));
-				//Check Portable
-				if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("true")) {
-					roles.add(new Role("ROLE_PORTABLE"));
-				}
-				break;
-			case "A":
-				roles.add(new Role("ROLE_ADMIN"));
-				//Check Portable
-				if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("true")) {
-					roles.add(new Role("ROLE_PORTABLE"));
-				}
-				break;
-			case "P":
-				roles.add(new Role("ROLE_PART"));
-				
-				// SET ROLE - sub rules
-				if("1".equals(vo.getIsClientAdmin())) { roles.add(new Role("ROLE_CLIENT_ADMIN")); }
-				if("1".equals(vo.getIsUserAdmin())) { roles.add(new Role("ROLE_USER_ADMIN")); }
-				if("1".equals(vo.getIsNoticeAdmin())) { roles.add(new Role("ROLE_NOTICE_ADMIN")); }
-				if("1".equals(vo.getIsDesktopAdmin())) { roles.add(new Role("ROLE_DESKTOP_ADMIN")); }
-
-				//Check Portable
-				if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("true")) {
-					if ("1".equals(vo.getIsPortableAdmin())) {
+				case "S" -> {
+					roles.add(new Role("ROLE_SUPER"));
+					//Check Portable
+					if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("true")) {
 						roles.add(new Role("ROLE_PORTABLE"));
-						roles.add(new Role("ROLE_PORTABLE_ADMIN"));
 					}
 				}
-				break;
-			default:
-				break;
+				case "A" -> {
+					roles.add(new Role("ROLE_ADMIN"));
+					//Check Portable
+					if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("true")) {
+						roles.add(new Role("ROLE_PORTABLE"));
+					}
+				}
+				case "P" -> {
+					roles.add(new Role("ROLE_PART"));
+
+					// SET ROLE - sub rules
+					if ("1".equals(vo.getIsClientAdmin())) {
+						roles.add(new Role("ROLE_CLIENT_ADMIN"));
+					}
+					if ("1".equals(vo.getIsUserAdmin())) {
+						roles.add(new Role("ROLE_USER_ADMIN"));
+					}
+					if ("1".equals(vo.getIsNoticeAdmin())) {
+						roles.add(new Role("ROLE_NOTICE_ADMIN"));
+					}
+					if ("1".equals(vo.getIsDesktopAdmin())) {
+						roles.add(new Role("ROLE_DESKTOP_ADMIN"));
+					}
+
+					//Check Portable
+					if (GPMSConstants.USE_PORTABLE.equalsIgnoreCase("true")) {
+						if ("1".equals(vo.getIsPortableAdmin())) {
+							roles.add(new Role("ROLE_PORTABLE"));
+							roles.add(new Role("ROLE_PORTABLE_ADMIN"));
+						}
+					}
+				}
+				default -> {
+				}
 			}
 		}
 
@@ -116,9 +128,18 @@ public class UserLoginService implements UserDetailsService {
 		if (user == null) {
 			user = new User(vo);
 			user.setAuthorities(roles);
+			// FIXME : ClientConf fetch 안전성 검토
+			try {
+				if ((clientConfDAO.selectSiteLoginOtpEnable("") == 1)) {
+					user.setOtpEnabled(true);
+				} else {
+					user.setOtpEnabled(false);
+				}
+			} catch (SQLException e) {
+				user.setOtpEnabled(false);
+			}
 		}
 
 		return user;
 	}
-
 }

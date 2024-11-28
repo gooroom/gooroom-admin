@@ -16,17 +16,8 @@
 
 package kr.gooroom.gpms.gkm.utils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -95,14 +86,12 @@ public class FileUtils {
 		} catch (Exception e) {
 			return defaultValue;
 		}
-		if (unit.equals("g") || unit.equals("gb")) {
-			return value * GB;
-		} else if (unit.equals("m") || unit.equals("mb")) {
-			return value * MB;
-		} else if (unit.equals("k") || unit.equals("kb")) {
-			return value * KB;
-		}
-		return defaultValue;
+		return switch (unit) {
+			case "g", "gb" -> value * GB;
+			case "m", "mb" -> value * MB;
+			case "k", "kb" -> value * KB;
+			default -> defaultValue;
+		};
 	}
 
 	/**
@@ -145,7 +134,7 @@ public class FileUtils {
 		InputStreamReader is = null;
 		BufferedReader reader = null;
 		try {
-			is = new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8"));
+			is = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
 			reader = new BufferedReader(is);
 			String line = null;
 			while ((line = reader.readLine()) != null) {
@@ -187,7 +176,7 @@ public class FileUtils {
 	public static void writeContent(File file, String content) {
 		OutputStreamWriter os = null;
 		try {
-			os = new OutputStreamWriter(new FileOutputStream(file), Charset.forName("UTF-8"));
+			os = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
 			BufferedWriter writer = new BufferedWriter(os);
 			writer.append(content);
 			writer.flush();

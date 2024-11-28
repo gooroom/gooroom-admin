@@ -45,16 +45,14 @@ public class CspDAO extends SqlSessionMetaDAO {
 	/**
 	 * response boolean for csp id was duplicated.
 	 * 
-	 * @param gscpId string target csp id.
+	 * @param gcspId string target csp id.
 	 * @return boolean true if csp id was duplicate.
-	 * @throws SQLException
 	 */
-	public boolean isExistGcspId(String gcspId) throws SQLException {
+	public boolean isExistGcspId(String gcspId) {
 
 		boolean re = true;
 		try {
-			re = ((Boolean) sqlSessionMeta.selectOne("isExistGcspId", gcspId)).booleanValue();
-
+			re = sqlSessionMeta.selectOne("isExistGcspId", gcspId);
 		} catch (Exception ex) {
 			re = true;
 		}
@@ -65,21 +63,20 @@ public class CspDAO extends SqlSessionMetaDAO {
 	/**
 	 * generate gooroom csp list data.
 	 * 
-	 * @param statusCd   string status value.
+	 * @param gcsp_status string status value.
 	 * @param search_key string search keyword.
 	 * @return CspVO list
-	 * @throws SQLException
 	 */
-	public List<CspVO> selectGcspDataList(String gcsp_status, String search_key) throws SQLException {
+	public List<CspVO> selectGcspDataList(String gcsp_status, String search_key) {
+
 		List<CspVO> re = null;
 		try {
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("gcspStatus", gcsp_status);
 			map.put("searchKey", search_key);
 			re = sqlSessionMeta.selectList("selectGcspDataList", map);
 		} catch (Exception ex) {
 			logger.error("CspDAO.selectGcspDataList error occured : ", ex);
-			re = null;
 		}
 		return re;
 	}
@@ -89,15 +86,14 @@ public class CspDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap.
 	 * @return CspVO list
-	 * @throws SQLException
 	 */
-	public List<CspVO> selectGcspListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<CspVO> selectGcspListPaged(HashMap<String, Object> options) {
+
 		List<CspVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectGcspListPaged", options);
 		} catch (Exception ex) {
 			logger.error("CspDAO.selectGcspListPaged error occured : ", ex);
-			re = null;
 		}
 		return re;
 	}
@@ -107,10 +103,9 @@ public class CspDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap.
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectGcspListTotalCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectGcspListTotalCount", options);
+	public long selectGcspListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectGcspListTotalCount", options);
 	}
 
 	/**
@@ -118,10 +113,9 @@ public class CspDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap.
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectGcspListFilteredCount(HashMap<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectGcspListFilteredCount", options);
+	public long selectGcspListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectGcspListFilteredCount", options);
 	}
 
 	/**
@@ -129,15 +123,12 @@ public class CspDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param gcspId string csp id.
 	 * @return CspVO csp configuration data bean
-	 * @throws SQLException
 	 */
-	public CspVO selectGcspData(String gcspId) throws SQLException {
+	public CspVO selectGcspData(String gcspId) {
 
 		CspVO re = null;
 		try {
-
 			re = sqlSessionMeta.selectOne("selectGcspData", gcspId);
-
 		} catch (Exception ex) {
 			re = null;
 		}
@@ -148,34 +139,32 @@ public class CspDAO extends SqlSessionMetaDAO {
 	/**
 	 * create new gooroom csp configuration data.
 	 * 
-	 * @param cspVO CspVO csp cofiguration data bean.
+	 * @param vo CspVO csp cofiguration data bean.
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long createGcspData(CspVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertGcspData", vo);
+	public long createGcspData(CspVO vo) {
+		return sqlSessionMeta.insert("insertGcspData", vo);
 	}
 
 	/**
 	 * modify gooroom csp information
 	 * 
-	 * @param cspVO CspVO csp cofiguration data bean.
+	 * @param vo CspVO csp cofiguration data bean.
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long editGcspData(CspVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("updateGcspData", vo);
+	public long editGcspData(CspVO vo) {
+		return sqlSessionMeta.insert("updateGcspData", vo);
 	}
 
 	/**
 	 * save certificate information.
 	 * 
-	 * @param cspVO CspVO csp cofiguration data bean.
+	 * @param vo CspVO csp cofiguration data bean.
 	 * @return long data insert result count.
 	 * @throws SQLException
 	 */
 	public long saveGcspCert(CspVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("updateGcspCert", vo);
+		return sqlSessionMeta.insert("updateGcspCert", vo);
 	}
 
 	/**
@@ -183,10 +172,9 @@ public class CspDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param vo AdminUserVO administrator user data bean
 	 * @return long data delete result count.
-	 * @throws SQLException
 	 */
-	public long deleteGcspData(CspVO vo) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteGcspData", vo);
+	public long deleteGcspData(CspVO vo) {
+		return sqlSessionMeta.delete("deleteGcspData", vo);
 	}
 
 }

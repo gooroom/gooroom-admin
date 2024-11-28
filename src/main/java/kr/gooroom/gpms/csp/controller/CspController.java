@@ -20,11 +20,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -225,8 +225,8 @@ public class CspController {
 	 * <p>
 	 * csp : cloud service provider.
 	 * 
-	 * @param gcspStatus string status value.
-	 * @param searchKey  string search keyword.
+	 * @param req HttpServletRequest
+	 * @param res HttpServletResponse
 	 * @return ResultVO result data bean
 	 *
 	 */
@@ -235,15 +235,15 @@ public class CspController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
 		options.put("status", req.getParameter("status"));
 
 		// << paging >>
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -294,7 +294,7 @@ public class CspController {
 	 *
 	 */
 	@PostMapping(value = "/readGcspData")
-	public @ResponseBody ResultVO readGcspData(@RequestParam(value = "gcsp_id", required = true) String gcspId) {
+	public @ResponseBody ResultVO readGcspData(@RequestParam(value = "gcsp_id") String gcspId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {

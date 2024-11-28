@@ -19,7 +19,7 @@ package kr.gooroom.gpms.mng.service.impl;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,11 +77,7 @@ public class IconMngServiceImpl implements IconMngService {
 				groupFrag = false;
 				long resultGroupCnt = iconMngDAO.insertIconInGroup(iconVO.getGrpId(), iconVO.getIconId());
 
-				if (resultGroupCnt > 0) {
-					groupFrag = true;
-				} else {
-					groupFrag = false;
-				}
+				groupFrag = resultGroupCnt > 0;
 			}
 
 			if (resultCnt > 0 && groupFrag) {
@@ -184,11 +180,7 @@ public class IconMngServiceImpl implements IconMngService {
 				groupFrag = false;
 				long resultGroupCnt = iconMngDAO.insertIconInGroup(iconVO.getGrpId(), iconVO.getIconId());
 
-				if (resultGroupCnt > 0) {
-					groupFrag = true;
-				} else {
-					groupFrag = false;
-				}
+				groupFrag = resultGroupCnt > 0;
 			}
 
 			if (reCnt > 0 && groupFrag) {
@@ -226,10 +218,9 @@ public class IconMngServiceImpl implements IconMngService {
 	 * 
 	 * @param grpId string group id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getIconList(String grpId) throws Exception {
+	public ResultVO getIconList(String grpId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -239,7 +230,7 @@ public class IconMngServiceImpl implements IconMngService {
 
 			if (re != null && re.size() > 0) {
 
-				IconVO[] row = re.stream().toArray(IconVO[]::new);
+				IconVO[] row = re.toArray(IconVO[]::new);
 
 				// create icon url by filepath and filename
 				for (IconVO vo : row) {
@@ -262,10 +253,8 @@ public class IconMngServiceImpl implements IconMngService {
 
 			logger.error("error in getIconList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -276,10 +265,9 @@ public class IconMngServiceImpl implements IconMngService {
 	 * response icon list data that not include any group.
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getNoGroupIconList() throws Exception {
+	public ResultVO getNoGroupIconList() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -289,7 +277,7 @@ public class IconMngServiceImpl implements IconMngService {
 
 			if (re != null && re.size() > 0) {
 
-				IconVO[] row = re.stream().toArray(IconVO[]::new);
+				IconVO[] row = re.toArray(IconVO[]::new);
 				// create icon url by filepath and filename
 				for (IconVO vo : row) {
 					vo.setIconUrl(GPMSConstants.PATH_FOR_ICONURL + "/" + vo.getFileNm());
@@ -310,10 +298,8 @@ public class IconMngServiceImpl implements IconMngService {
 
 			logger.error("error in getNoGroupIconList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -325,10 +311,9 @@ public class IconMngServiceImpl implements IconMngService {
 	 * 
 	 * @param iconId String icon id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getIconData(String iconId) throws Exception {
+	public ResultVO getIconData(String iconId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -355,10 +340,8 @@ public class IconMngServiceImpl implements IconMngService {
 
 			logger.error("error in getIconData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -369,10 +352,9 @@ public class IconMngServiceImpl implements IconMngService {
 	 * 
 	 * @param iconGroupVO IconGroupVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO createIconGroupData(IconGroupVO iconGroupVO) throws Exception {
+	public StatusVO createIconGroupData(IconGroupVO iconGroupVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -393,10 +375,8 @@ public class IconMngServiceImpl implements IconMngService {
 		} catch (Exception ex) {
 			logger.error("error in createIconGroupData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -431,19 +411,15 @@ public class IconMngServiceImpl implements IconMngService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in deleteIconGroupData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 		} catch (Exception ex) {
 
 			logger.error("error in deleteIconGroupData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -454,10 +430,9 @@ public class IconMngServiceImpl implements IconMngService {
 	 * 
 	 * @param iconGroupVO IconGroupVO data bean
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO editIconGroupData(IconGroupVO iconGroupVO) throws Exception {
+	public StatusVO editIconGroupData(IconGroupVO iconGroupVO) {
 
 		StatusVO statusVO = new StatusVO();
 
@@ -476,10 +451,8 @@ public class IconMngServiceImpl implements IconMngService {
 		} catch (Exception ex) {
 			logger.error("error in editIconGroupData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -489,10 +462,9 @@ public class IconMngServiceImpl implements IconMngService {
 	 * response icon group list data
 	 * 
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getIconGroupList() throws Exception {
+	public ResultVO getIconGroupList() {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -502,7 +474,7 @@ public class IconMngServiceImpl implements IconMngService {
 
 			if (re != null && re.size() > 0) {
 
-				IconGroupVO[] row = re.stream().toArray(IconGroupVO[]::new);
+				IconGroupVO[] row = re.toArray(IconGroupVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -519,10 +491,8 @@ public class IconMngServiceImpl implements IconMngService {
 
 			logger.error("error in getIconGroupList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -534,10 +504,9 @@ public class IconMngServiceImpl implements IconMngService {
 	 * 
 	 * @param iconGroupId string icon group id
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getIconGroupData(String iconGroupId) throws Exception {
+	public ResultVO getIconGroupData(String iconGroupId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -564,10 +533,8 @@ public class IconMngServiceImpl implements IconMngService {
 
 			logger.error("error in getIconGroupData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -590,8 +557,8 @@ public class IconMngServiceImpl implements IconMngService {
 		try {
 
 			boolean isOk = true;
-			for (int i = 0; i < icon_list.length; i++) {
-				long cnt = iconMngDAO.insertIconInGroup(grpId, icon_list[i]);
+			for (String s : icon_list) {
+				long cnt = iconMngDAO.insertIconInGroup(grpId, s);
 				if (cnt < 1) {
 					isOk = false;
 					break;
@@ -609,20 +576,16 @@ public class IconMngServiceImpl implements IconMngService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in createIconsInGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in createIconsInGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;
@@ -657,20 +620,16 @@ public class IconMngServiceImpl implements IconMngService {
 		} catch (SQLException sqlEx) {
 			logger.error("error in deleteIconInGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), sqlEx.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 			throw sqlEx;
 
 		} catch (Exception ex) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			logger.error("error in deleteIconInGroup : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (statusVO != null) {
-				statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
-			}
+			statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR));
 		}
 
 		return statusVO;

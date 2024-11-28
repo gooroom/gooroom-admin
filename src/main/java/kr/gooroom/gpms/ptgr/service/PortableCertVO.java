@@ -1,10 +1,13 @@
 package kr.gooroom.gpms.ptgr.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 public class PortableCertVO implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = -3260953642926733426L;
     int certId;
     int publish; //발급절차
 

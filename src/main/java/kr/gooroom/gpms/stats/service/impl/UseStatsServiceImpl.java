@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,16 +62,15 @@ public class UseStatsServiceImpl implements UseStatsService {
 	 * @param fromDate String start date
 	 * @param toDate   String end date
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getLoginDailyCount(String fromDate, String toDate) throws Exception {
+	public ResultVO getLoginDailyCount(String fromDate, String toDate) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
 			
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("fromDate", fromDate);
 			map.put("toDate", toDate);
 			
@@ -84,7 +83,7 @@ public class UseStatsServiceImpl implements UseStatsService {
 
 			if (re != null && re.size() > 0) {
 
-				LoginCountVO[] row = re.stream().toArray(LoginCountVO[]::new);
+				LoginCountVO[] row = re.toArray(LoginCountVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -102,10 +101,8 @@ public class UseStatsServiceImpl implements UseStatsService {
 		} catch (Exception ex) {
 			logger.error("error in getLoginDailyCount : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -117,15 +114,14 @@ public class UseStatsServiceImpl implements UseStatsService {
 	 * @param searchType String search type
 	 * @param searchDate String search date
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getLoginList(String searchType, String searchDate) throws Exception {
+	public ResultVO getLoginList(String searchType, String searchDate) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<LoginDataVO> re = useStatsDAO.selectLoginList(searchType, searchDate);
 			if (re != null && re.size() > 0) {
-				LoginDataVO[] row = re.stream().toArray(LoginDataVO[]::new);
+				LoginDataVO[] row = re.toArray(LoginDataVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -138,10 +134,8 @@ public class UseStatsServiceImpl implements UseStatsService {
 		} catch (Exception ex) {
 			logger.error("error in getLoginList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -151,10 +145,9 @@ public class UseStatsServiceImpl implements UseStatsService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getLoginListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getLoginListPaged(HashMap<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 		try {
 			String grRole = LoginInfoHelper.getUserGRRole();
@@ -166,7 +159,7 @@ public class UseStatsServiceImpl implements UseStatsService {
 			long totalCount = useStatsDAO.selectLoginTotalCount(options);
 			long filteredCount = useStatsDAO.selectLoginFilteredCount(options);
 			if (re != null && re.size() > 0) {
-				LoginDataVO[] row = re.stream().toArray(LoginDataVO[]::new);
+				LoginDataVO[] row = re.toArray(LoginDataVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -182,10 +175,8 @@ public class UseStatsServiceImpl implements UseStatsService {
 		} catch (Exception ex) {
 			logger.error("error in getLoginListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -196,16 +187,15 @@ public class UseStatsServiceImpl implements UseStatsService {
 	 * @param fromDate String start date
 	 * @param toDate   String end date
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getClientMngCount(String fromDate, String toDate) throws Exception {
+	public ResultVO getClientMngCount(String fromDate, String toDate) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
 			
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("fromDate", fromDate);
 			map.put("toDate", toDate);
 			
@@ -218,7 +208,7 @@ public class UseStatsServiceImpl implements UseStatsService {
 
 			if (re != null && re.size() > 0) {
 
-				ClientMngCountVO[] row = re.stream().toArray(ClientMngCountVO[]::new);
+				ClientMngCountVO[] row = re.toArray(ClientMngCountVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -236,10 +226,8 @@ public class UseStatsServiceImpl implements UseStatsService {
 		} catch (Exception ex) {
 			logger.error("error in getClientMngCount : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -250,10 +238,9 @@ public class UseStatsServiceImpl implements UseStatsService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getClientMngListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getClientMngListPaged(HashMap<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 		try {
 			
@@ -274,7 +261,7 @@ public class UseStatsServiceImpl implements UseStatsService {
 					return obj;
 				}).collect(Collectors.toList());
 				
-				ClientStatsVO[] row = re.stream().toArray(ClientStatsVO[]::new);
+				ClientStatsVO[] row = re.toArray(ClientStatsVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -290,10 +277,8 @@ public class UseStatsServiceImpl implements UseStatsService {
 		} catch (Exception ex) {
 			logger.error("error in getClientMngListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}

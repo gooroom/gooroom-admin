@@ -40,9 +40,8 @@ public class UserTokenDAO extends SqlSessionMetaDAO {
 	 *
 	 * @param paramMap
 	 * @return
-	 * @throws Exception
 	 */
-	public UserTokenVO selectTokenInfo(Map<?, ?> paramMap) throws Exception {
+	public UserTokenVO selectTokenInfo(Map<?, ?> paramMap) {
 		return sqlSessionMeta.selectOne("userTokenDAO.selectTokenInfo", paramMap);
 	}
 }

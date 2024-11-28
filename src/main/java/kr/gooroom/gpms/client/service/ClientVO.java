@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.client.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,9 +28,10 @@ import java.util.Date;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class ClientVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = -9111575786343163744L;
 	// view
 	private String nullColumn = "";
 
@@ -40,6 +42,7 @@ public class ClientVO implements Serializable {
 
 	private String clientIp;
 	private String prodNo;
+	private String osVer;
 
 	private String patchVersion;
 
@@ -453,4 +456,11 @@ public class ClientVO implements Serializable {
 		this.strgUse = strgUse;
 	}
 
+	public String getOsVer() {
+		return osVer;
+	}
+
+	public void setOsVer(String osVer) {
+		this.osVer = osVer;
+	}
 }

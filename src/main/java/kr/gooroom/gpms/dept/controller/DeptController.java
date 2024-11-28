@@ -3,13 +3,14 @@ package kr.gooroom.gpms.dept.controller;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import kr.gooroom.gpms.common.service.*;
 import kr.gooroom.gpms.common.utils.CommonUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -85,7 +86,7 @@ public class DeptController {
 				hm = new Object[objs.length];
 				for (int i = 0; i < objs.length; i++) {
 					DeptVO vo = (DeptVO) objs[i];
-					HashMap<String, Object> vm = new HashMap<String, Object>();
+					HashMap<String, Object> vm = new HashMap<>();
 					vm.put("title", vo.getDeptNm());
 					vm.put("key", vo.getDeptCd());
 					vm.put("hasChildren", vo.getHasChildren());
@@ -129,7 +130,7 @@ public class DeptController {
 			StatusVO status = deptService.updateDeptData(paramVO);
 			resultVO.setStatus(status);
 
-			ArrayList<String> userIdList = new ArrayList<String>();
+			ArrayList<String> userIdList = new ArrayList<>();
 
 			if (GPMSConstants.MSG_SUCCESS.equals(status.getResult())) {
 
@@ -201,7 +202,7 @@ public class DeptController {
 	 * @return
 	 */
 	@PostMapping(value = "/updateRuleForDepts")
-	public @ResponseBody ResultVO updateRuleForDepts(@RequestParam(value = "deptCds", required = true) String deptCds,
+	public @ResponseBody ResultVO updateRuleForDepts(@RequestParam(value = "deptCds") String deptCds,
 			@RequestParam(value = "browserRuleId") String browserRuleId,
 			@RequestParam(value = "mediaRuleId") String mediaRuleId,
 			@RequestParam(value = "securityRuleId") String securityRuleId,
@@ -218,10 +219,10 @@ public class DeptController {
 			resultVO.setStatus(status);
 
 			// [JOBCREATE]
-			ArrayList<String> userIdList = new ArrayList<String>();
+			ArrayList<String> userIdList = new ArrayList<>();
 			if (GPMSConstants.MSG_SUCCESS.equals(status.getResult())) {
-				for (int i = 0; i < deptCdArray.length; i++) {
-					ResultVO users = userService.getUserListInDept(deptCdArray[i]);
+				for (String s : deptCdArray) {
+					ResultVO users = userService.getUserListInDept(s);
 					if (users != null && users.getData() != null && users.getData().length > 0) {
 						for (int c = 0; c < users.getData().length; c++) {
 							userIdList.add(((UserVO) users.getData()[c]).getUserId());
@@ -443,7 +444,7 @@ public class DeptController {
 	public @ResponseBody ResultVO readDeptListPaged(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_")
@@ -451,8 +452,8 @@ public class DeptController {
 		options.put("searchKey", searchKey);
 
 		// << paging >>
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -514,10 +515,10 @@ public class DeptController {
 
 		if (iterator.hasNext()) {
 
-			String fileName = (String) iterator.next();
+			String fileName = iterator.next();
 			MultipartFile multipartFile = multipartHttpServletRequest.getFile(fileName);
 
-			List<DeptVO> deptList = new ArrayList<DeptVO>();
+			List<DeptVO> deptList = new ArrayList<>();
 			List<List<String>> dataList = null;
 			try {
 
@@ -539,8 +540,8 @@ public class DeptController {
 				}
 				// set deptList from resultVO
 				Object[] objs = resultVO.getData();
-				for(int i = 0; i < objs.length; i++) {
-					DeptVO vo = (DeptVO) objs[i];
+				for (Object obj : objs) {
+					DeptVO vo = (DeptVO) obj;
 					deptList.add(vo);
 				}
 

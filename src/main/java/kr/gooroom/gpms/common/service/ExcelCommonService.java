@@ -11,51 +11,45 @@ public interface ExcelCommonService {
 
     /**
      * 업로드 된 엑셀 포맷에 맞는 workbook 객체 생성
-     * @param file
-     * @return
+     * @param file MultipartFile
      */
     Workbook getWorkbook(MultipartFile file) throws Exception;
 
     /**
      * 셀 형식에 따른 값 String으로 변환
-     * @param cell
-     * @return
+     * @param cell Cell
      */
     String getValue(Cell cell);
 
     /**
      * 일괄등록(조직, 사용자) 엑셀 파일 내용 읽기
-     * @param file
-     * @return
+     * @param file MultipartFile
+     * @param fileType String
      * @throws Exception
      */
     List<List<String>> read(MultipartFile file, String fileType) throws Exception;
 
     /**
      * 조직, 사용자 리스트 엑셀파이로 출력
-     * @param list
-     * @return
+     * @param list List
      */
     XSSFWorkbook write(List<List<String>> list);
 
     /**
      * 조직코드 유효성 체크
-     * @param deptCd
-     * @return
+     * @param deptCd String
      */
     boolean deptCdRegex(String deptCd);
 
     /**
      * 사용자 아이디 유효성 체크
-     * @param userId
-     * @return
+     * @param userId String
      */
     boolean userIdRegex(String userId);
 
     /**
      * 이메일 형식 체크
-     * @param email
-     * @return
+     * @param email String
      */
     boolean emailRegex(String email);
 }

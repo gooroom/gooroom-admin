@@ -20,9 +20,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +79,7 @@ public class DesktopAppController {
 	/**
 	 * create(insert) new desktop app configuration data.
 	 * 
-	 * @param paramVO DesktopAppVO desktop configuration data bean
+	 * @param desktopAppVO DesktopAppVO desktop configuration data bean
 	 * @return ResultVO result data bean
 	 *
 	 */
@@ -112,7 +113,7 @@ public class DesktopAppController {
 	 *
 	 */
 	@PostMapping(value = "/cloneDesktopApp")
-	public @ResponseBody ResultVO cloneDesktopApp(@RequestParam(value = "appId", required = true) String appId) {
+	public @ResponseBody ResultVO cloneDesktopApp(@RequestParam(value = "appId") String appId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -138,7 +139,7 @@ public class DesktopAppController {
 	 */
 	@PostMapping(value = "/deleteDesktopApp")
 	public @ResponseBody ResultVO deleteDesktopApp(
-			@RequestParam(value = "desktopAppId", required = true) String desktopAppId) {
+			@RequestParam(value = "desktopAppId") String desktopAppId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -160,7 +161,7 @@ public class DesktopAppController {
 	/**
 	 * modify desktop app configuration data.
 	 * 
-	 * @param paramVO DesktopAppVO desktop configuration data bean
+	 * @param desktopAppVO DesktopAppVO desktop configuration data bean
 	 * @return ResultVO result data bean
 	 *
 	 */
@@ -223,7 +224,7 @@ public class DesktopAppController {
 	public @ResponseBody ResultVO readDesktopAppListPaged(HttpServletRequest req) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		options.put("GR_CONTEXT", createContextAddress(req));
 
@@ -234,8 +235,8 @@ public class DesktopAppController {
 		options.put("status", status);
 
 		// << paging >>
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = StringUtils.defaultString(req.getParameter("start"));
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -286,12 +287,8 @@ public class DesktopAppController {
 	 *
 	 */
 	private String createContextAddress(HttpServletRequest req) {
-		StringBuffer sb = new StringBuffer();
-
-		sb.append(GPMSConstants.ICON_SERVER_PROTOCOL).append("://");
-		sb.append(GPMSConstants.ICON_SERVERPATH).append("/");
-
-		return sb.toString();
+		return GPMSConstants.ICON_SERVER_PROTOCOL + "://" +
+				GPMSConstants.ICON_SERVERPATH + "/";
 	}
 
 	/**
@@ -303,7 +300,7 @@ public class DesktopAppController {
 	 */
 	@PostMapping(value = "/readDesktopAppData")
 	public @ResponseBody ResultVO readDesktopAppData(
-			@RequestParam(value = "desktopAppId", required = true) String desktopAppId) {
+			@RequestParam(value = "desktopAppId") String desktopAppId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {

@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.stats.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,9 +28,10 @@ import java.util.Date;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class LoginDataVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = 2019914155090950343L;
 	private String histSeq = "";
 	private String clientGroup = "";
 	private String clientId = "";

@@ -21,10 +21,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +90,7 @@ public class ClientLogController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = null;
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		try {
 			// << options >>
@@ -122,8 +123,8 @@ public class ClientLogController {
 			}
 
 			// << paging >>
-			options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-			options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+			options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+			options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 			// << order >>
 			String paramOrderColumn = req.getParameter("orderColumn");
@@ -148,10 +149,10 @@ public class ClientLogController {
 
 			resultVO = clientLogService.getSecurityLogListPaged(options);
 
-			HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> fromDateHm = new HashMap<>();
 			fromDateHm.put("name", "fromDate");
 			fromDateHm.put("value", fromDate);
-			HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> toDateHm = new HashMap<>();
 			toDateHm.put("name", "toDate");
 			toDateHm.put("value", toDate);
 			resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -159,7 +160,7 @@ public class ClientLogController {
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));
 			resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
 			resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
-			resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+			resultVO.setRowLength(ObjectUtils.defaultIfNull(req.getParameter("length"), "10"));
 
 		} catch (Exception ex) {
 			logger.error("error in readSecurityLogListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -230,7 +231,7 @@ public class ClientLogController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		try {
 			// << options >>
@@ -257,8 +258,8 @@ public class ClientLogController {
 			}
 
 			// << paging >>
-			options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-			options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+			options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+			options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 			// << order >>
 			String paramOrderColumn = req.getParameter("orderColumn");
@@ -283,10 +284,10 @@ public class ClientLogController {
 
 			resultVO = clientLogService.getGeneralLogListPaged(options);
 
-			HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> fromDateHm = new HashMap<>();
 			fromDateHm.put("name", "fromDate");
 			fromDateHm.put("value", fromDate);
-			HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+			HashMap<String, Object> toDateHm = new HashMap<>();
 			toDateHm.put("name", "toDate");
 			toDateHm.put("value", toDate);
 			resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -294,7 +295,7 @@ public class ClientLogController {
 			resultVO.setDraw(String.valueOf(req.getParameter("page")));
 			resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
 			resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
-			resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+			resultVO.setRowLength(ObjectUtils.defaultIfNull(req.getParameter("length"), "10"));
 
 		} catch (Exception ex) {
 			logger.error("error in readGeneralLogListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
@@ -317,8 +318,8 @@ public class ClientLogController {
 	 *
 	 */
 	@PostMapping(value = "/deleteUserClientUseHist")
-	public @ResponseBody ResultVO deleteUserClientUseHist(@RequestParam(value = "userId", required = true) String userId,
-														  @RequestParam(value = "clientIds", required = true) String clientIds) throws Exception {
+	public @ResponseBody ResultVO deleteUserClientUseHist(@RequestParam(value = "userId" ) String userId,
+														  @RequestParam(value = "clientIds") String clientIds) {
 		ResultVO resultVO = new ResultVO();
 
 		HashMap<String, Object> options = new HashMap<>();

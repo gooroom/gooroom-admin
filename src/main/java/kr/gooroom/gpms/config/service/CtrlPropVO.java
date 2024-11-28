@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.config.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,9 +28,10 @@ import java.util.Date;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class CtrlPropVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = 8663491403707463140L;
 	private String objId;
 	private String newObjId;
 	private String mngObjTp;

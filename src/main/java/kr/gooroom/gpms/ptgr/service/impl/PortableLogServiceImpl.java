@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class PortableLogServiceImpl implements PortableLogService {
     private PortableLogDAO portableLogDAO;
 
     @Override
-    public StatusVO createLogData(PortableLogVO portableLogVO) throws Exception {
+    public StatusVO createLogData(PortableLogVO portableLogVO) {
 
         StatusVO statusVO = new StatusVO();
 
@@ -47,7 +47,7 @@ public class PortableLogServiceImpl implements PortableLogService {
     }
 
     @Override
-    public ResultVO readLogData() throws Exception {
+    public ResultVO readLogData() {
 
         ResultVO resultVO = new ResultVO();
 
@@ -71,7 +71,7 @@ public class PortableLogServiceImpl implements PortableLogService {
     }
 
     @Override
-    public ResultVO readLogDataByOptions(HashMap<String, Object> options) throws Exception {
+    public ResultVO readLogDataByOptions(HashMap<String, Object> options) {
 
         ResultVO resultVO = new ResultVO();
 
@@ -95,7 +95,7 @@ public class PortableLogServiceImpl implements PortableLogService {
     }
 
     @Override
-    public StatusVO deleteAllLogData() throws Exception {
+    public StatusVO deleteAllLogData() {
 
         StatusVO statusVO = new StatusVO();
 
@@ -118,12 +118,12 @@ public class PortableLogServiceImpl implements PortableLogService {
     }
 
     @Override
-    public int readNextLogDataIndex() throws Exception {
+    public int readNextLogDataIndex() {
         return portableLogDAO.selectNextPortableLogNumber();
     }
 
     @Override
-    public int readLogDataCount() throws Exception {
+    public int readLogDataCount() {
         return portableLogDAO.selectPortableLogCount();
     }
 }

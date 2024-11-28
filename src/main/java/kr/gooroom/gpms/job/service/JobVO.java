@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.job.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,9 +28,10 @@ import java.util.Date;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class JobVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = 4345110552829954899L;
 	private String jobNo;
 	private String jobName;
 

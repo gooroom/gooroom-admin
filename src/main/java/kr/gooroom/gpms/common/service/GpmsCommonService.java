@@ -49,8 +49,8 @@ public interface GpmsCommonService {
 	 * @return StatusVO result status data
 	 * @throws Exception
 	 */
-	StatusVO createUserActLogHistory(String actType, String actItem, String actData, String accessIp, String userId)
-			throws Exception;
+	StatusVO createUserActLogHistory(String actType, String actItem, String actData, String accessIp, String userId,
+			String actTarget,boolean isSuccess);
 
 	/**
 	 * response available network ip information.

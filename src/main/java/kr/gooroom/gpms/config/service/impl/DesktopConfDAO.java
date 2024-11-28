@@ -40,19 +40,15 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * response desktop configuration list data
 	 * 
 	 * @return DesktopConfVO List data
-	 * @throws SQLException
 	 */
-	public List<DesktopConfVO> readDesktopConfList() throws SQLException {
+	public List<DesktopConfVO> readDesktopConfList() {
 
 		List<DesktopConfVO> re = null;
 		try {
-
 			re = sqlSessionMeta.selectList("selectDesktopConfList", "");
-
 		} catch (Exception ex) {
 			logger.error("error in readDesktopConfList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -62,19 +58,15 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * response desktop configuration list data
 	 * 
 	 * @return DesktopConfVO List data
-	 * @throws SQLException
 	 */
-	public List<DesktopConfVO> selectDesktopConfListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<DesktopConfVO> selectDesktopConfListPaged(HashMap<String, Object> options) {
 
 		List<DesktopConfVO> re = null;
 		try {
-
 			re = sqlSessionMeta.selectList("selectDesktopConfListPaged", options);
-
 		} catch (Exception ex) {
 			logger.error("error in selectDesktopConfListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -85,11 +77,9 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectDesktopConfListFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectDesktopConfListFilteredCount", options);
+	public long selectDesktopConfListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectDesktopConfListFilteredCount", options);
 	}
 
 	/**
@@ -97,11 +87,9 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectDesktopConfListTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectDesktopConfListTotalCount", options);
+	public long selectDesktopConfListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectDesktopConfListTotalCount", options);
 	}
 
 	/**
@@ -112,8 +100,7 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long createDesktopConf(DesktopConfVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertDesktopConf", vo);
+		return sqlSessionMeta.insert("insertDesktopConf", vo);
 
 	}
 
@@ -125,8 +112,7 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long cloneDesktopConf(DesktopConfVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertClonedDesktopConf", vo);
+		return sqlSessionMeta.insert("insertClonedDesktopConf", vo);
 
 	}
 
@@ -138,9 +124,7 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long createDesktopAppInConf(DesktopConfVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertDesktopAppInConf", vo);
-
+		return sqlSessionMeta.insert("insertDesktopAppInConf", vo);
 	}
 
 	/**
@@ -151,8 +135,7 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long cloneDesktopAppInConf(DesktopConfVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertClonedDesktopAppInConf", vo);
+		return sqlSessionMeta.insert("insertClonedDesktopAppInConf", vo);
 
 	}
 
@@ -160,19 +143,15 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * response desktop configuration data
 	 * 
 	 * @return DesktopConfVO data bean
-	 * @throws SQLException
 	 */
-	public DesktopConfVO getDesktopConfData(String desktopConfId) throws SQLException {
+	public DesktopConfVO getDesktopConfData(String desktopConfId) {
 
 		DesktopConfVO re = null;
 		try {
-
 			re = sqlSessionMeta.selectOne("selectDesktopConf", desktopConfId);
-
 		} catch (Exception ex) {
 			logger.error("error in getDesktopConfData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -182,19 +161,15 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * response desktop configuration data
 	 * 
 	 * @return DesktopConfVO data bean
-	 * @throws SQLException
 	 */
-	public DesktopInfoVO getDesktopInfoByConfId(Map<?, ?> paramMap) throws SQLException {
+	public DesktopInfoVO getDesktopInfoByConfId(Map<?, ?> paramMap) {
 
 		DesktopInfoVO re = null;
 		try {
-
 			re = sqlSessionMeta.selectOne("selectDesktopInfoByConfId", paramMap);
-
 		} catch (Exception ex) {
 			logger.error("error in getDesktopInfoByConfId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -208,9 +183,7 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateDesktopConf(DesktopConfVO vo) throws SQLException {
-
-		return (long) sqlSessionMeta.update("updateDesktopConf", vo);
-
+		return sqlSessionMeta.update("updateDesktopConf", vo);
 	}
 
 	/**
@@ -221,7 +194,6 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteDesktopConf(String desktopConfId) throws SQLException {
-
 		return sqlSessionMeta.delete("deleteDesktopConf", desktopConfId);
 	}
 
@@ -233,7 +205,6 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteDesktopConfInClientGroup(String desktopConfId) throws SQLException {
-
 		return sqlSessionMeta.delete("deleteDesktopConfInClientGroup", desktopConfId);
 	}
 
@@ -245,7 +216,6 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteDesktopAppsInConf(String desktopConfId) throws SQLException {
-
 		return sqlSessionMeta.delete("deleteDesktopAppsInConf", desktopConfId);
 	}
 
@@ -254,17 +224,17 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param groupId string target group id
 	 * @return DesktopInfoVO data bean
-	 * @throws SQLException
 	 */
-	public DesktopConfVO selectDesktopConfByGroupId(String groupId) throws SQLException {
+	public DesktopConfVO selectDesktopConfByGroupId(String groupId) {
+
 		DesktopConfVO re = null;
 		try {
 			re = sqlSessionMeta.selectOne("selectDesktopConfByGroupId", groupId);
 		} catch (Exception ex) {
 			logger.error("error in selectDesktopConfByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
+
 		return re;
 	}
 
@@ -273,17 +243,17 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param deptCd string target dept cd
 	 * @return DesktopInfoVO data bean
-	 * @throws SQLException
 	 */
-	public DesktopConfVO selectDesktopConfByDeptCd(String deptCd) throws SQLException {
+	public DesktopConfVO selectDesktopConfByDeptCd(String deptCd) {
+
 		DesktopConfVO re = null;
 		try {
 			re = sqlSessionMeta.selectOne("selectDesktopConfByDeptCd", deptCd);
 		} catch (Exception ex) {
 			logger.error("error in selectDesktopConfByDeptCd : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
+
 		return re;
 	}
 
@@ -292,9 +262,8 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param userId string target user id
 	 * @return DesktopInfoVO data bean
-	 * @throws SQLException
 	 */
-	public DesktopConfVO selectDesktopConfByUserId(String userId) throws SQLException {
+	public DesktopConfVO selectDesktopConfByUserId(String userId) {
 
 		DesktopConfVO re = null;
 		try {
@@ -302,8 +271,8 @@ public class DesktopConfDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectDesktopConfByUserId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
+
 		return re;
 	}
 }

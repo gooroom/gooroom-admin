@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.common.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -26,9 +27,10 @@ import java.io.Serializable;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class MenuVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = 4716745300511267015L;
 	private String name;
 	private String fontName;
 	private String pageName;

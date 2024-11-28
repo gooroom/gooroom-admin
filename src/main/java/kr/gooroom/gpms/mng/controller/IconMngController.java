@@ -19,8 +19,8 @@ package kr.gooroom.gpms.mng.controller;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -132,7 +132,7 @@ public class IconMngController {
 	 *
 	 */
 	@PostMapping(value = "/deleteIconData")
-	public @ResponseBody ResultVO deleteIconData(@RequestParam(value = "iconId", required = true) String iconId) {
+	public @ResponseBody ResultVO deleteIconData(@RequestParam(value = "iconId") String iconId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -258,7 +258,7 @@ public class IconMngController {
 	 *
 	 */
 	@PostMapping(value = "/readIconData")
-	public @ResponseBody ResultVO readIconData(@RequestParam(value = "iconId", required = true) String iconId) {
+	public @ResponseBody ResultVO readIconData(@RequestParam(value = "iconId") String iconId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -310,7 +310,7 @@ public class IconMngController {
 	 */
 	@PostMapping(value = "/readIconGroupData")
 	public @ResponseBody ResultVO readIconGroupData(
-			@RequestParam(value = "iconGrpId", required = true) String iconGrpId) {
+			@RequestParam(value = "iconGrpId") String iconGrpId) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -395,7 +395,7 @@ public class IconMngController {
 	 *
 	 */
 	@PostMapping(value = "/deleteIconGroupData")
-	public @ResponseBody ResultVO deleteIconGroupData(@RequestParam(value = "grpId", required = true) String grpId) {
+	public @ResponseBody ResultVO deleteIconGroupData(@RequestParam(value = "grpId") String grpId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -423,8 +423,8 @@ public class IconMngController {
 	 *
 	 */
 	@PostMapping(value = "/createIconsInGroup")
-	public @ResponseBody ResultVO createIconsInGroup(@RequestParam(value = "grpId", required = true) String grpId,
-			@RequestParam(value = "icons", required = true) String icons) {
+	public @ResponseBody ResultVO createIconsInGroup(@RequestParam(value = "grpId") String grpId,
+			@RequestParam(value = "icons") String icons) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -456,8 +456,8 @@ public class IconMngController {
 	 *
 	 */
 	@PostMapping(value = "/deleteIconInGroup")
-	public @ResponseBody ResultVO deleteIconInGroup(@RequestParam(value = "grpId", required = true) String grpId,
-			@RequestParam(value = "iconId", required = true) String iconId) {
+	public @ResponseBody ResultVO deleteIconInGroup(@RequestParam(value = "grpId") String grpId,
+			@RequestParam(value = "iconId") String iconId) {
 
 		ResultVO resultVO = new ResultVO();
 

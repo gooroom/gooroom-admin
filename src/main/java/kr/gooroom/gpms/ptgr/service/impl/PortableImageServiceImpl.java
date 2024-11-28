@@ -10,10 +10,9 @@ import kr.gooroom.gpms.ptgr.service.PortableImageVO;
 import kr.gooroom.gpms.ptgr.service.PortableImageViewVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class PortableImageServiceImpl implements PortableImageService {
     private PortableImageDAO portableImageDAO;
 
     @Override
-    public StatusVO createImageData(PortableImageVO portableImageVO) throws Exception {
+    public StatusVO createImageData(PortableImageVO portableImageVO) {
         StatusVO statusVO = new StatusVO();
 
         try {
@@ -49,7 +48,7 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public ResultPagingVO readImageData(HashMap<String, Object> options) throws Exception {
+    public ResultPagingVO readImageData(HashMap<String, Object> options) {
 
         ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -80,7 +79,7 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public ResultVO readImageDataById(int imageId) throws Exception {
+    public ResultVO readImageDataById(int imageId) {
 
         ResultVO resultVO = new ResultVO();
 
@@ -104,12 +103,12 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public ResultVO readImageDataByAdminId(String adminId) throws Exception {
+    public ResultVO readImageDataByAdminId(String adminId) {
         return null;
     }
 
     @Override
-    public StatusVO updateImageData(PortableImageVO imageVO) throws Exception {
+    public StatusVO updateImageData(PortableImageVO imageVO) {
         StatusVO statusVO = new StatusVO();
 
         try {
@@ -131,7 +130,7 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public StatusVO updateImageStatus(HashMap<String, Object> options) throws Exception {
+    public StatusVO updateImageStatus(HashMap<String, Object> options) {
         StatusVO statusVO = new StatusVO();
 
         try {
@@ -153,7 +152,7 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public StatusVO removeImageDataByImageId(int id) throws Exception {
+    public StatusVO removeImageDataByImageId(int id) {
         StatusVO statusVO = new StatusVO();
 
         try {
@@ -176,7 +175,7 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public StatusVO removeImageDataByImageIds(HashMap<String, Object> ids) throws Exception {
+    public StatusVO removeImageDataByImageIds(HashMap<String, Object> ids) {
 
         StatusVO statusVO = new StatusVO();
 
@@ -200,7 +199,7 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public StatusVO removeAllImageData() throws Exception {
+    public StatusVO removeAllImageData() {
 
         StatusVO statusVO = new StatusVO();
 
@@ -224,7 +223,7 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public StatusVO deleteImageDataByImageId(int id) throws Exception {
+    public StatusVO deleteImageDataByImageId(int id) {
         StatusVO statusVO = new StatusVO();
 
         try {
@@ -247,12 +246,12 @@ public class PortableImageServiceImpl implements PortableImageService {
     }
 
     @Override
-    public int readNextImageDataIndex() throws Exception {
+    public int readNextImageDataIndex() {
         return portableImageDAO.selectNextPortableImageNumber();
     }
 
     @Override
-    public long readImageDataCount() throws Exception {
+    public long readImageDataCount() {
         return portableImageDAO.selectPortableImageTotalCount(null);
     }
 }

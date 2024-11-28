@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="DiskResourceDAO">
+
+    <resultMap type="DiskResourceVO" id="diskResourceData" extends="ResourceMetricsDAO.resourceMetricsData">
+        <result property="value" column="USED_PERCENT"/>
+    </resultMap>
+
+    <select id="selectDiskResourceList" parameterType="hashMap" resultMap="diskResourceData">
+        SELECT DISTINCT insertion_timestamp, USED_PERCENT FROM RESOURCE_METRICS_DISK
+        WHERE fstype = 'ext4'
+        ORDER BY insertion_timestamp DESC
+        LIMIT 60;
+    </select>
+</mapper>

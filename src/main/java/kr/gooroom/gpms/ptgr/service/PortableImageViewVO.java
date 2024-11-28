@@ -1,10 +1,13 @@
 package kr.gooroom.gpms.ptgr.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 public class PortableImageViewVO implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = -4381800600576032956L;
     int imageId;
     long size;
     String userId;

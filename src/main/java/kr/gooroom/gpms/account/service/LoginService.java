@@ -33,6 +33,6 @@ public interface LoginService {
 	 * @return AccountVO bean for user's account
 	 * @throws Exception
 	 */
-	public AccountVO getLoginInfo(String userId) throws Exception;
+    AccountVO getLoginInfo(String userId) throws Exception;
 
 }

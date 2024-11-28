@@ -1,21 +1,20 @@
 package kr.gooroom.gpms.common.utils;
 
+import org.bouncycastle.openssl.PEMParser;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-
-import java.security.cert.CertificateException;
-
-import org.bouncycastle.openssl.PEMParser;
 
 public final class PemUtil {
 
@@ -31,25 +30,7 @@ public final class PemUtil {
 			
 			pemParser.close();
 			return KeyFactory.getInstance("RSA").generatePrivate(pkcs8EncodedKeySpec);
-		} catch (IOException e) {
-			if(pemParser != null) {
-				try {
-					pemParser.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			if(pemParser != null) {
-				try {
-					pemParser.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-			e.printStackTrace();
-		} catch (InvalidKeySpecException e) {
+		} catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
 			if(pemParser != null) {
 				try {
 					pemParser.close();
@@ -64,9 +45,9 @@ public final class PemUtil {
 
 	public static PublicKey getPublicKey(String certificatePem) {
 		try {
-			X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(certificatePem.getBytes("UTF-8")));
+			X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(certificatePem.getBytes(StandardCharsets.UTF_8)));
 			return  cert.getPublicKey();
-		} catch (CertificateException | UnsupportedEncodingException e) {
+		} catch (CertificateException e) {
 			e.printStackTrace();
 		}
 		return null;

@@ -1,17 +1,15 @@
 package kr.gooroom.gpms.ptgr.service.impl;
 
+import jakarta.annotation.Resource;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
-import kr.gooroom.gpms.ptgr.service.PortableImageVO;
 import kr.gooroom.gpms.ptgr.service.PortableJobService;
 import kr.gooroom.gpms.ptgr.service.PortableJobVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 @Service("portableJobService")
 public class PortableJobServiceImpl implements PortableJobService {
@@ -22,7 +20,7 @@ public class PortableJobServiceImpl implements PortableJobService {
     private PortableJobDAO portableJobDAO;
 
     @Override
-    public StatusVO createJobData(PortableJobVO portableJobVO) throws Exception {
+    public StatusVO createJobData(PortableJobVO portableJobVO) {
 
         StatusVO statusVO = new StatusVO();
 
@@ -46,7 +44,7 @@ public class PortableJobServiceImpl implements PortableJobService {
     }
 
     @Override
-    public StatusVO deleteJobDataByImageId(int imageId) throws Exception {
+    public StatusVO deleteJobDataByImageId(int imageId) {
 
         StatusVO statusVO = new StatusVO();
 
@@ -69,7 +67,7 @@ public class PortableJobServiceImpl implements PortableJobService {
     }
 
     @Override
-    public StatusVO deleteAllJobData() throws Exception {
+    public StatusVO deleteAllJobData() {
 
         StatusVO statusVO = new StatusVO();
 
@@ -92,7 +90,7 @@ public class PortableJobServiceImpl implements PortableJobService {
     }
 
     @Override
-    public ResultVO readJobDataByImageId(int imageId) throws Exception {
+    public ResultVO readJobDataByImageId(int imageId) {
 
         ResultVO resultVO = new ResultVO();
 
@@ -116,7 +114,7 @@ public class PortableJobServiceImpl implements PortableJobService {
     }
 
     @Override
-    public StatusVO updateJobData(PortableJobVO portableJobVO) throws Exception {
+    public StatusVO updateJobData(PortableJobVO portableJobVO) {
         StatusVO statusVO = new StatusVO();
 
         try {

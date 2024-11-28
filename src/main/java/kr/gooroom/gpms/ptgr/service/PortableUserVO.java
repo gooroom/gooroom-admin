@@ -1,15 +1,16 @@
 package kr.gooroom.gpms.ptgr.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class PortableUserVO implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 3859582424752626764L;
     int ptgrUserId;
-
     String userNm;
     String userPw;
     String userDept;
-
 
     public int getPtgrUserId() {
         return ptgrUserId;

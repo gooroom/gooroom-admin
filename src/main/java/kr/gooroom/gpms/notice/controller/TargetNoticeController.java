@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class TargetNoticeController {
 	public ResponseEntity<List<TargetNoticeResponseModel>> getNoticesByTarget(
 			@RequestAttribute(value = "CLIENT_ID") String clientId,
 			@RequestAttribute(value = "USER_ID", required = false) String userId,
-			@PageableDefault(page = 0, size = 10, sort = "openDt", direction = Direction.DESC) Pageable pageable) {
+			@PageableDefault(sort = "openDt", direction = Direction.DESC) Pageable pageable) {
 
 		logger.debug("REST request to get Notices : {}, {}", clientId, userId);
 
@@ -80,11 +80,11 @@ public class TargetNoticeController {
 	public ResponseEntity<TargetNoticeResponseModel> getNoticeByTarget(
 			@RequestAttribute(value = "CLIENT_ID") String clientId,
 			@RequestAttribute(value = "USER_ID", required = false) String userId,
-			@PathVariable String noticePublishId) {
+			@PathVariable("noticePublishId") String noticePublishId) {
 
 		logger.debug("REST request to get Notice : {}, {}, {}", clientId, userId, noticePublishId);
 
-		Optional<TargetNoticeResponseModel> notice = null;
+		Optional<TargetNoticeResponseModel> notice = Optional.empty();
 		try {
 			notice = noticeService.getNoticeByTarget(userId, clientId, noticePublishId)
 					.map(tnVO -> new TargetNoticeResponseModel(tnVO, true));
@@ -95,22 +95,22 @@ public class TargetNoticeController {
 			throw new InternalServerErrorException("error in getNoticeByTarget");
 		}
 
-		return notice.map(response -> ResponseEntity.ok(response)).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+		return notice.map(ResponseEntity::ok).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	@GetMapping(value = "/apis/notices/{noticePublishId}/pagenumber")
 	@ResponseBody
 	public ResponseEntity<Map<String, Integer>> getPageNumberOfNoticeByTarget(
 			@RequestAttribute(value = "CLIENT_ID") String clientId,
-			@RequestAttribute(value = "USER_ID", required = false) String userId, @PathVariable String noticePublishId,
-			@PageableDefault(page = 0, size = 10, sort = "openDt", direction = Direction.DESC) Pageable pageable) {
+			@RequestAttribute(value = "USER_ID", required = false) String userId, @PathVariable("noticePublishId") String noticePublishId,
+			@PageableDefault(sort = "openDt", direction = Direction.DESC) Pageable pageable) {
 
 		logger.debug("REST request to get PageNumber of notice : {}, {}, {}", clientId, userId, noticePublishId);
 
 		int pageNumber = 0;
 		try {
 			while (true) {
-				Pageable newPageable = new PageRequest(pageNumber, pageable.getPageSize(), pageable.getSort());
+				Pageable newPageable = PageRequest.of(pageNumber, pageable.getPageSize(), pageable.getSort());
 				Page<TargetNoticeVO> page = noticeService.getNoticesByTarget(newPageable, userId, clientId);
 				if (page.getNumberOfElements() <= 0) {
 					break;

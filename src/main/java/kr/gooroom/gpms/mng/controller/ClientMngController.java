@@ -23,10 +23,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +107,7 @@ public class ClientMngController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
@@ -116,8 +117,8 @@ public class ClientMngController {
 		// << paging >>
 		String paramOrderColumn = req.getParameter("orderColumn");
 		String paramOrderDir = req.getParameter("orderDir");
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 
 		if ("chRegKey".equalsIgnoreCase(paramOrderColumn)) {
 			options.put("paramOrderColumn", "REGKEY_NO");
@@ -174,7 +175,7 @@ public class ClientMngController {
 
 			StatusVO statusVO = new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 					MessageSourceHelper.getMessage("system.common.selectdata"));
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("key", uuid_r.toString());
 			Object[] re = new Object[] { map };
 			resultVO.setResultInfo(statusVO, re);
@@ -190,8 +191,6 @@ public class ClientMngController {
 	/**
 	 * create(insert) new client registration key information data.
 	 * 
-	 * @param clientRegKeyVO ClientRegKeyVO client registration key information.
-	 * @param request        HttpServletRequest
 	 * @return ResultVO result data bean.
 	 *
 	 */
@@ -226,7 +225,6 @@ public class ClientMngController {
 	/**
 	 * edit(update) client registration key information data.
 	 * 
-	 * @param request HttpServletRequest
 	 * @return ResultVO result data bean.
 	 *
 	 */
@@ -267,7 +265,7 @@ public class ClientMngController {
 	 *
 	 */
 	@PostMapping(value = "/deleteRegKeyData")
-	public @ResponseBody ResultVO deleteRegKeyData(@RequestParam(value = "regKeyNo", required = true) String regKeyNo) {
+	public @ResponseBody ResultVO deleteRegKeyData(@RequestParam(value = "regKeyNo") String regKeyNo) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -278,10 +276,8 @@ public class ClientMngController {
 		} catch (Exception ex) {
 			logger.error("error in deleteRegKeyData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -289,7 +285,6 @@ public class ClientMngController {
 	/**
 	 * create profile set by reference client id, start job.
 	 * 
-	 * @param request HttpServletRequest
 	 * @return ResultVO result data bean.
 	 *
 	 */
@@ -297,9 +292,9 @@ public class ClientMngController {
 	public @ResponseBody ResultVO createProfileSet(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
 		ClientProfileSetVO vo = new ClientProfileSetVO();
-		vo.setClientId(StringUtils.defaultString(req.getParameter("clientId"), ""));
-		vo.setProfileNm(StringUtils.defaultString(req.getParameter("profileNm"), ""));
-		vo.setProfileCmt(StringUtils.defaultString(req.getParameter("profileCmt"), ""));
+		vo.setClientId(StringUtils.defaultString(req.getParameter("clientId")));
+		vo.setProfileNm(StringUtils.defaultString(req.getParameter("profileNm")));
+		vo.setProfileCmt(StringUtils.defaultString(req.getParameter("profileCmt")));
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -320,22 +315,21 @@ public class ClientMngController {
 	/**
 	 * create profile job for profiling to clients.
 	 * 
-	 * @param request HttpServletRequest
 	 * @return ResultVO result data bean.
 	 *
 	 */
 	@PostMapping(value = "/createProfileJob")
 	public @ResponseBody ResultVO createProfileJob(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
-		String profileNo = StringUtils.defaultString(req.getParameter("profileNo"), "");
-		String targetClientIds = StringUtils.defaultString(req.getParameter("targetClientIds"), "");
-		String targetClientGroupIds = StringUtils.defaultString(req.getParameter("targetClientGroupIds"), "");
-		String isRemoval = StringUtils.defaultString(req.getParameter("isRemoval"), "");
+		String profileNo = StringUtils.defaultString(req.getParameter("profileNo"));
+		String targetClientIds = StringUtils.defaultString(req.getParameter("targetClientIds"));
+		String targetClientGroupIds = StringUtils.defaultString(req.getParameter("targetClientGroupIds"));
+		String isRemoval = StringUtils.defaultString(req.getParameter("isRemoval"));
 
 		ResultVO resultVO = new ResultVO();
 		try {
 			// make job
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("profile_no", profileNo);
 			map.put("removal", isRemoval);
 
@@ -344,8 +338,7 @@ public class ClientMngController {
 			jobs[1] = Job.generateJob("package", "update_package_version_to_server");
 
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
@@ -353,13 +346,6 @@ public class ClientMngController {
 
 			} catch (Exception jsonex) {
 				logger.error("ClientMngController.createProfileJob (make json) Exception occurred. ", jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 
 			JobVO jobVO = new JobVO();
@@ -368,22 +354,22 @@ public class ClientMngController {
 			jobVO.setRegUserId(LoginInfoHelper.getUserId());
 
 			// setup target data
-			ArrayList<String> clientList = new ArrayList<String>();
+			ArrayList<String> clientList = new ArrayList<>();
 			if (targetClientGroupIds != null && targetClientGroupIds.length() > 0) {
 				String[] groupIdArray = targetClientGroupIds.split(",");
-				for (int m = 0; m < groupIdArray.length; m++) {
-					ResultVO clientResultVO = clientService.getClientListInGroup(groupIdArray[m]);
+				for (String s : groupIdArray) {
+					ResultVO clientResultVO = clientService.getClientListInGroup(s);
 					ClientVO[] clients = (ClientVO[]) clientResultVO.getData();
-					for (int i = 0; i < clients.length; i++) {
-						clientList.add(clients[i].getClientId());
+					for (ClientVO client : clients) {
+						clientList.add(client.getClientId());
 					}
 				}
 			}
 			if (targetClientIds != null && targetClientIds.length() > 0) {
 				String[] clientIdArray = targetClientIds.split(",");
-				for (int m = 0; m < clientIdArray.length; m++) {
-					if (!(clientList.contains(clientIdArray[m]))) {
-						clientList.add(clientIdArray[m]);
+				for (String s : clientIdArray) {
+					if (!(clientList.contains(s))) {
+						clientList.add(s);
 					}
 				}
 			}
@@ -398,10 +384,8 @@ public class ClientMngController {
 		} catch (Exception ex) {
 			logger.error("error in createProfileJob : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -418,7 +402,7 @@ public class ClientMngController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
@@ -429,8 +413,8 @@ public class ClientMngController {
 		// << paging >>
 		String paramOrderColumn = req.getParameter("orderColumn");
 		String paramOrderDir = req.getParameter("orderDir");
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 
 		// << Order >>
 		if ("chProfileSetNo".equalsIgnoreCase(paramOrderColumn)) {
@@ -486,7 +470,7 @@ public class ClientMngController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = null;
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		options.put("clientId", req.getParameter("clientId"));
@@ -494,8 +478,8 @@ public class ClientMngController {
 		options.put("searchKey", ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : ""));
 
 		// << paging >>
-		options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-		options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+		options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+		options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
 		// << ordering >>
 		String paramOrderColumn = req.getParameter("orderColumn");
@@ -529,10 +513,8 @@ public class ClientMngController {
 		} catch (Exception ex) {
 			logger.error("error in readProfilePackageListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -547,7 +529,7 @@ public class ClientMngController {
 	 */
 	@PostMapping(value = "/deleteProfileSetData")
 	public @ResponseBody ResultVO deleteProfileSetData(
-			@RequestParam(value = "profileNo", required = true) String profileNo) {
+			@RequestParam(value = "profileNo") String profileNo) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -569,7 +551,6 @@ public class ClientMngController {
 	/**
 	 * edit(update) client profile set data.
 	 * 
-	 * @param request HttpServletRequest
 	 * @return ResultVO result data bean.
 	 *
 	 */
@@ -578,10 +559,10 @@ public class ClientMngController {
 
 		ClientProfileSetVO vo = new ClientProfileSetVO();
 
-		vo.setProfileNo(StringUtils.defaultString(req.getParameter("profileNo"), ""));
-		vo.setClientId(StringUtils.defaultString(req.getParameter("clientId"), ""));
-		vo.setProfileNm(StringUtils.defaultString(req.getParameter("profileNm"), ""));
-		vo.setProfileCmt(StringUtils.defaultString(req.getParameter("profileCmt"), ""));
+		vo.setProfileNo(StringUtils.defaultString(req.getParameter("profileNo")));
+		vo.setClientId(StringUtils.defaultString(req.getParameter("clientId")));
+		vo.setProfileNm(StringUtils.defaultString(req.getParameter("profileNm")));
+		vo.setProfileCmt(StringUtils.defaultString(req.getParameter("profileCmt")));
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -603,8 +584,6 @@ public class ClientMngController {
 	/**
 	 * create(insert) new client software app data.
 	 * 
-	 * @param clientRegKeyVO ClientRegKeyVO client registration key information.
-	 * @param request        HttpServletRequest
 	 * @return ResultVO result data bean.
 	 *
 	 */
@@ -642,7 +621,7 @@ public class ClientMngController {
 	 *
 	 */
 	@PostMapping(value = "/deleteClientSoftware")
-	public @ResponseBody ResultVO deleteClientSoftware(@RequestParam(value = "swId", required = true) String swId) {
+	public @ResponseBody ResultVO deleteClientSoftware(@RequestParam(value = "swId") String swId) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -664,7 +643,6 @@ public class ClientMngController {
 	/**
 	 * edit(update) client software information data.
 	 * 
-	 * @param request HttpServletRequest
 	 * @return ResultVO result data bean.
 	 *
 	 */
@@ -706,7 +684,7 @@ public class ClientMngController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 		String searchKey = ((req.getParameter("keyword") != null) ? req.getParameter("keyword").replace("_", "\\_") : "");
@@ -717,8 +695,8 @@ public class ClientMngController {
 		// << paging >>
 		String paramOrderColumn = req.getParameter("orderColumn");
 		String paramOrderDir = req.getParameter("orderDir");
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "5");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "5");
 
 		if ("chSwId".equalsIgnoreCase(paramOrderColumn)) {
 			options.put("paramOrderColumn", "REGKEY_NO");

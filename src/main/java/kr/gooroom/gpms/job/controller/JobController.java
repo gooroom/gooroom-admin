@@ -20,11 +20,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -142,7 +142,7 @@ public class JobController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		String jobStatus = req.getParameter("jobStatus");
 
@@ -159,8 +159,8 @@ public class JobController {
 		options.put("jobType", ((req.getParameter("jobType") != null ? req.getParameter("jobType") : "")));
 
 		// << paging >>
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 
@@ -218,7 +218,7 @@ public class JobController {
 	 *
 	 */
 	@PostMapping(value = "/readJobInfo")
-	public @ResponseBody ResultVO readJobInfo(@RequestParam(value = "jobNo", required = true) String jobNo) {
+	public @ResponseBody ResultVO readJobInfo(@RequestParam(value = "jobNo") String jobNo) {
 
 		ResultVO resultVO = new ResultVO();
 		try {
@@ -240,7 +240,7 @@ public class JobController {
 	 *
 	 */
 	@PostMapping(value = "/readClientListInJob")
-	public @ResponseBody ResultVO readClientListInJob(@RequestParam(value = "jobNo", required = true) String jobNo) {
+	public @ResponseBody ResultVO readClientListInJob(@RequestParam(value = "jobNo") String jobNo) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -260,7 +260,6 @@ public class JobController {
 	/**
 	 * get gooroom job list data for paging.
 	 * 
-	 * @param jobNo string job number.
 	 * @return ResultVO
 	 *
 	 */
@@ -269,7 +268,7 @@ public class JobController {
 			ModelMap model) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
-		HashMap<String, Object> options = new HashMap<String, Object>();
+		HashMap<String, Object> options = new HashMap<>();
 
 		// << options >>
 
@@ -278,8 +277,8 @@ public class JobController {
 		options.put("jobStatus", req.getParameter("jobStatus"));
 
 		// << paging >>
-		String paramStart = StringUtils.defaultString(req.getParameter("start"), "0");
-		String paramLength = StringUtils.defaultString(req.getParameter("length"), "10");
+		String paramStart = ObjectUtils.defaultIfNull(req.getParameter("start"), "0");
+		String paramLength = ObjectUtils.defaultIfNull(req.getParameter("length"), "10");
 		options.put("paramStart", Integer.parseInt(paramStart));
 		options.put("paramLength", Integer.parseInt(paramLength));
 

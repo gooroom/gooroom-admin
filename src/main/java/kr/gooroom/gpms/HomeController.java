@@ -16,8 +16,6 @@
 
 package kr.gooroom.gpms;
 
-import java.util.Collection;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -25,7 +23,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Handles requests for the application home page.
@@ -155,11 +155,7 @@ public class HomeController {
 	 */
 	@PostMapping(value = "/error")
 	public String errorPost(Model model, @RequestParam(value = "code", required = false) String code) {
-		if (code == null) {
-			model.addAttribute("errorCode", "Error");
-		} else {
-			model.addAttribute("errorCode", code);
-		}
+		model.addAttribute("errorCode", Objects.requireNonNullElse(code, "Error"));
 		return "error/error";
 	}
 
@@ -174,11 +170,7 @@ public class HomeController {
 	 */
 	@GetMapping(value = "/error")
 	public String errorGet(Model model, @RequestParam(value = "code", required = false) String code) {
-		if (code == null) {
-			model.addAttribute("errorCode", "Error");
-		} else {
-			model.addAttribute("errorCode", code);
-		}
+		model.addAttribute("errorCode", Objects.requireNonNullElse(code, "Error"));
 		return "error/error";
 	}
 

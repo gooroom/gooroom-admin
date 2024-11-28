@@ -29,6 +29,16 @@
 		<result property="isNoticeAdmin" column="ISNOTICEADMIN"/>
 		<result property="isPortableAdmin" column="ISPORTABLEADMIN"/>
 
+		<result property="secret" column="SECRET"/>
+		<result property="secretSaved" column="SECRET_SAVED"/>
+		<result property="loginTrial" column="LOGIN_TRIAL" />
+		<result property="loginTrialDate" jdbcType="TIMESTAMP" column="LOGIN_TRIAL_DT" javaType="java.util.Date" />
+		<result property="loginElapsedTime" column="LOGIN_ELAPSED_TIME"/>
+		<result property="otpLoginTrial" column="OTP_LOGIN_TRIAL"/>
+
+<!--		<result property="adminLoginTrialCount" column="login_trial_count" />-->
+<!--		<result property="adminLoginLockTime" column="login_lock_time"/>-->
+
 		<collection property="connIps" column="ADMIN_ID" javaType="java.util.ArrayList" ofType="String" select="selectConnIps" />
 		<collection property="grpInfoList" column="{adminId=admin_id}" javaType="java.util.ArrayList" ofType="GpmsCommonDAO.simpleDataInfo" select="ClientGroupDAO.selectClientGroupSimpleData" />
 		<collection property="deptInfoList" column="{adminId=admin_id}" javaType="java.util.ArrayList" ofType="GpmsCommonDAO.simpleDataInfo" select="DeptDAO.selectDeptSimpleData" />
@@ -79,7 +89,10 @@
 		       IFNULL(AR.USER_ADMIN, 0) ISUSERADMIN,
 		       IFNULL(AR.DESKTOP_ADMIN, 0) ISDESKTOPADMIN,
 		       IFNULL(AR.NOTICE_ADMIN, 0) ISNOTICEADMIN,
-			   IFNULL(AR.PORTABLE_ADMIN, 0) ISPORTABLEADMIN
+			   IFNULL(AR.PORTABLE_ADMIN, 0) ISPORTABLEADMIN,
+
+			   IFNULL(AM.LOGIN_TRIAL, 0) LOGIN_TRIAL,
+			   IFNULL(AM.OTP_LOGIN_TRIAL, 0) OTP_LOGIN_TRIAL
 
 		FROM ADMIN_MSTR AM
 		     LEFT JOIN
@@ -144,8 +157,8 @@
 		VALUES 
 			(#{adminId}, 
 			#{adminNm},
-			SHA2(#{adminPw}, 256),
-			#{adminTp}, 
+			#{adminPw},
+			#{adminTp},
 			#{status},
 			#{modUserId}, now(),
 			#{regUserId}, now())
@@ -154,9 +167,14 @@
 	<!-- 관리자 정보 조회 -->
 	<select id="selectAdminUserData" parameterType="String" resultMap="adminUserInfo">
 		SELECT AM.ADMIN_ID, AM.ADMIN_NM, AM.ADMIN_PW, AM.ADMIN_TP, AM.POLLING_CYCLE,
-		    AM.STATUS_CD, AM.MOD_USER_ID, AM.MOD_DT, AM.REG_USER_ID, AM.REG_DT,
+		    AM.STATUS_CD, AM.MOD_USER_ID, AM.MOD_DT, AM.REG_USER_ID, AM.REG_DT, AM.SECRET, AM.SECRET_SAVED,
 		    AP.CONNECT_IP, AP.SESSION_ID,
-		    
+
+			IFNULL(AM.LOGIN_TRIAL, 0) LOGIN_TRIAL,
+			IFNULL(AM.LOGIN_TRIAL_DT, now()) LOGIN_TRIAL_DT,
+			TIMESTAMPDIFF(MINUTE, IFNULL(AM.LOGIN_TRIAL_DT, now()), now()) LOGIN_ELAPSED_TIME,
+			IFNULL(AM.OTP_LOGIN_TRIAL, 0) OTP_LOGIN_TRIAL,
+
 		    IFNULL(AR.CLIENT_ADMIN, 0) ISCLIENTADMIN,
 		    IFNULL(AR.USER_ADMIN, 0) ISUSERADMIN,
 		    IFNULL(AR.DESKTOP_ADMIN, 0) ISDESKTOPADMIN,
@@ -187,11 +205,11 @@
 		UPDATE ADMIN_MSTR SET
 			ADMIN_NM = #{adminNm},
 			<if test="adminPw != null and adminPw != ''">
-    		ADMIN_PW = SHA2(#{adminPw}, 256),
+    		ADMIN_PW = #{adminPw},
   			</if>
 			ADMIN_TP = #{adminTp},
 			MOD_USER_ID = #{modUserId},
-			MOD_DT = now() 
+			MOD_DT = now()
 		WHERE
 			ADMIN_ID = #{adminId}
 	</update>
@@ -213,10 +231,9 @@
 
 	<!-- 관리자 정보 조회:인증!!!! -->
 	<select id="selectAdminUserAuthAndInfo" parameterType="hashmap" resultMap="adminUserInfo">
-		SELECT ADMIN_ID, ADMIN_NM
+		SELECT ADMIN_ID, ADMIN_NM, ADMON_PW
 		FROM ADMIN_MSTR
-		WHERE ADMIN_ID = #{adminId} AND ADMIN_PW = SHA2(#{adminPw}, 256)
-
+		WHERE ADMIN_ID = #{adminId}
 	</select>
 
 	
@@ -312,6 +329,89 @@
 		WHERE ADMIN_ID=#{adminId} AND RULE_TYPE=#{adminRule}
 	</select>
 
+	<!-- 관리자 OTP SECRET 업데이트 -->
+	<update id="insertOrUpdateAdminSecret" parameterType="hashmap">
+		UPDATE ADMIN_MSTR
+		SET SECRET=#{secret}
+		WHERE ADMIN_ID=#{adminId}
+	</update>
+
+	<!-- 관리자 접속 정보에 중복 접속 요청 정보 삭제 -->
+	<update id="updateAdminLoginTrialCount" parameterType="string">
+		UPDATE ADMIN_MSTR 
+			SET LOGIN_TRIAL = (SELECT ADMIN_LOGIN_TRIAL_COUNT FROM SITE_MSTR 1),
+			OTP_LOGIN_TRIAL = (SELECT ADMIN_LOGIN_TRIAL_COUNT FROM SITE_MSTR 1)
+		WHERE ADMIN_ID = #{adminId}
+	</update>
+
+	<!--
+		================================== LOGIN TRIAL ==================================
+	-->
+
+	<!-- LOGIN TRIAL 초기화 -->
+	<update id="updateLoginTrialInit" parameterType="hashmap">
+		UPDATE ADMIN_MSTR 
+			SET LOGIN_TRIAL = (SELECT ADMIN_LOGIN_TRIAL_COUNT FROM SITE_MSTR LIMIT 1)
+		WHERE ADMIN_ID = #{adminId}
+	</update>
+
+	<!-- LOGIN TRIAL 조회 -->
+	<select id="selectLoginTrial" parameterType="hashmap" resultType="integer">
+		SELECT LOGIN_TRIAL FROM ADMIN_MSTR
+		WHERE ADMIN_ID=#{adminId}
+	</select>
+
+	<!-- LOGIN TRIAL  업데이트 -->
+	<update id="updateLoginTrial" parameterType="hashmap">
+		UPDATE ADMIN_MSTR SET LOGIN_TRIAL = (LOGIN_TRIAL-1), LOGIN_TRIAL_DT = now() WHERE ADMIN_ID=#{adminId}
+	</update>
+
+	<!-- 관리자 LOGIN TRIAL DATE  업데이트 -->
+	<update id="updateAdminLoginTrialDate" parameterType="hashmap">
+		UPDATE ADMIN_MSTR
+		SET LOGIN_TRIAL_DT=#{timestamp}
+		WHERE ADMIN_ID=#{adminId}
+	</update>
+
+	<!--
+		================================== OTP LOGIN TRIAL ==================================
+	-->
+
+	<!-- OTP LOGIN TRIAL 초기화 -->
+	<update id="updateOtpLoginTrialInit" parameterType="hashmap">
+		UPDATE ADMIN_MSTR 
+			SET OTP_LOGIN_TRIAL = (SELECT ADMIN_LOGIN_TRIAL_COUNT FROM SITE_MSTR LIMIT 1)
+		WHERE ADMIN_ID = #{adminId}
+	</update>
+
+	<!-- OTP LOGIN TRIAL  업데이트 -->
+	<update id="updateOtpLoginTrial" parameterType="hashmap">
+		UPDATE ADMIN_MSTR SET OTP_LOGIN_TRIAL = (OTP_LOGIN_TRIAL-1), LOGIN_TRIAL_DT = now() WHERE ADMIN_ID=#{adminId}
+	</update>
+	
+	<update id="updateOtpSecretSaved" parameterType="hashmap">
+		UPDATE ADMIN_MSTR SET SECRET_SAVED=#{isSaved} WHERE ADMIN_ID=#{adminId}
+	</update>
+
+	<select id="selectOtpSecretSaved" parameterType="String">
+		SELECT SECRET_SAVED FROM ADMIN_MSTR WHERE ADMIN_ID=#{adminId}
+	</select>
+
+	<!--
+		================================== FROM SITE_MSTR ==================================
+	-->
+
+	<!-- Site LOGIN TRIAL COUNT 설정 조회 -->
+	<select id="selectAdminLoginTrialCount" parameterType="string" resultType="integer">
+		SELECT IFNULL(ADMIN_LOGIN_TRIAL_COUNT, 5)
+		FROM SITE_MSTR LIMIT 1
+	</select>
+
+	<!-- Site LOGIN TRIAL LOCK TIME 설정 조회 -->
+	<select id="selectAdminLoginLockTimeValue" parameterType="string" resultType="integer">
+		SELECT IFNULL(ADMIN_LOGIN_LOCK_TIME, 0)
+		FROM SITE_MSTR LIMIT 1
+	</select>
 </mapper>
 
 

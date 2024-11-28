@@ -19,7 +19,7 @@ package kr.gooroom.gpms.stats.service.impl;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,16 +57,15 @@ public class SecurityStatsServiceImpl implements SecurityStatsService {
 	 * @param fromDate String start date
 	 * @param toDate   String end date
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getViolatedCount(String fromDate, String toDate, String countType) throws Exception {
+	public ResultVO getViolatedCount(String fromDate, String toDate, String countType) {
 
 		ResultVO resultVO = new ResultVO();
 
 		try {
 			
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("fromDate", fromDate);
 			map.put("toDate", toDate);
 			map.put("defaultViolatedLogType", GPMSConstants.DEFAULT_VIOLATED_LOGTYPE);
@@ -79,13 +78,7 @@ public class SecurityStatsServiceImpl implements SecurityStatsService {
 			List<ViolatedCountVO> re = securityStatsDAO.selectViolatedCount(map, countType);
 
 			if (re != null && re.size() > 0) {
-				ViolatedCountVO[] row = re.stream().toArray(ViolatedCountVO[]::new);
-//		if (row != null && row.length > 0) {
-//		    for (int i = 0; i < row.length; i++) {
-//			row[i].setMediaProtectorCount((row[i].getMediaProtectorCount() == 0) ? -1 : row[i].getMediaProtectorCount());
-//		    }
-//		}
-
+				ViolatedCountVO[] row = re.toArray(ViolatedCountVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -99,10 +92,8 @@ public class SecurityStatsServiceImpl implements SecurityStatsService {
 		} catch (Exception ex) {
 			logger.error("error in getViolatedCount : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 
 		return resultVO;
@@ -114,15 +105,14 @@ public class SecurityStatsServiceImpl implements SecurityStatsService {
 	 * @param searchType String search type
 	 * @param searchDate String search date.
 	 * @return ResultVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getViolatedList(String searchType, String searchDate) throws Exception {
+	public ResultVO getViolatedList(String searchType, String searchDate) {
 		ResultVO resultVO = new ResultVO();
 		try {
 			List<ViolatedLogVO> re = securityStatsDAO.selectViolatedList(searchType, searchDate);
 			if (re != null && re.size() > 0) {
-				ViolatedLogVO[] row = re.stream().toArray(ViolatedLogVO[]::new);
+				ViolatedLogVO[] row = re.toArray(ViolatedLogVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -135,10 +125,8 @@ public class SecurityStatsServiceImpl implements SecurityStatsService {
 		} catch (Exception ex) {
 			logger.error("error in getViolatedList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}
@@ -148,10 +136,9 @@ public class SecurityStatsServiceImpl implements SecurityStatsService {
 	 * 
 	 * @param options HashMap<String, Object> option data
 	 * @return ResultPagingVO result data bean
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getViolatedListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getViolatedListPaged(HashMap<String, Object> options) {
 		ResultPagingVO resultVO = new ResultPagingVO();
 		try {
 			
@@ -165,7 +152,7 @@ public class SecurityStatsServiceImpl implements SecurityStatsService {
 			long filteredCount = securityStatsDAO.selectViolatedFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				ViolatedLogVO[] row = re.stream().toArray(ViolatedLogVO[]::new);
+				ViolatedLogVO[] row = re.toArray(ViolatedLogVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -181,10 +168,8 @@ public class SecurityStatsServiceImpl implements SecurityStatsService {
 		} catch (Exception ex) {
 			logger.error("error in getViolatedListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			if (resultVO != null) {
-				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
-						MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
-			}
+			resultVO.setStatus(new StatusVO(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_SYSERROR,
+					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR)));
 		}
 		return resultVO;
 	}

@@ -16,21 +16,9 @@
 
 package kr.gooroom.gpms.job.custom;
 
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.annotation.Resource;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import jakarta.annotation.Resource;
 import kr.gooroom.gpms.client.service.ClientGroupVO;
 import kr.gooroom.gpms.client.service.ClientService;
 import kr.gooroom.gpms.client.service.ClientVO;
@@ -45,6 +33,15 @@ import kr.gooroom.gpms.config.service.CtrlPropVO;
 import kr.gooroom.gpms.job.nodes.Job;
 import kr.gooroom.gpms.job.service.JobService;
 import kr.gooroom.gpms.job.service.JobVO;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Gooroom Job management class.
@@ -91,7 +88,7 @@ public class CustomJobMaker {
 			ClientVO[] row = (ClientVO[]) re.getData();
 
 			if (row.length > 0) {
-				HashMap<String, String> map = new HashMap<String, String>();
+				HashMap<String, String> map = new HashMap<>();
 				map.put("traffic_size", stressCount);
 
 				try {
@@ -101,8 +98,7 @@ public class CustomJobMaker {
 					jobs[0] = Job.generateJobWithMap("SERVER", "raise_traffic", map);
 
 					String jsonStr = "";
-					StringWriter outputWriter = new StringWriter();
-					try {
+					try (StringWriter outputWriter = new StringWriter()) {
 						ObjectMapper mapper = new ObjectMapper();
 						mapper.setSerializationInclusion(Include.NON_NULL);
 						mapper.writeValue(outputWriter, jobs);
@@ -111,13 +107,6 @@ public class CustomJobMaker {
 					} catch (Exception jsonex) {
 						logger.error("CustomJobMaker.createJobForClientStressTest (make json) Exception occurred. ",
 								jsonex);
-					} finally {
-						try {
-							if (outputWriter != null) {
-								outputWriter.close();
-							}
-						} catch (Exception finalex) {
-						}
 					}
 
 					JobVO jobVO = new JobVO();
@@ -147,9 +136,9 @@ public class CustomJobMaker {
 	 * <p>
 	 * target client is used by target user and online.
 	 * 
-	 * @param objId   string configuration id.
+	 * @param confId string configuration id.
 	 * @param jobName string job name.
-	 * @param userIds string user id array that will null if none.
+	 * @param confTp string
 	 * @return void
 	 * @throws Exception
 	 */
@@ -164,7 +153,7 @@ public class CustomJobMaker {
 					// create job
 					Job[] jobs = new Job[1];
 					if (GPMSConstants.TYPE_FILTEREDSOFTWARE.equals(confTp) || GPMSConstants.TYPE_CTRLCENTERITEMRULE.equals(confTp)) {
-						HashMap<String, String> map = new HashMap<String, String>();
+						HashMap<String, String> map = new HashMap<>();
 						map.put("from_gpms", "yes");
 						jobs[0] = Job.generateJobWithMap("config", jobName, map);
 					} else {
@@ -172,8 +161,7 @@ public class CustomJobMaker {
 					}
 
 					String jsonStr = "";
-					StringWriter outputWriter = new StringWriter();
-					try {
+					try (StringWriter outputWriter = new StringWriter()) {
 						ObjectMapper mapper = new ObjectMapper();
 						mapper.setSerializationInclusion(Include.NON_NULL);
 						mapper.writeValue(outputWriter, jobs);
@@ -181,13 +169,6 @@ public class CustomJobMaker {
 
 					} catch (Exception jsonex) {
 						logger.error("CustomJobMaker.createJobForUserConf (make json) Exception occurred. ", jsonex);
-					} finally {
-						try {
-							if (outputWriter != null) {
-								outputWriter.close();
-							}
-						} catch (Exception finalex) {
-						}
 					}
 
 					JobVO jobVO = new JobVO();
@@ -243,13 +224,12 @@ public class CustomJobMaker {
 				// create job
 				Job[] jobs = new Job[1];
 				if (map == null) {
-					map = new HashMap<String, String>();
+					map = new HashMap<>();
 				}
 				jobs[0] = Job.generateJobWithMap("config", jobName, map);
 
 				String jsonStr = "";
-				StringWriter outputWriter = new StringWriter();
-				try {
+				try (StringWriter outputWriter = new StringWriter()) {
 					ObjectMapper mapper = new ObjectMapper();
 					mapper.setSerializationInclusion(Include.NON_NULL);
 					mapper.writeValue(outputWriter, jobs);
@@ -257,13 +237,6 @@ public class CustomJobMaker {
 
 				} catch (Exception jsonex) {
 					logger.error("CustomJobMaker.createJobForClientConf (make json) Exception occurred. ", jsonex);
-				} finally {
-					try {
-						if (outputWriter != null) {
-							outputWriter.close();
-						}
-					} catch (Exception finalex) {
-					}
 				}
 
 				JobVO jobVO = new JobVO();
@@ -312,13 +285,12 @@ public class CustomJobMaker {
 				// create job
 				Job[] jobs = new Job[1];
 				if (map == null) {
-					map = new HashMap<String, String>();
+					map = new HashMap<>();
 				}
 				jobs[0] = Job.generateJobWithMap("config", jobName, map);
 
 				String jsonStr = "";
-				StringWriter outputWriter = new StringWriter();
-				try {
+				try (StringWriter outputWriter = new StringWriter()) {
 					ObjectMapper mapper = new ObjectMapper();
 					mapper.setSerializationInclusion(Include.NON_NULL);
 					mapper.writeValue(outputWriter, jobs);
@@ -326,13 +298,6 @@ public class CustomJobMaker {
 
 				} catch (Exception jsonex) {
 					logger.error("CustomJobMaker.createJobForAllClient (make json) Exception occurred. ", jsonex);
-				} finally {
-					try {
-						if (outputWriter != null) {
-							outputWriter.close();
-						}
-					} catch (Exception finalex) {
-					}
 				}
 
 				JobVO jobVO = new JobVO();
@@ -362,23 +327,20 @@ public class CustomJobMaker {
 	 * @param map       configuration item hierarchy data.
 	 * @param clientIds string client id array
 	 * @return void
-	 * @throws Exception
 	 */
-	public void createJobForClientSetupWithClients(String jobName, HashMap<String, String> map, String[] clientIds)
-			throws Exception {
+	public void createJobForClientSetupWithClients(String jobName, HashMap<String, String> map, String[] clientIds) {
 
 		if (clientIds != null && clientIds.length > 0) {
 			try {
 				// create job
 				Job[] jobs = new Job[1];
 				if (map == null) {
-					map = new HashMap<String, String>();
+					map = new HashMap<>();
 				}
 				jobs[0] = Job.generateJobWithMap("config", jobName, map);
 
 				String jsonStr = "";
-				StringWriter outputWriter = new StringWriter();
-				try {
+				try (StringWriter outputWriter = new StringWriter()) {
 					ObjectMapper mapper = new ObjectMapper();
 					mapper.setSerializationInclusion(Include.NON_NULL);
 					mapper.writeValue(outputWriter, jobs);
@@ -387,13 +349,6 @@ public class CustomJobMaker {
 				} catch (Exception jsonex) {
 					logger.error("CustomJobMaker.createJobForClientSetupWithClients (make json) Exception occurred. ",
 							jsonex);
-				} finally {
-					try {
-						if (outputWriter != null) {
-							outputWriter.close();
-						}
-					} catch (Exception finalex) {
-					}
 				}
 
 				JobVO jobVO = new JobVO();
@@ -419,37 +374,28 @@ public class CustomJobMaker {
 	 * 
 	 * @param clientId string target client
 	 * @return StatusVO
-	 * @throws Exception
 	 */
-	public StatusVO createJobForProfiling(String clientId, String profileNo) throws Exception {
+	public StatusVO createJobForProfiling(String clientId, String profileNo) {
 
 		StatusVO statusVO = null;
 
 		try {
 			// create job
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("profile_no", profileNo);
 
 			Job[] jobs = new Job[1];
 			jobs[0] = Job.generateJobWithMap("package", "profiling_packages", map);
 
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
 				jsonStr = outputWriter.toString();
 
-			} catch (Exception jsonex) {
+			} catch (IOException jsonex) {
 				logger.error("CustomJobMaker.createJobForProfiling (make json) Exception occurred. ", jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 
 			JobVO jobVO = new JobVO();
@@ -476,11 +422,10 @@ public class CustomJobMaker {
 	 * create job with clients list and job name
 	 * 
 	 * @param jobName   string job name.
-	 * @param clientIds string user id array that will null if none.
+	 * @param clientArray string user id array that will null if none.
 	 * @return void
-	 * @throws Exception
 	 */
-	public void createJobWithClientIds(String jobName, String[] clientArray) throws Exception {
+	public void createJobWithClientIds(String jobName, String[] clientArray) {
 
 		try {
 			// create job
@@ -488,8 +433,7 @@ public class CustomJobMaker {
 			jobs[0] = Job.generateJob("config", jobName);
 
 			String jsonStr = "";
-			StringWriter outputWriter = new StringWriter();
-			try {
+			try (StringWriter outputWriter = new StringWriter()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.writeValue(outputWriter, jobs);
@@ -497,13 +441,6 @@ public class CustomJobMaker {
 
 			} catch (Exception jsonex) {
 				logger.error("CustomJobMaker.createJobWithClientIds (make json) Exception occurred. ", jsonex);
-			} finally {
-				try {
-					if (outputWriter != null) {
-						outputWriter.close();
-					}
-				} catch (Exception finalex) {
-				}
 			}
 
 			JobVO jobVO = new JobVO();
@@ -527,20 +464,19 @@ public class CustomJobMaker {
 	 * 
 	 * @param userIds string user id array that will null if none.
 	 * @return void
-	 * @throws Exception
 	 */
-	public void createJobForUseRuleByChangeDept(String[] userIds) throws Exception {
+	public void createJobForUseRuleByChangeDept(String[] userIds) {
 
 		try {
 			ResultVO re = clientService.getOnlineClientIdsInUserIds(userIds);
 			if (GPMSConstants.MSG_SUCCESS.equals(re.getStatus().getResult())) {
 				OnlineClientAndUserVO[] row = (OnlineClientAndUserVO[]) re.getData();
-				ArrayList<String> mediaJobTarget = new ArrayList<String>();
-				ArrayList<String> browserJobTarget = new ArrayList<String>();
-				ArrayList<String> securityJobTarget = new ArrayList<String>();
-				ArrayList<String> softwareFilterJobTarget = new ArrayList<String>();
-				ArrayList<String> ctrlCenterItemJobTarget = new ArrayList<String>();
-				ArrayList<String> policyKitJobTarget = new ArrayList<String>();
+				ArrayList<String> mediaJobTarget = new ArrayList<>();
+				ArrayList<String> browserJobTarget = new ArrayList<>();
+				ArrayList<String> securityJobTarget = new ArrayList<>();
+				ArrayList<String> softwareFilterJobTarget = new ArrayList<>();
+				ArrayList<String> ctrlCenterItemJobTarget = new ArrayList<>();
+				ArrayList<String> policyKitJobTarget = new ArrayList<>();
 				
 				if (row != null && row.length > 0) {
 					for (OnlineClientAndUserVO vo : row) {
@@ -572,25 +508,25 @@ public class CustomJobMaker {
 
 					// Create Job
 					if (mediaJobTarget.size() > 0) {
-						createMediaJobByClientIds(mediaJobTarget.toArray(new String[mediaJobTarget.size()]));
+						createMediaJobByClientIds(mediaJobTarget.toArray(new String[0]));
 					}
 					if (browserJobTarget.size() > 0) {
-						createBrowserJobByClientIds(browserJobTarget.toArray(new String[browserJobTarget.size()]));
+						createBrowserJobByClientIds(browserJobTarget.toArray(new String[0]));
 					}
 					if (securityJobTarget.size() > 0) {
-						createSecurityJobByClientIds(securityJobTarget.toArray(new String[securityJobTarget.size()]));
+						createSecurityJobByClientIds(securityJobTarget.toArray(new String[0]));
 					}
 					if (softwareFilterJobTarget.size() > 0) {
 						createSoftwareFilterJobByClientIds(
-								softwareFilterJobTarget.toArray(new String[softwareFilterJobTarget.size()]));
+								softwareFilterJobTarget.toArray(new String[0]));
 					}
 					if (ctrlCenterItemJobTarget.size() > 0) {
 						createCtrlCenterItemJobByClientIds(
-								ctrlCenterItemJobTarget.toArray(new String[ctrlCenterItemJobTarget.size()]));
+								ctrlCenterItemJobTarget.toArray(new String[0]));
 					}
 					if (policyKitJobTarget.size() > 0) {
 						createPolicyKitJobByClientIds(
-								policyKitJobTarget.toArray(new String[policyKitJobTarget.size()]));
+								policyKitJobTarget.toArray(new String[0]));
 					}
 				}
 			}
@@ -607,22 +543,21 @@ public class CustomJobMaker {
 	 * <p>
 	 * used when, move user to dept, dept info changed.
 	 * 
-	 * @param userIds string user id array that will null if none.
+	 * @param userId string user
 	 * @return void
-	 * @throws Exception
 	 */
-	public void createJobForUseRuleByChangeUser(String userId) throws Exception {
+	public void createJobForUseRuleByChangeUser(String userId) {
 
 		try {
 			ResultVO re = clientService.getOnlineClientIdsInUserIds(new String[] { userId });
 			if (GPMSConstants.MSG_SUCCESS.equals(re.getStatus().getResult())) {
 				OnlineClientAndUserVO[] row = (OnlineClientAndUserVO[]) re.getData();
-				ArrayList<String> mediaJobTarget = new ArrayList<String>();
-				ArrayList<String> browserJobTarget = new ArrayList<String>();
-				ArrayList<String> securityJobTarget = new ArrayList<String>();
-				ArrayList<String> softwareFilterJobTarget = new ArrayList<String>();
-				ArrayList<String> ctrlCenterItemJobTarget = new ArrayList<String>();
-				ArrayList<String> policyKitJobTarget = new ArrayList<String>();
+				ArrayList<String> mediaJobTarget = new ArrayList<>();
+				ArrayList<String> browserJobTarget = new ArrayList<>();
+				ArrayList<String> securityJobTarget = new ArrayList<>();
+				ArrayList<String> softwareFilterJobTarget = new ArrayList<>();
+				ArrayList<String> ctrlCenterItemJobTarget = new ArrayList<>();
+				ArrayList<String> policyKitJobTarget = new ArrayList<>();
 
 				if (row != null && row.length > 0) {
 					for (OnlineClientAndUserVO vo : row) {
@@ -648,25 +583,22 @@ public class CustomJobMaker {
 
 					// Create Job
 					if (mediaJobTarget.size() > 0) {
-						createMediaJobByClientIds(mediaJobTarget.toArray(new String[mediaJobTarget.size()]));
+						createMediaJobByClientIds(mediaJobTarget.toArray(new String[0]));
 					}
 					if (browserJobTarget.size() > 0) {
-						createBrowserJobByClientIds(browserJobTarget.toArray(new String[browserJobTarget.size()]));
+						createBrowserJobByClientIds(browserJobTarget.toArray(new String[0]));
 					}
 					if (securityJobTarget.size() > 0) {
-						createSecurityJobByClientIds(securityJobTarget.toArray(new String[securityJobTarget.size()]));
+						createSecurityJobByClientIds(securityJobTarget.toArray(new String[0]));
 					}
 					if (softwareFilterJobTarget.size() > 0) {
-						createSoftwareFilterJobByClientIds(
-								softwareFilterJobTarget.toArray(new String[softwareFilterJobTarget.size()]));
+						createSoftwareFilterJobByClientIds(softwareFilterJobTarget.toArray(new String[0]));
 					}
 					if (ctrlCenterItemJobTarget.size() > 0) {
-						createCtrlCenterItemJobByClientIds(
-								ctrlCenterItemJobTarget.toArray(new String[ctrlCenterItemJobTarget.size()]));
+						createCtrlCenterItemJobByClientIds(ctrlCenterItemJobTarget.toArray(new String[0]));
 					}
 					if (policyKitJobTarget.size() > 0) {
-						createPolicyKitJobByClientIds(
-								policyKitJobTarget.toArray(new String[policyKitJobTarget.size()]));
+						createPolicyKitJobByClientIds(policyKitJobTarget.toArray(new String[0]));
 					}
 				}
 			}
@@ -751,7 +683,7 @@ public class CustomJobMaker {
 				try {
 					// create Job
 					Job[] jobs = new Job[1];
-					HashMap<String, String> map = new HashMap<String, String>();
+					HashMap<String, String> map = new HashMap<>();
 					map.put("notice_publish_id", noticePublishId);
 					jobs[0] = Job.generateJobWithMap(moduleName, taskName, map);
 
@@ -832,7 +764,7 @@ public class CustomJobMaker {
 					}
 	
 					// home reset job
-					HashMap<String, String> map = new HashMap<String, String>();
+					HashMap<String, String> map = new HashMap<>();
 					if ("true".equalsIgnoreCase(homeReset)) {
 						map.put("operation", "enable");
 					} else {
@@ -842,7 +774,7 @@ public class CustomJobMaker {
 							clientIds);
 					
 					// root / sudo allow job
-					HashMap<String, String> mapAccountAllow = new HashMap<String, String>();
+					HashMap<String, String> mapAccountAllow = new HashMap<>();
 					if ("true".equalsIgnoreCase(rootAllow)) {
 						mapAccountAllow.put("root_use", "allow");
 					} else {
@@ -881,7 +813,7 @@ public class CustomJobMaker {
 			// software filtered job
 			if (beforeGroupVO == null || beforeGroupVO.getFilteredSoftwareRuleId() == null
 					|| !(beforeGroupVO.getFilteredSoftwareRuleId().equals(newGroupVO.getFilteredSoftwareRuleId()))) {
-				HashMap<String, String> map = new HashMap<String, String>();
+				HashMap<String, String> map = new HashMap<>();
 				map.put("from_gpms", "yes");
 				createJobForClientSetupWithClients(GPMSConstants.JOB_FILTEREDSOFTWARE_RULE_CHANGE, map,
 						clientIds);
@@ -890,7 +822,7 @@ public class CustomJobMaker {
 			// control center item job
 			if (beforeGroupVO == null || beforeGroupVO.getCtrlCenterItemRuleId() == null
 					|| !(beforeGroupVO.getCtrlCenterItemRuleId().equals(newGroupVO.getCtrlCenterItemRuleId()))) {
-				HashMap<String, String> map = new HashMap<String, String>();
+				HashMap<String, String> map = new HashMap<>();
 				map.put("from_gpms", "yes");
 				createJobForClientSetupWithClients(GPMSConstants.JOB_CTRLCENTERITEMS_RULE_CHANGE, map,
 						clientIds);
@@ -968,7 +900,7 @@ public class CustomJobMaker {
 				}
 
 				// home reset job
-				HashMap<String, String> mapHomeReset = new HashMap<String, String>();
+				HashMap<String, String> mapHomeReset = new HashMap<>();
 				if ("true".equalsIgnoreCase(homeReset)) {
 					mapHomeReset.put("operation", "enable");
 				} else {
@@ -977,7 +909,7 @@ public class CustomJobMaker {
 				createJobForClientSetupWithClients(GPMSConstants.JOB_CLIENTCONF_HOMERESET_CHANGE, mapHomeReset, clientIds);
 
 				// root / sudo allow job
-				HashMap<String, String> mapAccountAllow = new HashMap<String, String>();
+				HashMap<String, String> mapAccountAllow = new HashMap<>();
 				if ("true".equalsIgnoreCase(rootAllow)) {
 					mapAccountAllow.put("root_use", "allow");
 				} else {
@@ -1007,12 +939,12 @@ public class CustomJobMaker {
 			createJobForClientSetupWithClients(GPMSConstants.JOB_CLIENTCONF_HOSTS_CHANGE, null, clientIds);
 
 			// software filtered job
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("from_gpms", "yes");
 			createJobForClientSetupWithClients(GPMSConstants.JOB_FILTEREDSOFTWARE_RULE_CHANGE, map, clientIds);
 
 			// control center item job
-			map = new HashMap<String, String>();
+			map = new HashMap<>();
 			map.put("from_gpms", "yes");
 			createJobForClientSetupWithClients(GPMSConstants.JOB_CTRLCENTERITEMS_RULE_CHANGE, map, clientIds);
 
@@ -1052,13 +984,12 @@ public class CustomJobMaker {
 				// create job
 				Job[] jobs = new Job[1];
 				if (map == null) {
-					map = new HashMap<String, String>();
+					map = new HashMap<>();
 				}
 				jobs[0] = Job.generateJobWithMap("config", GPMSConstants.JOB_CLIENTSETTING_THEME_CHANGE, map);
 
 				String jsonStr = "";
-				StringWriter outputWriter = new StringWriter();
-				try {
+				try (StringWriter outputWriter = new StringWriter()) {
 					ObjectMapper mapper = new ObjectMapper();
 					mapper.setSerializationInclusion(Include.NON_NULL);
 					mapper.writeValue(outputWriter, jobs);
@@ -1066,13 +997,6 @@ public class CustomJobMaker {
 
 				} catch (Exception jsonex) {
 					logger.error("CustomJobMaker.createJobForCustomTheme (make json) Exception occurred. ", jsonex);
-				} finally {
-					try {
-						if (outputWriter != null) {
-							outputWriter.close();
-						}
-					} catch (Exception finalex) {
-					}
 				}
 
 				JobVO jobVO = new JobVO();
@@ -1098,23 +1022,15 @@ public class CustomJobMaker {
 		jobs[0] = Job.generateJobWithMap("config", "server_event_usb_whitelist", map);
 
 		String jsonStr = "";
-		StringWriter outputWriter = new StringWriter();
 
-		try {
+		try (StringWriter outputWriter = new StringWriter()) {
 			ObjectMapper mapper = new ObjectMapper();
-			mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			mapper.setSerializationInclusion(Include.NON_NULL);
 			mapper.writeValue(outputWriter, jobs);
 			jsonStr = outputWriter.toString();
 
 		} catch (Exception jsonex) {
 			logger.error("CustomJobMaker.createJobForUserReq (make json) Exception occurred. ", jsonex);
-		} finally {
-			try {
-				if (outputWriter != null) {
-					outputWriter.close();
-				}
-			} catch (Exception finalex) {
-			}
 		}
 
 		JobVO jobVO = new JobVO();

@@ -21,12 +21,11 @@ public class NoticeInstantNoticeDAO extends SqlSessionMetaDAO {
 	/**
 	 * create notice instant notice.
 	 * 
-	 * @param noticeVO
+	 * @param noticeInstantNoticeVO NoticeinstantNoticeVO
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long createNoticeInstantNotice(NoticeInstantNoticeVO noticeInstantNoticeVO) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertNoticeInstantNotice", noticeInstantNoticeVO);
+	public long createNoticeInstantNotice(NoticeInstantNoticeVO noticeInstantNoticeVO) {
+		return sqlSessionMeta.insert("insertNoticeInstantNotice", noticeInstantNoticeVO);
 	}
 
 	/**
@@ -34,16 +33,14 @@ public class NoticeInstantNoticeDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options
 	 * @return NoticePublishTargetVO List selected list data
-	 * @throws SQLException
 	 */
-	public List<NoticeInstantNoticeVO> selectNoticeInstantNoticeList(Map<String, Object> options) throws SQLException {
+	public List<NoticeInstantNoticeVO> selectNoticeInstantNoticeList(Map<String, Object> options) {
 		List<NoticeInstantNoticeVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectNoticeInstantNoticeList", options);
 		} catch (Exception ex) {
 			logger.error("error in selectNoticeInstantNoticeList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -57,7 +54,7 @@ public class NoticeInstantNoticeDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long selectNoticeInstantNoticeListTotalCount(Map<String, Object> options) {
-		return (long) sqlSessionMeta.selectOne("selectNoticeInstantNoticeListTotalCount", options);
+		return sqlSessionMeta.selectOne("selectNoticeInstantNoticeListTotalCount", options);
 	}
 
 	/**
@@ -69,6 +66,6 @@ public class NoticeInstantNoticeDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long selectNoticeInstantNoticeListFilteredCount(Map<String, Object> options) {
-		return (long) sqlSessionMeta.selectOne("selectNoticeInstantNoticeListFilteredCount", options);
+		return sqlSessionMeta.selectOne("selectNoticeInstantNoticeListFilteredCount", options);
 	}
 }

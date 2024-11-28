@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,7 +37,7 @@ public class PortableServiceImpl implements PortableService {
     @Resource(name = "portableLogDAO")
     private PortableLogDAO logDAO;
 
-    private void createLog (PortableVO portableVO, String code, String message) throws Exception {
+    private void createLog (PortableVO portableVO, String code, String message) {
         PortableLogVO logVO = new PortableLogVO();
         logVO.setLogId(logDAO.selectNextPortableLogNumber());
         logVO.setPtgrId(portableVO.getPtgrId());
@@ -47,10 +47,10 @@ public class PortableServiceImpl implements PortableService {
         logVO.setLogLevel(PortableConstants.LOG_WARN);
         logVO.setLogValue(MessageSourceHelper.getMessage(message));
         logDAO.createPortableLog(logVO);
-        logger.debug("create log : \n {}", logVO.toString());
+        logger.debug("create log : \n {}", logVO);
     }
 
-    private boolean deletePortableDataAndRelationData(List<PortableVO> ptgrList) throws Exception {
+    private boolean deletePortableDataAndRelationData(List<PortableVO> ptgrList) {
         for (PortableVO vo : ptgrList) {
             long ret = portableDAO.deletePortableDataById(vo.getPtgrId());
             if (ret == 0) {
@@ -99,7 +99,7 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public StatusVO createPortableData(PortableVO portableVO) throws Exception {
+    public StatusVO createPortableData(PortableVO portableVO) {
 
         StatusVO statusVO = new StatusVO();
 
@@ -123,7 +123,7 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public ResultVO readPortableView() throws Exception {
+    public ResultVO readPortableView() {
 
         ResultVO resultVO = new ResultVO();
 
@@ -148,7 +148,7 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public ResultPagingVO readPortableViewPaged(HashMap<String, Object> options) throws Exception {
+    public ResultPagingVO readPortableViewPaged(HashMap<String, Object> options) {
 
         ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -180,7 +180,7 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public ResultPagingVO readPortableViewById(HashMap<String, Object> options) throws Exception {
+    public ResultPagingVO readPortableViewById(HashMap<String, Object> options) {
 
         ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -205,7 +205,7 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public ResultVO readPortableDataById(HashMap<String, Object> options) throws Exception {
+    public ResultVO readPortableDataById(HashMap<String, Object> options) {
 
         ResultVO resultVO = new ResultVO();
 
@@ -230,7 +230,7 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public ResultVO readPortableDataByAdminIdAndApprove(HashMap<String, Object> options) throws Exception {
+    public ResultVO readPortableDataByAdminIdAndApprove(HashMap<String, Object> options) {
 
         ResultVO resultVO = new ResultVO();
 
@@ -255,7 +255,7 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public ResultVO readPortableArroveState(HashMap<String, Object> options) throws Exception {
+    public ResultVO readPortableArroveState(HashMap<String, Object> options) {
 
         ResultVO resultVO = new ResultVO();
 
@@ -275,7 +275,7 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public StatusVO updatePortableData(PortableVO portableVO) throws Exception {
+    public StatusVO updatePortableData(PortableVO portableVO) {
         StatusVO statusVO = new StatusVO();
 
         try {
@@ -298,12 +298,13 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public StatusVO updateAllPortableDataForApprove(String adminId) throws Exception {
+    public StatusVO updateAllPortableDataForApprove(String adminId) {
         return null;
     }
 
     @Override
-    public StatusVO deletePortableData(HashMap<String, Object> ids) throws Exception {
+    public StatusVO deletePortableData(HashMap<String, Object> ids) {
+        StatusVO result = null;
 
         StatusVO statusVO = new StatusVO();
 
@@ -312,43 +313,43 @@ public class PortableServiceImpl implements PortableService {
             if (ptgrList.size() == 0) {
                 statusVO.setResultInfo(GPMSConstants.MSG_FAIL, GPMSConstants.CODE_NODATA,
                         MessageSourceHelper.getMessage("system.common.noselectdata"));
-                return statusVO;
-            }
-
-            for (PortableVO vo : ptgrList) {
-                PortableCertVO certVO =  portableCertDAO.selectPortableCert(Integer.toString(vo.getCertId()));
-                if (certVO == null) {
-                    createLog(vo, GPMSConstants.CODE_SELECT, "portable.result.noselectcert");
-                }
-                else {
-                    //File remove
-                    String certPath = certVO.getCertPath();
-                    if (certPath != null && !certPath.isEmpty()) {
-                        Path path = Paths.get(certPath);
-                        FileUtils.delete(new File(path.getParent().toString()));
+                result = statusVO;
+            } else {
+                for (PortableVO vo : ptgrList) {
+                    PortableCertVO certVO = portableCertDAO.selectPortableCert(Integer.toString(vo.getCertId()));
+                    if (certVO == null) {
+                        createLog(vo, GPMSConstants.CODE_SELECT, "portable.result.noselectcert");
+                    } else {
+                        //File remove
+                        String certPath = certVO.getCertPath();
+                        if (certPath != null && !certPath.isEmpty()) {
+                            Path path = Paths.get(certPath);
+                            FileUtils.delete(new File(path.getParent().toString()));
+                        }
+                    }
+                    long ret = portableDAO.deletePortableDataById(vo.getPtgrId());
+                    if (ret == 0) {
+                        createLog(vo, GPMSConstants.CODE_DELETE, "portable.result.nodelete");
                     }
                 }
-                long ret = portableDAO.deletePortableDataById(vo.getPtgrId());
-                if (ret == 0) {
-                    createLog(vo, GPMSConstants.CODE_DELETE, "portable.result.nodelete");
-                }
+                statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
+                        MessageSourceHelper.getMessage("portable.result.delete"));
             }
 
-            statusVO.setResultInfo(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_DELETE,
-                    MessageSourceHelper.getMessage("portable.result.delete"));
-
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("error in deletePortableData: {}, {}, {}", GPMSConstants.CODE_SYSERROR,
                     MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), e.toString());
             throw e;
         }
+        if (result == null) {
+            result = statusVO;
+        }
 
-        return statusVO;
+        return result;
     }
 
     @Override
-    public StatusVO deleteAllPortableData() throws Exception {
+    public StatusVO deleteAllPortableData() {
 
         StatusVO statusVO = new StatusVO();
 
@@ -378,19 +379,18 @@ public class PortableServiceImpl implements PortableService {
      *
      * @param ids list of user id
      * @return ResultVO result data bean
-     * @throws Exception
      */
     @Override
-    public ResultVO isNoExistInUserIdList(String[] ids) throws Exception {
+    public ResultVO isNoExistInUserIdList(String[] ids) {
 
         ResultVO resultVO = new ResultVO();
 
         try {
-            List<String> idList = new ArrayList<String>();
+            List<String> idList = new ArrayList<>();
 
             for (String s : ids) {
                 String id = portableDAO.selectPortableUserListForDuplicateUserId(s);
-                if (id != "" && id != null)
+                if (!id.equals("") && id != null)
                     idList.add(id);
             }
 
@@ -415,12 +415,12 @@ public class PortableServiceImpl implements PortableService {
     }
 
     @Override
-    public int readNextPortableDataIndex() throws Exception {
+    public int readNextPortableDataIndex() {
         return portableDAO.selectNextPortableNumber();
     }
 
     @Override
-    public long readPortableDataCount() throws Exception {
+    public long readPortableDataCount() {
         return portableDAO.selectPortableTotalCount(null);
     }
 }

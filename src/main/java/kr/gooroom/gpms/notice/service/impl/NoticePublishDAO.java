@@ -23,23 +23,21 @@ public class NoticePublishDAO extends SqlSessionMetaDAO {
      * 
      * @param noticePublishVO
      * @return long data insert result count.
-     * @throws SQLException
-     */
-    public long createNoticePublish(NoticePublishVO noticePublishVO) throws SQLException {
-        return (long) sqlSessionMeta.insert("insertNoticePublish", noticePublishVO);
+	 */
+    public long createNoticePublish(NoticePublishVO noticePublishVO) {
+        return sqlSessionMeta.insert("insertNoticePublish", noticePublishVO);
     }
     /**
      * update notice_publish by noticePublish data bean.
      * 
      * @param noticePublishVO
      * @return long data update result count.
-     * @throws SQLException
-     */
-    public long updateNoticePublish(NoticePublishVO noticePublishVO) throws SQLException {
-        return (long) sqlSessionMeta.update("updateNoticePublish", noticePublishVO);
+	 */
+    public long updateNoticePublish(NoticePublishVO noticePublishVO) {
+        return sqlSessionMeta.update("updateNoticePublish", noticePublishVO);
     }
     
-	public NoticePublishVO selectNoticePublish(String noticePublishId) throws SQLException {
+	public NoticePublishVO selectNoticePublish(String noticePublishId) {
 	    return sqlSessionMeta.selectOne("selectNoticePublish", noticePublishId);
 	}
 
@@ -48,16 +46,14 @@ public class NoticePublishDAO extends SqlSessionMetaDAO {
      * 
      * @param options Map<String, Object> options for select
      * @return NoticePublishVO List selected list data
-     * @throws SQLException
-     */
-	public List<NoticePublishVO> selectNoticePublishList(Map<String, Object> options) throws SQLException {
+	 */
+	public List<NoticePublishVO> selectNoticePublishList(Map<String, Object> options) {
 		List<NoticePublishVO> re = null;
 		try {
 		    re = sqlSessionMeta.selectList("selectNoticePublishList", options);
 		} catch (Exception ex) {
 		    logger.error("error in selectNoticePublishList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 			    MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-		    re = null;
 		}
 
 		return re;
@@ -68,10 +64,9 @@ public class NoticePublishDAO extends SqlSessionMetaDAO {
      * 
      * @param options Map<String, Object> options for select
      * @return long total count number.
-     * @throws SQLException
-     */
-	public long selectNoticePublishListTotalCount(Map<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectNoticePublishListTotalCount", options);
+	 */
+	public long selectNoticePublishListTotalCount(Map<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectNoticePublishListTotalCount", options);
 	}
 
     /**
@@ -80,9 +75,8 @@ public class NoticePublishDAO extends SqlSessionMetaDAO {
      * 
      * @param options Map<String, Object> options for select
      * @return long filtered count number.
-     * @throws SQLException
-     */
-	public long selectNoticePublishListFilteredCount(Map<String, Object> options) throws SQLException {
-		return (long) sqlSessionMeta.selectOne("selectNoticePublishListFilteredCount", options);
+	 */
+	public long selectNoticePublishListFilteredCount(Map<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectNoticePublishListFilteredCount", options);
 	}
 }

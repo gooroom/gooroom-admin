@@ -56,8 +56,6 @@ public class MessageSourceHelper {
 	 * set message source object
 	 * 
 	 * @param messageSource MessageSource message object
-	 * @return void
-	 *
 	 */
 	public static void setMessageSource(MessageSource messageSource) {
 		MessageSourceHelper.messageSource = messageSource;

@@ -16,20 +16,18 @@
 
 package kr.gooroom.gpms.job.service.impl;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.job.service.ClientInJobVO;
-import kr.gooroom.gpms.job.service.JobResultVO;
 import kr.gooroom.gpms.job.service.JobVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * data access object class for gooroom job management process.
@@ -49,20 +47,18 @@ public class JobDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param job_status String job status option.
 	 * @return JobVO List job list
-	 * @throws SQLException
 	 */
-	public List<JobVO> selectJobList(String job_status) throws SQLException {
+	public List<JobVO> selectJobList(String job_status) {
 
 		List<JobVO> re = null;
 		try {
-			HashMap<String, String> map = new HashMap<String, String>();
+			HashMap<String, String> map = new HashMap<>();
 			map.put("jobStatus", job_status);
 			re = sqlSessionMeta.selectList("selectJobList", map);
 
 		} catch (Exception ex) {
 			logger.error("error in selectJobList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -73,9 +69,8 @@ public class JobDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return JobVO List job list
-	 * @throws SQLException
 	 */
-	public List<JobVO> selectJobListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<JobVO> selectJobListPaged(HashMap<String, Object> options) {
 
 		List<JobVO> re = null;
 		try {
@@ -84,7 +79,6 @@ public class JobDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectJobListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -95,11 +89,10 @@ public class JobDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectJobListFilteredCount(HashMap<String, Object> options) throws SQLException {
+	public long selectJobListFilteredCount(HashMap<String, Object> options) {
 
-		return (long) sqlSessionMeta.selectOne("selectJobListFilteredCount", options);
+		return sqlSessionMeta.selectOne("selectJobListFilteredCount", options);
 	}
 
 	/**
@@ -107,11 +100,10 @@ public class JobDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectJobListTotalCount(HashMap<String, Object> options) throws SQLException {
+	public long selectJobListTotalCount(HashMap<String, Object> options) {
 
-		return (long) sqlSessionMeta.selectOne("selectJobListTotalCount", options);
+		return sqlSessionMeta.selectOne("selectJobListTotalCount", options);
 	}
 
 	/**
@@ -119,9 +111,8 @@ public class JobDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param jobNo String job id.
 	 * @return JobVO result object.
-	 * @throws SQLException
 	 */
-	public JobVO selectJobInfo(String jobNo) throws SQLException {
+	public JobVO selectJobInfo(String jobNo) {
 
 		JobVO re = null;
 		try {
@@ -129,7 +120,6 @@ public class JobDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectJobInfo : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -138,12 +128,11 @@ public class JobDAO extends SqlSessionMetaDAO {
 	/**
 	 * modify job by job data bean.
 	 * 
-	 * @param jobVO JobVO job configuration data bean.
+	 * @param vo jobVO JobVO job configuration data bean.
 	 * @return long data insert result count.
-	 * @throws SQLException
 	 */
-	public long updateJobClientToCancel(JobVO vo) throws SQLException {
-		return (long) sqlSessionMeta.update("updateJobClientToCancel", vo);
+	public long updateJobClientToCancel(JobVO vo) {
+		return sqlSessionMeta.update("updateJobClientToCancel", vo);
 	}
 
 	/**
@@ -151,9 +140,8 @@ public class JobDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param jobNo String job id(number).
 	 * @return ClientInJobVO list selected client list data.
-	 * @throws SQLException
 	 */
-	public List<ClientInJobVO> selectClientListInJob(String jobNo) throws SQLException {
+	public List<ClientInJobVO> selectClientListInJob(String jobNo) {
 
 		List<ClientInJobVO> re = null;
 		try {
@@ -161,7 +149,6 @@ public class JobDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectClientListInJob : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -170,11 +157,10 @@ public class JobDAO extends SqlSessionMetaDAO {
 	/**
 	 * response client list data that was targeted job.
 	 * 
-	 * @param jobNo String job id(number).
+	 * @param options HashMap<Sring, Object>
 	 * @return ClientInJobVO list selected client list data.
-	 * @throws SQLException
 	 */
-	public List<ClientInJobVO> selectClientListInJobPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ClientInJobVO> selectClientListInJobPaged(HashMap<String, Object> options) {
 
 		List<ClientInJobVO> re = null;
 		try {
@@ -182,7 +168,6 @@ public class JobDAO extends SqlSessionMetaDAO {
 		} catch (Exception ex) {
 			logger.error("error in selectClientListInJobPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 
 		return re;
@@ -193,11 +178,9 @@ public class JobDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectClientListInJobFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectClientListInJobFilteredCount", options);
+	public long selectClientListInJobFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectClientListInJobFilteredCount", options);
 	}
 
 	/**
@@ -205,11 +188,9 @@ public class JobDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectClientListInJobTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectClientListInJobTotalCount", options);
+	public long selectClientListInJobTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectClientListInJobTotalCount", options);
 	}
 
 	/**
@@ -220,9 +201,7 @@ public class JobDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long createJobMaster(JobVO jobVO) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertJobMaster", jobVO);
-
+		return sqlSessionMeta.insert("insertJobMaster", jobVO);
 	}
 
 	/**
@@ -233,9 +212,7 @@ public class JobDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long createJobTarget(JobVO jobVO) throws SQLException {
-
-		return (long) sqlSessionMeta.insert("insertJobTarget", jobVO);
-
+		return sqlSessionMeta.insert("insertJobTarget", jobVO);
 	}
 
 }

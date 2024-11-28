@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +33,9 @@ import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
-import kr.gooroom.gpms.common.utils.LoginInfoHelper;
+
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
 import kr.gooroom.gpms.job.service.ClientInJobVO;
-import kr.gooroom.gpms.job.service.JobResultVO;
 import kr.gooroom.gpms.job.service.JobService;
 import kr.gooroom.gpms.job.service.JobVO;
 
@@ -76,8 +75,8 @@ public class JobServiceImpl implements JobService {
 			if (reCnt1 > 0) {
 				long reCnt2 = 0;
 				String[] clientArray = jobVO.getClientIds();
-				for (int i = 0; i < clientArray.length; i++) {
-					jobVO.setClientId(clientArray[i]);
+				for (String s : clientArray) {
+					jobVO.setClientId(s);
 					reCnt2 = jobDAO.createJobTarget(jobVO);
 				}
 
@@ -121,10 +120,9 @@ public class JobServiceImpl implements JobService {
 	 * 
 	 * @param jobVO JobVO job configuration data bean.
 	 * @return StatusVO result status
-	 * @throws Exception
 	 */
 	@Override
-	public StatusVO setJobToCancel(JobVO jobVO) throws Exception {
+	public StatusVO setJobToCancel(JobVO jobVO) {
 		StatusVO statusVO = new StatusVO();
 		try {
 			long reCnt = jobDAO.updateJobClientToCancel(jobVO);
@@ -151,10 +149,9 @@ public class JobServiceImpl implements JobService {
 	 * 
 	 * @param job_status String job status option.
 	 * @return ResultVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getJobList(String job_status) throws Exception {
+	public ResultVO getJobList(String job_status) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -163,7 +160,7 @@ public class JobServiceImpl implements JobService {
 			List<JobVO> re = jobDAO.selectJobList(job_status);
 
 			if (re != null && re.size() > 0) {
-				JobVO[] row = re.stream().toArray(JobVO[]::new);
+				JobVO[] row = re.toArray(JobVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -191,10 +188,9 @@ public class JobServiceImpl implements JobService {
 	 * 
 	 * @param options HashMap<String, Object>.
 	 * @return ResultPagingVO result object
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getJobListPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getJobListPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -205,7 +201,7 @@ public class JobServiceImpl implements JobService {
 			long filteredCount = jobDAO.selectJobListFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				JobVO[] row = re.stream().toArray(JobVO[]::new);
+				JobVO[] row = re.toArray(JobVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -234,12 +230,11 @@ public class JobServiceImpl implements JobService {
 	/**
 	 * response job information by job id.
 	 * 
-	 * @param jobId String job id.
+	 * @param jobNo String
 	 * @return ResultVO result object.
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO getJobInfo(String jobNo) throws Exception {
+	public ResultVO getJobInfo(String jobNo) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -277,10 +272,9 @@ public class JobServiceImpl implements JobService {
 	 * 
 	 * @param jobNo String job id(number).
 	 * @return ResultVO result object.
-	 * @throws Exception
 	 */
 	@Override
-	public ResultVO readClientListInJob(String jobNo) throws Exception {
+	public ResultVO readClientListInJob(String jobNo) {
 
 		ResultVO resultVO = new ResultVO();
 
@@ -289,7 +283,7 @@ public class JobServiceImpl implements JobService {
 			List<ClientInJobVO> re = jobDAO.selectClientListInJob(jobNo);
 
 			if (re != null && re.size() > 0) {
-				ClientInJobVO[] row = re.stream().toArray(ClientInJobVO[]::new);
+				ClientInJobVO[] row = re.toArray(ClientInJobVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));
@@ -317,10 +311,9 @@ public class JobServiceImpl implements JobService {
 	 * 
 	 * @param options HashMap<String, Object> option data.
 	 * @return ResultVO result object.
-	 * @throws Exception
 	 */
 	@Override
-	public ResultPagingVO getClientListInJobPaged(HashMap<String, Object> options) throws Exception {
+	public ResultPagingVO getClientListInJobPaged(HashMap<String, Object> options) {
 
 		ResultPagingVO resultVO = new ResultPagingVO();
 
@@ -331,7 +324,7 @@ public class JobServiceImpl implements JobService {
 			long filteredCount = jobDAO.selectClientListInJobFilteredCount(options);
 
 			if (re != null && re.size() > 0) {
-				ClientInJobVO[] row = re.stream().toArray(ClientInJobVO[]::new);
+				ClientInJobVO[] row = re.toArray(ClientInJobVO[]::new);
 				resultVO.setData(row);
 				resultVO.setStatus(new StatusVO(GPMSConstants.MSG_SUCCESS, GPMSConstants.CODE_SELECT,
 						MessageSourceHelper.getMessage("system.common.selectdata")));

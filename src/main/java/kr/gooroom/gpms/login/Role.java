@@ -2,11 +2,11 @@ package kr.gooroom.gpms.login;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import java.io.Serial;
+
 public class Role implements GrantedAuthority {
 
-	/**
-	 * 
-	 */
+	@Serial
 	private static final long serialVersionUID = -4586688222110526356L;
 	private String name;
 	

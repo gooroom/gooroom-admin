@@ -16,21 +16,19 @@
 
 package kr.gooroom.gpms.client.service.impl;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-
-import kr.gooroom.gpms.account.service.AccountVO;
 import kr.gooroom.gpms.client.service.ClientGroupVO;
 import kr.gooroom.gpms.client.service.ClientVO;
 import kr.gooroom.gpms.common.GPMSConstants;
 import kr.gooroom.gpms.common.service.dao.SqlSessionMetaDAO;
 import kr.gooroom.gpms.common.utils.LoginInfoHelper;
 import kr.gooroom.gpms.common.utils.MessageSourceHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * data access object class for client management process.
@@ -51,15 +49,13 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * response client group list.
 	 * 
 	 * @return ClientGroupVO List selected client group object
-	 * @throws SQLException
 	 */
-	public List<ClientGroupVO> selectClientGroupList() throws SQLException {
+	public List<ClientGroupVO> selectClientGroupList() {
 
 		List<ClientGroupVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectClientGroupList");
 		} catch (Exception ex) {
-			re = null;
 			logger.error("error in selectClientGroupList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
@@ -72,16 +68,14 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return ClientGroupVO List selected client group object
-	 * @throws SQLException
 	 */
-	public List<ClientGroupVO> selectClientGroupListPaged(HashMap<String, Object> options) throws SQLException {
+	public List<ClientGroupVO> selectClientGroupListPaged(HashMap<String, Object> options) {
 
 		List<ClientGroupVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("selectClientGroupListPaged", options);
 
 		} catch (Exception ex) {
-			re = null;
 			logger.error("error in selectClientGroupListPaged : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
@@ -94,11 +88,9 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long filtered count number.
-	 * @throws SQLException
 	 */
-	public long selectClientGroupListFilteredCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectClientGroupListFilteredCount", options);
+	public long selectClientGroupListFilteredCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectClientGroupListFilteredCount", options);
 	}
 
 	/**
@@ -106,11 +98,9 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param options HashMap<String, Object> options for select
 	 * @return long total count number.
-	 * @throws SQLException
 	 */
-	public long selectClientGroupListTotalCount(HashMap<String, Object> options) throws SQLException {
-
-		return (long) sqlSessionMeta.selectOne("selectClientGroupListTotalCount", options);
+	public long selectClientGroupListTotalCount(HashMap<String, Object> options) {
+		return sqlSessionMeta.selectOne("selectClientGroupListTotalCount", options);
 	}
 
 	/**
@@ -126,11 +116,9 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 		try {
 			re = sqlSessionMeta.selectOne("selectClientGroupData", grpId);
 		} catch (Exception ex) {
-			re = null;
 			logger.error("error in selectClientGroupData : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
-
 		return re;
 	}
 
@@ -139,18 +127,15 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param groupIds string target group id array
 	 * @return ClientGroupVO selected client group object
-	 * @throws SQLException
 	 */
-	public List<ClientGroupVO> selectClientGroupNodeList(String[] groupIds) throws SQLException {
+	public List<ClientGroupVO> selectClientGroupNodeList(String[] groupIds) {
 
 		List<ClientGroupVO> re = null;
 		try {
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put("groupIds", groupIds);
-			
 			re = sqlSessionMeta.selectList("selectClientGroupNodeList", map);
 		} catch (Exception ex) {
-			re = null;
 			logger.error("error in selectClientGroupNodeList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
@@ -166,7 +151,7 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long createClientGroup(ClientGroupVO vo) throws SQLException {
-		return (long) sqlSessionMeta.insert("insertClientGroup", vo);
+		return sqlSessionMeta.insert("insertClientGroup", vo);
 	}
 
 	/**
@@ -180,12 +165,12 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 */
 	public long createClientGroupHist(String chgTp, String groupId, String regUserId) throws SQLException {
 		
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("chgTp", chgTp);
 		map.put("regUserId", regUserId);
 		map.put("grpId", groupId);
 		
-		return (long) sqlSessionMeta.insert("insertClientGroupHist", map);
+		return sqlSessionMeta.insert("insertClientGroupHist", map);
 	}
 
 	/**
@@ -197,7 +182,7 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 */
 	public long createDefaultClientGroup(ClientGroupVO vo) throws SQLException {
 
-		return (long) sqlSessionMeta.insert("insertDefaultClientGroup", vo);
+		return sqlSessionMeta.insert("insertDefaultClientGroup", vo);
 
 	}
 
@@ -207,19 +192,17 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * @param parentGrpId string parent group id
 	 * @param groupName string group name
 	 * @return boolean Boolean value
-	 * @throws SQLException
 	 */
-	public boolean isExistGroupNameByParentId(String parentGrpId, String groupName) throws SQLException {
+	public boolean isExistGroupNameByParentId(String parentGrpId, String groupName) {
 		boolean re = true;
 		try {
 			if (parentGrpId != null && parentGrpId.length() > 0) {
-				HashMap<String, Object> map = new HashMap<String, Object>();
+				HashMap<String, Object> map = new HashMap<>();
 				map.put("parentGrpId", parentGrpId);
 				map.put("groupName", groupName);
-				re = ((Boolean) sqlSessionMeta.selectOne("isExistGroupNameByParentId", map)).booleanValue();
+				re = sqlSessionMeta.selectOne("isExistGroupNameByParentId", map);
 			}
 		} catch (Exception ex) {
-			re = true;
 			logger.error("error in isExistGroupNameInParent : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
@@ -232,19 +215,17 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * @param grpId string group id
 	 * @param groupName string group name
 	 * @return boolean Boolean value
-	 * @throws SQLException
 	 */
-	public boolean isExistGroupNameByGroupId(String grpId, String groupName) throws SQLException {
+	public boolean isExistGroupNameByGroupId(String grpId, String groupName) {
 		boolean re = true;
 		try {
 			if (grpId != null && grpId.length() > 0) {
-				HashMap<String, Object> map = new HashMap<String, Object>();
+				HashMap<String, Object> map = new HashMap<>();
 				map.put("grpId", grpId);
 				map.put("groupName", groupName);
-				re = ((Boolean) sqlSessionMeta.selectOne("isExistGroupNameByGroupId", map)).booleanValue();
+				re = sqlSessionMeta.selectOne("isExistGroupNameByGroupId", map);
 			}
 		} catch (Exception ex) {
-			re = true;
 			logger.error("error in isExistGroupNameByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
 		}
@@ -259,7 +240,7 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteClientGroup(String grpId) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteClientGroup", grpId);
+		return sqlSessionMeta.delete("deleteClientGroup", grpId);
 	}
 
 	/**
@@ -267,39 +248,34 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param groupIds string array target group id list
 	 * @return long query result count
-	 * @throws SQLException
 	 */
-	public boolean deleteClientGroupList(String[] groupIds, String regUserId) throws SQLException {
+	public boolean deleteClientGroupList(String[] groupIds, String regUserId) {
 	
 		if(groupIds != null && groupIds.length > 0) {
 			try {
-				
-				for(int i = 0; i < groupIds.length; i++) {
-					HashMap<String, String> map = new HashMap<String, String>();
+				for (String groupId : groupIds) {
+					HashMap<String, String> map = new HashMap<>();
 					map.put("chgTp", "DELETE");
 					map.put("regUserId", regUserId);
-					map.put("grpId", groupIds[i]);
-					
+					map.put("grpId", groupId);
 					// 1. insert client group history
 					long re = sqlSessionMeta.insert("insertClientGroupHist", map);
-					if(re > 0 ) {
-					// 2. delete master
-					long delRe = sqlSessionMeta.delete("deleteClientGroup", groupIds[i]);
-					if(delRe > 0 ) {
-						// 3. delete rule table for group : gr_group_rule_conf
-						sqlSessionMeta.delete("deleteClientGroupFromRule", groupIds[i]);
-						// 4. delete admin table for group : admin_clientgrp
-						sqlSessionMeta.delete("deleteClientGroupForAdmin", groupIds[i]);
-					}
+					if (re > 0) {
+						// 2. delete master
+						long delRe = sqlSessionMeta.delete("deleteClientGroup", groupId);
+						if (delRe > 0) {
+							// 3. delete rule table for group : gr_group_rule_conf
+							sqlSessionMeta.delete("deleteClientGroupFromRule", groupId);
+							// 4. delete admin table for group : admin_clientgrp
+							sqlSessionMeta.delete("deleteClientGroupForAdmin", groupId);
+						}
 					}
 				}
 				return true;
-				
 			} catch (Exception ex) {
 				return false;
 			}
 		}
-		
 		return false;
 	}
 
@@ -311,7 +287,7 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteClientGroupFromRule(String grpId) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteClientGroupFromRule", grpId);
+		return sqlSessionMeta.delete("deleteClientGroupFromRule", grpId);
 	}
 
 	/**
@@ -322,7 +298,7 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteClientGroupForAdmin(String grpId) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteClientGroupForAdmin", grpId);
+		return sqlSessionMeta.delete("deleteClientGroupForAdmin", grpId);
 	}
 
 	/**
@@ -333,7 +309,7 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long deleteClientGroupForNoti(String grpId) throws SQLException {
-		return (long) sqlSessionMeta.delete("deleteClientGroupForNoti", grpId);
+		return sqlSessionMeta.delete("deleteClientGroupForNoti", grpId);
 	}
 
 	/**
@@ -341,12 +317,11 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param groupIds string array target group id list
 	 * @return long query result count
-	 * @throws SQLException
 	 */
-	public long deleteClientGroupListFromRule(String[] groupIds) throws SQLException {
-		HashMap<String, Object> map = new HashMap<String, Object>();
+	public long deleteClientGroupListFromRule(String[] groupIds) {
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("groupIds", groupIds);
-		return (long) sqlSessionMeta.delete("deleteClientGroupListFromRule", map);
+		return sqlSessionMeta.delete("deleteClientGroupListFromRule", map);
 	}
 
 	/**
@@ -357,9 +332,7 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * @throws SQLException
 	 */
 	public long updateClientGroup(ClientGroupVO clientGroupVO) throws SQLException {
-
-		return (long) sqlSessionMeta.update("updateClientGroup", clientGroupVO);
-
+		return sqlSessionMeta.update("updateClientGroup", clientGroupVO);
 	}
 
 	/**
@@ -368,18 +341,17 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * create mapping data with client and group
 	 * 
 	 * @param grpId    string target group id
-	 * @param clientId string target client id
+	 * @param clientIds string target client id
 	 * @return long query result count
 	 * @throws SQLException
 	 */
 	public long updateGroupToClient(String grpId, String[] clientIds) throws SQLException {
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("grpId", grpId);
 		map.put("clientIds", clientIds);
 		map.put("modUserId", LoginInfoHelper.getUserId());
-
-		return (long) sqlSessionMeta.update("updateGroupToClient", map);
+		return sqlSessionMeta.update("updateGroupToClient", map);
 	}
 
 	/**
@@ -391,30 +363,27 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 */
 	public long updateGroupToClientForDelete(String grpId) throws SQLException {
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("newGroupId", GPMSConstants.DEFAULT_GROUPID);
 		map.put("grpId", grpId);
 		map.put("modUserId", LoginInfoHelper.getUserId());
-
-		return (long) sqlSessionMeta.delete("updateGroupToClientForDelete", map);
+		return sqlSessionMeta.delete("updateGroupToClientForDelete", map);
 	}
 
 	/**
 	 * remove clients in group list (multi). update to default group id in client
 	 * 
 	 * @param groupIds string array target group id list
-	 * @param clientId string target client id
 	 * @return long query result count
-	 * @throws SQLException
 	 */
-	public long updateGroupListToClientForDelete(String[] groupIds) throws SQLException {
+	public long updateGroupListToClientForDelete(String[] groupIds) {
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("newGroupId", GPMSConstants.DEFAULT_GROUPID);
 		map.put("groupIds", groupIds);
 		map.put("modUserId", LoginInfoHelper.getUserId());
 
-		return (long) sqlSessionMeta.delete("updateGroupListToClientForDelete", map);
+		return sqlSessionMeta.delete("updateGroupListToClientForDelete", map);
 	}
 
 	/**
@@ -430,13 +399,13 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	public long insertOrUpdateConfigWithGroup(String grpId, String regUserId, String configId, String configTp)
 			throws SQLException {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("grpId", grpId);
 		map.put("regUserId", regUserId);
 		map.put("configId", configId);
 		map.put("configTp", configTp);
 
-		return (long) sqlSessionMeta.update("insertOrUpdateConfigWithGroup", map);
+		return sqlSessionMeta.update("insertOrUpdateConfigWithGroup", map);
 	}
 
 	/**
@@ -450,11 +419,11 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	public long insertGroupInAdminRelation(String grpId, String regUserId)
 			throws SQLException {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("grpId", grpId);
 		map.put("regUserId", regUserId);
 
-		return (long) sqlSessionMeta.update("insertGroupInAdminRelation", map);
+		return sqlSessionMeta.update("insertGroupInAdminRelation", map);
 	}
 
 	/**
@@ -467,10 +436,10 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 */
 	public long deleteConfigWithGroup(String grpId, String configTp) throws SQLException {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("grpId", grpId);
 		map.put("configTp", configTp);
-		return (long) sqlSessionMeta.update("deleteConfigWithGroup", map);
+		return sqlSessionMeta.update("deleteConfigWithGroup", map);
 	}
 
 	/**
@@ -478,16 +447,14 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param grpId string group id
 	 * @return ClientVO List
-	 * @throws SQLException
 	 */
-	public List<ClientVO> selectOnlineClientIdsByGroupId(String grpId) throws SQLException {
+	public List<ClientVO> selectOnlineClientIdsByGroupId(String grpId) {
 		List<ClientVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("ClientGroupDAO.selectOnlineClientIdsByGroupId", grpId);
 		} catch (Exception ex) {
 			logger.error("error in selectOnlineClientIdsByGroupId : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 		return re;
 	}
@@ -497,16 +464,14 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	 * 
 	 * @param grpId string group id List
 	 * @return ClientVO List
-	 * @throws SQLException
 	 */
-	public List<ClientVO> selectOnlineClientIdsByGroupList(String[] grpId) throws SQLException {
+	public List<ClientVO> selectOnlineClientIdsByGroupList(String[] grpId) {
 		List<ClientVO> re = null;
 		try {
 			re = sqlSessionMeta.selectList("ClientGroupDAO.selectOnlineClientIdsByGroupList", grpId);
 		} catch (Exception ex) {
 			logger.error("error in selectOnlineClientIdsByGroupList : {}, {}, {}", GPMSConstants.CODE_SYSERROR,
 					MessageSourceHelper.getMessage(GPMSConstants.MSG_SYSERROR), ex.toString());
-			re = null;
 		}
 		return re;
 	}
@@ -514,29 +479,19 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	/**
 	 * select root client group info
 	 * 
-	 * @param
 	 * @return ClientGroupVO
-	 * @throws Exception
 	 */
-	public ClientGroupVO selectRootChildrenClientGroupInfo() throws SQLException {
-		ClientGroupVO re = null;
-		try {
-			re = sqlSessionMeta.selectOne("selectRootChildrenClientGroupInfo");
-		} catch (Exception ex) {
-			re = null;
-		}
-		return re;
+	public ClientGroupVO selectRootChildrenClientGroupInfo() {
+		return sqlSessionMeta.selectOne("selectRootChildrenClientGroupInfo");
 	}
 
 	/**
 	 * select list of client group by parent group id (one depth)
 	 * 
-	 * @param
 	 * @return List<ClientGroupVO>
-	 * @throws Exception
 	 */
-	public List<ClientGroupVO> selectChildrenClientGroupList(HashMap<String, Object> map) throws SQLException {
-		List<ClientGroupVO> re = null;
+	public List<ClientGroupVO> selectChildrenClientGroupList(HashMap<String, Object> map) {
+		List<ClientGroupVO> re;
 		try {
 			re = sqlSessionMeta.selectList("selectChildrenClientGroupList", map);
 		} catch (Exception ex) {
@@ -548,12 +503,10 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	/**
 	 * select list of client group by parent group id (one depth)
 	 * 
-	 * @param
 	 * @return List<ClientGroupVO>
-	 * @throws Exception
 	 */
-	public List<ClientGroupVO> selectChildrenClientGroupListByAdmin(HashMap<String, Object> map) throws SQLException {
-		List<ClientGroupVO> re = null;
+	public List<ClientGroupVO> selectChildrenClientGroupListByAdmin(HashMap<String, Object> map) {
+		List<ClientGroupVO> re;
 		try {
 			re = sqlSessionMeta.selectList("selectChildrenClientGroupListByAdmin", map);
 		} catch (Exception ex) {
@@ -565,12 +518,10 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	/**
 	 * child group list (all depth)
 	 * 
-	 * @param
 	 * @return List<ClientGroupVO>
-	 * @throws Exception
 	 */
-	public List<ClientGroupVO> selectAllChildrenGroupList(String grpId) throws SQLException {
-		List<ClientGroupVO> re = null;
+	public List<ClientGroupVO> selectAllChildrenGroupList(String grpId) {
+		List<ClientGroupVO> re;
 		try {
 			re = sqlSessionMeta.selectList("selectAllChildrenGroupList", grpId);
 		} catch (Exception ex) {
@@ -582,15 +533,13 @@ public class ClientGroupDAO extends SqlSessionMetaDAO {
 	/**
 	 * child group list by multi parents (all depth)
 	 * 
-	 * @param
 	 * @return List<ClientGroupVO>
-	 * @throws Exception
+	 * @throws SQLException
 	 */
 	public List<ClientGroupVO> selectAllChildrenGroupListByParents(String[] groupIds) throws SQLException {
-		List<ClientGroupVO> re = null;
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		List<ClientGroupVO> re;
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("groupIds", groupIds);
-
 		try {
 			re = sqlSessionMeta.selectList("selectAllChildrenGroupListByParents", map);
 		} catch (Exception ex) {

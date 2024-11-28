@@ -2,13 +2,11 @@ package kr.gooroom.gpms.login.exception;
 
 import org.springframework.security.core.AuthenticationException;
 
-public class DuplicateAccessIpException extends AuthenticationException {
-	// ~ Constructors
-	// ===================================================================================================
+import java.io.Serial;
 
-	/**
-	 * 
-	 */
+public class DuplicateAccessIpException extends AuthenticationException {
+
+	@Serial
 	private static final long serialVersionUID = 4414132120245767084L;
 
 	/**

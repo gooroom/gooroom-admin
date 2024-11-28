@@ -71,7 +71,6 @@ public interface DesktopAppService {
 	/**
 	 * get desktop application list data
 	 * 
-	 * @param contextAddress String use desktop application.
 	 * @return ResultVO
 	 * @throws Exception
 	 */

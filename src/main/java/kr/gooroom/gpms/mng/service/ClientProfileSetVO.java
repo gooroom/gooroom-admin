@@ -16,12 +16,14 @@
 
 package kr.gooroom.gpms.mng.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
-@SuppressWarnings("serial")
 public class ClientProfileSetVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = -5172486772272855864L;
 	private String clientId;
 	private String clientNm;
 

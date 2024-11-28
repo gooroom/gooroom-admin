@@ -16,15 +16,14 @@
 
 package kr.gooroom.gpms.user.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import kr.gooroom.gpms.common.service.ResultPagingVO;
 import kr.gooroom.gpms.common.service.ResultVO;
 import kr.gooroom.gpms.common.service.StatusVO;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * user management service interface
@@ -92,7 +91,7 @@ public interface UserService {
 	/**
 	 * response user information data
 	 * 
-	 * @param adminId string user id
+	 * @param userId string user id
 	 * @return ResultVO result data bean
 	 * @throws Exception
 	 */
@@ -190,7 +189,7 @@ public interface UserService {
 	/**
 	 * get user configuration information data by dept code.
 	 * 
-	 * @param DeptCd String dept code
+	 * @param deptCd String dept code
 	 * @return ResultVO result data bean
 	 * @throws Exception
 	 */
@@ -263,7 +262,7 @@ public interface UserService {
 	/**
 	 * 여러 사용자 권한정보 일괄 수정
 	 */
-	public StatusVO updateRuleInfoToMultiUser(ArrayList<String>  deptCds, String browserRuleId, String mediaRuleId,
+	StatusVO updateRuleInfoToMultiUser(ArrayList<String>  deptCds, String browserRuleId, String mediaRuleId,
 											  String securityRuleId, String filteredSoftwareRuleId, String ctrlCenterItemRuleId, String policyKitRuleId,
 											  String desktopConfId) throws Exception;
 

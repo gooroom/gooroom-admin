@@ -12,6 +12,7 @@
 		<typeAlias type="kr.gooroom.gpms.client.service.ClientStatsVO" alias="clientStatsVO"/>
 		<typeAlias type="kr.gooroom.gpms.client.service.ClientGroupVO" alias="clientGroupVO"/>
 		<typeAlias type="kr.gooroom.gpms.client.service.ClientPackageVO" alias="clientPackageVO"/>
+		<typeAlias type="kr.gooroom.gpms.client.service.ClientPackageSpecVO" alias="clientPackageSpecVO"/>
 		<typeAlias type="kr.gooroom.gpms.client.service.ClientSummaryVO" alias="clientSummaryVO"/>
 		<typeAlias type="kr.gooroom.gpms.client.service.UpdatePackageClientVO" alias="updatePackageClientVO"/>
 				
@@ -72,6 +73,12 @@
 		<typeAlias type="kr.gooroom.gpms.mng.service.WallpaperVO" alias="wallpaperVO" />
 		<typeAlias type="kr.gooroom.gpms.mng.service.IconVO" alias="iconVO" />
 		<typeAlias type="kr.gooroom.gpms.mng.service.IconGroupVO" alias="iconGroupVO" />
+
+		<typeAlias type="kr.gooroom.gpms.metrics.service.ResourceMetricsVO" alias="resourceMetricsVO" />
+		<typeAlias type="kr.gooroom.gpms.metrics.service.CpuResourceVO" alias="cpuResourceVO" />
+		<typeAlias type="kr.gooroom.gpms.metrics.service.MemResourceVO" alias="memResourceVO" />
+		<typeAlias type="kr.gooroom.gpms.metrics.service.NetResourceVO" alias="netResourceVO" />
+		<typeAlias type="kr.gooroom.gpms.metrics.service.DiskResourceVO" alias="diskResourceVO" />
 		
 		<typeAlias type="kr.gooroom.gpms.job.custom.OnlineClientAndUserVO" alias="onlineClientAndUserVO" />
 		<typeAlias type="kr.gooroom.gpms.config.service.RuleIdsVO" alias="ruleIdsVO" />
@@ -94,6 +101,8 @@
 		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableViewVO" alias="portableViewVO" />
 		<typeAlias type="kr.gooroom.gpms.ptgr.service.PortableImageViewVO" alias="portableImageViewVO" />
 
+		<typeAlias type="kr.gooroom.gpms.health.service.GPMSModuleHealthVO" alias="gpmsModuleHealthVO" />
+		<typeAlias type="kr.gooroom.gpms.health.service.GPMSHealthCheckVO" alias="gpmsHealthCheckVO" />
 	</typeAliases>
 	
 </configuration>

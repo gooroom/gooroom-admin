@@ -41,7 +41,7 @@ public interface ClientLogService {
 	 * @return ResultVO result object
 	 * @throws Exception
 	 */
-	public ResultVO getGeneralLogList(String fromDate, String toDate, String logItem) throws Exception;
+	ResultVO getGeneralLogList(String fromDate, String toDate, String logItem) throws Exception;
 
 	/**
 	 * response general log list data paged.
@@ -50,7 +50,7 @@ public interface ClientLogService {
 	 * @return ResultPagingVO result object
 	 * @throws Exception
 	 */
-	public ResultPagingVO getGeneralLogListPaged(HashMap<String, Object> options) throws Exception;
+	ResultPagingVO getGeneralLogListPaged(HashMap<String, Object> options) throws Exception;
 
 	/**
 	 * get security log list data paged
@@ -59,7 +59,7 @@ public interface ClientLogService {
 	 * @return ResultPagingVO result object
 	 * @throws Exception
 	 */
-	public ResultPagingVO getSecurityLogListPaged(HashMap<String, Object> options) throws Exception;
+	ResultPagingVO getSecurityLogListPaged(HashMap<String, Object> options) throws Exception;
 
 	/**
 	 * delete user client use hist
@@ -68,6 +68,5 @@ public interface ClientLogService {
 	 * @return ResultPagingVO result object
 	 * @throws Exception
 	 */
-	public StatusVO deleteUserClientUseHist(HashMap<String, Object> options) throws Exception;
-
+	StatusVO deleteUserClientUseHist(HashMap<String, Object> options) throws Exception;
 }

@@ -14,6 +14,7 @@ import kr.gooroom.gpms.ptgr.service.PortableImageViewVO;
 import kr.gooroom.gpms.ptgr.service.PortableJobService;
 import kr.gooroom.gpms.ptgr.util.JenkinsJob;
 import kr.gooroom.gpms.ptgr.util.JenkinsUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +22,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 @Controller
 @RequestMapping("/portable")
@@ -90,7 +89,7 @@ public class PortableImageController {
 
         try
         {
-            HashMap<String, Object> options = new HashMap<String, Object>();
+            HashMap<String, Object> options = new HashMap<>();
             String fromDate = StringUtils.defaultString(req.getParameter("fromDate"));
             String toDate = StringUtils.defaultString(req.getParameter("toDate"));
             if ("".equals(fromDate) || "".equals(toDate)) {
@@ -103,8 +102,8 @@ public class PortableImageController {
             options.put("fromDate", fromDate);
             options.put("toDate", toDate);
 
-            options.put("paramStart", Integer.parseInt(StringUtils.defaultString(req.getParameter("start"), "0")));
-            options.put("paramLength", Integer.parseInt(StringUtils.defaultString(req.getParameter("length"), "10")));
+            options.put("paramStart", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("start"), "0")));
+            options.put("paramLength", Integer.parseInt(ObjectUtils.defaultIfNull(req.getParameter("length"), "10")));
 
             String searchType = req.getParameter("searchType");
             if (searchType != null) {
@@ -144,10 +143,10 @@ public class PortableImageController {
 
             resultVO = portableImageService.readImageData(options);
 
-            HashMap<String, Object> fromDateHm = new HashMap<String, Object>();
+            HashMap<String, Object> fromDateHm = new HashMap<>();
             fromDateHm.put("name", "fromDate");
             fromDateHm.put("value", fromDate);
-            HashMap<String, Object> toDateHm = new HashMap<String, Object>();
+            HashMap<String, Object> toDateHm = new HashMap<>();
             toDateHm.put("name", "toDate");
             toDateHm.put("value", toDate);
             resultVO.setExtend(new Object[] { fromDateHm, toDateHm });
@@ -155,7 +154,7 @@ public class PortableImageController {
             resultVO.setDraw(String.valueOf(req.getParameter("page")));
             resultVO.setOrderColumn(StringUtils.defaultString(req.getParameter("orderColumn")));
             resultVO.setOrderDir(StringUtils.defaultString(req.getParameter("orderDir")));
-            resultVO.setRowLength(StringUtils.defaultString(req.getParameter("length"), "10"));
+            resultVO.setRowLength(ObjectUtils.defaultIfNull(req.getParameter("length"), "10"));
 
             for ( Object o : resultVO.getData()) {
                 PortableImageViewVO imgViewVO = (PortableImageViewVO) o;
@@ -277,7 +276,7 @@ public class PortableImageController {
         }
         try
         {
-            HashMap<String, Object> options =  new HashMap<String, Object>();
+            HashMap<String, Object> options = new HashMap<>();
             options.put("imageId", imageId);
             options.put("status", status);
             statusVO = portableImageService.updateImageStatus(options);
@@ -308,7 +307,7 @@ public class PortableImageController {
                 statusVO = portableImageService.removeAllImageData();
             }
             else {
-                HashMap<String, Object> options = new HashMap<String, Object>();
+                HashMap<String, Object> options = new HashMap<>();
                 options.put("imageIds", ids);
                 statusVO = portableImageService.removeImageDataByImageIds(options);
             }

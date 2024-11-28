@@ -16,6 +16,7 @@
 
 package kr.gooroom.gpms.stats.service;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,9 +28,10 @@ import java.util.Date;
  * @since 1.8
  */
 
-@SuppressWarnings("serial")
 public class ViolatedCountVO implements Serializable {
 
+	@Serial
+	private static final long serialVersionUID = 4663294230094211974L;
 	private Integer protectorCount;
 	private Integer bootProtectorCount;
 	private Integer exeProtectorCount;

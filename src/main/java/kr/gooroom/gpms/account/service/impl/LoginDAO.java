@@ -48,7 +48,7 @@ public class LoginDAO extends SqlSessionMetaDAO {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("userId", userId);
 
-		return (AccountVO) sqlSessionMeta.selectOne("adminDAO.selectAdminLoginInfo", param);
+		return sqlSessionMeta.selectOne("adminDAO.selectAdminLoginInfo", param);
 	}
 
 }

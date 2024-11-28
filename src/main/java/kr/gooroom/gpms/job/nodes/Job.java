@@ -63,7 +63,7 @@ public class Job {
 	 */
 	public void createJobWithPackage(String moduleName, String taskName, String packages) {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("pkgs", packages);
 
 		createJobWithMap(moduleName, taskName, map);
@@ -79,7 +79,7 @@ public class Job {
 	 */
 	public void createJob(String moduleName, String taskName) {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		createJobWithMap(moduleName, taskName, map);
 	}
 
@@ -94,7 +94,7 @@ public class Job {
 	 */
 	public void createJobWithLabel(String moduleName, String taskName, String label) {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("label", label);
 
 		createJobWithMap(moduleName, taskName, map);
@@ -134,7 +134,7 @@ public class Job {
 	public static Job generateJob(String moduleName, String taskName) {
 
 		Job job = new Job();
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		job.createJobWithMap(moduleName, taskName, map);
 
 		return job;
@@ -152,7 +152,7 @@ public class Job {
 	public static Job generateJobWithLabel(String moduleName, String taskName, String label) {
 
 		Job job = new Job();
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("label", label);
 		job.createJobWithMap(moduleName, taskName, map);
 
@@ -171,7 +171,7 @@ public class Job {
 	public static Job generateJobWithPackage(String moduleName, String taskName, String packages) {
 
 		Job job = new Job();
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		map.put("pkgs", packages);
 
 		job.createJobWithMap(moduleName, taskName, map);

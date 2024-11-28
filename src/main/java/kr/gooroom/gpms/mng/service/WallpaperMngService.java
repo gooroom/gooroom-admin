@@ -59,7 +59,6 @@ public interface WallpaperMngService {
 	/**
 	 * response wallpaper list data by group id
 	 * 
-	 * @param grpId string group id
 	 * @return ResultVO result object
 	 * @throws Exception
 	 */
