@@ -132,7 +132,6 @@ public class GPMSConstants {
 	public static final String ERR_LOGIN_USER = "E02";
 	public static final String ERR_LOGIN_ACCOUNT = "E03";
 	public static final String ERR_LOGIN_PASSWORD_TRIAL = "E04";
-	public static final String ERR_LOGIN_OUT_OF_PASSWORD_TRIAL = "E05";
 	public static final String ERR_LOGIN_LOCK = "E06";
 	public static final String ERR_LOGIN_DENIED = "E21";
 	public static final String ERR_LOGIN_DUPLICATE = "E22";

@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <title>GPMS OTP Login</title>
     <script src="/gpms/plugins/js-qrcode/qrcode.min.js"></script>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
     <style>
         body {
             background-color: #e6e6e6;
@@ -292,7 +293,7 @@
                         <input class="authInput" name="authInput" type="password" maxlength="1" pattern="[0-9]" tabIndex="5" required>
                         <input class="authInput" name="authInput" type="password" maxlength="1" pattern="[0-9]" tabIndex="6" required>
                     </div>
-                     <p class="sysmsg" align="center">${msg}</p>
+                     <p class="sysmsg" align="center"><c:out value="${msg}" escapeXml="true"/></p>
                     <button class="submit" type="submit">확인</button>
                 </form>
             </div>

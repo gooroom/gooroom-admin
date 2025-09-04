@@ -27,7 +27,9 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                 response.sendRedirect("logout");
             } else {
                 logger.info("[CustomAccessDeniedHandler] : otp not enabled, go to login failure");
-                response.sendRedirect("/login?s=fail&c=" + exception.getMessage());
+                request.setAttribute("s", "fail");
+                request.setAttribute("c", exception.getMessage());
+                request.getRequestDispatcher("/login").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();

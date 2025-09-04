@@ -111,7 +111,7 @@ public class OtpAuthenticationProvider implements AuthenticationProvider {
         } catch (OtpTrialExceedException e) {
             Base64.Encoder encoder = Base64.getEncoder();
             byte[] encodedBytes = encoder
-                    .encode((new StringBuffer(GPMSConstants.ERR_LOGIN_LOCK)).append(";NONE").toString().getBytes());
+                    .encode(e.getMessage().getBytes());
             throw new OtpTrialExceedException(new String(encodedBytes));
         } catch (Exception e) {
             Base64.Encoder encoder = Base64.getEncoder();

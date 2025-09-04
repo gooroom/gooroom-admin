@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
   <title>GPMS sign-in</title>
   <script src="plugins/js-sha256/sha256.min.js"></script>
   <style>
@@ -158,12 +159,11 @@
 <body>
   <div class="main">
     <p class="sign" align="center">GPMS</p>
-<%--    <p class="version" align="center">v2.0</p>--%>
 <% if(request.getAttribute("msg2") != null) { %>
-        <p class="sysmsg" align="center">${msg}</p>
-        <p class="sysmsg" align="center">${msg2}</p>
+        <p class="sysmsg" align="center"><c:out value="${msg}" escapeXml="true"/></p>
+        <p class="sysmsg" align="center"><c:out value="${msg2}" escapeXml="true"/></p>
 <% } else { %>
-    <p class="sysmsg" align="center">${msg}</p>
+    <p class="sysmsg" align="center"><c:out value="${msg}" escapeXml="true"/></p>
 <% } %>
     <form name='f' action="login" method='POST' onSubmit="gr_encoding()">
 		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

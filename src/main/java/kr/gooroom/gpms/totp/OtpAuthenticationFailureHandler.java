@@ -17,9 +17,13 @@ public class OtpAuthenticationFailureHandler implements AuthenticationFailureHan
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         if(exception instanceof OtpTrialExceedException) {
             SecurityContextHolder.clearContext();
-            response.sendRedirect("/gpms/login?s=fail&c=" + exception.getMessage());
+            request.setAttribute("s", "fail");
+            request.setAttribute("c", exception.getMessage());
+            request.getRequestDispatcher("/login").forward(request, response);
         } else {
-            response.sendRedirect("/gpms/otp/login?s=fail&c=" + exception.getMessage());
+            request.setAttribute("s", "fail");
+            request.setAttribute("c", exception.getMessage());
+            request.getRequestDispatcher("/otp/login").forward(request, response);
         }
     }
 }

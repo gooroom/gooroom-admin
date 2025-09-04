@@ -27,10 +27,16 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException {
 
-		if(exception instanceof ProviderNotFoundException) {
-			response.sendRedirect("otp/login");
-		} else {
-			response.sendRedirect("login?s=fail&c=" + exception.getMessage());
+		try {
+			if (exception instanceof ProviderNotFoundException) {
+				response.sendRedirect("otp/login");
+			} else {
+				request.setAttribute("s", "fail");
+				request.setAttribute("c", exception.getMessage());
+				request.getRequestDispatcher("/login").forward(request, response);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }
